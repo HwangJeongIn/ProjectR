@@ -1,0 +1,21 @@
+{
+  "ClassName": "Folder",
+  "Children": [
+    {
+      "Name": "CurrentGameLength",
+      "ClassName": "IntValue"
+    },
+    {
+      "Name": "PlayerCount",
+      "ClassName": "IntValue"
+    },
+    {
+      "Name": "PlayersLeftCount",
+      "ClassName": "IntValue"
+    },
+    {
+      "Name": "MainMessage",
+      "ClassName": "StringValue"
+    }
+  ]
+}

@@ -2,12 +2,13 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="RemoteEvent" referent="RBXEBDAF35C156B4BB9B8F44F18867D8005">
+	<Item class="IntValue" referent="RBX667A2837ADD64B7292BBF097F5CBCA00">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
-			<string name="Name">AddToolSTC</string>
+			<string name="Name">CurrentGameLength</string>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
+			<int64 name="Value">0</int64>
 		</Properties>
 	</Item>
 </roblox>

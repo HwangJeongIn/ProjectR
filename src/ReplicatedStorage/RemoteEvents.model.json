@@ -1,0 +1,35 @@
+{
+  "ClassName": "Folder",
+  "Children": [
+    
+    {
+      "Name": "AddToolSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "RemoveToolSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "ChangeGameStateSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "InstanceTestSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "NotifyWinnerSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "UpdateKillCountSTC",
+      "ClassName": "RemoteEvent"
+    },
+
+   {
+      "Name": "ChangeGameDataCTS",
+      "ClassName": "RemoteEvent"
+    }
+  ]
+}

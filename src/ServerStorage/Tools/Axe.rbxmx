@@ -2,7 +2,7 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="Tool" referent="RBXACBF02F8DB2D45018D05827531E6E1FF">
+	<Item class="Tool" referent="RBXBEAAA12479804BBFB80DB8DAE228973F">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<bool name="CanBeDropped">true</bool>
@@ -22,14 +22,14 @@
 				<R22>1</R22>
 			</CoordinateFrame>
 			<bool name="ManualActivationOnly">false</bool>
-			<string name="Name">AxeTest</string>
+			<string name="Name">Axe</string>
 			<bool name="RequiresHandle">true</bool>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 			<Content name="TextureId"><null></null></Content>
 			<string name="ToolTip"></string>
 		</Properties>
-		<Item class="Part" referent="RBXFF0F98D547CC4E4DB331BD9C6376E179">
+		<Item class="Part" referent="RBX6450D709EDFB49028DB618F76D6C029B">
 			<Properties>
 				<bool name="Anchored">false</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -122,7 +122,7 @@
 					<Z>0.333333343</Z>
 				</Vector3>
 			</Properties>
-			<Item class="Part" referent="RBXF13AE0DE05E048D6BC38DB93B1FA3B5B">
+			<Item class="Part" referent="RBXB4C3F155E32F4EB090A692E745F79160">
 				<Properties>
 					<bool name="Anchored">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -216,7 +216,7 @@
 					</Vector3>
 				</Properties>
 			</Item>
-			<Item class="WeldConstraint" referent="RBX922E7E9E56934125A1B365AB218E1650">
+			<Item class="WeldConstraint" referent="RBXE398C88EBBFC40DA8BAFE1EC08369C59">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<CoordinateFrame name="CFrame0">
@@ -234,15 +234,15 @@
 						<R22>1</R22>
 					</CoordinateFrame>
 					<string name="Name">WeldConstraint</string>
-					<Ref name="Part0Internal">RBXFF0F98D547CC4E4DB331BD9C6376E179</Ref>
-					<Ref name="Part1Internal">RBXF13AE0DE05E048D6BC38DB93B1FA3B5B</Ref>
+					<Ref name="Part0Internal">RBX6450D709EDFB49028DB618F76D6C029B</Ref>
+					<Ref name="Part1Internal">RBXB4C3F155E32F4EB090A692E745F79160</Ref>
 					<int64 name="SourceAssetId">-1</int64>
 					<int name="State">1</int>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Part" referent="RBX4E11C38EFF0E4C03BED8DCB6AEF3D0FA">
+		<Item class="Part" referent="RBXBEDD366D74614A179314363B40490F3F">
 			<Properties>
 				<bool name="Anchored">false</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -335,13 +335,13 @@
 					<Z>0.333333343</Z>
 				</Vector3>
 			</Properties>
-			<Item class="WeldConstraint" referent="RBX9B9D9BF1096340079F27ADBEB0355230">
+			<Item class="WeldConstraint" referent="RBX5F27B2F671394900A04F0DE3D1490FE0">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<CoordinateFrame name="CFrame0">
-						<X>0</X>
-						<Y>0</Y>
-						<Z>0</Z>
+						<X>0.0999999642</X>
+						<Y>2.59999847</Y>
+						<Z>-0.333333015</Z>
 						<R00>1</R00>
 						<R01>0</R01>
 						<R02>0</R02>
@@ -353,19 +353,19 @@
 						<R22>1</R22>
 					</CoordinateFrame>
 					<string name="Name">WeldConstraint</string>
-					<Ref name="Part0Internal">RBX4E11C38EFF0E4C03BED8DCB6AEF3D0FA</Ref>
-					<Ref name="Part1Internal">RBX61D459EDC4094D09A78ACA8247A90128</Ref>
+					<Ref name="Part0Internal">RBXBEDD366D74614A179314363B40490F3F</Ref>
+					<Ref name="Part1Internal">RBX712EAF4223234784904D9603DFF8F381</Ref>
 					<int64 name="SourceAssetId">-1</int64>
-					<int name="State">1</int>
+					<int name="State">3</int>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="WeldConstraint" referent="RBXB595AE5780FE45C9A5A1E8F1A70C0B46">
+			<Item class="WeldConstraint" referent="RBXF42E5D5CD6C041BAA00F2D180562A12D">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<CoordinateFrame name="CFrame0">
 						<X>0</X>
-						<Y>0</Y>
+						<Y>1.16666651</Y>
 						<Z>0</Z>
 						<R00>1</R00>
 						<R01>0</R01>
@@ -378,15 +378,15 @@
 						<R22>1</R22>
 					</CoordinateFrame>
 					<string name="Name">WeldConstraint</string>
-					<Ref name="Part0Internal">RBX4E11C38EFF0E4C03BED8DCB6AEF3D0FA</Ref>
-					<Ref name="Part1Internal">RBXFF0F98D547CC4E4DB331BD9C6376E179</Ref>
+					<Ref name="Part0Internal">RBXBEDD366D74614A179314363B40490F3F</Ref>
+					<Ref name="Part1Internal">RBX6450D709EDFB49028DB618F76D6C029B</Ref>
 					<int64 name="SourceAssetId">-1</int64>
-					<int name="State">1</int>
+					<int name="State">3</int>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Part" referent="RBX61D459EDC4094D09A78ACA8247A90128">
+		<Item class="Part" referent="RBX712EAF4223234784904D9603DFF8F381">
 			<Properties>
 				<bool name="Anchored">false</bool>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -480,96 +480,7 @@
 				</Vector3>
 			</Properties>
 		</Item>
-		<Item class="Script" referent="RBXEA5E08C84E834027840F489C009D2C09">
-			<Properties>
-				<BinaryString name="AttributesSerialize"></BinaryString>
-				<bool name="Disabled">true</bool>
-				<Content name="LinkedSource"><null></null></Content>
-				<string name="Name">AxeController2</string>
-				<token name="RunContext">0</token>
-				<string name="ScriptGuid">{D6706828-E119-4D69-9E13-1A7BB662CAF4}</string>
-				<ProtectedString name="Source"><![CDATA[local tool = script.Parent
-
-local function explode(point)
-	local e = Instance.new("Explosion")
-	e.DestroyJointRadiusPercent = 0 -- Make the explosion non-deadly 
-	e.Position = point
-	e.Parent = workspace
-end
-
-local function onActivated()
-	-- Get the Humanoid that Activated the tool
-	print("onActivated")
-	local human = tool.Parent.Humanoid
-	-- Call explode with the current point the Humanoid is targetting
-	explode(tool.Parent.HumanoidRootPart.Position) 
-end
-
-tool.Activated:Connect(onActivated)]]></ProtectedString>
-				<int64 name="SourceAssetId">-1</int64>
-				<BinaryString name="Tags"></BinaryString>
-			</Properties>
-		</Item>
-		<Item class="Script" referent="RBX2FCBE15008FC4F2AA3084F43178B9F76">
-			<Properties>
-				<BinaryString name="AttributesSerialize"></BinaryString>
-				<bool name="Disabled">true</bool>
-				<Content name="LinkedSource"><null></null></Content>
-				<string name="Name">WeaponController</string>
-				<token name="RunContext">0</token>
-				<string name="ScriptGuid">{C5EF0495-4F10-4896-845D-198B7BADEBFA}</string>
-				<ProtectedString name="Source"><![CDATA[-- 로컬 변수
-
-local tool = script.Parent
-local anim1 = tool.anim1
-local damage = 30
-local isAttacking = false
-local humanoid
-local target
-local anim1Track
-
-
--- 이벤트 함수 정의
-
-local function onTouched(otherPart)
-
-	if isAttacking == false then return end
-
-	isAttacking = false
-	target = otherPart.Parent:FindFirstChild("Humanoid")
-	if target ~= nil then 
-		if target.Parent == tool.Parent then return end
-	else
-		if not otherPart.Parent.ObjectModule then return end
-
-		target = require(otherPart.Parent.ObjectModule)
-		if target == nil then return end
-	end
-
-	target:TakeDamage(damage)
-end
-
-
-local function onActivated()
-
-	isAttacking = true
-	humanoid = tool.Parent.Humanoid
-	anim1Track = humanoid:LoadAnimation(anim1)
-	anim1Track:Play()
-
-	anim1Track.Stopped:Connect(function() isAttacking = false end)
-end
-
-
--- 이벤트 바인드
-
-tool.Activated:Connect(onActivated)
-tool.Attacker.Touched:Connect(onTouched)]]></ProtectedString>
-				<int64 name="SourceAssetId">-1</int64>
-				<BinaryString name="Tags"></BinaryString>
-			</Properties>
-		</Item>
-		<Item class="Animation" referent="RBX7BE71B5065724C51937435D2CA4669E2">
+		<Item class="Animation" referent="RBX6D0E8F98F7884A08A74EDCC49EF33AC7">
 			<Properties>
 				<Content name="AnimationId"><url>rbxassetid://10147183892</url></Content>
 				<BinaryString name="AttributesSerialize"></BinaryString>
@@ -578,7 +489,16 @@ tool.Attacker.Touched:Connect(onTouched)]]></ProtectedString>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="BoolValue" referent="RBXE848CB8FA61F4518B525544D152483F4">
+		<Item class="IntValue" referent="RBX1AF201730AB04667988E6B88918AAEDC">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">Key</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<int64 name="Value">3</int64>
+			</Properties>
+		</Item>
+		<Item class="BoolValue" referent="RBX48164579460D42F593A8D28FDC8B6C7D">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">Damager</string>

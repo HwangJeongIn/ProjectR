@@ -1,0 +1,687 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Tool" referent="RBXA3A0E3B3ED264444AAD0BC2D60D7EB05">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<bool name="CanBeDropped">true</bool>
+			<bool name="Enabled">true</bool>
+			<CoordinateFrame name="Grip">
+				<X>0</X>
+				<Y>0</Y>
+				<Z>0</Z>
+				<R00>1</R00>
+				<R01>0</R01>
+				<R02>0</R02>
+				<R10>0</R10>
+				<R11>1</R11>
+				<R12>0</R12>
+				<R20>0</R20>
+				<R21>0</R21>
+				<R22>1</R22>
+			</CoordinateFrame>
+			<bool name="ManualActivationOnly">false</bool>
+			<string name="Name">Sword</string>
+			<bool name="RequiresHandle">true</bool>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+			<Content name="TextureId"><null></null></Content>
+			<string name="ToolTip"></string>
+		</Properties>
+		<Item class="Part" referent="RBX189225880FB64D1093590941295EDD5D">
+			<Properties>
+				<bool name="Anchored">false</bool>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="BackParamA">-0.5</float>
+				<float name="BackParamB">0.5</float>
+				<token name="BackSurface">0</token>
+				<token name="BackSurfaceInput">0</token>
+				<float name="BottomParamA">-0.5</float>
+				<float name="BottomParamB">0.5</float>
+				<token name="BottomSurface">0</token>
+				<token name="BottomSurfaceInput">0</token>
+				<CoordinateFrame name="CFrame">
+					<X>-42.4992447</X>
+					<Y>3.44406509</Y>
+					<Z>-327.815002</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>-1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>-1</R22>
+				</CoordinateFrame>
+				<bool name="CanCollide">false</bool>
+				<bool name="CanQuery">false</bool>
+				<bool name="CanTouch">false</bool>
+				<bool name="CastShadow">true</bool>
+				<int name="CollisionGroupId">0</int>
+				<Color3uint8 name="Color3uint8">4284702562</Color3uint8>
+				<PhysicalProperties name="CustomPhysicalProperties">
+					<CustomPhysics>false</CustomPhysics>
+				</PhysicalProperties>
+				<float name="FrontParamA">-0.5</float>
+				<float name="FrontParamB">0.5</float>
+				<token name="FrontSurface">0</token>
+				<token name="FrontSurfaceInput">0</token>
+				<float name="LeftParamA">-0.5</float>
+				<float name="LeftParamB">0.5</float>
+				<token name="LeftSurface">0</token>
+				<token name="LeftSurfaceInput">0</token>
+				<bool name="Locked">false</bool>
+				<bool name="Massless">false</bool>
+				<token name="Material">256</token>
+				<string name="MaterialVariantSerialized"></string>
+				<string name="Name">Mesh1</string>
+				<CoordinateFrame name="PivotOffset">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<float name="Reflectance">0.400000006</float>
+				<float name="RightParamA">-0.5</float>
+				<float name="RightParamB">0.5</float>
+				<token name="RightSurface">0</token>
+				<token name="RightSurfaceInput">0</token>
+				<int name="RootPriority">0</int>
+				<Vector3 name="RotVelocity">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<int64 name="SourceAssetId">10166054667</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<float name="TopParamA">-0.5</float>
+				<float name="TopParamB">0.5</float>
+				<token name="TopSurface">0</token>
+				<token name="TopSurfaceInput">0</token>
+				<float name="Transparency">0</float>
+				<Vector3 name="Velocity">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<token name="formFactorRaw">3</token>
+				<token name="shape">1</token>
+				<Vector3 name="size">
+					<X>1.00451899</X>
+					<Y>6.88812971</Y>
+					<Z>0.429999977</Z>
+				</Vector3>
+			</Properties>
+			<Item class="SpecialMesh" referent="RBXEC54EA34D30D4AD4B4EC1EAABEB0A9AD">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<token name="LODX">2</token>
+					<token name="LODY">2</token>
+					<Content name="MeshId"><url>http://www.roblox.com/asset/?id=48094745 </url></Content>
+					<token name="MeshType">5</token>
+					<string name="Name">Mesh</string>
+					<Vector3 name="Offset">
+						<X>0</X>
+						<Y>0</Y>
+						<Z>0</Z>
+					</Vector3>
+					<Vector3 name="Scale">
+						<X>1.435027</X>
+						<Y>1.43502688</Y>
+						<Z>1.435027</Z>
+					</Vector3>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<Content name="TextureId"><url>http://www.roblox.com/asset/?id=85164961</url></Content>
+					<Vector3 name="VertexColor">
+						<X>1</X>
+						<Y>1</Y>
+						<Z>1</Z>
+					</Vector3>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="Part" referent="RBXF3C6C8011A004DF3A6A83D9800DC4401">
+			<Properties>
+				<bool name="Anchored">false</bool>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="BackParamA">-0.5</float>
+				<float name="BackParamB">0.5</float>
+				<token name="BackSurface">0</token>
+				<token name="BackSurfaceInput">0</token>
+				<float name="BottomParamA">-0.5</float>
+				<float name="BottomParamB">0.5</float>
+				<token name="BottomSurface">0</token>
+				<token name="BottomSurfaceInput">0</token>
+				<CoordinateFrame name="CFrame">
+					<X>-42.5508385</X>
+					<Y>4.44370079</Y>
+					<Z>-327.954132</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>-1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>-1</R22>
+				</CoordinateFrame>
+				<bool name="CanCollide">true</bool>
+				<bool name="CanQuery">true</bool>
+				<bool name="CanTouch">true</bool>
+				<bool name="CastShadow">true</bool>
+				<int name="CollisionGroupId">0</int>
+				<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+				<PhysicalProperties name="CustomPhysicalProperties">
+					<CustomPhysics>false</CustomPhysics>
+				</PhysicalProperties>
+				<float name="FrontParamA">-0.5</float>
+				<float name="FrontParamB">0.5</float>
+				<token name="FrontSurface">0</token>
+				<token name="FrontSurfaceInput">0</token>
+				<float name="LeftParamA">-0.5</float>
+				<float name="LeftParamB">0.5</float>
+				<token name="LeftSurface">0</token>
+				<token name="LeftSurfaceInput">0</token>
+				<bool name="Locked">false</bool>
+				<bool name="Massless">false</bool>
+				<token name="Material">256</token>
+				<string name="MaterialVariantSerialized"></string>
+				<string name="Name">Attacker</string>
+				<CoordinateFrame name="PivotOffset">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<float name="Reflectance">0</float>
+				<float name="RightParamA">-0.5</float>
+				<float name="RightParamB">0.5</float>
+				<token name="RightSurface">0</token>
+				<token name="RightSurfaceInput">0</token>
+				<int name="RootPriority">0</int>
+				<Vector3 name="RotVelocity">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<float name="TopParamA">-0.5</float>
+				<float name="TopParamB">0.5</float>
+				<token name="TopSurface">0</token>
+				<token name="TopSurfaceInput">0</token>
+				<float name="Transparency">1</float>
+				<Vector3 name="Velocity">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<token name="formFactorRaw">1</token>
+				<token name="shape">1</token>
+				<Vector3 name="size">
+					<X>0.5</X>
+					<Y>5.0999999</Y>
+					<Z>0.5</Z>
+				</Vector3>
+			</Properties>
+		</Item>
+		<Item class="Part" referent="RBX2780A1081C5549ABB2688D4F855B4421">
+			<Properties>
+				<bool name="Anchored">false</bool>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="BackParamA">-0.5</float>
+				<float name="BackParamB">0.5</float>
+				<token name="BackSurface">0</token>
+				<token name="BackSurfaceInput">0</token>
+				<float name="BottomParamA">-0.5</float>
+				<float name="BottomParamB">0.5</float>
+				<token name="BottomSurface">0</token>
+				<token name="BottomSurfaceInput">0</token>
+				<CoordinateFrame name="CFrame">
+					<X>-42.4999695</X>
+					<Y>1.09369183</Y>
+					<Z>-327.904144</Z>
+					<R00>0</R00>
+					<R01>0</R01>
+					<R02>-1</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>1</R20>
+					<R21>0</R21>
+					<R22>0</R22>
+				</CoordinateFrame>
+				<bool name="CanCollide">true</bool>
+				<bool name="CanQuery">true</bool>
+				<bool name="CanTouch">true</bool>
+				<bool name="CastShadow">true</bool>
+				<int name="CollisionGroupId">0</int>
+				<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
+				<PhysicalProperties name="CustomPhysicalProperties">
+					<CustomPhysics>false</CustomPhysics>
+				</PhysicalProperties>
+				<float name="FrontParamA">-0.5</float>
+				<float name="FrontParamB">0.5</float>
+				<token name="FrontSurface">0</token>
+				<token name="FrontSurfaceInput">0</token>
+				<float name="LeftParamA">-0.5</float>
+				<float name="LeftParamB">0.5</float>
+				<token name="LeftSurface">0</token>
+				<token name="LeftSurfaceInput">0</token>
+				<bool name="Locked">false</bool>
+				<bool name="Massless">false</bool>
+				<token name="Material">256</token>
+				<string name="MaterialVariantSerialized"></string>
+				<string name="Name">Handle</string>
+				<CoordinateFrame name="PivotOffset">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<float name="Reflectance">0</float>
+				<float name="RightParamA">-0.5</float>
+				<float name="RightParamB">0.5</float>
+				<token name="RightSurface">0</token>
+				<token name="RightSurfaceInput">0</token>
+				<int name="RootPriority">0</int>
+				<Vector3 name="RotVelocity">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<float name="TopParamA">-0.5</float>
+				<float name="TopParamB">0.5</float>
+				<token name="TopSurface">0</token>
+				<token name="TopSurfaceInput">0</token>
+				<float name="Transparency">1</float>
+				<Vector3 name="Velocity">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Vector3>
+				<token name="formFactorRaw">1</token>
+				<token name="shape">1</token>
+				<Vector3 name="size">
+					<X>0.200000003</X>
+					<Y>1</Y>
+					<Z>0.200000003</Z>
+				</Vector3>
+			</Properties>
+			<Item class="WeldConstraint" referent="RBXFC0A0513F46A4A079FC49EC190E0099C">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<CoordinateFrame name="CFrame0">
+						<X>-0.049987793</X>
+						<Y>3.35000896</Y>
+						<Z>0.050868988</Z>
+						<R00>0</R00>
+						<R01>0</R01>
+						<R02>-1</R02>
+						<R10>0</R10>
+						<R11>-1</R11>
+						<R12>-0</R12>
+						<R20>-1</R20>
+						<R21>0</R21>
+						<R22>-0</R22>
+					</CoordinateFrame>
+					<string name="Name">WeldConstraint</string>
+					<Ref name="Part0Internal">RBX2780A1081C5549ABB2688D4F855B4421</Ref>
+					<Ref name="Part1Internal">RBXF3C6C8011A004DF3A6A83D9800DC4401</Ref>
+					<int64 name="SourceAssetId">-1</int64>
+					<int name="State">3</int>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="WeldConstraint" referent="RBX5B72EAEEC6E74996A4D11BEB55BB1867">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<CoordinateFrame name="CFrame0">
+						<X>0.0891418457</X>
+						<Y>2.35037327</Y>
+						<Z>-0.00072479248</Z>
+						<R00>0</R00>
+						<R01>0</R01>
+						<R02>-1</R02>
+						<R10>0</R10>
+						<R11>-1</R11>
+						<R12>-0</R12>
+						<R20>-1</R20>
+						<R21>0</R21>
+						<R22>-0</R22>
+					</CoordinateFrame>
+					<string name="Name">WeldConstraint</string>
+					<Ref name="Part0Internal">RBX2780A1081C5549ABB2688D4F855B4421</Ref>
+					<Ref name="Part1Internal">RBX189225880FB64D1093590941295EDD5D</Ref>
+					<int64 name="SourceAssetId">-1</int64>
+					<int name="State">3</int>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="Script" referent="RBX96D30D0F05B34D6199A67D3D79126CA7">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="Disabled">true</bool>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">WeaponController</string>
+				<token name="RunContext">0</token>
+				<string name="ScriptGuid">{FBEFD06F-A59E-464D-8E4E-50AF535DAC50}</string>
+				<ProtectedString name="Source"><![CDATA[-- 로컬 변수
+
+local tool = script.Parent
+local anim1 = tool.anim1
+local damage = 5
+local isAttacking = false
+local humanoid
+local target
+local anim1Track
+
+
+-- 이벤트 함수 정의
+
+local function onTouched(otherPart)
+	
+	if isAttacking == false then return end
+	
+	isAttacking = false
+	target = otherPart.Parent:FindFirstChild("Humanoid")
+	if target ~= nil then 
+		if target.Parent == tool.Parent then return end
+	else
+		if not otherPart.Parent.ObjectModule then return end
+	
+		target = require(otherPart.Parent.ObjectModule)
+		if target == nil then return end
+	end
+	
+	target:TakeDamage(damage)
+end
+
+
+local function onActivated()
+	
+	isAttacking = true
+	humanoid = tool.Parent.Humanoid
+	anim1Track = humanoid:LoadAnimation(anim1)
+	anim1Track:Play()
+	
+	anim1Track.Stopped:Connect(function() isAttacking = false end)
+	
+	humanoid:TakeDamage(50)
+end
+
+
+-- 이벤트 바인드
+tool.Activated:Connect(onActivated)
+tool.Attacker.Touched:Connect(onTouched)]]></ProtectedString>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="Animation" referent="RBXD1D93FF738DD4022B29238827401A060">
+			<Properties>
+				<Content name="AnimationId"><url>rbxassetid://10147183892</url></Content>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">anim1</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="IntValue" referent="RBXA8FC5C7ADA9B416CB85808FFC61829B5">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">Key</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<int64 name="Value">2</int64>
+			</Properties>
+		</Item>
+		<Item class="BoolValue" referent="RBX3F4445DF62464E1595ED42CCB9F0C31F">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">Damager</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<bool name="Value">false</bool>
+			</Properties>
+		</Item>
+		<Item class="Script" referent="RBX8BCEE806B71B4CD08D62FE6BDD3C0A3D">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="Disabled">false</bool>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">Damager</string>
+				<token name="RunContext">0</token>
+				<string name="ScriptGuid">{BC4B3487-B25B-47BC-ADCB-3399D3D180FE}</string>
+				<ProtectedString name="Source"><![CDATA[-- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
+
+local ServerStorage = game:GetService("ServerStorage")
+local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
+local Utility = ServerModuleFacade.Utility
+local Debug = ServerModuleFacade.Debug
+local ServerConstant = ServerModuleFacade.ServerConstant
+local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
+
+local GameDataType = ServerModuleFacade.ServerEnum.GameDataType
+
+local ToolBase = Utility.DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
+local Debris = game:GetService("Debris")
+
+local Tool = script.Parent
+local Anim1 = Tool.anim1
+local isAttacking = false
+
+ToolBase:InitializeAll(GameDataType.Tool, Tool)
+
+-- 함수 정의 ------------------------------------------------------------------------------------------------------
+
+function CanAttack(otherPart)
+	
+	if not otherPart then
+		Debug.Assert(false, "대상이 존재하지 않습니다.")
+		return false
+	end
+	
+	local otherModel = otherPart.Parent
+	if not otherModel then
+		Debug.Assert(false, "모델이 존재하지 않습니다.")
+		return false
+	end
+	
+	if not Tool then
+		Debug.Assert(false, "도구가 없습니다.")
+		return false
+	end
+	
+	local toolParent = Tool.Parent
+	local toolParentClassName = toolParent.ClassName
+	if not toolParentClassName 
+		or toolParentClassName == "Workspace" 		-- 필드에 존재
+		or toolParentClassName == "Backpack" then	-- 가방에 존재
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	-- 자기자신인 경우
+	if toolParent == otherModel then
+		return false
+	end
+	
+	return true
+	
+end
+
+function CalcDamage(attackerCharacter, attackeeCharacter)
+	
+	local attackerSTR = 0
+	local attackeeDEF = 0
+	
+	-- ==== 캐릭터 계산 ====
+	local attackerCharacterGameData = ServerGlobalStorage:GetGameData(attackerCharacter, GameDataType.Character)
+	local attackeeCharacterGameData = ServerGlobalStorage:GetGameData(attackeeCharacter, GameDataType.Character)
+	
+	-- 캐릭터 공격 데이터
+	if not attackerCharacterGameData then
+		Debug.Assert(false, "캐릭터 정보가 없습니다." .. attackerCharacter.Name)
+	else
+		attackerSTR += attackerCharacterGameData.STR
+	end
+	
+	-- 캐릭터 방어 데이터
+	if not attackeeCharacterGameData then
+		Debug.Assert(false, "캐릭터 정보가 없습니다." .. attackeeCharacter.Name)
+	else
+		attackeeDEF += attackeeCharacterGameData.DEF
+	end
+	
+	-- ==== 도구 계산 =====
+	local attackerToolGameData = ServerGlobalStorage:GetGameData(attackerCharacter, GameDataType.Tool)
+	local attackeeToolGameData = ServerGlobalStorage:GetGameData(attackeeCharacter, GameDataType.Tool)
+	
+	-- 도구 공격 데이터
+	if attackerToolGameData and attackerToolGameData.STR then
+		attackerSTR += attackerToolGameData.STR
+	end
+	-- 도구 방어 데이터
+	if attackeeToolGameData and attackeeToolGameData.DEF then
+		attackeeDEF += attackeeToolGameData.DEF
+	end
+	
+	
+	local finalDamage = ServerConstant.DefaultAttackPoint + (attackerSTR * ServerConstant.DefaultSTRFactor) - attackeeDEF
+	
+	finalDamage = math.clamp(finalDamage, 0, 100)
+	
+	return finalDamage
+	
+end
+
+function AttackCharacter(attackerCharacter, attackeeCharacter)
+
+	local damage = CalcDamage(attackerCharacter, attackeeCharacter)
+	Debug.Log("Damage : ".. tostring(damage))
+	if damage == 0 then
+		return
+	end
+
+	local attackeeCharacterHumanoid = attackeeCharacter:FindFirstChild("Humanoid")
+	if not attackeeCharacterHumanoid then
+		Debug.Assert(false, "Humanoid가 없습니다.")
+		return
+	end
+
+	attackeeCharacterHumanoid:TakeDamage(damage)
+	
+end
+
+function Attack(attackeePart)
+	
+	
+	if CanAttack(attackeePart) == false then
+		--Debug.Assert(false, "공격할 수 없습니다.")
+		return
+	end
+	
+	
+	local attackeePlayer = game.Players:GetPlayerFromCharacter(attackeePart.Parent)
+	print(attackeePlayer)
+	print(attackeePart)
+	print(attackeePart.Parent)
+	if not attackeePlayer then
+		-- 추가해야한다.
+		Debug.log("플레이어가 아닙니다.")
+	else
+		local attackerCharacter = Tool.Parent
+		local attackeeCharacter = attackeePart.Parent
+		AttackCharacter(attackerCharacter, attackeeCharacter)
+	end
+	
+	
+--[[
+	local attackerTag = Instance.new("ObjectValue")
+	attackerTag.Name = "AttackerTag"
+	attackerTag.Value = attackerPlayer
+	attackerTag.Parent = attackeeHumanoid
+	Debris:AddItem(attackerTag, 3.5)
+	--]]
+end
+
+
+function onTouched(otherPart)
+
+	if isAttacking == false then return end
+	isAttacking = false
+	
+	Attack(otherPart)
+	
+	--[[
+	target = otherPart.Parent:FindFirstChild("Humanoid")
+	if target ~= nil then 
+		if target.Parent == tool.Parent then return end
+	else
+		if not otherPart.Parent.ObjectModule then return end
+
+		target = require(otherPart.Parent.ObjectModule)
+		if target == nil then return end
+	end
+
+	target:TakeDamage(damage)
+	--]]
+end
+
+
+function onActivated()
+
+	--Debug.Assert(false, ToolBase:GetGameDataKey())
+	isAttacking = true
+	local humanoid = Tool.Parent:FindFirstChild("Humanoid")
+	local anim1Track = humanoid:LoadAnimation(Anim1)
+	anim1Track:Play()
+
+	anim1Track.Stopped:Connect(function() isAttacking = false end)
+
+	--humanoid:TakeDamage(50)
+end
+
+
+-- 이벤트 바인드
+Tool.Activated:Connect(onActivated)
+Tool.Attacker.Touched:Connect(onTouched)
+]]></ProtectedString>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>
