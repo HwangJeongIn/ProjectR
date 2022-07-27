@@ -377,8 +377,6 @@ return GameDataBase
           <string name="Name">CommonGlobalStorage</string>
           <string name="Source">local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- RemoteEvent
-
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 local Debug = require(CommonModule:WaitForChild("Debug"))
 local Utility = require(CommonModule:WaitForChild("Utility"))
@@ -464,7 +462,7 @@ function CommonGlobalStorage:CreateEmptyData()
 
 		-- 그냥 명시적으로 표현
 		[StatusType.WeaponSlot] = {Value = nil, ToolGameData = nil},
-		[StatusType.Inventory] = Utility:DeepCopy(Inventory)
+		[StatusType.Inventory] = Utility.DeepCopy(Inventory)
 	}
 
 	if self.IsClient then
@@ -539,7 +537,7 @@ function CommonGlobalStorage:ClearPlayer(player)
 end
 
 function CommonGlobalStorage:AddTool(playerId, tool)
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return false
 	end
@@ -553,7 +551,7 @@ function CommonGlobalStorage:AddTool(playerId, tool)
 end
 
 function CommonGlobalStorage:RemoveTool(playerId, tool)
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return false
 	end
@@ -592,7 +590,7 @@ end
 
 function CommonGlobalStorage:GetPlayerStatistic(playerId)
 
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return nil
 	end
@@ -624,7 +622,7 @@ end
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
 function CommonGlobalStorage:CheckAndEquipIfWeapon(playerId, weapon)
 	
-	if self.CheckPlayer(playerId) == false then
+	if not self.CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -680,7 +678,7 @@ end
 
 function CommonGlobalStorage:EquipArmor(playerId, armor)
 	
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -713,7 +711,7 @@ return CommonGlobalStorage
 --[[
 function CommonGlobalStorage:GetAllToolGameData(playerId)
 
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return false
 	end
@@ -741,7 +739,7 @@ function CommonGlobalStorage:CheckStatisticDirtyFlag(playerId)
 end
 
 function CommonGlobalStorage:CheckAndCalculateStatistic(playerId)
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return
 	end
@@ -1527,10 +1525,12 @@ local IsTestMode = ServerConstant.IsTestMode
 -- 따라서 WaitForChild를 사용하여 로드될 때까지 기다린다.
 local MapsFolder = ServerStorage:WaitForChild("Maps")
 
-local MainMessage = ReplicatedStorage:WaitForChild("MainMessage")
-local CurrentGameLength = ReplicatedStorage:WaitForChild("CurrentGameLength")
-local PlayerCount = ReplicatedStorage:WaitForChild("PlayerCount")
-local PlayersLeftCount = ReplicatedStorage:WaitForChild("PlayersLeftCount")
+local RemoteValues = ReplicatedStorage:WaitForChild("RemoteValues")
+
+local MainMessage = RemoteValues:WaitForChild("MainMessage")
+local CurrentGameLength = RemoteValues:WaitForChild("CurrentGameLength")
+local PlayerCount = RemoteValues:WaitForChild("PlayerCount")
+local PlayersLeftCount = RemoteValues:WaitForChild("PlayersLeftCount")
 
 
 -- 공통 저장소관련
@@ -1539,9 +1539,11 @@ local WinnerType = ServerModuleFacade.CommonEnum.WinnerType
 
 
 -- RemoteEvent
-local ChangeGameStateSTC = ReplicatedStorage:WaitForChild("ChangeGameStateSTC")
-local NotifyWinnerSTC = ReplicatedStorage:WaitForChild("NotifyWinnerSTC")
-local ChangeGameDataCTS = ReplicatedStorage:WaitForChild("ChangeGameDataCTS")
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+
+local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
+local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
+local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 
 ChangeGameDataCTS.OnServerEvent:Connect(function(player, arg1)
 	print(arg1 .. " is client message")
@@ -1578,7 +1580,7 @@ end
 Initializer:InitializeGame()
 
 
-while false  do
+while true  do
 	
 	
 	-- 다른 플레이어를 기다리는 중
@@ -1735,7 +1737,9 @@ end</string>
         <Properties>
           <string name="Name">Initializer</string>
           <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ChangeGameStateSTC = ReplicatedStorage:WaitForChild("ChangeGameStateSTC")
+
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
 
 
 local ServerStorage = game:GetService("ServerStorage")
@@ -35457,9 +35461,14 @@ return ToolBase
         </Item>
         <Item class="Folder" referent="674">
           <Properties>
+            <string name="Name">VehicleModule</string>
+          </Properties>
+        </Item>
+        <Item class="Folder" referent="675">
+          <Properties>
             <string name="Name">WorldInteractorModule</string>
           </Properties>
-          <Item class="ModuleScript" referent="675">
+          <Item class="ModuleScript" referent="676">
             <Properties>
               <string name="Name">WorldInteractorBase</string>
               <string name="Source"><![CDATA[-- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
@@ -35534,7 +35543,7 @@ return WorldInteractorBase
           </Item>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="676">
+      <Item class="ModuleScript" referent="677">
         <Properties>
           <string name="Name">ServerConstant</string>
           <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -35558,7 +35567,7 @@ return ServerConstant
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="677">
+      <Item class="ModuleScript" referent="678">
         <Properties>
           <string name="Name">ServerEnum</string>
           <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -35581,11 +35590,11 @@ return ServerEnum
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="678">
+      <Item class="Folder" referent="679">
         <Properties>
           <string name="Name">ServerGameDataModule</string>
         </Properties>
-        <Item class="ModuleScript" referent="679">
+        <Item class="ModuleScript" referent="680">
           <Properties>
             <string name="Name">ServerGameDataManager</string>
             <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -35610,7 +35619,7 @@ setmetatable(ServerGameDataManager, CommonGameDataManager)
 return ServerGameDataManager
 ]]></string>
           </Properties>
-          <Item class="ModuleScript" referent="680">
+          <Item class="ModuleScript" referent="681">
             <Properties>
               <string name="Name">CharacterGameData</string>
               <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -35650,7 +35659,7 @@ return setmetatable({}, CharacterGameData)
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="681">
+          <Item class="ModuleScript" referent="682">
             <Properties>
               <string name="Name">WorldInteractorGameData</string>
               <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -35677,7 +35686,7 @@ return setmetatable({}, WorldInteractorGameData)
           </Item>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="682">
+      <Item class="ModuleScript" referent="683">
         <Properties>
           <string name="Name">ServerGlobalStorage</string>
           <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -35691,7 +35700,7 @@ local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local GameDataType = ServerEnum.GameDataType
 
-local ServerGlobalStorage = {}
+local ServerGlobalStorage = CommonGlobalStorage
 
 -- static 변수 반드시 싱글톤으로 사용해야 한다.
 local Characters = {}
@@ -35768,7 +35777,7 @@ end
 ServerGlobalStorage.__index = Utility.Inheritable__index
 ServerGlobalStorage.__newindex = Utility.Inheritable__newindex
 
-setmetatable(ServerGlobalStorage, CommonGlobalStorage)
+--setmetatable(ServerGlobalStorage, CommonGlobalStorage)
 
 
 return ServerGlobalStorage
@@ -35776,7 +35785,7 @@ return ServerGlobalStorage
         </Properties>
       </Item>
     </Item>
-    <Item class="ModuleScript" referent="683">
+    <Item class="ModuleScript" referent="684">
       <Properties>
         <string name="Name">ServerModuleFacade</string>
         <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -35822,11 +35831,11 @@ return ServerModuleFacade
 ]]></string>
       </Properties>
     </Item>
-    <Item class="Folder" referent="684">
+    <Item class="Folder" referent="685">
       <Properties>
         <string name="Name">TestCode</string>
       </Properties>
-      <Item class="Script" referent="685">
+      <Item class="Script" referent="686">
         <Properties>
           <string name="Name">Loader</string>
           <string name="Source"><![CDATA[local SubClassCDO = require(script.SubClass)
@@ -35867,7 +35876,7 @@ print("GetPrivateValue2 => ".. tostring(subClassObject:GetPrivateValue2()))
 local b = 2
 ]]></string>
         </Properties>
-        <Item class="ModuleScript" referent="686">
+        <Item class="ModuleScript" referent="687">
           <Properties>
             <string name="Name">ClassBase</string>
             <string name="Source"><![CDATA[function AccessProtection__index(table, key)
@@ -36093,7 +36102,7 @@ return ClassBase
 ]]></string>
           </Properties>
         </Item>
-        <Item class="Script" referent="687">
+        <Item class="Script" referent="688">
           <Properties>
             <string name="Name">Script6</string>
             <string name="Source">-- 인스턴스로 만들 때 독립적인 인스턴스를 CDO에서 복사하여 생성하여야 한다.
@@ -36257,7 +36266,7 @@ local b = 2
 --]]</string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="688">
+        <Item class="ModuleScript" referent="689">
           <Properties>
             <string name="Name">SubClass</string>
             <string name="Source">local root = script.Parent
@@ -36320,7 +36329,7 @@ SubClassCDO:SetType("SubClass")
 return SubClassCDO</string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="689">
+        <Item class="ModuleScript" referent="690">
           <Properties>
             <string name="Name">SuperClass</string>
             <string name="Source">local root = script.Parent
@@ -36379,11 +36388,11 @@ return SuperClassCDO</string>
         </Item>
       </Item>
     </Item>
-    <Item class="Folder" referent="690">
+    <Item class="Folder" referent="691">
       <Properties>
         <string name="Name">Tools</string>
       </Properties>
-      <Item class="Tool" referent="691">
+      <Item class="Tool" referent="692">
         <Properties>
           <string name="Name">Axe</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -36413,7 +36422,7 @@ return SuperClassCDO</string>
           </Content>
           <string name="ToolTip"></string>
         </Properties>
-        <Item class="Part" referent="692">
+        <Item class="Part" referent="693">
           <Properties>
             <string name="Name">Mesh1</string>
             <bool name="Anchored">false</bool>
@@ -36506,7 +36515,7 @@ return SuperClassCDO</string>
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="Part" referent="693">
+          <Item class="Part" referent="694">
             <Properties>
               <string name="Name">Part</string>
               <bool name="Anchored">false</bool>
@@ -36600,7 +36609,7 @@ return SuperClassCDO</string>
               </Vector3>
             </Properties>
           </Item>
-          <Item class="WeldConstraint" referent="694">
+          <Item class="WeldConstraint" referent="695">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -36618,15 +36627,15 @@ return SuperClassCDO</string>
                 <R21>0</R21>
                 <R22>1</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">692</Ref>
-              <Ref name="Part1Internal">693</Ref>
+              <Ref name="Part0Internal">693</Ref>
+              <Ref name="Part1Internal">694</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">1</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
         </Item>
-        <Item class="Part" referent="695">
+        <Item class="Part" referent="696">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -36719,7 +36728,7 @@ return SuperClassCDO</string>
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="WeldConstraint" referent="696">
+          <Item class="WeldConstraint" referent="697">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -36737,14 +36746,14 @@ return SuperClassCDO</string>
                 <R21>0</R21>
                 <R22>1</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">695</Ref>
-              <Ref name="Part1Internal">697</Ref>
+              <Ref name="Part0Internal">696</Ref>
+              <Ref name="Part1Internal">698</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="WeldConstraint" referent="698">
+          <Item class="WeldConstraint" referent="699">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -36762,15 +36771,15 @@ return SuperClassCDO</string>
                 <R21>0</R21>
                 <R22>1</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">695</Ref>
-              <Ref name="Part1Internal">692</Ref>
+              <Ref name="Part0Internal">696</Ref>
+              <Ref name="Part1Internal">693</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
         </Item>
-        <Item class="Part" referent="697">
+        <Item class="Part" referent="698">
           <Properties>
             <string name="Name">Attacker</string>
             <bool name="Anchored">false</bool>
@@ -36864,7 +36873,7 @@ return SuperClassCDO</string>
             </Vector3>
           </Properties>
         </Item>
-        <Item class="Animation" referent="699">
+        <Item class="Animation" referent="700">
           <Properties>
             <string name="Name">anim1</string>
             <Content name="AnimationId">
@@ -36875,7 +36884,7 @@ return SuperClassCDO</string>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="IntValue" referent="700">
+        <Item class="IntValue" referent="701">
           <Properties>
             <string name="Name">Key</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -36884,7 +36893,7 @@ return SuperClassCDO</string>
             <int64 name="Value">3</int64>
           </Properties>
         </Item>
-        <Item class="BoolValue" referent="701">
+        <Item class="BoolValue" referent="702">
           <Properties>
             <string name="Name">Damager</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -36894,7 +36903,7 @@ return SuperClassCDO</string>
           </Properties>
         </Item>
       </Item>
-      <Item class="Tool" referent="702">
+      <Item class="Tool" referent="703">
         <Properties>
           <string name="Name">Sword</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -36924,7 +36933,7 @@ return SuperClassCDO</string>
           </Content>
           <string name="ToolTip"></string>
         </Properties>
-        <Item class="Part" referent="703">
+        <Item class="Part" referent="704">
           <Properties>
             <string name="Name">Mesh1</string>
             <bool name="Anchored">false</bool>
@@ -37017,7 +37026,7 @@ return SuperClassCDO</string>
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="SpecialMesh" referent="704">
+          <Item class="SpecialMesh" referent="705">
             <Properties>
               <string name="Name">Mesh</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -37050,7 +37059,7 @@ return SuperClassCDO</string>
             </Properties>
           </Item>
         </Item>
-        <Item class="Part" referent="705">
+        <Item class="Part" referent="706">
           <Properties>
             <string name="Name">Attacker</string>
             <bool name="Anchored">false</bool>
@@ -37144,7 +37153,7 @@ return SuperClassCDO</string>
             </Vector3>
           </Properties>
         </Item>
-        <Item class="Part" referent="706">
+        <Item class="Part" referent="707">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -37237,7 +37246,7 @@ return SuperClassCDO</string>
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="WeldConstraint" referent="707">
+          <Item class="WeldConstraint" referent="708">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -37255,14 +37264,14 @@ return SuperClassCDO</string>
                 <R21>0</R21>
                 <R22>-0</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">706</Ref>
-              <Ref name="Part1Internal">705</Ref>
+              <Ref name="Part0Internal">707</Ref>
+              <Ref name="Part1Internal">706</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="WeldConstraint" referent="708">
+          <Item class="WeldConstraint" referent="709">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -37280,15 +37289,15 @@ return SuperClassCDO</string>
                 <R21>0</R21>
                 <R22>-0</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">706</Ref>
-              <Ref name="Part1Internal">703</Ref>
+              <Ref name="Part0Internal">707</Ref>
+              <Ref name="Part1Internal">704</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
         </Item>
-        <Item class="Script" referent="709">
+        <Item class="Script" referent="710">
           <Properties>
             <string name="Name">WeaponController</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -37351,7 +37360,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="Animation" referent="710">
+        <Item class="Animation" referent="711">
           <Properties>
             <string name="Name">anim1</string>
             <Content name="AnimationId">
@@ -37362,7 +37371,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="IntValue" referent="711">
+        <Item class="IntValue" referent="712">
           <Properties>
             <string name="Name">Key</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -37371,7 +37380,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
             <int64 name="Value">2</int64>
           </Properties>
         </Item>
-        <Item class="BoolValue" referent="712">
+        <Item class="BoolValue" referent="713">
           <Properties>
             <string name="Name">Damager</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -37383,11 +37392,11 @@ tool.Attacker.Touched:Connect(onTouched)</string>
       </Item>
     </Item>
   </Item>
-  <Item class="StarterGui" referent="713">
+  <Item class="StarterGui" referent="714">
     <Properties>
       <string name="Name">StarterGui</string>
     </Properties>
-    <Item class="ScreenGui" referent="714">
+    <Item class="ScreenGui" referent="715">
       <Properties>
         <string name="Name">GuiBoard</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -37406,7 +37415,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
         <BinaryString name="Tags"></BinaryString>
         <token name="ZIndexBehavior">1</token>
       </Properties>
-      <Item class="ScreenGui" referent="715">
+      <Item class="ScreenGui" referent="716">
         <Properties>
           <string name="Name">GuiPlayersLeftCount</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -37425,7 +37434,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <BinaryString name="Tags"></BinaryString>
           <token name="ZIndexBehavior">1</token>
         </Properties>
-        <Item class="TextLabel" referent="716">
+        <Item class="TextLabel" referent="717">
           <Properties>
             <string name="Name">GuiTextLabel</string>
             <bool name="Active">false</bool>
@@ -37508,7 +37517,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
             <int name="ZIndex">1</int>
           </Properties>
         </Item>
-        <Item class="TextLabel" referent="717">
+        <Item class="TextLabel" referent="718">
           <Properties>
             <string name="Name">GuiPlayersLeftCountText</string>
             <bool name="Active">false</bool>
@@ -37592,7 +37601,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           </Properties>
         </Item>
       </Item>
-      <Item class="ScreenGui" referent="718">
+      <Item class="ScreenGui" referent="719">
         <Properties>
           <string name="Name">GuiKilledCount</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -37611,7 +37620,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <BinaryString name="Tags"></BinaryString>
           <token name="ZIndexBehavior">1</token>
         </Properties>
-        <Item class="TextLabel" referent="719">
+        <Item class="TextLabel" referent="720">
           <Properties>
             <string name="Name">GuiTextLabel</string>
             <bool name="Active">false</bool>
@@ -37694,7 +37703,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
             <int name="ZIndex">1</int>
           </Properties>
         </Item>
-        <Item class="TextLabel" referent="720">
+        <Item class="TextLabel" referent="721">
           <Properties>
             <string name="Name">GuiKilledCountText</string>
             <bool name="Active">false</bool>
@@ -37778,7 +37787,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           </Properties>
         </Item>
       </Item>
-      <Item class="ScreenGui" referent="721">
+      <Item class="ScreenGui" referent="722">
         <Properties>
           <string name="Name">GuiCurrentGameLength</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -37797,7 +37806,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <BinaryString name="Tags"></BinaryString>
           <token name="ZIndexBehavior">1</token>
         </Properties>
-        <Item class="TextLabel" referent="722">
+        <Item class="TextLabel" referent="723">
           <Properties>
             <string name="Name">GuiCurrentGameLengthText</string>
             <bool name="Active">false</bool>
@@ -37882,7 +37891,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
         </Item>
       </Item>
     </Item>
-    <Item class="LocalScript" referent="723">
+    <Item class="LocalScript" referent="724">
       <Properties>
         <string name="Name">GuiController</string>
         <string name="Source"><![CDATA[-- 클라이언트에게 보여주는 GUI이기 때문에 LocalScript 사용
@@ -37892,17 +37901,18 @@ tool.Attacker.Touched:Connect(onTouched)</string>
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- StarterGui UI
+-- PlayerGui UI
 
-local StarterGui = script.Parent
+local PlayerGui = script.Parent
 
-local MainMessageText = StarterGui:WaitForChild("MainMessage").MainMessageText
-local EventMessageText = StarterGui:WaitForChild("EventMessage").EventMessageText
+local GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
+local GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
 
-local PlayersLeftCountText = StarterGui.PlayersLeftCount.PlayersLeftCountText
-local KilledCountText = StarterGui.KilledCount.KilledCountText
 
-local CurrentGameLengthText = StarterGui.CurrentGameLength.CurrentGameLengthText
+local GuiBoard = PlayerGui:WaitForChild("GuiBoard")
+local GuiPlayersLeftCountText = GuiBoard:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
+local GuiKilledCountText = GuiBoard:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
+local GuiCurrentGameLengthText = GuiBoard:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
 
 
 -- 공통 저장소 변수
@@ -37915,79 +37925,82 @@ local WinnerType = CommonModuleFacade.CommonEnum.WinnerType
 -- 리플리케이션 저장소 변수
 
 
---local MainMessage = ReplicatedStorage:WaitForChild("MainMessage")
---MainMessageText.Text = MainMessage.Value
+--local GuiMainMessage = ReplicatedStorage:WaitForChild("GuiMainMessage")
+--GuiMainMessageText.Text = GuiMainMessage.Value
 
-local PlayersLeftCount = ReplicatedStorage:WaitForChild("PlayersLeftCount")
-PlayersLeftCountText.Text = PlayersLeftCount.Value
+local RemoteValues = ReplicatedStorage:WaitForChild("RemoteValues")
 
-local CurrentGameLength = ReplicatedStorage:WaitForChild("CurrentGameLength")
-CurrentGameLengthText.Text = CurrentGameLength.Value
+local PlayersLeftCount = RemoteValues:WaitForChild("PlayersLeftCount")
+GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
+
+local CurrentGameLength = RemoteValues:WaitForChild("CurrentGameLength")
+GuiCurrentGameLengthText.Text = CurrentGameLength.Value
 
 -- Remote Event
 
-local ChangeGameStateSTC = ReplicatedStorage:WaitForChild("ChangeGameStateSTC")
-local NotifyWinnerSTC = ReplicatedStorage:WaitForChild("NotifyWinnerSTC")
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 
-local ChangeGameDataCTS = ReplicatedStorage:WaitForChild("ChangeGameDataCTS")
+local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
+local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
+local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 
 
 PlayersLeftCount:GetPropertyChangedSignal("Value"):Connect(function()
-	PlayersLeftCountText.Text = PlayersLeftCount.Value
+	GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
 end)
 
 CurrentGameLength:GetPropertyChangedSignal("Value"):Connect(function()
-	CurrentGameLengthText.Text = CurrentGameLength.Value
+	GuiCurrentGameLengthText.Text = CurrentGameLength.Value
 end)
 
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
 local function ToggleInGameGui(isEnabled)
-	PlayersLeftCountText.Parent.Enabled = isEnabled
-	CurrentGameLengthText.Parent.Enabled = isEnabled
-	KilledCountText.Parent.Enabled = isEnabled
+	GuiPlayersLeftCountText.Parent.Enabled = isEnabled
+	GuiCurrentGameLengthText.Parent.Enabled = isEnabled
+	GuiKilledCountText.Parent.Enabled = isEnabled
 end
 
 
-local function SetMainMessage(inputText)
+local function SetGuiMainMessage(inputText)
 	
 	if inputText == "" then
 		
-		MainMessageText.Parent.Enabled = false
+		GuiMainMessageText.Parent.Enabled = false
 		
 	else
 --[[
 		local length = inputText:len()
 		local boxSize = length * 20 + 40
 
-		if MainMessageText.Size.X.Offset ~= boxSize then
-			MainMessageText.Size = UDim2.fromOffset(boxSize, MainMessageText.Size.Y.Offset)
+		if GuiMainMessageText.Size.X.Offset ~= boxSize then
+			GuiMainMessageText.Size = UDim2.fromOffset(boxSize, GuiMainMessageText.Size.Y.Offset)
 		end
 
-		if MainMessageText.Position.X.Offset ~= (-(boxSize/2)) then
-			MainMessageText.Position = UDim2.new(MainMessageText.Position.X.Scale, -(boxSize/2), MainMessageText.Position.Y.Offset, MainMessageText.Position.Y.Scale)
+		if GuiMainMessageText.Position.X.Offset ~= (-(boxSize/2)) then
+			GuiMainMessageText.Position = UDim2.new(GuiMainMessageText.Position.X.Scale, -(boxSize/2), GuiMainMessageText.Position.Y.Offset, GuiMainMessageText.Position.Y.Scale)
 		end
 --]]
-		MainMessageText.Text = inputText
-		MainMessageText.Parent.Enabled = true
+		GuiMainMessageText.Text = inputText
+		GuiMainMessageText.Parent.Enabled = true
 	end
 end
 
-local function SetEventMessage(inputText)
+local function SetGuiEventMessage(inputText)
 	
 	if inputText == "" then
 
-		EventMessageText.Parent.Enabled = false
+		GuiEventMessageText.Parent.Enabled = false
 
 	else
 
-		EventMessageText.Text = inputText
-		EventMessageText.Parent.Enabled = true
+		GuiEventMessageText.Text = inputText
+		GuiEventMessageText.Parent.Enabled = true
 		
 		wait(3)
 
-		EventMessageText.Parent.Enabled = false
+		GuiEventMessageText.Parent.Enabled = false
 	end
 end
 
@@ -37995,10 +38008,10 @@ end
 local function ProcessWaiting(arguments)
 
 	print("GameStateType.Waiting in client")
-	SetMainMessage("Waiting ... ")
-	PlayersLeftCountText.Parent.Enabled = false
-	CurrentGameLengthText.Parent.Enabled = false
-	KilledCountText.Parent.Enabled = false
+	SetGuiMainMessage("Waiting ... ")
+	GuiPlayersLeftCountText.Parent.Enabled = false
+	GuiCurrentGameLengthText.Parent.Enabled = false
+	GuiKilledCountText.Parent.Enabled = false
 	
 end
 
@@ -38007,7 +38020,7 @@ local function ProcessStarting(arguments)
 
 	print("GameStateType.Starting in client")
 	for i = 5, 1, -1 do
-		SetMainMessage(tostring(i))
+		SetGuiMainMessage(tostring(i))
 		wait(1)
 	end
 	
@@ -38017,25 +38030,25 @@ end
 local function ProcessPlaying(arguments)
 
 	local mapName = arguments[1]
-	SetMainMessage(mapName .. " is selected")
+	SetGuiMainMessage(mapName .. " is selected")
 	
 	wait(2)
 	
-	SetMainMessage("Get ready to play")
-	PlayersLeftCountText.Parent.Enabled = true
-	CurrentGameLengthText.Parent.Enabled = true
-	KilledCountText.Parent.Enabled = true
+	SetGuiMainMessage("Get ready to play")
+	GuiPlayersLeftCountText.Parent.Enabled = true
+	GuiCurrentGameLengthText.Parent.Enabled = true
+	GuiKilledCountText.Parent.Enabled = true
 	
 	wait(2)
 	
-	SetMainMessage("")
+	SetGuiMainMessage("")
 	
 end
 
 
 local function ProcessDead(arguments)
 
-	SetMainMessage("You Died")
+	SetGuiMainMessage("You Died")
 	
 end
 
@@ -38081,12 +38094,12 @@ NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerRew
 		end
 	end
 	
-	SetMainMessage(winnerMessageString)
+	SetGuiMainMessage(winnerMessageString)
 	
 	wait(3)
 	
 	if rewardMessageString then
-		SetMainMessage(rewardMessageString)
+		SetGuiMainMessage(rewardMessageString)
 	end
 	
 end)
@@ -38095,7 +38108,7 @@ end)
 -- 실행 코드 ------------------------------------------------------------------------------------------------------
 ]]></string>
       </Properties>
-      <Item class="ModuleScript" referent="724">
+      <Item class="ModuleScript" referent="725">
         <Properties>
           <string name="Name">GuiEquipSlotController</string>
           <string name="Source"><![CDATA[local module = {}
@@ -38104,7 +38117,7 @@ return module
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="725">
+      <Item class="ModuleScript" referent="726">
         <Properties>
           <string name="Name">GuiInventoryController</string>
           <string name="Source"><![CDATA[local module = {}
@@ -38114,7 +38127,7 @@ return module
         </Properties>
       </Item>
     </Item>
-    <Item class="ScreenGui" referent="726">
+    <Item class="ScreenGui" referent="727">
       <Properties>
         <string name="Name">GuiEventMessage</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -38133,7 +38146,7 @@ return module
         <BinaryString name="Tags"></BinaryString>
         <token name="ZIndexBehavior">1</token>
       </Properties>
-      <Item class="TextLabel" referent="727">
+      <Item class="TextLabel" referent="728">
         <Properties>
           <string name="Name">GuiEventMessageText</string>
           <bool name="Active">false</bool>
@@ -38217,7 +38230,7 @@ return module
         </Properties>
       </Item>
     </Item>
-    <Item class="ScreenGui" referent="728">
+    <Item class="ScreenGui" referent="729">
       <Properties>
         <string name="Name">GuiMainMessage</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -38236,7 +38249,7 @@ return module
         <BinaryString name="Tags"></BinaryString>
         <token name="ZIndexBehavior">1</token>
       </Properties>
-      <Item class="TextLabel" referent="729">
+      <Item class="TextLabel" referent="730">
         <Properties>
           <string name="Name">GuiMainMessageText</string>
           <bool name="Active">false</bool>
@@ -38320,7 +38333,7 @@ return module
         </Properties>
       </Item>
     </Item>
-    <Item class="BillboardGui" referent="730">
+    <Item class="BillboardGui" referent="731">
       <Properties>
         <string name="Name">GuiObjectTooltip</string>
         <bool name="Active">true</bool>
@@ -38378,7 +38391,7 @@ return module
         <BinaryString name="Tags"></BinaryString>
         <token name="ZIndexBehavior">1</token>
       </Properties>
-      <Item class="TextLabel" referent="731">
+      <Item class="TextLabel" referent="732">
         <Properties>
           <string name="Name">GuiObjectName</string>
           <bool name="Active">false</bool>
@@ -38461,7 +38474,7 @@ return module
           <int name="ZIndex">1</int>
         </Properties>
       </Item>
-      <Item class="TextLabel" referent="732">
+      <Item class="TextLabel" referent="733">
         <Properties>
           <string name="Name">GuiInteraction</string>
           <bool name="Active">false</bool>
@@ -38545,7 +38558,7 @@ return module
         </Properties>
       </Item>
     </Item>
-    <Item class="ScreenGui" referent="733">
+    <Item class="ScreenGui" referent="734">
       <Properties>
         <string name="Name">GuiPlayerStatus</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -38564,7 +38577,7 @@ return module
         <BinaryString name="Tags"></BinaryString>
         <token name="ZIndexBehavior">1</token>
       </Properties>
-      <Item class="Frame" referent="734">
+      <Item class="Frame" referent="735">
         <Properties>
           <string name="Name">GuiPlayerStatusWindow</string>
           <bool name="Active">false</bool>
@@ -38624,7 +38637,7 @@ return module
           <bool name="Visible">true</bool>
           <int name="ZIndex">1</int>
         </Properties>
-        <Item class="Frame" referent="735">
+        <Item class="Frame" referent="736">
           <Properties>
             <string name="Name">GuiEquipSlots</string>
             <bool name="Active">false</bool>
@@ -38684,7 +38697,7 @@ return module
             <bool name="Visible">true</bool>
             <int name="ZIndex">1</int>
           </Properties>
-          <Item class="Frame" referent="736">
+          <Item class="Frame" referent="737">
             <Properties>
               <string name="Name">GuiChestplateSlot</string>
               <bool name="Active">false</bool>
@@ -38744,7 +38757,7 @@ return module
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="ImageButton" referent="737">
+            <Item class="ImageButton" referent="738">
               <Properties>
                 <string name="Name">GuiItemImage</string>
                 <bool name="Active">true</bool>
@@ -38851,7 +38864,7 @@ return module
                 <bool name="Visible">true</bool>
                 <int name="ZIndex">1</int>
               </Properties>
-              <Item class="TextLabel" referent="738">
+              <Item class="TextLabel" referent="739">
                 <Properties>
                   <string name="Name">ItemName</string>
                   <bool name="Active">false</bool>
@@ -38936,7 +38949,7 @@ return module
               </Item>
             </Item>
           </Item>
-          <Item class="Frame" referent="739">
+          <Item class="Frame" referent="740">
             <Properties>
               <string name="Name">GuiLeggingsSlot</string>
               <bool name="Active">false</bool>
@@ -38996,7 +39009,7 @@ return module
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="ImageButton" referent="740">
+            <Item class="ImageButton" referent="741">
               <Properties>
                 <string name="Name">GuiItemImage</string>
                 <bool name="Active">true</bool>
@@ -39103,7 +39116,7 @@ return module
                 <bool name="Visible">true</bool>
                 <int name="ZIndex">1</int>
               </Properties>
-              <Item class="TextLabel" referent="741">
+              <Item class="TextLabel" referent="742">
                 <Properties>
                   <string name="Name">ItemName</string>
                   <bool name="Active">false</bool>
@@ -39188,7 +39201,7 @@ return module
               </Item>
             </Item>
           </Item>
-          <Item class="Frame" referent="742">
+          <Item class="Frame" referent="743">
             <Properties>
               <string name="Name">GuiBootsSlot</string>
               <bool name="Active">false</bool>
@@ -39248,7 +39261,7 @@ return module
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="ImageButton" referent="743">
+            <Item class="ImageButton" referent="744">
               <Properties>
                 <string name="Name">GuiItemImage</string>
                 <bool name="Active">true</bool>
@@ -39355,7 +39368,7 @@ return module
                 <bool name="Visible">true</bool>
                 <int name="ZIndex">1</int>
               </Properties>
-              <Item class="TextLabel" referent="744">
+              <Item class="TextLabel" referent="745">
                 <Properties>
                   <string name="Name">ItemName</string>
                   <bool name="Active">false</bool>
@@ -39440,7 +39453,7 @@ return module
               </Item>
             </Item>
           </Item>
-          <Item class="Frame" referent="745">
+          <Item class="Frame" referent="746">
             <Properties>
               <string name="Name">GuiHelmetSlot</string>
               <bool name="Active">false</bool>
@@ -39500,7 +39513,7 @@ return module
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="ImageButton" referent="746">
+            <Item class="ImageButton" referent="747">
               <Properties>
                 <string name="Name">GuiItemImage</string>
                 <bool name="Active">true</bool>
@@ -39607,7 +39620,7 @@ return module
                 <bool name="Visible">true</bool>
                 <int name="ZIndex">1</int>
               </Properties>
-              <Item class="TextLabel" referent="747">
+              <Item class="TextLabel" referent="748">
                 <Properties>
                   <string name="Name">ItemName</string>
                   <bool name="Active">false</bool>
@@ -39692,7 +39705,7 @@ return module
               </Item>
             </Item>
           </Item>
-          <Item class="Frame" referent="748">
+          <Item class="Frame" referent="749">
             <Properties>
               <string name="Name">GuiWeaponSlot</string>
               <bool name="Active">false</bool>
@@ -39752,7 +39765,7 @@ return module
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="ImageButton" referent="749">
+            <Item class="ImageButton" referent="750">
               <Properties>
                 <string name="Name">GuiItemImage</string>
                 <bool name="Active">true</bool>
@@ -39859,7 +39872,7 @@ return module
                 <bool name="Visible">true</bool>
                 <int name="ZIndex">1</int>
               </Properties>
-              <Item class="TextLabel" referent="750">
+              <Item class="TextLabel" referent="751">
                 <Properties>
                   <string name="Name">ItemName</string>
                   <bool name="Active">false</bool>
@@ -39945,7 +39958,7 @@ return module
             </Item>
           </Item>
         </Item>
-        <Item class="ScrollingFrame" referent="751">
+        <Item class="ScrollingFrame" referent="752">
           <Properties>
             <string name="Name">GuiInventory</string>
             <bool name="Active">true</bool>
@@ -40037,7 +40050,7 @@ return module
             <bool name="Visible">true</bool>
             <int name="ZIndex">1</int>
           </Properties>
-          <Item class="Frame" referent="752">
+          <Item class="Frame" referent="753">
             <Properties>
               <string name="Name">GuiItemSlot</string>
               <bool name="Active">false</bool>
@@ -40097,7 +40110,7 @@ return module
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="ImageButton" referent="753">
+            <Item class="ImageButton" referent="754">
               <Properties>
                 <string name="Name">GuiItemImage</string>
                 <bool name="Active">true</bool>
@@ -40204,7 +40217,7 @@ return module
                 <bool name="Visible">true</bool>
                 <int name="ZIndex">1</int>
               </Properties>
-              <Item class="TextLabel" referent="754">
+              <Item class="TextLabel" referent="755">
                 <Properties>
                   <string name="Name">GuiItemName</string>
                   <bool name="Active">false</bool>
@@ -40287,7 +40300,7 @@ return module
                   <int name="ZIndex">1</int>
                 </Properties>
               </Item>
-              <Item class="TextLabel" referent="755">
+              <Item class="TextLabel" referent="756">
                 <Properties>
                   <string name="Name">GuiItemStackCount</string>
                   <bool name="Active">false</bool>
@@ -40375,7 +40388,7 @@ return module
         </Item>
       </Item>
     </Item>
-    <Item class="ScreenGui" referent="756">
+    <Item class="ScreenGui" referent="757">
       <Properties>
         <string name="Name">GuiQuickSlots</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -40395,7 +40408,7 @@ return module
         <token name="ZIndexBehavior">1</token>
       </Properties>
     </Item>
-    <Item class="ScreenGui" referent="757">
+    <Item class="ScreenGui" referent="758">
       <Properties>
         <string name="Name">GuiTooltip</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -40414,7 +40427,7 @@ return module
         <BinaryString name="Tags"></BinaryString>
         <token name="ZIndexBehavior">1</token>
       </Properties>
-      <Item class="Frame" referent="758">
+      <Item class="Frame" referent="759">
         <Properties>
           <string name="Name">GuiTooltipWindow</string>
           <bool name="Active">false</bool>
@@ -40474,7 +40487,7 @@ return module
           <bool name="Visible">true</bool>
           <int name="ZIndex">1</int>
         </Properties>
-        <Item class="Frame" referent="759">
+        <Item class="Frame" referent="760">
           <Properties>
             <string name="Name">GuiTooltipBaseData</string>
             <bool name="Active">false</bool>
@@ -40534,7 +40547,7 @@ return module
             <bool name="Visible">true</bool>
             <int name="ZIndex">1</int>
           </Properties>
-          <Item class="TextLabel" referent="760">
+          <Item class="TextLabel" referent="761">
             <Properties>
               <string name="Name">GuiToolName</string>
               <bool name="Active">false</bool>
@@ -40617,7 +40630,7 @@ return module
               <int name="ZIndex">1</int>
             </Properties>
           </Item>
-          <Item class="ImageLabel" referent="761">
+          <Item class="ImageLabel" referent="762">
             <Properties>
               <string name="Name">GuiToolImage</string>
               <bool name="Active">false</bool>
@@ -40713,7 +40726,7 @@ return module
               <int name="ZIndex">1</int>
             </Properties>
           </Item>
-          <Item class="Frame" referent="762">
+          <Item class="Frame" referent="763">
             <Properties>
               <string name="Name">GuiLine</string>
               <bool name="Active">false</bool>
@@ -40774,7 +40787,7 @@ return module
               <int name="ZIndex">1</int>
             </Properties>
           </Item>
-          <Item class="TextLabel" referent="763">
+          <Item class="TextLabel" referent="764">
             <Properties>
               <string name="Name">GuiToolType</string>
               <bool name="Active">false</bool>
@@ -40858,7 +40871,7 @@ return module
             </Properties>
           </Item>
         </Item>
-        <Item class="Frame" referent="764">
+        <Item class="Frame" referent="765">
           <Properties>
             <string name="Name">GuiTooltipDetailData</string>
             <bool name="Active">false</bool>
@@ -40918,7 +40931,7 @@ return module
             <bool name="Visible">true</bool>
             <int name="ZIndex">1</int>
           </Properties>
-          <Item class="TextLabel" referent="765">
+          <Item class="TextLabel" referent="766">
             <Properties>
               <string name="Name">GuiToolStatus</string>
               <bool name="Active">false</bool>
@@ -41000,7 +41013,7 @@ return module
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="Frame" referent="766">
+            <Item class="Frame" referent="767">
               <Properties>
                 <string name="Name">GuiLine</string>
                 <bool name="Active">false</bool>
@@ -41062,7 +41075,7 @@ return module
               </Properties>
             </Item>
           </Item>
-          <Item class="TextLabel" referent="767">
+          <Item class="TextLabel" referent="768">
             <Properties>
               <string name="Name">GuiToolDescription</string>
               <bool name="Active">false</bool>
@@ -41144,7 +41157,7 @@ return module
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="Frame" referent="768">
+            <Item class="Frame" referent="769">
               <Properties>
                 <string name="Name">GuiLine</string>
                 <bool name="Active">false</bool>
@@ -41206,7 +41219,7 @@ return module
               </Properties>
             </Item>
           </Item>
-          <Item class="Frame" referent="769">
+          <Item class="Frame" referent="770">
             <Properties>
               <string name="Name">GuiLine</string>
               <bool name="Active">false</bool>
@@ -41268,7 +41281,7 @@ return module
             </Properties>
           </Item>
         </Item>
-        <Item class="Frame" referent="770">
+        <Item class="Frame" referent="771">
           <Properties>
             <string name="Name">GuiTooltipButtons</string>
             <bool name="Active">false</bool>
@@ -41328,7 +41341,7 @@ return module
             <bool name="Visible">true</bool>
             <int name="ZIndex">1</int>
           </Properties>
-          <Item class="ImageButton" referent="771">
+          <Item class="ImageButton" referent="772">
             <Properties>
               <string name="Name">GuiUseButton</string>
               <bool name="Active">true</bool>
@@ -41440,11 +41453,11 @@ return module
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPack" referent="772">
+  <Item class="StarterPack" referent="773">
     <Properties>
       <string name="Name">StarterPack</string>
     </Properties>
-    <Item class="Tool" referent="773">
+    <Item class="Tool" referent="774">
       <Properties>
         <string name="Name">AxeTemp</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -41474,7 +41487,7 @@ return module
         </Content>
         <string name="ToolTip"></string>
       </Properties>
-      <Item class="Part" referent="774">
+      <Item class="Part" referent="775">
         <Properties>
           <string name="Name">Mesh1</string>
           <bool name="Anchored">false</bool>
@@ -41567,7 +41580,7 @@ return module
             <Z>0</Z>
           </Vector3>
         </Properties>
-        <Item class="Part" referent="775">
+        <Item class="Part" referent="776">
           <Properties>
             <string name="Name">Part</string>
             <bool name="Anchored">false</bool>
@@ -41661,7 +41674,7 @@ return module
             </Vector3>
           </Properties>
         </Item>
-        <Item class="WeldConstraint" referent="776">
+        <Item class="WeldConstraint" referent="777">
           <Properties>
             <string name="Name">WeldConstraint</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -41679,15 +41692,15 @@ return module
               <R21>0</R21>
               <R22>1</R22>
             </CoordinateFrame>
-            <Ref name="Part0Internal">774</Ref>
-            <Ref name="Part1Internal">775</Ref>
+            <Ref name="Part0Internal">775</Ref>
+            <Ref name="Part1Internal">776</Ref>
             <int64 name="SourceAssetId">-1</int64>
             <int name="State">3</int>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
       </Item>
-      <Item class="Part" referent="777">
+      <Item class="Part" referent="778">
         <Properties>
           <string name="Name">Handle</string>
           <bool name="Anchored">false</bool>
@@ -41780,7 +41793,7 @@ return module
             <Z>0</Z>
           </Vector3>
         </Properties>
-        <Item class="WeldConstraint" referent="778">
+        <Item class="WeldConstraint" referent="779">
           <Properties>
             <string name="Name">WeldConstraint</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -41798,14 +41811,14 @@ return module
               <R21>0</R21>
               <R22>1</R22>
             </CoordinateFrame>
-            <Ref name="Part0Internal">777</Ref>
-            <Ref name="Part1Internal">779</Ref>
+            <Ref name="Part0Internal">778</Ref>
+            <Ref name="Part1Internal">780</Ref>
             <int64 name="SourceAssetId">-1</int64>
             <int name="State">3</int>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="WeldConstraint" referent="780">
+        <Item class="WeldConstraint" referent="781">
           <Properties>
             <string name="Name">WeldConstraint</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -41823,15 +41836,15 @@ return module
               <R21>0</R21>
               <R22>1</R22>
             </CoordinateFrame>
-            <Ref name="Part0Internal">777</Ref>
-            <Ref name="Part1Internal">774</Ref>
+            <Ref name="Part0Internal">778</Ref>
+            <Ref name="Part1Internal">775</Ref>
             <int64 name="SourceAssetId">-1</int64>
             <int name="State">3</int>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
       </Item>
-      <Item class="Part" referent="779">
+      <Item class="Part" referent="780">
         <Properties>
           <string name="Name">Attacker</string>
           <bool name="Anchored">false</bool>
@@ -41925,7 +41938,7 @@ return module
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Script" referent="781">
+      <Item class="Script" referent="782">
         <Properties>
           <string name="Name">AxeController2</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -41958,7 +41971,7 @@ tool.Activated:Connect(onActivated)</string>
           <BinaryString name="Tags"></BinaryString>
         </Properties>
       </Item>
-      <Item class="Script" referent="782">
+      <Item class="Script" referent="783">
         <Properties>
           <string name="Name">WeaponController</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42020,7 +42033,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <BinaryString name="Tags"></BinaryString>
         </Properties>
       </Item>
-      <Item class="Animation" referent="783">
+      <Item class="Animation" referent="784">
         <Properties>
           <string name="Name">anim1</string>
           <Content name="AnimationId">
@@ -42031,7 +42044,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <BinaryString name="Tags"></BinaryString>
         </Properties>
       </Item>
-      <Item class="IntValue" referent="784">
+      <Item class="IntValue" referent="785">
         <Properties>
           <string name="Name">Key</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42040,7 +42053,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <int64 name="Value">3</int64>
         </Properties>
       </Item>
-      <Item class="BoolValue" referent="785">
+      <Item class="BoolValue" referent="786">
         <Properties>
           <string name="Name">Damager</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42049,7 +42062,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <bool name="Value">false</bool>
         </Properties>
       </Item>
-      <Item class="Script" referent="786">
+      <Item class="Script" referent="787">
         <Properties>
           <string name="Name">Damager</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42260,7 +42273,7 @@ Tool.Attacker.Touched:Connect(onTouched)
         </Properties>
       </Item>
     </Item>
-    <Item class="Tool" referent="787">
+    <Item class="Tool" referent="788">
       <Properties>
         <string name="Name">SwordTemp</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42290,7 +42303,7 @@ Tool.Attacker.Touched:Connect(onTouched)
         </Content>
         <string name="ToolTip"></string>
       </Properties>
-      <Item class="Part" referent="788">
+      <Item class="Part" referent="789">
         <Properties>
           <string name="Name">Mesh1</string>
           <bool name="Anchored">false</bool>
@@ -42383,7 +42396,7 @@ Tool.Attacker.Touched:Connect(onTouched)
             <Z>0</Z>
           </Vector3>
         </Properties>
-        <Item class="SpecialMesh" referent="789">
+        <Item class="SpecialMesh" referent="790">
           <Properties>
             <string name="Name">Mesh</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42416,7 +42429,7 @@ Tool.Attacker.Touched:Connect(onTouched)
           </Properties>
         </Item>
       </Item>
-      <Item class="Part" referent="790">
+      <Item class="Part" referent="791">
         <Properties>
           <string name="Name">Attacker</string>
           <bool name="Anchored">false</bool>
@@ -42510,7 +42523,7 @@ Tool.Attacker.Touched:Connect(onTouched)
           </Vector3>
         </Properties>
       </Item>
-      <Item class="Part" referent="791">
+      <Item class="Part" referent="792">
         <Properties>
           <string name="Name">Handle</string>
           <bool name="Anchored">false</bool>
@@ -42603,7 +42616,7 @@ Tool.Attacker.Touched:Connect(onTouched)
             <Z>0</Z>
           </Vector3>
         </Properties>
-        <Item class="WeldConstraint" referent="792">
+        <Item class="WeldConstraint" referent="793">
           <Properties>
             <string name="Name">WeldConstraint</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42621,14 +42634,14 @@ Tool.Attacker.Touched:Connect(onTouched)
               <R21>0</R21>
               <R22>-0</R22>
             </CoordinateFrame>
-            <Ref name="Part0Internal">791</Ref>
-            <Ref name="Part1Internal">790</Ref>
+            <Ref name="Part0Internal">792</Ref>
+            <Ref name="Part1Internal">791</Ref>
             <int64 name="SourceAssetId">-1</int64>
             <int name="State">3</int>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="WeldConstraint" referent="793">
+        <Item class="WeldConstraint" referent="794">
           <Properties>
             <string name="Name">WeldConstraint</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42646,15 +42659,15 @@ Tool.Attacker.Touched:Connect(onTouched)
               <R21>0</R21>
               <R22>-0</R22>
             </CoordinateFrame>
-            <Ref name="Part0Internal">791</Ref>
-            <Ref name="Part1Internal">788</Ref>
+            <Ref name="Part0Internal">792</Ref>
+            <Ref name="Part1Internal">789</Ref>
             <int64 name="SourceAssetId">-1</int64>
             <int name="State">3</int>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
       </Item>
-      <Item class="Script" referent="794">
+      <Item class="Script" referent="795">
         <Properties>
           <string name="Name">WeaponController</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42717,7 +42730,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <BinaryString name="Tags"></BinaryString>
         </Properties>
       </Item>
-      <Item class="Animation" referent="795">
+      <Item class="Animation" referent="796">
         <Properties>
           <string name="Name">anim1</string>
           <Content name="AnimationId">
@@ -42728,7 +42741,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <BinaryString name="Tags"></BinaryString>
         </Properties>
       </Item>
-      <Item class="IntValue" referent="796">
+      <Item class="IntValue" referent="797">
         <Properties>
           <string name="Name">Key</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42737,7 +42750,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <int64 name="Value">2</int64>
         </Properties>
       </Item>
-      <Item class="BoolValue" referent="797">
+      <Item class="BoolValue" referent="798">
         <Properties>
           <string name="Name">Damager</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42746,7 +42759,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
           <bool name="Value">false</bool>
         </Properties>
       </Item>
-      <Item class="Script" referent="798">
+      <Item class="Script" referent="799">
         <Properties>
           <string name="Name">Damager</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42958,19 +42971,19 @@ Tool.Attacker.Touched:Connect(onTouched)
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="799">
+  <Item class="StarterPlayer" referent="800">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="800">
+    <Item class="StarterPlayerScripts" referent="801">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="801">
+      <Item class="Folder" referent="802">
         <Properties>
           <string name="Name">ClientModule</string>
         </Properties>
-        <Item class="ModuleScript" referent="802">
+        <Item class="ModuleScript" referent="803">
           <Properties>
             <string name="Name">ClientGlobalStorage</string>
             <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -42994,11 +43007,11 @@ local CommonGlobalStorage = require(CommonModule:WaitForChild("CommonGlobalStora
 local LocalPlayer = game.Players.LocalPlayer
 local PlayerId = LocalPlayer.UserId
 
-local ClientGlobalStorage = {}
+local ClientGlobalStorage = CommonGlobalStorage
 
 function ClientGlobalStorage:Initialize()
 	self:SetClientMode()
-	self:AddPlayer(PlayerId) -- 본인거는 서버도 통보안해준다.
+	self:AddPlayer(LocalPlayer) -- 본인거는 서버도 통보안해준다.
 end
 
 function ClientGlobalStorage:GetData()
@@ -43062,7 +43075,7 @@ end
 
 ClientGlobalStorage.__index = Utility.Inheritable__index
 ClientGlobalStorage.__newindex = Utility.Inheritable__newindex
-setmetatable(ClientGlobalStorage, CommonGlobalStorage)
+--setmetatable(ClientGlobalStorage, CommonGlobalStorage)
 
 ClientGlobalStorage:Initialize()
 
@@ -43070,7 +43083,7 @@ return ClientGlobalStorage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="803">
+        <Item class="ModuleScript" referent="804">
           <Properties>
             <string name="Name">KeyBinder</string>
             <string name="Source">game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
@@ -43341,7 +43354,7 @@ UserInputService.InputBegan:Connect(onInputBegan)
           </Properties>
         </Item>
       </Item>
-      <Item class="LocalScript" referent="804">
+      <Item class="LocalScript" referent="805">
         <Properties>
           <string name="Name">ClientModuleLoader</string>
           <string name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
@@ -43353,7 +43366,7 @@ require(ClientModule:WaitForChild("ClientGlobalStorage"))
 ]]></string>
         </Properties>
       </Item>
-      <Item class="LocalScript" referent="805">
+      <Item class="LocalScript" referent="806">
         <Properties>
           <string name="Name">CustomInventory</string>
           <string name="Source"><![CDATA[--[[
@@ -43410,29 +43423,6 @@ UserInputService.InputEnded:Connect(onInputEnded)
 	
 	--]]
 ]]></string>
-        </Properties>
-      </Item>
-      <Item class="LocalScript" referent="806">
-        <Properties>
-          <string name="Name">InstanceTest</string>
-          <string name="Source"><![CDATA[
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local InstanceTestSTC = ReplicatedStorage:WaitForChild("InstanceTestSTC")
-local InstanceTestModule = require(ReplicatedStorage:WaitForChild("InstanceTestModule"))
-
-InstanceTestSTC.OnClientEvent:Connect(function(...)
-	
-	InstanceTestModule["Client"] = 1
-	local args = {...}
-	for _, arg in ipairs(args) do
-		print("TEST!!")
-		local temp2 = getmetatable(arg)
-		local temp = 3
-		
-	end
-	
-end)]]></string>
         </Properties>
       </Item>
       <Item class="LocalScript" referent="807">

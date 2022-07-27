@@ -9,7 +9,7 @@ local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local GameDataType = ServerEnum.GameDataType
 
-local ServerGlobalStorage = {}
+local ServerGlobalStorage = CommonGlobalStorage
 
 -- static 변수 반드시 싱글톤으로 사용해야 한다.
 local Characters = {}
@@ -86,7 +86,7 @@ end
 ServerGlobalStorage.__index = Utility.Inheritable__index
 ServerGlobalStorage.__newindex = Utility.Inheritable__newindex
 
-setmetatable(ServerGlobalStorage, CommonGlobalStorage)
+--setmetatable(ServerGlobalStorage, CommonGlobalStorage)
 
 
 return ServerGlobalStorage

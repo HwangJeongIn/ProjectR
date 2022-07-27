@@ -1,5 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ChangeGameStateSTC = ReplicatedStorage:WaitForChild("ChangeGameStateSTC")
+
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
 
 
 local ServerStorage = game:GetService("ServerStorage")

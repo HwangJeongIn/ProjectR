@@ -19,7 +19,7 @@ local CommonGlobalStorage = require(CommonModule:WaitForChild("CommonGlobalStora
 local LocalPlayer = game.Players.LocalPlayer
 local PlayerId = LocalPlayer.UserId
 
-local ClientGlobalStorage = {}
+local ClientGlobalStorage = CommonGlobalStorage
 
 function ClientGlobalStorage:Initialize()
 	self:SetClientMode()
@@ -87,7 +87,7 @@ end
 
 ClientGlobalStorage.__index = Utility.Inheritable__index
 ClientGlobalStorage.__newindex = Utility.Inheritable__newindex
-setmetatable(ClientGlobalStorage, CommonGlobalStorage)
+--setmetatable(ClientGlobalStorage, CommonGlobalStorage)
 
 ClientGlobalStorage:Initialize()
 

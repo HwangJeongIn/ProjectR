@@ -1,7 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- RemoteEvent
-
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 local Debug = require(CommonModule:WaitForChild("Debug"))
 local Utility = require(CommonModule:WaitForChild("Utility"))
@@ -87,7 +85,7 @@ function CommonGlobalStorage:CreateEmptyData()
 
 		-- 그냥 명시적으로 표현
 		[StatusType.WeaponSlot] = {Value = nil, ToolGameData = nil},
-		[StatusType.Inventory] = Utility:DeepCopy(Inventory)
+		[StatusType.Inventory] = Utility.DeepCopy(Inventory)
 	}
 
 	if self.IsClient then
@@ -162,7 +160,7 @@ function CommonGlobalStorage:ClearPlayer(player)
 end
 
 function CommonGlobalStorage:AddTool(playerId, tool)
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return false
 	end
@@ -176,7 +174,7 @@ function CommonGlobalStorage:AddTool(playerId, tool)
 end
 
 function CommonGlobalStorage:RemoveTool(playerId, tool)
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return false
 	end
@@ -215,7 +213,7 @@ end
 
 function CommonGlobalStorage:GetPlayerStatistic(playerId)
 
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return nil
 	end
@@ -247,7 +245,7 @@ end
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
 function CommonGlobalStorage:CheckAndEquipIfWeapon(playerId, weapon)
 	
-	if self.CheckPlayer(playerId) == false then
+	if not self.CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -303,7 +301,7 @@ end
 
 function CommonGlobalStorage:EquipArmor(playerId, armor)
 	
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -336,7 +334,7 @@ return CommonGlobalStorage
 --[[
 function CommonGlobalStorage:GetAllToolGameData(playerId)
 
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return false
 	end
@@ -364,7 +362,7 @@ function CommonGlobalStorage:CheckStatisticDirtyFlag(playerId)
 end
 
 function CommonGlobalStorage:CheckAndCalculateStatistic(playerId)
-	if self:CheckPlayer(playerId) == false then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return
 	end

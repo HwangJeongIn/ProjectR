@@ -20,10 +20,12 @@ local IsTestMode = ServerConstant.IsTestMode
 -- 따라서 WaitForChild를 사용하여 로드될 때까지 기다린다.
 local MapsFolder = ServerStorage:WaitForChild("Maps")
 
-local MainMessage = ReplicatedStorage:WaitForChild("MainMessage")
-local CurrentGameLength = ReplicatedStorage:WaitForChild("CurrentGameLength")
-local PlayerCount = ReplicatedStorage:WaitForChild("PlayerCount")
-local PlayersLeftCount = ReplicatedStorage:WaitForChild("PlayersLeftCount")
+local RemoteValues = ReplicatedStorage:WaitForChild("RemoteValues")
+
+local MainMessage = RemoteValues:WaitForChild("MainMessage")
+local CurrentGameLength = RemoteValues:WaitForChild("CurrentGameLength")
+local PlayerCount = RemoteValues:WaitForChild("PlayerCount")
+local PlayersLeftCount = RemoteValues:WaitForChild("PlayersLeftCount")
 
 
 -- 공통 저장소관련
@@ -32,9 +34,11 @@ local WinnerType = ServerModuleFacade.CommonEnum.WinnerType
 
 
 -- RemoteEvent
-local ChangeGameStateSTC = ReplicatedStorage:WaitForChild("ChangeGameStateSTC")
-local NotifyWinnerSTC = ReplicatedStorage:WaitForChild("NotifyWinnerSTC")
-local ChangeGameDataCTS = ReplicatedStorage:WaitForChild("ChangeGameDataCTS")
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+
+local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
+local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
+local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 
 ChangeGameDataCTS.OnServerEvent:Connect(function(player, arg1)
 	print(arg1 .. " is client message")
@@ -71,7 +75,7 @@ end
 Initializer:InitializeGame()
 
 
-while false  do
+while true  do
 	
 	
 	-- 다른 플레이어를 기다리는 중

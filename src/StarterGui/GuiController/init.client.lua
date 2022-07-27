@@ -5,17 +5,18 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- StarterGui UI
+-- PlayerGui UI
 
-local StarterGui = script.Parent
+local PlayerGui = script.Parent
 
-local MainMessageText = StarterGui:WaitForChild("MainMessage").MainMessageText
-local EventMessageText = StarterGui:WaitForChild("EventMessage").EventMessageText
+local GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
+local GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
 
-local PlayersLeftCountText = StarterGui.PlayersLeftCount.PlayersLeftCountText
-local KilledCountText = StarterGui.KilledCount.KilledCountText
 
-local CurrentGameLengthText = StarterGui.CurrentGameLength.CurrentGameLengthText
+local GuiBoard = PlayerGui:WaitForChild("GuiBoard")
+local GuiPlayersLeftCountText = GuiBoard:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
+local GuiKilledCountText = GuiBoard:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
+local GuiCurrentGameLengthText = GuiBoard:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
 
 
 -- 공통 저장소 변수
@@ -28,79 +29,82 @@ local WinnerType = CommonModuleFacade.CommonEnum.WinnerType
 -- 리플리케이션 저장소 변수
 
 
---local MainMessage = ReplicatedStorage:WaitForChild("MainMessage")
---MainMessageText.Text = MainMessage.Value
+--local GuiMainMessage = ReplicatedStorage:WaitForChild("GuiMainMessage")
+--GuiMainMessageText.Text = GuiMainMessage.Value
 
-local PlayersLeftCount = ReplicatedStorage:WaitForChild("PlayersLeftCount")
-PlayersLeftCountText.Text = PlayersLeftCount.Value
+local RemoteValues = ReplicatedStorage:WaitForChild("RemoteValues")
 
-local CurrentGameLength = ReplicatedStorage:WaitForChild("CurrentGameLength")
-CurrentGameLengthText.Text = CurrentGameLength.Value
+local PlayersLeftCount = RemoteValues:WaitForChild("PlayersLeftCount")
+GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
+
+local CurrentGameLength = RemoteValues:WaitForChild("CurrentGameLength")
+GuiCurrentGameLengthText.Text = CurrentGameLength.Value
 
 -- Remote Event
 
-local ChangeGameStateSTC = ReplicatedStorage:WaitForChild("ChangeGameStateSTC")
-local NotifyWinnerSTC = ReplicatedStorage:WaitForChild("NotifyWinnerSTC")
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 
-local ChangeGameDataCTS = ReplicatedStorage:WaitForChild("ChangeGameDataCTS")
+local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
+local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
+local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 
 
 PlayersLeftCount:GetPropertyChangedSignal("Value"):Connect(function()
-	PlayersLeftCountText.Text = PlayersLeftCount.Value
+	GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
 end)
 
 CurrentGameLength:GetPropertyChangedSignal("Value"):Connect(function()
-	CurrentGameLengthText.Text = CurrentGameLength.Value
+	GuiCurrentGameLengthText.Text = CurrentGameLength.Value
 end)
 
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
 local function ToggleInGameGui(isEnabled)
-	PlayersLeftCountText.Parent.Enabled = isEnabled
-	CurrentGameLengthText.Parent.Enabled = isEnabled
-	KilledCountText.Parent.Enabled = isEnabled
+	GuiPlayersLeftCountText.Parent.Enabled = isEnabled
+	GuiCurrentGameLengthText.Parent.Enabled = isEnabled
+	GuiKilledCountText.Parent.Enabled = isEnabled
 end
 
 
-local function SetMainMessage(inputText)
+local function SetGuiMainMessage(inputText)
 	
 	if inputText == "" then
 		
-		MainMessageText.Parent.Enabled = false
+		GuiMainMessageText.Parent.Enabled = false
 		
 	else
 --[[
 		local length = inputText:len()
 		local boxSize = length * 20 + 40
 
-		if MainMessageText.Size.X.Offset ~= boxSize then
-			MainMessageText.Size = UDim2.fromOffset(boxSize, MainMessageText.Size.Y.Offset)
+		if GuiMainMessageText.Size.X.Offset ~= boxSize then
+			GuiMainMessageText.Size = UDim2.fromOffset(boxSize, GuiMainMessageText.Size.Y.Offset)
 		end
 
-		if MainMessageText.Position.X.Offset ~= (-(boxSize/2)) then
-			MainMessageText.Position = UDim2.new(MainMessageText.Position.X.Scale, -(boxSize/2), MainMessageText.Position.Y.Offset, MainMessageText.Position.Y.Scale)
+		if GuiMainMessageText.Position.X.Offset ~= (-(boxSize/2)) then
+			GuiMainMessageText.Position = UDim2.new(GuiMainMessageText.Position.X.Scale, -(boxSize/2), GuiMainMessageText.Position.Y.Offset, GuiMainMessageText.Position.Y.Scale)
 		end
 --]]
-		MainMessageText.Text = inputText
-		MainMessageText.Parent.Enabled = true
+		GuiMainMessageText.Text = inputText
+		GuiMainMessageText.Parent.Enabled = true
 	end
 end
 
-local function SetEventMessage(inputText)
+local function SetGuiEventMessage(inputText)
 	
 	if inputText == "" then
 
-		EventMessageText.Parent.Enabled = false
+		GuiEventMessageText.Parent.Enabled = false
 
 	else
 
-		EventMessageText.Text = inputText
-		EventMessageText.Parent.Enabled = true
+		GuiEventMessageText.Text = inputText
+		GuiEventMessageText.Parent.Enabled = true
 		
 		wait(3)
 
-		EventMessageText.Parent.Enabled = false
+		GuiEventMessageText.Parent.Enabled = false
 	end
 end
 
@@ -108,10 +112,10 @@ end
 local function ProcessWaiting(arguments)
 
 	print("GameStateType.Waiting in client")
-	SetMainMessage("Waiting ... ")
-	PlayersLeftCountText.Parent.Enabled = false
-	CurrentGameLengthText.Parent.Enabled = false
-	KilledCountText.Parent.Enabled = false
+	SetGuiMainMessage("Waiting ... ")
+	GuiPlayersLeftCountText.Parent.Enabled = false
+	GuiCurrentGameLengthText.Parent.Enabled = false
+	GuiKilledCountText.Parent.Enabled = false
 	
 end
 
@@ -120,7 +124,7 @@ local function ProcessStarting(arguments)
 
 	print("GameStateType.Starting in client")
 	for i = 5, 1, -1 do
-		SetMainMessage(tostring(i))
+		SetGuiMainMessage(tostring(i))
 		wait(1)
 	end
 	
@@ -130,25 +134,25 @@ end
 local function ProcessPlaying(arguments)
 
 	local mapName = arguments[1]
-	SetMainMessage(mapName .. " is selected")
+	SetGuiMainMessage(mapName .. " is selected")
 	
 	wait(2)
 	
-	SetMainMessage("Get ready to play")
-	PlayersLeftCountText.Parent.Enabled = true
-	CurrentGameLengthText.Parent.Enabled = true
-	KilledCountText.Parent.Enabled = true
+	SetGuiMainMessage("Get ready to play")
+	GuiPlayersLeftCountText.Parent.Enabled = true
+	GuiCurrentGameLengthText.Parent.Enabled = true
+	GuiKilledCountText.Parent.Enabled = true
 	
 	wait(2)
 	
-	SetMainMessage("")
+	SetGuiMainMessage("")
 	
 end
 
 
 local function ProcessDead(arguments)
 
-	SetMainMessage("You Died")
+	SetGuiMainMessage("You Died")
 	
 end
 
@@ -169,9 +173,8 @@ local GameStateProcessSelector = {
 }
 
 ChangeGameStateSTC.OnClientEvent:Connect(function(gameState, ...)
-	
 	print("GameStateType : " .. gameState)
-	GameStateProcessSelector[gameState](...)
+	GameStateProcessSelector[gameState]({...})
 end)
 
 
@@ -194,12 +197,12 @@ NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerRew
 		end
 	end
 	
-	SetMainMessage(winnerMessageString)
+	SetGuiMainMessage(winnerMessageString)
 	
 	wait(3)
 	
 	if rewardMessageString then
-		SetMainMessage(rewardMessageString)
+		SetGuiMainMessage(rewardMessageString)
 	end
 	
 end)
