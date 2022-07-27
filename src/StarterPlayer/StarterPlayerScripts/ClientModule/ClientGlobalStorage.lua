@@ -23,7 +23,7 @@ local ClientGlobalStorage = {}
 
 function ClientGlobalStorage:Initialize()
 	self:SetClientMode()
-	self:AddPlayer(PlayerId) -- 본인거는 서버도 통보안해준다.
+	self:AddPlayer(LocalPlayer) -- 본인거는 서버도 통보안해준다.
 end
 
 function ClientGlobalStorage:GetData()

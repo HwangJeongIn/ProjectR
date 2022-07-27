@@ -1,11 +1,16 @@
 {
-  "name": "project",
+  "name": "ProjectR",
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
       "$ignoreUnknownInstances": true,
       "$path": "src/ReplicatedStorage"
+    },
+    "ReplicatedFirst": {
+      "$className": "ReplicatedFirst",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/ReplicatedFirst"
     },
     "ServerScriptService": {
       "$className": "ServerScriptService",
@@ -40,6 +45,27 @@
       "$className": "Workspace",
       "$ignoreUnknownInstances": true,
       "$path": "src/Workspace"
+    },
+    
+    "Lighting": {
+      "$className": "Lighting",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/Lighting"
+    },
+    "TextChatService": {
+      "$className": "TextChatService",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/TextChatService"
+    },
+    "VoiceChatService": {
+      "$className": "VoiceChatService",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/VoiceChatService"
+    },
+    "TestService": {
+      "$className": "TestService",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/TestService"
     }
   }
 }
