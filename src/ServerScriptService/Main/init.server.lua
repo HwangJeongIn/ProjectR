@@ -1,0 +1,225 @@
+-- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
+
+-- 플레이어에게 복제되는 값들을 저장하는 컨테이너
+-- 서버와 모든 플레이어에게 보인다.
+-- GUI를 업데이트 하기 위한 MainMessage, MainMessage value 등이 들어간다.
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+
+-- 서버에서만 보이는 스토리지 -- 소드와 맵 등을 저장했다.
+-- 다른 플레이어는 보지 못하기 때문에 악용할 수 없다
+local ServerStorage = game:GetService("ServerStorage")
+
+local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
+local ServerConstant = ServerModuleFacade.ServerConstant
+local IsTestMode = ServerConstant.IsTestMode
+
+-- 게임이 생성되기 전에 스크립트가 먼저 실행될 수 있기 때문에
+-- 스크립트 실행 시점에 로드되어 있지 않을 수 있다. 
+-- 따라서 WaitForChild를 사용하여 로드될 때까지 기다린다.
+local MapsFolder = ServerStorage:WaitForChild("Maps")
+
+local MainMessage = ReplicatedStorage:WaitForChild("MainMessage")
+local CurrentGameLength = ReplicatedStorage:WaitForChild("CurrentGameLength")
+local PlayerCount = ReplicatedStorage:WaitForChild("PlayerCount")
+local PlayersLeftCount = ReplicatedStorage:WaitForChild("PlayersLeftCount")
+
+
+-- 공통 저장소관련
+local GameStateType = ServerModuleFacade.CommonEnum.GameStateType
+local WinnerType = ServerModuleFacade.CommonEnum.WinnerType
+
+
+-- RemoteEvent
+local ChangeGameStateSTC = ReplicatedStorage:WaitForChild("ChangeGameStateSTC")
+local NotifyWinnerSTC = ReplicatedStorage:WaitForChild("NotifyWinnerSTC")
+local ChangeGameDataCTS = ReplicatedStorage:WaitForChild("ChangeGameDataCTS")
+
+ChangeGameDataCTS.OnServerEvent:Connect(function(player, arg1)
+	print(arg1 .. " is client message")
+	print(MainMessage.Value)
+end)
+
+
+local DefaultReward = 100
+local GameLength = 50
+local MinPlayerCount = 1
+local MaxPlayerCount = 16
+
+
+local Initializer = require(script:WaitForChild("Initializer"))
+local MapController = require(script:WaitForChild("MapController"))
+
+
+-- 함수 정의 ------------------------------------------------------------------------------------------------------
+
+
+
+
+
+function ClearGui()
+	CurrentGameLength.Value = 0
+	PlayersLeftCount.Value = 0
+	MainMessage.Value = ""
+end
+
+
+
+
+-- 실행 코드 ------------------------------------------------------------------------------------------------------
+Initializer:InitializeGame()
+
+
+while false  do
+	
+	
+	-- 다른 플레이어를 기다리는 중
+	
+	if IsTestMode then
+		while #game.Players:GetPlayers() < 1 do
+			wait(1)
+		end
+		--[[
+		if IsTestMode and #game.Players:GetPlayers() < 2 then
+			Instance.new("Player", game.Players)
+		end
+		--]]
+	else
+		while #game.Players:GetPlayers() < 2 do
+			wait(1)
+		end
+	end
+
+	
+
+	-- 플레이어 저장
+	
+	local playersInGame = {}
+	local players = game.Players:GetPlayers()
+	for i, player in pairs(players) do
+		
+		if not player then
+			continue
+		end
+		
+		table.insert(playersInGame, player)
+		ChangeGameStateSTC:FireClient(player, GameStateType.Starting)
+	end
+	
+
+	-- 10초 딜레이
+	if IsTestMode then
+		wait(1)
+	else
+		wait(5)
+	end
+
+	
+	-- 맵 선택
+	local clonedMap = MapController:SelectRandomMap()
+	
+	-- 플레이어 초기화 : SpawnPoint로 이동, 도구 제공 등
+	Initializer:EnterGame(clonedMap, playersInGame)
+	
+	-- 맵 선택 메시지, 게임 시작 메시지
+	for i, player in pairs(playersInGame) do
+
+		if not player then
+			table.remove(playersInGame, i)
+			continue
+		end
+
+		ChangeGameStateSTC:FireClient(player, GameStateType.Playing, clonedMap.Name)
+	end
+	
+	local currentGameLength = GameLength
+	
+	local prevTime = 0
+	local elapsedTime = 0
+	local currentCharacter = nil
+	local finalPlayerCount = #playersInGame
+
+	local winnerType
+	local winnerName
+	local winnerReward
+	
+	while true do
+		
+		prevTime = os.time()
+		
+		wait(1)
+		
+		for i, player in pairs(playersInGame) do
+			
+			if not player then
+				-- 플레이어가 떠났을 때
+				table.remove(playersInGame, i)
+				continue
+			end
+			
+			currentCharacter = player.Character
+			
+			if not currentCharacter then
+				-- 플레이어의 캐릭터가 사망 / 플레이어가 떠났을 때
+				table.remove(playersInGame, i)
+			else
+				if not currentCharacter:FindFirstChild("AliveTag") then
+					table.remove(playersInGame, i)
+				end
+			end
+		end
+		
+		elapsedTime = os.time() - prevTime
+		currentGameLength -= elapsedTime
+		if currentGameLength < 0 then
+			currentGameLength = 0
+		end
+		
+		-- 클라이언트로 리플리케이션
+		CurrentGameLength.Value = currentGameLength
+		PlayersLeftCount.Value = #playersInGame
+		
+		-- 게임 종료 조건 확인
+		if #playersInGame == 1 then
+			
+			local reward = (playersInGame[1].KilledCount + (finalPlayerCount / 2)) * DefaultReward
+			
+			winnerType = WinnerType.Player
+			winnerName = playersInGame[1].Name
+			winnerReward = reward
+			
+			playersInGame[1].leaderstats.Coins.Value += reward
+			break
+			
+		elseif #playersInGame == 0 then
+			
+			winnerType = WinnerType.NoOne_AllPlayersWereDead
+			break
+			
+		elseif currentGameLength <= 0 then
+			
+			winnerType = WinnerType.NoOne_TimeIsUp
+			break
+		end
+	end
+
+	wait(5)
+	if winnerType == WinnerType.Player then
+		NotifyWinnerSTC:FireAllClients(winnerType, winnerName, winnerReward)
+	else
+		NotifyWinnerSTC:FireAllClients(winnerType)
+	end
+	
+	if IsTestMode then
+		wait(10)
+	end
+	
+	-- 맵 정리
+	
+	Initializer:ClearPlayers(playersInGame)
+	ClearGui()
+	clonedMap:Destroy()
+	
+	wait(5)
+end

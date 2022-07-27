@@ -1,0 +1,10 @@
+{
+    
+    "ignoreUnknownInstances": true,
+    "Children": [
+        {
+          "Name": "remlafmesamk",
+          "ClassName": "RemoteEvent"
+        }
+      ]
+}
