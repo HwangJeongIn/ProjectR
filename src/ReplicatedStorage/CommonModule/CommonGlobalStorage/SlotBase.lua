@@ -19,7 +19,8 @@ function SlotBase:GetToolGameData(tool)
 		return nil
 	end
 
-	local key = tool:FindFirstChild("Key")
+	-- FindFirstChild를 쓰면 가끔 못찾는 경우가 있다. 확인해봐야한다.
+	local key = tool:WaitForChild("Key")
 	if not key then
 		Debug.Assert(false, "Key 객체가 존재하지 않습니다. => " .. tostring(tool))
 		return nil
@@ -33,6 +34,10 @@ function SlotBase:GetToolGameData(tool)
 	end
 
 	return toolGameData
+end
+
+function SlotBase:IsValidTool(tool)
+	return (self:GetToolGameData(tool) ~= nil)
 end
 
 

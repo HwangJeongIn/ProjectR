@@ -187,8 +187,9 @@ while true  do
 		-- 게임 종료 조건 확인
 		if #playersInGame == 1 then
 			
-			local reward = (playersInGame[1].KilledCount + (finalPlayerCount / 2)) * DefaultReward
-			
+			--local reward = (playersInGame[1].KilledCount + (finalPlayerCount / 2)) * DefaultReward
+			local reward = (finalPlayerCount / 2) * DefaultReward
+
 			winnerType = WinnerType.Player
 			winnerName = playersInGame[1].Name
 			winnerReward = reward

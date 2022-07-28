@@ -1,10 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 local Utility = require(CommonModule:WaitForChild("Utility"))
+local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
+local EquipSlotCount = CommonEnum.ArmorType.Count - 1
+
 
 local CommonConstant = {
 	MaxQuickSlotCount = 5,
 	MaxInventorySlotCount = 30,
+	MaxEquipSlotCount = EquipSlotCount,
 	GuiInventorySlotCountPerLine = 5,
 	GuiInventorySlotOffset = 5,
 	UndefinedElementValue = false

@@ -17,6 +17,8 @@ local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 
 local Inventory = require(script:WaitForChild("Inventory"))
+local EquipSlots = require(script:WaitForChild("EquipSlots"))
+local PlayerStatistic = require(script:WaitForChild("PlayerStatistic"))
 
 --[[
 PlayerTable
@@ -75,6 +77,7 @@ end
 function CommonGlobalStorage:CreateEmptyData()
 	local playerData = {
 		[StatusType.Statistic] = self:CreateEmptyStatistic(),
+		--[[
 		[StatusType.ArmorSlot] = {
 			-- 그냥 명시적으로 표현
 			[ArmorType.Helmet] = {Value = nil, ToolGameData = nil},
@@ -85,6 +88,8 @@ function CommonGlobalStorage:CreateEmptyData()
 
 		-- 그냥 명시적으로 표현
 		[StatusType.WeaponSlot] = {Value = nil, ToolGameData = nil},
+		--]]
+		[StatusType.QuickSlots]
 		[StatusType.Inventory] = Utility.DeepCopy(Inventory)
 	}
 
@@ -183,10 +188,13 @@ function CommonGlobalStorage:RemoveTool(playerId, tool)
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
+
+	tool:Destroy()
 	
 	return true
 end
 
+--[[
 function CommonGlobalStorage:GetToolGameData(tool)
 	
 	if not tool then
@@ -210,7 +218,7 @@ function CommonGlobalStorage:GetToolGameData(tool)
 	
 	return toolGameData
 end
-
+--]]
 function CommonGlobalStorage:GetPlayerStatistic(playerId)
 
 	if not self:CheckPlayer(playerId) then
@@ -223,6 +231,12 @@ function CommonGlobalStorage:GetPlayerStatistic(playerId)
 end
 
 function CommonGlobalStorage:UpdateRemovedToolGameData(playerId, toolGameData)
+
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return
+	end
+
 	if not toolGameData then
 		return
 	end
@@ -232,7 +246,7 @@ function CommonGlobalStorage:UpdateRemovedToolGameData(playerId, toolGameData)
 	end
 end
 
-function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
+1function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
 	if not toolGameData then
 		return
 	end

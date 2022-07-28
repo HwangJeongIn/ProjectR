@@ -37,15 +37,15 @@ local CommonEnum = {
 		Helmet = 1,
 		Chestplate = 2,
 		Leggings = 3,
-		Boots = 4
+		Boots = 4,
+		Count = 5
 	},
 	
 	StatusType = {
 		Statistic = 1,
-		WeaponSlot = 2,
-		ArmorSlot = 3,
-		Inventory = 4,
-		QuickSlot = 5, -- 클라이언트 전용
+		EquipSlots = 2,
+		Inventory = 3,
+		QuickSlots = 4, -- 클라이언트 전용
 	}
 	
 	--[[,

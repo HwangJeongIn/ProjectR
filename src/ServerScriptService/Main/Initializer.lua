@@ -65,7 +65,11 @@ function ClearPlayer(player)
 	end
 	
 	-- 플레이어 가방 정리
-	player.Backpack:ClearAllChildren()
+	local allTools = player.Backpack:GetChildren()
+	for _, targetTool in pairs(allTools) do
+		targetTool.Parent = nil
+	end
+	--player.Backpack:ClearAllChildren()
 
 	-- 플레이어 데이터 정리
 	if not ServerGlobalStorage:ClearPlayer(player) then
@@ -165,9 +169,11 @@ function Initializer:StartGame(playersInGame)
 		
 		-- 기본 도구
 		local sword = ServerStorage.Tools.Sword:Clone()
+		--sword:WaitForChild("Key")
 		sword.Parent = player.Backpack
 
 		local axe = ServerStorage.Tools.Axe:Clone()
+		--axe:WaitForChild("Key")
 		axe.Parent = player.Backpack
 
 		--[[
