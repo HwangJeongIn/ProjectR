@@ -6,7 +6,7 @@ local GameDataType = CommonEnum.GameDataType
 
 local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
-local GameDataBase = Utility.DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
+local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
 
 local WorldInteractorGameData = setmetatable({Name = "WorldInteractorGameData"}, GameDataBase)

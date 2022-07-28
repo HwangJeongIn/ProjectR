@@ -63,5 +63,5 @@ end
 
 -- 반환 코드 ------------------------------------------------------------------------------------------------------
 
-setmetatable(WorldInteractorBase, Utility.DeepCopy(require(ServerModuleFacade.ObjectModule:WaitForChild("ObjectBase"))))
+setmetatable(WorldInteractorBase, Utility:DeepCopy(require(ServerModuleFacade.ObjectModule:WaitForChild("ObjectBase"))))
 return WorldInteractorBase

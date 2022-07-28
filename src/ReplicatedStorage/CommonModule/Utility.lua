@@ -29,7 +29,7 @@ Utility.__index = Inheritable__index
 Utility.__newindex = Immutable__newindex
 
 
-function Utility.DeepCopy(original)
+function Utility:DeepCopy(original)
 
 	local originalType = type(original)
 	local copy = {}
@@ -37,9 +37,9 @@ function Utility.DeepCopy(original)
 	if originalType == 'table' then
 
 		for key, value in next, original, nil do
-			copy[Utility.DeepCopy(key)] = Utility.DeepCopy(value)
+			copy[Utility:DeepCopy(key)] = Utility:DeepCopy(value)
 		end
-		setmetatable(copy, Utility.DeepCopy(getmetatable(original)))
+		setmetatable(copy, Utility:DeepCopy(getmetatable(original)))
 
 	else -- number, string, boolean, etc
 		copy = original
@@ -48,7 +48,7 @@ function Utility.DeepCopy(original)
 	return copy
 end
 
-function Utility.DeepCopyWithoutMetatable(original)
+function Utility:DeepCopyWithoutMetatable(original)
 
 	local originalType = type(original)
 	local copy = {}
@@ -56,7 +56,7 @@ function Utility.DeepCopyWithoutMetatable(original)
 	if originalType == 'table' then
 
 		for key, value in next, original, nil do
-			copy[Utility.DeepCopy(key)] = Utility.DeepCopy(value)
+			copy[Utility:DeepCopy(key)] = Utility:DeepCopy(value)
 		end
 		setmetatable(copy, getmetatable(original))
 

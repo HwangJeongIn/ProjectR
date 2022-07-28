@@ -16,6 +16,7 @@ local ArmorType = CommonEnum.ArmorType
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 
+local SlotBase = require(script:WaitForChild("SlotBase"))
 local Inventory = require(script:WaitForChild("Inventory"))
 local EquipSlots = require(script:WaitForChild("EquipSlots"))
 local PlayerStatistic = require(script:WaitForChild("PlayerStatistic"))
@@ -46,7 +47,7 @@ end
 
 function CommonGlobalStorage:CreateEmptyData()
 	local playerData = {
-		[StatusType.Statistic] =  Utility.DeepCopy(PlayerStatistic),
+		[StatusType.Statistic] =  Utility:DeepCopy(PlayerStatistic),
 		--[[
 		[StatusType.ArmorSlot] = {
 			-- 그냥 명시적으로 표현
@@ -59,8 +60,8 @@ function CommonGlobalStorage:CreateEmptyData()
 		-- 그냥 명시적으로 표현
 		[StatusType.WeaponSlot] = {Value = nil, ToolGameData = nil},
 		--]]
-		[StatusType.EquipSlots] = Utility.DeepCopy(EquipSlots),
-		[StatusType.Inventory] = Utility.DeepCopy(Inventory)
+		[StatusType.EquipSlots] = Utility:DeepCopy(EquipSlots),
+		[StatusType.Inventory] = Utility:DeepCopy(Inventory)
 	}
 
 	if self.IsClient then

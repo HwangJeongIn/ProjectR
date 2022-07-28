@@ -11,10 +11,10 @@ local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local ToolType = CommonEnum.ToolType
 
 local Container = CommonModule:WaitForChild("Container")
-local ArmorSlotsRaw = Utility.DeepCopy(require(Container:WaitForChild("TArray")))
+local ArmorSlotsRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
 ArmorSlotsRaw:Initialize(MaxEquipSlotCount)
 
-local EquipSlots = Utility.DeepCopy(require(script.Parent:WaitForChild("SlotBase")))
+local EquipSlots = Utility:DeepCopy(require(script.Parent:WaitForChild("SlotBase")))
 EquipSlots.ArmorSlotsRaw = ArmorSlotsRaw
 EquipSlots.WeaponSlot = nil
 

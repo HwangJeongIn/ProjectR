@@ -12,18 +12,18 @@ local GameDataType = CommonEnum.GameDataType
 local ToolType = CommonEnum.ToolType
 
 local Container = CommonModule:WaitForChild("Container")
-local InventoryRaw = Utility.DeepCopy(require(Container:WaitForChild("TArray")))
+local InventoryRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
 
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 
 InventoryRaw:Initialize(MaxInventorySlotCount)
 
-local Inventory = Utility.DeepCopy(require(script.Parent:WaitForChild("SlotBase")))
+local Inventory = Utility:DeepCopy(require(script.Parent:WaitForChild("SlotBase")))
 Inventory.InventoryRaw = InventoryRaw
-Inventory[ToolType.Armor] = Utility.DeepCopy(InventoryRaw)
-Inventory[ToolType.Weapon] = Utility.DeepCopy(InventoryRaw)
-Inventory[ToolType.Consumable] = Utility.DeepCopy(InventoryRaw)
+Inventory[ToolType.Armor] = Utility:DeepCopy(InventoryRaw)
+Inventory[ToolType.Weapon] = Utility:DeepCopy(InventoryRaw)
+Inventory[ToolType.Consumable] = Utility:DeepCopy(InventoryRaw)
 
 function Inventory:GetSlots(toolType)
 	if toolType == ToolType.All then

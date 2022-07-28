@@ -9,7 +9,7 @@ local ArmorTypeSelector = CommonEnum.ArmorType
 
 local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
-local GameDataBase = Utility.DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
+local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
 
 local ToolGameData = setmetatable({Name = "ToolGameData"}, GameDataBase)

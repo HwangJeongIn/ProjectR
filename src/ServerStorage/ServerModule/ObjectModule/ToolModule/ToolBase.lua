@@ -60,5 +60,5 @@ end
 
 -- 반환 코드 ------------------------------------------------------------------------------------------------------
 
-setmetatable(ToolBase, Utility.DeepCopy(require(ServerModuleFacade.ObjectModule:WaitForChild("ObjectBase"))))
+setmetatable(ToolBase, Utility:DeepCopy(require(ServerModuleFacade.ObjectModule:WaitForChild("ObjectBase"))))
 return ToolBase

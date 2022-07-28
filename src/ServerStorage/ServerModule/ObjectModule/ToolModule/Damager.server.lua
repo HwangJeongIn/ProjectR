@@ -9,7 +9,7 @@ local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
 local GameDataType = ServerModuleFacade.ServerEnum.GameDataType
 
-local ToolBase = Utility.DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
+local ToolBase = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
 local Debris = game:GetService("Debris")
 
 local Tool = script.Parent

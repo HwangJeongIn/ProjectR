@@ -241,7 +241,7 @@ local ArmorTypeSelector = CommonEnum.ArmorType
 
 local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
-local GameDataBase = Utility.DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
+local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
 
 local ToolGameData = setmetatable({Name = "ToolGameData"}, GameDataBase)
@@ -462,7 +462,7 @@ function CommonGlobalStorage:CreateEmptyData()
 
 		-- 그냥 명시적으로 표현
 		[StatusType.WeaponSlot] = {Value = nil, ToolGameData = nil},
-		[StatusType.Inventory] = Utility.DeepCopy(Inventory)
+		[StatusType.Inventory] = Utility:DeepCopy(Inventory)
 	}
 
 	if self.IsClient then
@@ -780,18 +780,18 @@ local GameDataType = CommonEnum.GameDataType
 local ToolType = CommonEnum.ToolType
 
 local Container = CommonModule:WaitForChild("Container")
-local InventoryRaw = Utility.DeepCopy(require(Container:WaitForChild("TArray")))
+local InventoryRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
 
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 
 InventoryRaw:Initialize(MaxInventorySlotCount)
 
-local Inventory = Utility.DeepCopy(require(script.Parent:WaitForChild("SlotBase")))
+local Inventory = Utility:DeepCopy(require(script.Parent:WaitForChild("SlotBase")))
 Inventory.InventoryRaw = InventoryRaw
-Inventory[ToolType.Armor] = Utility.DeepCopy(InventoryRaw)
-Inventory[ToolType.Weapon] = Utility.DeepCopy(InventoryRaw)
-Inventory[ToolType.Consumable] = Utility.DeepCopy(InventoryRaw)
+Inventory[ToolType.Armor] = Utility:DeepCopy(InventoryRaw)
+Inventory[ToolType.Weapon] = Utility:DeepCopy(InventoryRaw)
+Inventory[ToolType.Consumable] = Utility:DeepCopy(InventoryRaw)
 
 function Inventory:GetSlots(toolType)
 	if toolType == ToolType.All then
@@ -908,7 +908,7 @@ local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
 local UndefinedElementValue = CommonConstant.UndefinedElementValue
 
 local Container = CommonModule:WaitForChild("Container")
-local TContainerBase = Utility.DeepCopy(require(Container:WaitForChild("TContainerBase")))
+local TContainerBase = Utility:DeepCopy(require(Container:WaitForChild("TContainerBase")))
 
 local TArray = TContainerBase
 
@@ -1136,7 +1136,7 @@ local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
 local UndefinedElementValue = CommonConstant.UndefinedElementValue
 
 local Container = CommonModule:WaitForChild("Container")
-local TContainerBase = Utility.DeepCopy(require(Container:WaitForChild("TContainerBase")))
+local TContainerBase = Utility:DeepCopy(require(Container:WaitForChild("TContainerBase")))
 
 local TList = TContainerBase
 
@@ -1325,7 +1325,7 @@ Utility.__index = Inheritable__index
 Utility.__newindex = Immutable__newindex
 
 
-function Utility.DeepCopy(original)
+function Utility:DeepCopy(original)
 
 	local originalType = type(original)
 	local copy = {}
@@ -1333,9 +1333,9 @@ function Utility.DeepCopy(original)
 	if originalType == 'table' then
 
 		for key, value in next, original, nil do
-			copy[Utility.DeepCopy(key)] = Utility.DeepCopy(value)
+			copy[Utility:DeepCopy(key)] = Utility:DeepCopy(value)
 		end
-		setmetatable(copy, Utility.DeepCopy(getmetatable(original)))
+		setmetatable(copy, Utility:DeepCopy(getmetatable(original)))
 
 	else -- number, string, boolean, etc
 		copy = original
@@ -1344,7 +1344,7 @@ function Utility.DeepCopy(original)
 	return copy
 end
 
-function Utility.DeepCopyWithoutMetatable(original)
+function Utility:DeepCopyWithoutMetatable(original)
 
 	local originalType = type(original)
 	local copy = {}
@@ -1352,7 +1352,7 @@ function Utility.DeepCopyWithoutMetatable(original)
 	if originalType == 'table' then
 
 		for key, value in next, original, nil do
-			copy[Utility.DeepCopy(key)] = Utility.DeepCopy(value)
+			copy[Utility:DeepCopy(key)] = Utility:DeepCopy(value)
 		end
 		setmetatable(copy, getmetatable(original))
 
@@ -35198,7 +35198,7 @@ local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
 local GameDataType = ServerModuleFacade.ServerEnum.GameDataType
 
-local ToolBase = Utility.DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
+local ToolBase = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
 local Debris = game:GetService("Debris")
 
 local Tool = script.Parent
@@ -35460,7 +35460,7 @@ end
 
 -- 반환 코드 ------------------------------------------------------------------------------------------------------
 
-setmetatable(ToolBase, Utility.DeepCopy(require(ServerModuleFacade.ObjectModule:WaitForChild("ObjectBase"))))
+setmetatable(ToolBase, Utility:DeepCopy(require(ServerModuleFacade.ObjectModule:WaitForChild("ObjectBase"))))
 return ToolBase
 ]]></string>
             </Properties>
@@ -35543,7 +35543,7 @@ end
 
 -- 반환 코드 ------------------------------------------------------------------------------------------------------
 
-setmetatable(WorldInteractorBase, Utility.DeepCopy(require(ServerModuleFacade.ObjectModule:WaitForChild("ObjectBase"))))
+setmetatable(WorldInteractorBase, Utility:DeepCopy(require(ServerModuleFacade.ObjectModule:WaitForChild("ObjectBase"))))
 return WorldInteractorBase
 ]]></string>
             </Properties>
@@ -35637,7 +35637,7 @@ local GameDataType = CommonEnum.GameDataType
 
 local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
-local GameDataBase = Utility.DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
+local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
 
 local CharacterGameData = setmetatable({Name = "CharacterGameData"}, GameDataBase)
@@ -35677,7 +35677,7 @@ local GameDataType = CommonEnum.GameDataType
 
 local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
-local GameDataBase = Utility.DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
+local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
 
 local WorldInteractorGameData = setmetatable({Name = "WorldInteractorGameData"}, GameDataBase)
@@ -42090,7 +42090,7 @@ local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
 local GameDataType = ServerModuleFacade.ServerEnum.GameDataType
 
-local ToolBase = Utility.DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
+local ToolBase = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
 local Debris = game:GetService("Debris")
 
 local Tool = script.Parent
@@ -42787,7 +42787,7 @@ local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
 local GameDataType = ServerModuleFacade.ServerEnum.GameDataType
 
-local ToolBase = Utility.DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
+local ToolBase = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
 local Debris = game:GetService("Debris")
 
 local Tool = script.Parent
@@ -44252,7 +44252,7 @@ local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
 local GameDataType = ServerModuleFacade.ServerEnum.GameDataType
 
-local ToolBase = Utility.DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
+local ToolBase = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
 local Debris = game:GetService("Debris")
 
 local Tool = script.Parent
