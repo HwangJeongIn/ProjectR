@@ -18,33 +18,6 @@ local EquipSlots = Utility.DeepCopy(require(script.Parent:WaitForChild("SlotBase
 EquipSlots.ArmorSlotsRaw = ArmorSlotsRaw
 EquipSlots.WeaponSlot = nil
 
-function EquipSlots:CheckEquipToolGameData(toolGameData)
-	if not toolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-    local targetToolType = toolGameData.ToolType
-    if not targetToolType == ToolType.Armor and not targetToolType == ToolType.Weapon then
-		return false
-    end
-
-    return true
-end
-
-function EquipSlots:CheckWeaponToolGameData(toolGameData)
-    if not toolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-    local targetToolType = toolGameData.ToolType
-    if not targetToolType == ToolType.Weapon then
-		return false
-    end
-
-    return true
-end
 
 function EquipSlots:EquipTool(tool, withCheck)
     local toolGameData = self:GetToolGameData(tool)
@@ -54,7 +27,7 @@ function EquipSlots:EquipTool(tool, withCheck)
 	end
 
     if withCheck then
-        if not self:CheckEquipToolGameData(toolGameData) then
+        if not self:CheckEquipableToolGameData(toolGameData) then
             Debug.Assert(false, "비정상입니다.")
             return nil, nil
         end

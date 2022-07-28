@@ -20,36 +20,6 @@ local Inventory = require(script:WaitForChild("Inventory"))
 local EquipSlots = require(script:WaitForChild("EquipSlots"))
 local PlayerStatistic = require(script:WaitForChild("PlayerStatistic"))
 
---[[
-PlayerTable
-	Player ...
-	
-	Player(UserId, InstanceAddress)
-	
-		ArmorSlot(StatusType.ArmorSlot)
-			- HelmetSlot
-			- ChestplateSlot
-			- LeggingsSlot
-			- BootsSlot
-			
-		WeaponSlot(StatusType.WeaponSlot)
-			- WeaponSlot	- 
-
-		Inventory(StatusType.Inventory)
-			- ToolType.Armor
-				...
-				
-			- ToolType.Weapon
-				...
-			
-			- ToolType.Consumable
-				...
-				
-		QuickSlot(StatusType.QuickSlot) -- 클라이언트 전용
-			...
-		
---]]
-
 local CommonGlobalStorage = {
 	IsClient = false,
 	PlayerTable = {}
@@ -76,7 +46,7 @@ end
 
 function CommonGlobalStorage:CreateEmptyData()
 	local playerData = {
-		[StatusType.Statistic] = self:CreateEmptyStatistic(),
+		[StatusType.Statistic] =  Utility.DeepCopy(PlayerStatistic),
 		--[[
 		[StatusType.ArmorSlot] = {
 			-- 그냥 명시적으로 표현
@@ -89,12 +59,12 @@ function CommonGlobalStorage:CreateEmptyData()
 		-- 그냥 명시적으로 표현
 		[StatusType.WeaponSlot] = {Value = nil, ToolGameData = nil},
 		--]]
-		[StatusType.QuickSlots]
+		[StatusType.EquipSlots] = Utility.DeepCopy(EquipSlots),
 		[StatusType.Inventory] = Utility.DeepCopy(Inventory)
 	}
 
 	if self.IsClient then
-		playerData[StatusType.QuickSlot] = {}
+		playerData[StatusType.QuickSlots] = {}
 	end
 	
 	return playerData
@@ -231,59 +201,83 @@ function CommonGlobalStorage:GetPlayerStatistic(playerId)
 end
 
 function CommonGlobalStorage:UpdateRemovedToolGameData(playerId, toolGameData)
-
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
-		return
+		return false
 	end
 
-	if not toolGameData then
-		return
+	local playerStatistic = self.PlayerTable[playerId][StatusType.Statistic]
+	if not playerStatistic:UpdateRemovedToolGameData(toolGameData) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
 	end
-	
-	for attribute, value in pairs(toolGameData) do
-		self.PlayerTable[playerId][StatusType.Statistic][attribute] -= value
-	end
+
+	return true
 end
 
-1function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
-	if not toolGameData then
-		return
+function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return false
 	end
-	
-	for attribute, value in pairs(toolGameData) do
-		self.PlayerTable[playerId][StatusType.Statistic][attribute] += value
+
+	local playerStatistic = self.PlayerTable[playerId][StatusType.Statistic]
+	if not playerStatistic:UpdateAddedToolGameData(toolGameData) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
 	end
+
+	return true
 end
 
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
-function CommonGlobalStorage:CheckAndEquipIfWeapon(playerId, weapon)
-	
+function CommonGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
 	if not self.CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
-	
-	if not weapon then
+
+	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
+	if not equipSlots:CheckWeaponTool(tool) then
+		return false
+	end
+
+	local prevToolGameData, currentToolGameData = equipSlots:EquipTool(tool)
+	if not currentToolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-	local toolGameData = self:GetToolGameData(weapon)
-	if not toolGameData then
+	if prevToolGameData then
+		self:UpdateRemovedToolGameData(playerId, prevToolGameData)
+	end
+	
+	self:UpdateAddedToolGameData(playerId, currentToolGameData)
+	return true
+end
+
+function CommonGlobalStorage:CheckEquipableTool(playerId, tool)
+
+end
+
+function CommonGlobalStorage:EquipTool(playerId, tool)
+	if not self.CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
-	
-	if toolGameData.ToolType ~= ToolType.Weapon then
+
+	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
+	local prevToolGameData, currentToolGameData = equipSlots:EquipTool(tool, true)
+	if not currentToolGameData then
+		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-	self:UpdateRemovedToolGameData(self.PlayerTable[playerId][StatusType.WeaponSlot].ToolGameData)
-	self:UpdateAddedToolGameData(toolGameData)
+	if prevToolGameData then
+		self:UpdateRemovedToolGameData(playerId, prevToolGameData)
+	end
 	
-	self.PlayerTable[playerId][StatusType.WeaponSlot].Value = weapon
-	self.PlayerTable[playerId][StatusType.WeaponSlot].ToolGameData = toolGameData
+	self:UpdateAddedToolGameData(playerId, currentToolGameData)
 	return true
 end
 
