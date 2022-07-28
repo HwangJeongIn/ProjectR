@@ -7,81 +7,107 @@ local CommonGlobalStorage = CommonModuleFacade.CommonGlobalStorage
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
+
 local GameDataType = ServerEnum.GameDataType
+local StatusType = ServerEnum.StatusType
+local ToolType = ServerEnum.ToolType
+local ArmorType = ServerEnum.ArmorType
+
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+local SetInventorySlotSTC = RemoteEvents:WaitForChild("SetInventorySlotSTC")
+local AddPlayerSTC = RemoteEvents:WaitForChild("AddPlayerSTC")
+
 
 local ServerGlobalStorage = CommonGlobalStorage
 
--- static 변수 반드시 싱글톤으로 사용해야 한다.
-local Characters = {}
-
-
-function ServerGlobalStorage:CheckCharacter(character)
-	if Characters[character] then
-		return true
+function ServerGlobalStorage:AddTool(playerId, tool)
+	local player = game.Players:GetPlayerByUserId(playerId)
+	if not player then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return false
 	end
-	return false
-end
 
-function ServerGlobalStorage:AddCharacter(character)
-	
-	if self:CheckCharacter(character) then
-		Debug.Assert(false, "두 번 추가하려고 합니다.")
-		return
-	end
-	
-	Characters[character] = {}
-	
-end
-
-function ServerGlobalStorage:RemoveCharacter(character)
-	
-	Characters[character] = nil
-	
-end
-
-function ServerGlobalStorage:GetGameData(character, gameDataType)
-	
-	if not self:CheckCharacter(character) then
-		Debug.Assert(false, "캐릭터가 없습니다.")
-		return nil
-	end
-	
-	if not Characters[character][gameDataType] then
-		Debug.Print("게임 데이터 type(" .. tostring(gameDataType) .. ")가 초기화되지 않았습니다. => ".. character.Name)
-		return nil
-	end
-	
-	return Characters[character][gameDataType]
-	
-end
-
-
-function ServerGlobalStorage:AddGameData(character, gameData)
-	
-	if not gameData then
-		Debug.Assert(false, "입력으로 들어온 gameData가 비정상입니다.")
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어 데이터가 존재하지 않습니다.")
 		return false
 	end
 	
-	if not self:CheckCharacter(character) then
-		Debug.Assert(false, "캐릭터가 없습니다.")
+	local inventory = self.PlayerTable[playerId][StatusType.Inventory]
+	if not inventory:AddTool(tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local slotIndex = inventory:GetSlotIndexRaw(tool)
+	Debug.Assert(slotIndex, "코드 버그")
+
+	SetInventorySlotSTC:FireClient(player, slotIndex, tool)
+	return true
+end
+
+function ServerGlobalStorage:RemoveTool(playerId, tool)
+	local player = game.Players:GetPlayerByUserId(playerId)
+	if not player then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return false
+	end
+
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어 데이터가 존재하지 않습니다.")
 		return false
 	end
 	
-	local gameDataType = gameData:GetGameDataType()
-	Characters[character][gameDataType] = gameData
+	local inventory = self.PlayerTable[playerId][StatusType.Inventory]
+	local slotIndex = inventory:GetSlotIndexRaw(tool)
+	Debug.Assert(slotIndex, "코드 버그")
+
+	if not inventory:RemoveTool(tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	tool:Destroy()
+	
+	SetInventorySlotSTC:FireClient(player, slotIndex, nil)
+	return true
 end
 
-function ServerGlobalStorage:RemoveGameData(character, gameDataType)
-	
-	if not self:CheckCharacter(character) then
-		Debug.Assert(false, "캐릭터가 없습니다.")
-		return nil
+function ServerGlobalStorage:RegisterPlayerEvent(player)
+
+	if not player then
+		Debug.Assert(false, "비정상입니다.")
+		return false
 	end
+
+	local playerId = player.UserId
+	player.Backpack.ChildAdded:Connect(function(tool)
+		self:AddTool(playerId, tool)
+	end)
+
+	player.Backpack.ChildRemoved:Connect(function(tool)
+		self:RemoveTool(playerId, tool)
+	end)
 	
-	Characters[character][gameDataType] = nil
-	
+	return true
 end
+
+function ServerGlobalStorage:InitializePlayer(player)
+	
+	if not self:AddPlayer(player) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self:RegisterPlayerEvent(player) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+end
+
+
+
+
 
 ServerGlobalStorage.__index = Utility.Inheritable__index
 ServerGlobalStorage.__newindex = Utility.Inheritable__newindex

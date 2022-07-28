@@ -3,7 +3,11 @@
   "Children": [
     
     {
-      "Name": "AddToolSTC",
+      "Name": "AddPlayerSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "SetInventorySlotSTC",
       "ClassName": "RemoteEvent"
     },
     {

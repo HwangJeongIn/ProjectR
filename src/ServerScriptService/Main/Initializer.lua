@@ -113,7 +113,7 @@ function OnPlayerAdded(player)
 		OnCharacterRemoving(player, character)
 	end)
 	
-	ServerGlobalStorage:AddPlayer(player)
+	ServerGlobalStorage:InitializePlayer(player)
 
 	local leaderstatsFolder = Instance.new("Folder")
 	leaderstatsFolder.Name = "leaderstats"

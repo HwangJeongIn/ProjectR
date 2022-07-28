@@ -35,6 +35,39 @@ function Inventory:GetSlots(toolType)
 	return self[toolType]:GetValueToIndexTable()
 end
 
+function Inventory:GetSlotIndexRaw(tool)
+	return InventoryRaw:GetIndex(tool)
+end
+
+function Inventory:GetSlotIndex(tool)
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local slotIndex = InventoryRaw:GetIndex(tool)
+	if not slotIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+	
+	return slotIndex
+end
+
+function Inventory:SetTool(slotIndex, tool)
+	if not tool or not slotIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not InventoryRaw:Set(slotIndex) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
 function Inventory:AddTool(tool)
 	local toolGameData = ToolUtility:GetToolGameData(tool)
 	if not toolGameData then

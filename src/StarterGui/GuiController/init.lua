@@ -42,12 +42,6 @@ GuiCurrentGameLengthText.Text = CurrentGameLength.Value
 
 -- Remote Event
 
-local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
-
-local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
-local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
-local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
-
 
 PlayersLeftCount:GetPropertyChangedSignal("Value"):Connect(function()
 	GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
@@ -57,22 +51,21 @@ CurrentGameLength:GetPropertyChangedSignal("Value"):Connect(function()
 	GuiCurrentGameLengthText.Text = CurrentGameLength.Value
 end)
 
+local GuiController = {}
+
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
-local function ToggleInGameGui(isEnabled)
+function ToggleInGameGui(isEnabled)
 	GuiPlayersLeftCountText.Parent.Enabled = isEnabled
 	GuiCurrentGameLengthText.Parent.Enabled = isEnabled
 	GuiKilledCountText.Parent.Enabled = isEnabled
 end
 
 
-local function SetGuiMainMessage(inputText)
-	
+function SetGuiMainMessage(inputText)
 	if inputText == "" then
-		
 		GuiMainMessageText.Parent.Enabled = false
-		
 	else
 --[[
 		local length = inputText:len()
@@ -91,26 +84,19 @@ local function SetGuiMainMessage(inputText)
 	end
 end
 
-local function SetGuiEventMessage(inputText)
+function SetGuiEventMessage(inputText)
 	
 	if inputText == "" then
-
 		GuiEventMessageText.Parent.Enabled = false
-
 	else
-
 		GuiEventMessageText.Text = inputText
 		GuiEventMessageText.Parent.Enabled = true
-		
 		wait(3)
-
 		GuiEventMessageText.Parent.Enabled = false
 	end
 end
 
-
-local function ProcessWaiting(arguments)
-
+function ProcessWaiting(arguments)
 	print("GameStateType.Waiting in client")
 	SetGuiMainMessage("Waiting ... ")
 	GuiPlayersLeftCountText.Parent.Enabled = false
@@ -119,20 +105,15 @@ local function ProcessWaiting(arguments)
 	
 end
 
-
-local function ProcessStarting(arguments)
-
+function ProcessStarting(arguments)
 	print("GameStateType.Starting in client")
 	for i = 5, 1, -1 do
 		SetGuiMainMessage(tostring(i))
 		wait(1)
 	end
-	
 end
 
-
-local function ProcessPlaying(arguments)
-
+function ProcessPlaying(arguments)
 	local mapName = arguments[1]
 	SetGuiMainMessage(mapName .. " is selected")
 	
@@ -146,23 +127,15 @@ local function ProcessPlaying(arguments)
 	wait(2)
 	
 	SetGuiMainMessage("")
-	
 end
 
-
-local function ProcessDead(arguments)
-
+function ProcessDead(arguments)
 	SetGuiMainMessage("You Died")
-	
 end
 
-
-local function ProcessWaitingForFinishing(arguments)
-	
+function ProcessWaitingForFinishing(arguments)
 	ProcessWaiting()
-	
 end
-
 
 local GameStateProcessSelector = {
 	[GameStateType.Waiting] = ProcessWaiting,
@@ -171,12 +144,10 @@ local GameStateProcessSelector = {
 	[GameStateType.Dead] = ProcessDead,
 	[GameStateType.WaitingForFinishing] = ProcessWaitingForFinishing,
 }
-
-ChangeGameStateSTC.OnClientEvent:Connect(function(gameState, ...)
-	print("GameStateType : " .. gameState)
-	GameStateProcessSelector[gameState]({...})
-end)
-
+function GuiController:OnChangeGameStateSTC(gameState, arguments)
+	--print("GameStateType : " .. gameState)
+	GameStateProcessSelector[gameState](arguments)
+end
 
 local WinnerProcessSelector = {
 	[WinnerType.Player] = "Winner is ",
@@ -184,9 +155,7 @@ local WinnerProcessSelector = {
 	[WinnerType.NoOne_AllPlayersWereDead] = "No one won the game",
 	[WinnerType.Ai] = "Winner is AI",
 }
-
-NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerReward)
-	
+function GuiController:OnNotifyWinnerSTC(winnerType, winnerName, winnerReward)
 	local winnerMessageString = WinnerProcessSelector[winnerType]
 	local rewardMessageString = ""
 	
@@ -198,14 +167,19 @@ NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerRew
 	end
 	
 	SetGuiMainMessage(winnerMessageString)
-	
 	wait(3)
 	
 	if rewardMessageString then
 		SetGuiMainMessage(rewardMessageString)
 	end
-	
-end)
+end
 
+function GuiController:OnSetInventorySlotSTC(slotIndex, tool)
+
+end
+
+
+
+return GuiController
 
 -- 실행 코드 ------------------------------------------------------------------------------------------------------

@@ -19,7 +19,47 @@ local CommonGlobalStorage = require(CommonModule:WaitForChild("CommonGlobalStora
 local LocalPlayer = game.Players.LocalPlayer
 local PlayerId = LocalPlayer.UserId
 
+
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local GuiController = require(PlayerGui:WaitForChild("GuiController"))
+
+local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+
+local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
+local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
+local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
+local SetInventorySlotSTC = RemoteEvents:WaitForChild("SetInventorySlotSTC")
+--local AddPlayerSTC = RemoteEvents:WaitForChild("AddPlayerSTC")
+
+
 local ClientGlobalStorage = CommonGlobalStorage
+
+SetInventorySlotSTC.OnClientEvent:Connect(function(slotIndex, tool)
+	
+	Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
+	Debug.Assert(tool, "도구 비정상")
+	
+
+	local data = ClientGlobalStorage:GetData()
+
+	local inventory = data[StatusType.Inventory]
+
+	if not inventory:SetTool(slotIndex, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+
+	
+	
+end)
+
+
+
+
+
+
+
+
 
 function ClientGlobalStorage:Initialize()
 	self:SetClientMode()

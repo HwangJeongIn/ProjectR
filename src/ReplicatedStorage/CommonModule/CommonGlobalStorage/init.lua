@@ -94,14 +94,6 @@ function CommonGlobalStorage:AddPlayer(player)
 		return false
 	end
 	
-	player.Backpack.ChildAdded:Connect(function(tool)
-		self:AddTool(playerId, tool)
-	end)
-
-	player.Backpack.ChildRemoved:Connect(function(tool)
-		self:RemoveTool(playerId, tool)
-	end)
-	
 	self.PlayerTable[playerId] = self:CreateEmptyData()
 	return true
 end
@@ -135,61 +127,6 @@ function CommonGlobalStorage:ClearPlayer(player)
 	return true
 end
 
-function CommonGlobalStorage:AddTool(playerId, tool)
-	if not self:CheckPlayer(playerId) then
-		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
-		return false
-	end
-	
-	if not self.PlayerTable[playerId][StatusType.Inventory]:AddTool(tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	return true
-end
-
-function CommonGlobalStorage:RemoveTool(playerId, tool)
-	if not self:CheckPlayer(playerId) then
-		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
-		return false
-	end
-
-	if not self.PlayerTable[playerId][StatusType.Inventory]:RemoveTool(tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	tool:Destroy()
-	
-	return true
-end
-
---[[
-function CommonGlobalStorage:GetToolGameData(tool)
-	
-	if not tool then
-		Debug.Assert(false, "비정상입니다.")
-		return nil
-	end
-	
-	local key = tool:FindFirstChild("Key")
-	if not key then
-		Debug.Assert(false, "Key 객체가 존재하지 않습니다. => " .. tostring(tool))
-		return nil
-	end
-	
-	key = key.Value
-	
-	local toolGameData = CommonGameDataManager[GameDataType.Tool]:Get(key)
-	if not toolGameData then
-		Debug.Assert(false, "ToolGameData가 존재하지 않습니다. [key] => " .. tostring(key))
-		return nil
-	end
-	
-	return toolGameData
-end
---]]
 function CommonGlobalStorage:GetPlayerStatistic(playerId)
 
 	if not self:CheckPlayer(playerId) then
@@ -198,7 +135,7 @@ function CommonGlobalStorage:GetPlayerStatistic(playerId)
 	end
 
 	--self:CheckAndCalculateStatistic(playerId)
-	return self.PlayerTable[playerId][StatusType.Statistic]
+	return self.PlayerTable[playerId][StatusType.Statistic]:Get()
 end
 
 function CommonGlobalStorage:UpdateRemovedToolGameData(playerId, toolGameData)
@@ -255,10 +192,6 @@ function CommonGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
 	
 	self:UpdateAddedToolGameData(playerId, currentToolGameData)
 	return true
-end
-
-function CommonGlobalStorage:CheckEquipableTool(playerId, tool)
-
 end
 
 function CommonGlobalStorage:EquipTool(playerId, tool)
