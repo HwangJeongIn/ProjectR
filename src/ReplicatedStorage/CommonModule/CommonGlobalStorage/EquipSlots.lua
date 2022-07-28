@@ -14,20 +14,21 @@ local Container = CommonModule:WaitForChild("Container")
 local ArmorSlotsRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
 ArmorSlotsRaw:Initialize(MaxEquipSlotCount)
 
-local EquipSlots = Utility:DeepCopy(require(script.Parent:WaitForChild("SlotBase")))
+local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
+local EquipSlots = {}
 EquipSlots.ArmorSlotsRaw = ArmorSlotsRaw
 EquipSlots.WeaponSlot = nil
 
 
 function EquipSlots:EquipTool(tool, withCheck)
-    local toolGameData = self:GetToolGameData(tool)
+    local toolGameData = ToolUtility:GetToolGameData(tool)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return nil, nil
 	end
 
     if withCheck then
-        if not self:CheckEquipableToolGameData(toolGameData) then
+        if not ToolUtility:CheckEquipableToolGameData(toolGameData) then
             Debug.Assert(false, "비정상입니다.")
             return nil, nil
         end
@@ -48,7 +49,7 @@ function EquipSlots:EquipTool(tool, withCheck)
 
     local prevToolGameData = nil
     if prevTool then
-        prevToolGameData = self:GetToolGameData(prevTool)
+        prevToolGameData = ToolUtility:GetToolGameData(prevTool)
         if not prevToolGameData then
             Debug.Assert(false, "도구는 존재하지만 데이터가 존재하지 않습니다.")
         end
@@ -56,54 +57,5 @@ function EquipSlots:EquipTool(tool, withCheck)
 
     return prevToolGameData, toolGameData
 end
-
-function Inventory:GetSlots(toolType)
-	if toolType == ToolType.All then
-		return self.InventoryRaw.GetValue()
-	end
-	
-	return self[toolType]:GetValueToIndexTable()
-end
-
-function Inventory:AddTool(tool)
-	local toolGameData = self:GetToolGameData(tool)
-	if not toolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	if not self.InventoryRaw:Push(tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	if not self[toolGameData.ToolType]:Push(tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	return true
-end
-
-function Inventory:RemoveTool(tool)
-	local toolGameData = self:GetToolGameData(tool)
-	if not toolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	if not self.InventoryRaw:PopByValue(tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	if not self[toolGameData.ToolType]:PopByValue(tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	return true
-end
-
 
 return EquipSlots

@@ -67,4 +67,6 @@ function PlayerStatistic:UpdateAddedToolGameData(toolGameData)
 	end
 end
 
+PlayerStatistic:ClearData()
+
 return PlayerStatistic

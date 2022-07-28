@@ -19,7 +19,9 @@ local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonG
 
 InventoryRaw:Initialize(MaxInventorySlotCount)
 
-local Inventory = Utility:DeepCopy(require(script.Parent:WaitForChild("SlotBase")))
+local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
+
+local Inventory = {}
 Inventory.InventoryRaw = InventoryRaw
 Inventory[ToolType.Armor] = Utility:DeepCopy(InventoryRaw)
 Inventory[ToolType.Weapon] = Utility:DeepCopy(InventoryRaw)
@@ -34,7 +36,7 @@ function Inventory:GetSlots(toolType)
 end
 
 function Inventory:AddTool(tool)
-	local toolGameData = self:GetToolGameData(tool)
+	local toolGameData = ToolUtility:GetToolGameData(tool)
 	if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -54,7 +56,7 @@ function Inventory:AddTool(tool)
 end
 
 function Inventory:RemoveTool(tool)
-	local toolGameData = self:GetToolGameData(tool)
+	local toolGameData = ToolUtility:GetToolGameData(tool)
 	if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false

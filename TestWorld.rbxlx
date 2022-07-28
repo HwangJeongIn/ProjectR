@@ -787,7 +787,7 @@ local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonG
 
 InventoryRaw:Initialize(MaxInventorySlotCount)
 
-local Inventory = Utility:DeepCopy(require(script.Parent:WaitForChild("SlotBase")))
+local Inventory = Utility:DeepCopy(require(script.Parent:WaitForChild("ToolUtility")))
 Inventory.InventoryRaw = InventoryRaw
 Inventory[ToolType.Armor] = Utility:DeepCopy(InventoryRaw)
 Inventory[ToolType.Weapon] = Utility:DeepCopy(InventoryRaw)
@@ -848,7 +848,7 @@ return Inventory
         </Item>
         <Item class="ModuleScript" referent="17">
           <Properties>
-            <string name="Name">SlotBase</string>
+            <string name="Name">ToolUtility</string>
             <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 
@@ -861,9 +861,9 @@ local GameDataType = CommonEnum.GameDataType
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 
-local SlotBase = {}
+local ToolUtility = {}
 
-function SlotBase:GetToolGameData(tool)
+function ToolUtility:GetToolGameData(tool)
 	
 	if not tool then
 		Debug.Assert(false, "비정상입니다.")
@@ -887,7 +887,7 @@ function SlotBase:GetToolGameData(tool)
 end
 
 
-return SlotBase
+return ToolUtility
 ]]></string>
           </Properties>
         </Item>

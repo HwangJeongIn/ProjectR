@@ -11,9 +11,9 @@ local ToolType = CommonEnum.ToolType
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 
-local SlotBase = {}
+local ToolUtility = {}
 
-function SlotBase:GetToolGameData(tool)
+function ToolUtility:GetToolGameData(tool)
 	
 	if not tool then
 		Debug.Assert(false, "비정상입니다.")
@@ -37,11 +37,11 @@ function SlotBase:GetToolGameData(tool)
 	return toolGameData
 end
 
-function SlotBase:IsValidTool(tool)
+function ToolUtility:IsValidTool(tool)
 	return (self:GetToolGameData(tool) ~= nil)
 end
 
-function SlotBase:CheckEquipableToolGameData(toolGameData)
+function ToolUtility:CheckEquipableToolGameData(toolGameData)
 	if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -55,7 +55,7 @@ function SlotBase:CheckEquipableToolGameData(toolGameData)
     return true
 end
 
-function SlotBase:CheckEquipableTool(tool)
+function ToolUtility:CheckEquipableTool(tool)
     local toolGameData = self:GetToolGameData(tool)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
@@ -70,7 +70,7 @@ function SlotBase:CheckEquipableTool(tool)
     return true
 end
 
-function SlotBase:CheckWeaponToolGameData(toolGameData)
+function ToolUtility:CheckWeaponToolGameData(toolGameData)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -84,7 +84,7 @@ function SlotBase:CheckWeaponToolGameData(toolGameData)
     return true
 end
 
-function SlotBase:CheckWeaponTool(tool)
+function ToolUtility:CheckWeaponTool(tool)
     local toolGameData = self:GetToolGameData(tool)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
@@ -101,4 +101,4 @@ end
 
 
 
-return SlotBase
+return ToolUtility

@@ -16,7 +16,7 @@ local ArmorType = CommonEnum.ArmorType
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 
-local SlotBase = require(script:WaitForChild("SlotBase"))
+local ToolUtility = require(script:WaitForChild("ToolUtility"))
 local Inventory = require(script:WaitForChild("Inventory"))
 local EquipSlots = require(script:WaitForChild("EquipSlots"))
 local PlayerStatistic = require(script:WaitForChild("PlayerStatistic"))
