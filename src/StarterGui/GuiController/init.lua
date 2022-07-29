@@ -1,27 +1,22 @@
--- 클라이언트에게 보여주는 GUI이기 때문에 LocalScript 사용
-
-
--- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- PlayerGui UI
 
 local PlayerGui = script.Parent
 
+local GuiController = {}
+GuiController.GuiInventoryController = require(script:WaitForChild("GuiInventoryController"))
+GuiController.GuiEquipSlotsController = require(script:WaitForChild("GuiEquipSlotsController"))
+
 local GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
 local GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
-
 
 local GuiBoard = PlayerGui:WaitForChild("GuiBoard")
 local GuiPlayersLeftCountText = GuiBoard:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
 local GuiKilledCountText = GuiBoard:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
 local GuiCurrentGameLengthText = GuiBoard:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
 
-
--- 공통 저장소 변수
-
 local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
+local Debug = CommonModuleFacade.Debug
 local GameStateType = CommonModuleFacade.CommonEnum.GameStateType
 local WinnerType = CommonModuleFacade.CommonEnum.WinnerType
 
@@ -40,9 +35,6 @@ GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
 local CurrentGameLength = RemoteValues:WaitForChild("CurrentGameLength")
 GuiCurrentGameLengthText.Text = CurrentGameLength.Value
 
--- Remote Event
-
-
 PlayersLeftCount:GetPropertyChangedSignal("Value"):Connect(function()
 	GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
 end)
@@ -51,7 +43,6 @@ CurrentGameLength:GetPropertyChangedSignal("Value"):Connect(function()
 	GuiCurrentGameLengthText.Text = CurrentGameLength.Value
 end)
 
-local GuiController = {}
 
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
@@ -175,7 +166,9 @@ function GuiController:OnNotifyWinnerSTC(winnerType, winnerName, winnerReward)
 end
 
 function GuiController:OnSetInventorySlotSTC(slotIndex, tool)
-
+	if not self.GuiInventoryController:SetTool(slotIndex, tool) then
+		Debug.Assert(false, "비정상입니다.")
+	end
 end
 
 

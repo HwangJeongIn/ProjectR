@@ -143,7 +143,6 @@ end
 
 function Initializer:ClearPlayers(players)
 	for i, player in pairs (players) do
-		
 		if not ClearPlayer(player) then
 			Debug.Assert(false, "플레이어 데이터 정리에 실패했습니다. => " .. player.Name)
 			continue

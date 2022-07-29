@@ -11,7 +11,9 @@ local ToolType = CommonEnum.ToolType
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 
-local ToolUtility = {}
+local ToolUtility = {
+	EmptyToolImage = "http://www.roblox.com/asset/?id=35924240"
+}
 
 function ToolUtility:GetToolGameData(tool)
 	

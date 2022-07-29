@@ -1,0 +1,47 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Folder" referent="RBX0B785EC59FD146D5B7AB56AE218E0B7A">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<string name="Name">TempResource</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+		<Item class="Decal" referent="RBX0">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<Color3 name="Color3">
+					<R>1</R>
+					<G>1</G>
+					<B>1</B>
+				</Color3>
+				<token name="Face">5</token>
+				<string name="Name">t_DefaultTool</string>
+				<int64 name="SourceAssetId">5532758592</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<Content name="Texture"><url>http://www.roblox.com/asset/?id=5532758571</url></Content>
+				<float name="Transparency">0</float>
+				<int name="ZIndex">1</int>
+			</Properties>
+		</Item>
+		<Item class="Decal" referent="RBXBA0251D5696E4373A863DBE283201C77">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<Color3 name="Color3">
+					<R>1</R>
+					<G>1</G>
+					<B>1</B>
+				</Color3>
+				<token name="Face">5</token>
+				<string name="Name">t_ToolSlot</string>
+				<int64 name="SourceAssetId">6742779632</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<Content name="Texture"><url>http://www.roblox.com/asset/?id=6742779630</url></Content>
+				<float name="Transparency">0</float>
+				<int name="ZIndex">1</int>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>

@@ -31,17 +31,22 @@ local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 local SetInventorySlotSTC = RemoteEvents:WaitForChild("SetInventorySlotSTC")
 --local AddPlayerSTC = RemoteEvents:WaitForChild("AddPlayerSTC")
 
-
 local ClientGlobalStorage = CommonGlobalStorage
+
+NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerReward)
+	GuiController:OnNotifyWinnerSTC(winnerType, winnerName, winnerReward)
+end)
+
+ChangeGameStateSTC.OnClientEvent:Connect(function(gameState, ...)
+	GuiController:OnChangeGameStateSTC(gameState, {...})
+end)
 
 SetInventorySlotSTC.OnClientEvent:Connect(function(slotIndex, tool)
 	
 	Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
 	Debug.Assert(tool, "도구 비정상")
 	
-
 	local data = ClientGlobalStorage:GetData()
-
 	local inventory = data[StatusType.Inventory]
 
 	if not inventory:SetTool(slotIndex, tool) then
@@ -49,8 +54,7 @@ SetInventorySlotSTC.OnClientEvent:Connect(function(slotIndex, tool)
 		return
 	end
 
-	
-	
+	GuiController:OnSetInventorySlotSTC(slotIndex, tool)
 end)
 
 
