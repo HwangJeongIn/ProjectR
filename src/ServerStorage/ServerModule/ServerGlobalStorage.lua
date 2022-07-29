@@ -14,7 +14,8 @@ local ToolType = ServerEnum.ToolType
 local ArmorType = ServerEnum.ArmorType
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
-local SetInventorySlotSTC = RemoteEvents:WaitForChild("SetInventorySlotSTC")
+local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
+local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
 local AddPlayerSTC = RemoteEvents:WaitForChild("AddPlayerSTC")
 
 
@@ -41,7 +42,7 @@ function ServerGlobalStorage:AddTool(playerId, tool)
 	local slotIndex = inventory:GetSlotIndexRaw(tool)
 	Debug.Assert(slotIndex, "코드 버그")
 
-	SetInventorySlotSTC:FireClient(player, slotIndex, tool)
+	AddToolSTC:FireClient(player, slotIndex, tool)
 	return true
 end
 
@@ -66,9 +67,8 @@ function ServerGlobalStorage:RemoveTool(playerId, tool)
 		return false
 	end
 
+	RemoveToolSTC:FireClient(player, slotIndex, tool)
 	tool:Destroy()
-	
-	SetInventorySlotSTC:FireClient(player, slotIndex, nil)
 	return true
 end
 
@@ -98,11 +98,7 @@ function ServerGlobalStorage:InitializePlayer(player)
 		return false
 	end
 
-	if not self:RegisterPlayerEvent(player) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
+	return true
 end
 
 

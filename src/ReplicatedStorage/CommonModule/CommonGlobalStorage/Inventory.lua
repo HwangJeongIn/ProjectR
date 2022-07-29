@@ -36,7 +36,7 @@ function Inventory:GetSlots(toolType)
 end
 
 function Inventory:GetSlotIndexRaw(tool)
-	return InventoryRaw:GetIndex(tool)
+	return self.InventoryRaw:GetIndex(tool)
 end
 
 function Inventory:GetSlotIndex(tool)
@@ -45,7 +45,7 @@ function Inventory:GetSlotIndex(tool)
 		return nil
 	end
 
-	local slotIndex = InventoryRaw:GetIndex(tool)
+	local slotIndex = self.InventoryRaw:GetIndex(tool)
 	if not slotIndex then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
@@ -54,13 +54,49 @@ function Inventory:GetSlotIndex(tool)
 	return slotIndex
 end
 
-function Inventory:SetTool(slotIndex, tool)
-	if not tool or not slotIndex then
+function Inventory:AddToolToSlot(slotIndex, tool)
+	if not slotIndex or not tool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-	if not InventoryRaw:Set(slotIndex) then
+	if not self.InventoryRaw:Set(slotIndex, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local toolGameData = ToolUtility:GetToolGameData(tool)
+	if not toolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self[toolGameData.ToolType]:Push(tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+function Inventory:RemoveToolFromSlot(slotIndex, tool)
+	if not slotIndex or not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self.InventoryRaw:Set(slotIndex, nil) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local toolGameData = ToolUtility:GetToolGameData(tool)
+	if not toolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self[toolGameData.ToolType]:PopByValue(tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end

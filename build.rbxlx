@@ -1613,7 +1613,7 @@ return CommonModuleFacade
       </Item>
       <Item class="RemoteEvent" referent="29">
         <Properties>
-          <string name="Name">SetInventorySlotSTC</string>
+          <string name="Name">AddToolSTC</string>
         </Properties>
       </Item>
       <Item class="RemoteEvent" referent="30">
@@ -35909,7 +35909,7 @@ local ToolType = ServerEnum.ToolType
 local ArmorType = ServerEnum.ArmorType
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
-local SetInventorySlotSTC = RemoteEvents:WaitForChild("SetInventorySlotSTC")
+local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 local AddPlayerSTC = RemoteEvents:WaitForChild("AddPlayerSTC")
 
 
@@ -35936,7 +35936,7 @@ function ServerGlobalStorage:AddTool(playerId, tool)
 	local slotIndex = inventory:GetSlotIndexRaw(tool)
 	Debug.Assert(slotIndex, "코드 버그")
 
-	SetInventorySlotSTC:FireClient(player, slotIndex, tool)
+	AddToolSTC:FireClient(player, slotIndex, tool)
 	return true
 end
 
@@ -35963,7 +35963,7 @@ function ServerGlobalStorage:RemoveTool(playerId, tool)
 
 	tool:Destroy()
 	
-	SetInventorySlotSTC:FireClient(player, slotIndex, nil)
+	AddToolSTC:FireClient(player, slotIndex, nil)
 	return true
 end
 
@@ -38291,7 +38291,7 @@ function GuiController:OnNotifyWinnerSTC(winnerType, winnerName, winnerReward)
 	end
 end
 
-function GuiController:OnSetInventorySlotSTC(slotIndex, tool)
+function GuiController:OnAddToolSTC(slotIndex, tool)
 	if not self.GuiInventoryController:SetTool(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
 	end
@@ -41939,7 +41939,7 @@ local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
 local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
 local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
-local SetInventorySlotSTC = RemoteEvents:WaitForChild("SetInventorySlotSTC")
+local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 --local AddPlayerSTC = RemoteEvents:WaitForChild("AddPlayerSTC")
 
 local ClientGlobalStorage = CommonGlobalStorage
@@ -41952,7 +41952,7 @@ ChangeGameStateSTC.OnClientEvent:Connect(function(gameState, ...)
 	GuiController:OnChangeGameStateSTC(gameState, {...})
 end)
 
-SetInventorySlotSTC.OnClientEvent:Connect(function(slotIndex, tool)
+AddToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
 	
 	Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
 	Debug.Assert(tool, "도구 비정상")
@@ -41965,7 +41965,7 @@ SetInventorySlotSTC.OnClientEvent:Connect(function(slotIndex, tool)
 		return
 	end
 
-	GuiController:OnSetInventorySlotSTC(slotIndex, tool)
+	GuiController:OnAddToolSTC(slotIndex, tool)
 end)
 
 

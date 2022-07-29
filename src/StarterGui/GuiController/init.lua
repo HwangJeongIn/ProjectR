@@ -165,8 +165,8 @@ function GuiController:OnNotifyWinnerSTC(winnerType, winnerName, winnerReward)
 	end
 end
 
-function GuiController:OnSetInventorySlotSTC(slotIndex, tool)
-	if not self.GuiInventoryController:SetTool(slotIndex, tool) then
+function GuiController:SetInventoryToolSlot(slotIndex, tool)
+	if not self.GuiInventoryController:SetToolSlot(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
 	end
 end

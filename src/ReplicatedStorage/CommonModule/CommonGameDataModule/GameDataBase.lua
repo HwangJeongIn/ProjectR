@@ -68,7 +68,7 @@ function GameDataBase:InsertData(key, value)
 	value.GetKey = function() return key end
 	
 	setmetatable(value, {__index = function(_, prop)
-		Debug.Assert(false, "해당 속성이 존재하지 않습니다.".. self.Name .. "[" ..tostring(key).. "] => " .. tostring(prop)) 
+		--Debug.Print("해당 속성이 존재하지 않습니다.".. self.Name .. "[" ..tostring(key).. "] => " .. tostring(prop)) 
 	end} )
 	
 	value.__index = Utility.Inheritable__index

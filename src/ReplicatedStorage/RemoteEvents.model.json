@@ -1,13 +1,25 @@
 {
   "ClassName": "Folder",
   "Children": [
-    
+
     {
-      "Name": "AddPlayerSTC",
+      "Name": "EquipToolCTS",
       "ClassName": "RemoteEvent"
     },
     {
-      "Name": "SetInventorySlotSTC",
+      "Name": "EquipToolSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "EquipArmorCTS",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "EquipArmorSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "AddToolSTC",
       "ClassName": "RemoteEvent"
     },
     {

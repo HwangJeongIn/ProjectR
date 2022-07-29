@@ -8475,7 +8475,7 @@ local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
 local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
 local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
-local SetInventorySlotSTC = RemoteEvents:WaitForChild("SetInventorySlotSTC")
+local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 --local AddPlayerSTC = RemoteEvents:WaitForChild("AddPlayerSTC")
 
 local ClientGlobalStorage = CommonGlobalStorage
@@ -8488,7 +8488,7 @@ ChangeGameStateSTC.OnClientEvent:Connect(function(gameState, ...)
 	GuiController:OnChangeGameStateSTC(gameState, {...})
 end)
 
-SetInventorySlotSTC.OnClientEvent:Connect(function(slotIndex, tool)
+AddToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
 	
 	Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
 	Debug.Assert(tool, "도구 비정상")
@@ -8501,7 +8501,7 @@ SetInventorySlotSTC.OnClientEvent:Connect(function(slotIndex, tool)
 		return
 	end
 
-	GuiController:OnSetInventorySlotSTC(slotIndex, tool)
+	GuiController:OnAddToolSTC(slotIndex, tool)
 end)
 
 
@@ -9765,7 +9765,7 @@ function GuiController:OnNotifyWinnerSTC(winnerType, winnerName, winnerReward)
 	end
 end
 
-function GuiController:OnSetInventorySlotSTC(slotIndex, tool)
+function GuiController:OnAddToolSTC(slotIndex, tool)
 	if not self.GuiInventoryController:SetTool(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
 	end
@@ -9846,9 +9846,10 @@ function GuiInventoryController:InitializeGuiToolSlots()
 	local GuiInventoryOffsetRateX =  GuiInventorySlotOffset / GuiInventoryWidth
 	local GuiInventoryOffsetRateY =  GuiInventorySlotOffset / finalGuiInventoryHeight
 	
-	GuiToolSlot.Size = UDim2.new(slotRateX, 0, slotRateY, 0)
-	GuiToolSlot.Position = UDim2.new(GuiInventoryOffsetRateX + halfSlotRateX, 0, GuiInventoryOffsetRateY + halfSlotRateY, 0)
-	GuiToolSlot.AnchorPoint = Vector2.new(0.5, 0.5)
+	local slotSize = UDim2.new(slotRateX, 0, slotRateY, 0)
+	local slotAnchorPoint = Vector2.new(0.5, 0.5)
+	local FirstslotPosition = UDim2.new(GuiInventoryOffsetRateX + halfSlotRateX, 0, GuiInventoryOffsetRateY + halfSlotRateY, 0)
+
 	
 	GuiInventory.CanvasSize = UDim2.new(0, 0, finalGuiInventoryHeight / GuiInventorySize.Y, 0)
 	
@@ -9857,7 +9858,10 @@ function GuiInventoryController:InitializeGuiToolSlots()
 			
 			local newGuiToolSlot = GuiToolSlot:Clone()
 			local slotIndex = y * GuiInventorySlotCountPerLine + x
-			newGuiToolSlot.Position += UDim2.new((GuiInventoryOffsetRateX + slotRateX) * x, 0, (GuiInventoryOffsetRateY + slotRateY) * y, 0)
+			
+			newGuiToolSlot.Size = slotSize
+			newGuiToolSlot.AnchorPoint = slotAnchorPoint
+			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiInventoryOffsetRateX + slotRateX) * x, 0, (GuiInventoryOffsetRateY + slotRateY) * y, 0)
 			newGuiToolSlot.Parent = GuiInventory
 			newGuiToolSlot.Name = tostring(slotIndex)
 
@@ -9904,6 +9908,7 @@ return GuiInventoryController
 					<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonMoudleFacade.Debug
+local Utility = CommonMoudleFacade.Utility
 local ToolUtility = CommonMoudleFacade.ToolUtility
 
 local player = game.Players.LocalPlayer
@@ -9915,13 +9920,13 @@ local GuiToolSlot = GuiPlayerStatusWindow:WaitForChild("GuiToolSlot")
 local GuiToolSlotController = {}
 
 function GuiToolSlotController:new(newGuiToolSlot)
-	local newGuiToolSlotController = self
+	local newGuiToolSlotController = Utility:DeepCopy(self)
 
 	if not newGuiToolSlot then
 		newGuiToolSlot = GuiToolSlot:Clone()
 	end
 
-	local newGuiToolImage = GuiToolSlot:WaitForChild("GuiToolImage")
+	local newGuiToolImage = newGuiToolSlot:WaitForChild("GuiToolImage")
 	local newGuiToolName = newGuiToolImage:WaitForChild("GuiToolName")
 	local newGuiToolCount = newGuiToolImage:WaitForChild("GuiToolCount")
 
@@ -9945,6 +9950,8 @@ end
 
 function GuiToolSlotController:ClearToolData()
 	self.GuiToolImage.Image = ToolUtility.EmptyToolImage
+	self.GuiToolImage.ImageTransparency = 0.7
+	
 	self.GuiToolName.Text = ""
 	self.GuiToolCount.Text = ""
 end
@@ -11986,9 +11993,9 @@ return GuiToolSlotController:new(GuiToolSlot)
 						<Ref name="NextSelectionRight">null</Ref>
 						<Ref name="NextSelectionUp">null</Ref>
 						<UDim2 name="Position">
-							<XS>0.610000014</XS>
+							<XS>0</XS>
 							<XO>0</XO>
-							<YS>0.202500001</YS>
+							<YS>0</YS>
 							<YO>0</YO>
 						</UDim2>
 						<Content name="PressedImage"><null></null></Content>
@@ -12007,9 +12014,9 @@ return GuiToolSlotController:new(GuiToolSlot)
 						<int name="SelectionOrder">0</int>
 						<UDim2 name="Size">
 							<XS>0</XS>
-							<XO>100</XO>
+							<XO>0</XO>
 							<YS>0</YS>
-							<YO>100</YO>
+							<YO>0</YO>
 						</UDim2>
 						<token name="SizeConstraint">0</token>
 						<Rect2D name="SliceCenter">
@@ -48378,7 +48385,7 @@ local ToolType = ServerEnum.ToolType
 local ArmorType = ServerEnum.ArmorType
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
-local SetInventorySlotSTC = RemoteEvents:WaitForChild("SetInventorySlotSTC")
+local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 local AddPlayerSTC = RemoteEvents:WaitForChild("AddPlayerSTC")
 
 
@@ -48405,7 +48412,7 @@ function ServerGlobalStorage:AddTool(playerId, tool)
 	local slotIndex = inventory:GetSlotIndexRaw(tool)
 	Debug.Assert(slotIndex, "코드 버그")
 
-	SetInventorySlotSTC:FireClient(player, slotIndex, tool)
+	AddToolSTC:FireClient(player, slotIndex, tool)
 	return true
 end
 
@@ -48432,7 +48439,7 @@ function ServerGlobalStorage:RemoveTool(playerId, tool)
 
 	tool:Destroy()
 	
-	SetInventorySlotSTC:FireClient(player, slotIndex, nil)
+	AddToolSTC:FireClient(player, slotIndex, nil)
 	return true
 end
 
@@ -48462,11 +48469,7 @@ function ServerGlobalStorage:InitializePlayer(player)
 		return false
 	end
 
-	if not self:RegisterPlayerEvent(player) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
+	return true
 end
 
 
@@ -51780,7 +51783,7 @@ return CommonModuleFacade
 			<Item class="RemoteEvent" referent="29">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">SetInventorySlotSTC</string>
+					<string name="Name">AddToolSTC</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">5aa7e1dcf1e0b1b002f570c4000208cf</UniqueId>

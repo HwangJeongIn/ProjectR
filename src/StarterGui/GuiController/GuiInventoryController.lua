@@ -42,9 +42,10 @@ function GuiInventoryController:InitializeGuiToolSlots()
 	local GuiInventoryOffsetRateX =  GuiInventorySlotOffset / GuiInventoryWidth
 	local GuiInventoryOffsetRateY =  GuiInventorySlotOffset / finalGuiInventoryHeight
 	
-	GuiToolSlot.Size = UDim2.new(slotRateX, 0, slotRateY, 0)
-	GuiToolSlot.Position = UDim2.new(GuiInventoryOffsetRateX + halfSlotRateX, 0, GuiInventoryOffsetRateY + halfSlotRateY, 0)
-	GuiToolSlot.AnchorPoint = Vector2.new(0.5, 0.5)
+	local slotSize = UDim2.new(slotRateX, 0, slotRateY, 0)
+	local slotAnchorPoint = Vector2.new(0.5, 0.5)
+	local FirstslotPosition = UDim2.new(GuiInventoryOffsetRateX + halfSlotRateX, 0, GuiInventoryOffsetRateY + halfSlotRateY, 0)
+
 	
 	GuiInventory.CanvasSize = UDim2.new(0, 0, finalGuiInventoryHeight / GuiInventorySize.Y, 0)
 	
@@ -52,18 +53,21 @@ function GuiInventoryController:InitializeGuiToolSlots()
 		for x = 0, (GuiInventorySlotCountPerLine - 1) do
 			
 			local newGuiToolSlot = GuiToolSlot:Clone()
-			local slotIndex = y * GuiInventorySlotCountPerLine + x
-			newGuiToolSlot.Position += UDim2.new((GuiInventoryOffsetRateX + slotRateX) * x, 0, (GuiInventoryOffsetRateY + slotRateY) * y, 0)
+			local slotIndex = y * GuiInventorySlotCountPerLine + x + 1
+			
+			newGuiToolSlot.Size = slotSize
+			newGuiToolSlot.AnchorPoint = slotAnchorPoint
+			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiInventoryOffsetRateX + slotRateX) * x, 0, (GuiInventoryOffsetRateY + slotRateY) * y, 0)
 			newGuiToolSlot.Parent = GuiInventory
 			newGuiToolSlot.Name = tostring(slotIndex)
 
-            self.GuiInventoryRaw[slotIndex] = GuiToolSlotController:new(newGuiToolSlot)
+            self.GuiInventoryRaw[slotIndex] = GuiToolSlotController:new(slotIndex, newGuiToolSlot)
 		end
 	end
 end
 
-function GuiInventoryController:SetTool(slotIndex, tool)
-    if not tool or not slotIndex then
+function GuiInventoryController:SetToolSlot(slotIndex, tool)
+    if not slotIndex then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end

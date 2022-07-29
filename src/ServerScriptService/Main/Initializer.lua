@@ -89,6 +89,10 @@ function OnCharacterAdded(player, character)
 	ServerGlobalStorage:AddGameData(character, characterGameData)
 	--]]
 	
+	if not ServerGlobalStorage:RegisterPlayerEvent(player) then
+		Debug.Assert(false, "비정상입니다.")
+	end
+	
 	character.Humanoid.Died:Connect(function()
 		-- 죽었을 때
 		if character:FindFirstChild("AliveTag")  then
@@ -175,6 +179,28 @@ function Initializer:StartGame(playersInGame)
 		--axe:WaitForChild("Key")
 		axe.Parent = player.Backpack
 
+		
+		local sword = ServerStorage.Tools.Sword:Clone()
+		--sword:WaitForChild("Key")
+		sword.Parent = player.Backpack
+
+		local axe = ServerStorage.Tools.Axe:Clone()
+		--axe:WaitForChild("Key")
+		axe.Parent = player.Backpack
+
+		
+		local sword = ServerStorage.Tools.Sword:Clone()
+		--sword:WaitForChild("Key")
+		sword.Parent = player.Backpack
+
+		local axe = ServerStorage.Tools.Axe:Clone()
+		--axe:WaitForChild("Key")
+		axe.Parent = player.Backpack
+
+		
+		local sword = ServerStorage.Tools.Sword:Clone()
+		--sword:WaitForChild("Key")
+		sword.Parent = player.Backpack
 		--[[
 		local boolValue = Instance.new("BoolValue")
 		boolValue.Name = "BoolValue!!"
