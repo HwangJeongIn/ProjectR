@@ -122,11 +122,15 @@ function GuiTooltipController:Initialize()
 	local GuiToolName = GuiTooltipBaseData:WaitForChild("GuiToolName")
 	local GuiToolImage = GuiTooltipBaseData:WaitForChild("GuiToolImage")
 	local GuiToolType = GuiTooltipBaseData:WaitForChild("GuiToolType")
-	
+
 	self.GuiToolName = GuiToolName
 	self.GuiToolImage = GuiToolImage
 	self.GuiToolType = GuiToolType
 
+	local GuiExitButton = GuiTooltipBaseData:WaitForChild("GuiExitButton")
+	GuiExitButton.Activated:connect(function(inputObject)
+		self:ClearToolData()
+	end)
 
 	-- DetailData
 	local GuiTooltipDetailData = GuiTooltipWindow:WaitForChild("GuiTooltipDetailData")
