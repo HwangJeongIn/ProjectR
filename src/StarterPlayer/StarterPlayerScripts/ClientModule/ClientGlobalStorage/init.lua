@@ -30,7 +30,6 @@ local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
 local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
---local AddPlayerSTC = RemoteEvents:WaitForChild("AddPlayerSTC")
 
 local ClientGlobalStorage = CommonGlobalStorage
 

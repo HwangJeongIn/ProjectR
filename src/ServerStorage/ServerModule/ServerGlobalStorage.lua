@@ -16,7 +16,6 @@ local ArmorType = ServerEnum.ArmorType
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
-local AddPlayerSTC = RemoteEvents:WaitForChild("AddPlayerSTC")
 
 
 local ServerGlobalStorage = CommonGlobalStorage

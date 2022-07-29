@@ -32,7 +32,7 @@ local CommonEnum = {
 		Armor = 3,
 		Consumable = 4
 	},
-	
+
 	ArmorType = {
 		Helmet = 1,
 		Chestplate = 2,
@@ -47,13 +47,14 @@ local CommonEnum = {
 		Inventory = 3,
 		QuickSlots = 4, -- 클라이언트 전용
 	}
-	
-	--[[,
-	
-	MessageType = {
-		Main = 0,
-		Event = 1
-	}--]]
+}
+
+-- 필요하면 추가
+CommonEnum.ToolType.Converter = {
+	[CommonEnum.ToolType.All] = "All",
+	[CommonEnum.ToolType.Weapon] = "Weapon",
+	[CommonEnum.ToolType.Armor] = "Armor",
+	[CommonEnum.ToolType.Consumable] = "Consumable",
 }
 
 CommonEnum.__index = Utility.Inheritable__index
