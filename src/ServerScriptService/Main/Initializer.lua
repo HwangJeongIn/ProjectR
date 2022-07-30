@@ -67,6 +67,7 @@ function ClearPlayer(player)
 	-- 플레이어 가방 정리
 	local allTools = player.Backpack:GetChildren()
 	for _, targetTool in pairs(allTools) do
+		targetTool:Destroy()
 		targetTool.Parent = nil
 	end
 	--player.Backpack:ClearAllChildren()

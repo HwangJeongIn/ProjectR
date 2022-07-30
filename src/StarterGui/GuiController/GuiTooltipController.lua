@@ -8,6 +8,8 @@ local ToolTypeConverter = CommonEnum.ToolType.Converter
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
 
+local LocalPlayer = game.Players.LocalPlayer
+
 local GuiTooltipController = {}
 
 
@@ -99,7 +101,7 @@ function GuiTooltipController:ClearToolData()
 	self:SetToolStatus(nil)
 
 	--[[
-	self.GuiEquipButton = GuiEquipButton
+	self.GuiSelectButton = GuiSelectButton
 	self.GuiUseButton = GuiUseButton
 	self.GuiRemoveButton = GuiRemoveButton
 	--]]
@@ -146,13 +148,24 @@ function GuiTooltipController:Initialize()
 
 	-- ButtonData
 	local GuiTooltipButtons = GuiTooltipWindow:WaitForChild("GuiTooltipButtons")
-	local GuiEquipButton = GuiTooltipButtons:WaitForChild("GuiEquipButton")
+	local GuiSelectButton = GuiTooltipButtons:WaitForChild("GuiSelectButton")
 	local GuiUseButton = GuiTooltipButtons:WaitForChild("GuiUseButton")
 	local GuiRemoveButton = GuiTooltipButtons:WaitForChild("GuiRemoveButton")
 
-	self.GuiEquipButton = GuiEquipButton
+	self.GuiSelectButton = GuiSelectButton
 	self.GuiUseButton = GuiUseButton
 	self.GuiRemoveButton = GuiRemoveButton
+
+	GuiSelectButton.Activated:connect(function(inputObject)
+		if not self.Tool then
+			return
+		end
+
+		if self.Tool.Parent ~= LocalPlayer.Backpack then
+			Debug.Assert(false, "없을 수 있는 지 확인해야합니다.")
+		end
+
+	end)
 
 	self:ClearToolData()
 end

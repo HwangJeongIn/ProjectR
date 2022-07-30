@@ -1326,7 +1326,7 @@
 						<float name="LineHeight">1</float>
 						<int name="MaxVisibleGraphemes">-1</int>
 						<bool name="Modal">false</bool>
-						<string name="Name">GuiEquipButton</string>
+						<string name="Name">GuiSelectButton</string>
 						<Ref name="NextSelectionDown">null</Ref>
 						<Ref name="NextSelectionLeft">null</Ref>
 						<Ref name="NextSelectionRight">null</Ref>
@@ -1447,7 +1447,7 @@
 							<token name="SizeConstraint">0</token>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
-							<string name="Text">Equip</string>
+							<string name="Text">Select</string>
 							<Color3 name="TextColor3">
 								<R>1</R>
 								<G>1</G>
