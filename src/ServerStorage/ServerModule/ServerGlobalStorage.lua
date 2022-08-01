@@ -51,9 +51,8 @@ SelectToolCTS.OnServerEvent:Connect(function(player, inventorySlotIndex, tool)
 		return
 	end
 
-	--ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
 	humanoid:EquipTool(tool)
-	wait(3)
+	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
 end)
 
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
