@@ -3,7 +3,7 @@
   "Children": [
 
     {
-      "Name": "EquipToolCTS",
+      "Name": "SelectToolCTS",
       "ClassName": "RemoteEvent"
     },
     {
@@ -11,11 +11,7 @@
       "ClassName": "RemoteEvent"
     },
     {
-      "Name": "EquipArmorCTS",
-      "ClassName": "RemoteEvent"
-    },
-    {
-      "Name": "EquipArmorSTC",
+      "Name": "UnequipToolSTC",
       "ClassName": "RemoteEvent"
     },
     {

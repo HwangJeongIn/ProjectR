@@ -20,66 +20,112 @@ local LocalPlayer = game.Players.LocalPlayer
 local PlayerId = LocalPlayer.UserId
 
 
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local GuiController = require(PlayerGui:WaitForChild("GuiController"))
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 
+-- CTS
+local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
+local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
+
+-- STC
 local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
 local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
-local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
+local EquipToolSTC = RemoteEvents:WaitForChild("EquipToolSTC")
+local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
 
 local ClientGlobalStorage = CommonGlobalStorage
 
-NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerReward)
-	GuiController:OnNotifyWinnerSTC(winnerType, winnerName, winnerReward)
-end)
+-- 초기화 코드
+function ClientGlobalStorage:RegisterOnClientEvent(guiController)
+	-- STC
+	EquipToolSTC.OnClientEvent:Connect(function(tool)
+		Debug.Assert(tool, "도구 비정상")
+		local temp = LocalPlayer.Backpack:GetChildren()
+		Debug.Print(tostring(tool))
 
-ChangeGameStateSTC.OnClientEvent:Connect(function(gameState, ...)
-	GuiController:OnChangeGameStateSTC(gameState, {...})
-end)
+		for key,value in pairs(temp) do
+			Debug.Print(tostring(key) .. " : " .. tostring(value))
+		end
 
-AddToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
-	
-	Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
-	Debug.Assert(tool, "도구 비정상")
-	
-	local data = ClientGlobalStorage:GetData()
-	local inventory = data[StatusType.Inventory]
+		if not ClientGlobalStorage:EquipTool(PlayerId,tool) then
+			Debug.Assert(false, "장착하지 못했습니다.")
+			return
+		end
+	end)
 
-	if not inventory:AddToolToSlot(slotIndex, tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return
-	end
+	UnequipToolSTC.OnClientEvent:Connect(function(tool)
+		Debug.Assert(tool, "도구 비정상")
 
-	GuiController:SetInventoryToolSlot(slotIndex, tool)
-end)
+		if not ClientGlobalStorage:UnequipTool(PlayerId, tool) then
+			Debug.Assert(false, "장착 해제하지 못했습니다.")
+			return
+		end
+	end)
 
-RemoveToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
-	
-	Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
-	Debug.Assert(tool, "도구 비정상")
-	
-	local data = ClientGlobalStorage:GetData()
-	local inventory = data[StatusType.Inventory]
+	AddToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
+		
+		Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
+		Debug.Assert(tool, "도구 비정상")
+		
+		local data = ClientGlobalStorage:GetData()
+		local inventory = data[StatusType.Inventory]
 
-	if not inventory:RemoveToolFromSlot(slotIndex, tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return
-	end
+		if not inventory:AddToolToSlot(slotIndex, tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 
-	GuiController:SetInventoryToolSlot(slotIndex, nil)
-end)
+		guiController:SetInventoryToolSlot(slotIndex, tool)
+	end)
 
+	RemoveToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
+		
+		Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
+		Debug.Assert(tool, "도구 비정상")
+		
+		local data = ClientGlobalStorage:GetData()
+		local inventory = data[StatusType.Inventory]
 
+		if not inventory:RemoveToolFromSlot(slotIndex, tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 
+		guiController:SetInventoryToolSlot(slotIndex, nil)
+	end)
 
+	NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerReward)
+		guiController:SetWinnerMessage(winnerType, winnerName, winnerReward)
+	end)
 
-function ClientGlobalStorage:Initialize()
+	ChangeGameStateSTC.OnClientEvent:Connect(function(gameState, ...)
+		guiController:ChangeGameState(gameState, {...})
+	end)
+
+end
+
+function ClientGlobalStorage:Initialize(guiController)
 	self:SetClientMode()
 	self:AddPlayer(LocalPlayer) -- 본인거는 서버도 통보안해준다.
+
+	Debug.Assert(guiController, "비정상입니다.")
+	self.GuiController = guiController
+
+	self:RegisterOnClientEvent(guiController)
+end
+
+
+-- CTS
+function ClientGlobalStorage:SendSelectToolCTS(slotIndex, tool)
+	if not slotIndex or not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	SelectToolCTS:FireServer(slotIndex, tool)
+	return true
 end
 
 function ClientGlobalStorage:GetData()
@@ -139,12 +185,9 @@ function ClientGlobalStorage:SwapQuickSlot(quickSlotIndex1, quickSlotIndex2)
 	return true
 end
 
-
-
 ClientGlobalStorage.__index = Utility.Inheritable__index
 ClientGlobalStorage.__newindex = Utility.Inheritable__newindex
 --setmetatable(ClientGlobalStorage, CommonGlobalStorage)
 
-ClientGlobalStorage:Initialize()
-
+--ClientGlobalStorage:Initialize()
 return ClientGlobalStorage

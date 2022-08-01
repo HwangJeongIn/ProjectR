@@ -28,6 +28,18 @@ local Utility = {
 Utility.__index = Inheritable__index
 Utility.__newindex = Immutable__newindex
 
+function Utility:ShallowCopy(original)
+	local originalType = type(original)
+	local copy = {}
+
+	if originalType == 'table' then
+		for key, value in next, original, nil do
+			copy[key] = value
+		end
+	end
+
+	return copy
+end
 
 function Utility:DeepCopy(original)
 

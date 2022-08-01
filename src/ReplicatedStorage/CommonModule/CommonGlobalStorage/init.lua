@@ -168,34 +168,8 @@ function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
 	return true
 end
 
--- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
-function CommonGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
-	if not self.CheckPlayer(playerId) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
-	if not equipSlots:CheckWeaponTool(tool) then
-		return false
-	end
-
-	local prevToolGameData, currentToolGameData = equipSlots:EquipTool(tool)
-	if not currentToolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	if prevToolGameData then
-		self:UpdateRemovedToolGameData(playerId, prevToolGameData)
-	end
-	
-	self:UpdateAddedToolGameData(playerId, currentToolGameData)
-	return true
-end
-
 function CommonGlobalStorage:EquipTool(playerId, tool)
-	if not self.CheckPlayer(playerId) then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -215,6 +189,24 @@ function CommonGlobalStorage:EquipTool(playerId, tool)
 	return true
 end
 
+function CommonGlobalStorage:UnequipTool(playerId, tool)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
+	local prevToolGameData = equipSlots:UnequipTool(tool)
+	if not prevToolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	self:UpdateRemovedToolGameData(playerId, prevToolGameData)
+	return true
+end
+
+--[[
 function CommonGlobalStorage:CheckAndGetArmorData(armor)
 	if not armor then
 		Debug.Assert(false, "비정상입니다.")
@@ -262,7 +254,7 @@ function CommonGlobalStorage:EquipArmor(playerId, armor)
 	
 	return true
 end
-
+--]]
 
 CommonGlobalStorage.__index = Utility.Inheritable__index
 CommonGlobalStorage.__newindex = Utility.Inheritable__newindex

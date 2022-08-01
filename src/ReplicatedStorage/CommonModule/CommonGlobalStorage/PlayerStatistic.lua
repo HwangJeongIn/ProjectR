@@ -46,25 +46,33 @@ end
 function PlayerStatistic:UpdateRemovedToolGameData(toolGameData)
 	if not toolGameData then
         Debug.Assert(false, "비정상입니다.")
-		return
+		return false
 	end
 	
     local toolGameDataRaw = getmetatable(toolGameData)
 	for attribute, value in pairs(toolGameDataRaw) do
+		if not self.Value[attribute] then
+			continue
+		end
         self.Value[attribute] -= value
 	end
+	return true
 end
 
 function PlayerStatistic:UpdateAddedToolGameData(toolGameData)
 	if not toolGameData then
         Debug.Assert(false, "비정상입니다.")
-		return
+		return false
 	end
 	
     local toolGameDataRaw = getmetatable(toolGameData)
 	for attribute, value in pairs(toolGameDataRaw) do
+		if not self.Value[attribute] then
+			continue
+		end
         self.Value[attribute] += value
 	end
+	return true
 end
 
 PlayerStatistic:ClearData()

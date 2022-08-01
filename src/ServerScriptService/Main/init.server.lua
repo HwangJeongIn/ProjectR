@@ -56,24 +56,13 @@ local Initializer = require(script:WaitForChild("Initializer"))
 local MapController = require(script:WaitForChild("MapController"))
 
 
--- 함수 정의 ------------------------------------------------------------------------------------------------------
-
-
-
-
-
 function ClearGui()
 	CurrentGameLength.Value = 0
 	PlayersLeftCount.Value = 0
 	MainMessage.Value = ""
 end
 
-
-
-
--- 실행 코드 ------------------------------------------------------------------------------------------------------
 Initializer:InitializeGame()
-
 
 while true  do
 	

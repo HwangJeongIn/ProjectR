@@ -1,12 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonMoudleFacade.Debug
+local Utility = CommonMoudleFacade.Utility
+local ToolUtility = CommonMoudleFacade.ToolUtility
 local CommonConstant = CommonMoudleFacade.CommonConstant
-
 
 local MaxInventorySlotCount = CommonConstant.MaxInventorySlotCount
 local GuiInventorySlotCountPerLine = CommonConstant.GuiInventorySlotCountPerLine
 local GuiInventorySlotOffset = CommonConstant.GuiInventorySlotOffset
+
 
 
 local player = game.Players.LocalPlayer
@@ -17,11 +19,16 @@ local GuiEquipSlots = GuiPlayerStatusWindow:WaitForChild("GuiEquipSlots")
 local GuiInventory = GuiPlayerStatusWindow:WaitForChild("GuiInventory")
 local GuiToolSlot = GuiPlayerStatusWindow:WaitForChild("GuiToolSlot")
 local GuiToolSlotController = require(script.Parent:WaitForChild("GuiToolSlotController"))
+local GuiTooltipController = require(script.Parent:WaitForChild("GuiTooltipController"))
 
-
+local GuiInventoryRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
+GuiInventoryRaw:Initialize(MaxInventorySlotCount)
 local GuiInventoryController = {
-    GuiInventoryRaw = {}
+	GuiInventoryRaw = GuiInventoryRaw
 }
+
+GuiToolSlotController.GuiInventoryController = GuiInventoryController
+GuiTooltipController.GuiInventoryController = GuiInventoryController
 
 function GuiInventoryController:InitializeGuiToolSlots()
 	local GuiInventorySize = GuiInventory.AbsoluteWindowSize
@@ -61,25 +68,31 @@ function GuiInventoryController:InitializeGuiToolSlots()
 			newGuiToolSlot.Parent = GuiInventory
 			newGuiToolSlot.Name = tostring(slotIndex)
 
-            self.GuiInventoryRaw[slotIndex] = GuiToolSlotController:new(slotIndex, newGuiToolSlot)
+			self.GuiInventoryRaw:Set(slotIndex, GuiToolSlotController:new(slotIndex, newGuiToolSlot))
 		end
 	end
 end
 
-function GuiInventoryController:SetToolSlot(slotIndex, tool)
+function GuiInventoryController:GetToolSlot(slotIndex)
     if not slotIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+end
+
+function GuiInventoryController:SetToolSlot(slotIndex, tool)
+	if not slotIndex then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-    if not self.GuiInventoryRaw[slotIndex] then
+	local targetGuiToolSlotController = self.GuiInventoryRaw:Get(slotIndex)
+	if not targetGuiToolSlotController then
 		Debug.Assert(false, "비정상입니다.")
 		return false
-    end
+	end
 
-    local guiToolSlotController = self.GuiInventoryRaw[slotIndex]
-
-	if not guiToolSlotController:SetTool(tool) then
+	if not targetGuiToolSlotController:SetTool(tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end

@@ -1,3 +1,4 @@
+local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
@@ -53,7 +54,8 @@ function ClearPlayer(player)
 	if character then
 		-- 데이터 기반으로 수정해야 된다.
 		if character:FindFirstChild("AliveTag") then
-			character.AliveTag:Destroy()
+			Debris:AddItem(character.AliveTag,0)
+			--character.AliveTag:Destroy()
 		end
 		
 		local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -67,8 +69,10 @@ function ClearPlayer(player)
 	-- 플레이어 가방 정리
 	local allTools = player.Backpack:GetChildren()
 	for _, targetTool in pairs(allTools) do
-		targetTool:Destroy()
-		targetTool.Parent = nil
+		Debris:AddItem(targetTool,0)
+		
+		--targetTool:Destroy()
+		--targetTool.Parent = nil
 	end
 	--player.Backpack:ClearAllChildren()
 
@@ -171,6 +175,7 @@ function Initializer:StartGame(playersInGame)
 			continue
 		end
 		
+
 		-- 기본 도구
 		local sword = ServerStorage.Tools.Sword:Clone()
 		--sword:WaitForChild("Key")
@@ -180,28 +185,30 @@ function Initializer:StartGame(playersInGame)
 		--axe:WaitForChild("Key")
 		axe.Parent = player.Backpack
 
-		
-		local sword = ServerStorage.Tools.Sword:Clone()
-		--sword:WaitForChild("Key")
-		sword.Parent = player.Backpack
+		if false then
+			local sword = ServerStorage.Tools.Sword:Clone()
+			--sword:WaitForChild("Key")
+			sword.Parent = player.Backpack
+	
+			local axe = ServerStorage.Tools.Axe:Clone()
+			--axe:WaitForChild("Key")
+			axe.Parent = player.Backpack
+	
+			
+			local sword = ServerStorage.Tools.Sword:Clone()
+			--sword:WaitForChild("Key")
+			sword.Parent = player.Backpack
+	
+			local axe = ServerStorage.Tools.Axe:Clone()
+			--axe:WaitForChild("Key")
+			axe.Parent = player.Backpack
+	
+			
+			local sword = ServerStorage.Tools.Sword:Clone()
+			--sword:WaitForChild("Key")
+			sword.Parent = player.Backpack
+		end
 
-		local axe = ServerStorage.Tools.Axe:Clone()
-		--axe:WaitForChild("Key")
-		axe.Parent = player.Backpack
-
-		
-		local sword = ServerStorage.Tools.Sword:Clone()
-		--sword:WaitForChild("Key")
-		sword.Parent = player.Backpack
-
-		local axe = ServerStorage.Tools.Axe:Clone()
-		--axe:WaitForChild("Key")
-		axe.Parent = player.Backpack
-
-		
-		local sword = ServerStorage.Tools.Sword:Clone()
-		--sword:WaitForChild("Key")
-		sword.Parent = player.Backpack
 		--[[
 		local boolValue = Instance.new("BoolValue")
 		boolValue.Name = "BoolValue!!"

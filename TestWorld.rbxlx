@@ -82,27 +82,27 @@
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>45.5362587</X>
-					<Y>25.972147</Y>
-					<Z>10.5711298</Z>
-					<R00>0.463250369</R00>
-					<R01>-0.438533425</R01>
-					<R02>0.770121872</R02>
-					<R10>-0</R10>
-					<R11>0.868988991</R11>
-					<R12>0.494831622</R12>
-					<R20>-0.886227548</R20>
-					<R21>-0.229230925</R21>
-					<R22>0.402559429</R22>
+					<X>23.9774265</X>
+					<Y>14.8479223</Y>
+					<Z>3.34544611</Z>
+					<R00>0.92452538</R00>
+					<R01>-0.102225214</R01>
+					<R02>0.367155075</R02>
+					<R10>-7.45058149e-09</R10>
+					<R11>0.963356972</R11>
+					<R12>0.268222809</R12>
+					<R20>-0.381120533</R20>
+					<R21>-0.247978792</R21>
+					<R22>0.890647888</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>43.9960136</X>
-					<Y>24.9824829</Y>
-					<Z>9.76601028</Z>
+					<X>23.2431164</X>
+					<Y>14.3114767</Y>
+					<Z>1.56415033</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -8467,66 +8467,112 @@ local LocalPlayer = game.Players.LocalPlayer
 local PlayerId = LocalPlayer.UserId
 
 
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local GuiController = require(PlayerGui:WaitForChild("GuiController"))
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 
+-- CTS
+local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
+local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
+
+-- STC
 local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
 local NotifyWinnerSTC = RemoteEvents:WaitForChild("NotifyWinnerSTC")
-local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
+local EquipToolSTC = RemoteEvents:WaitForChild("EquipToolSTC")
+local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
 
 local ClientGlobalStorage = CommonGlobalStorage
 
-NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerReward)
-	GuiController:OnNotifyWinnerSTC(winnerType, winnerName, winnerReward)
-end)
+-- 초기화 코드
+function ClientGlobalStorage:RegisterOnClientEvent(guiController)
+	-- STC
+	EquipToolSTC.OnClientEvent:Connect(function(tool)
+		Debug.Assert(tool, "도구 비정상")
+		local temp = LocalPlayer.Backpack:GetChildren()
+		Debug.Print(tostring(tool))
 
-ChangeGameStateSTC.OnClientEvent:Connect(function(gameState, ...)
-	GuiController:OnChangeGameStateSTC(gameState, {...})
-end)
+		for key,value in pairs(temp) do
+			Debug.Print(tostring(key) .. " : " .. tostring(value))
+		end
 
-AddToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
-	
-	Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
-	Debug.Assert(tool, "도구 비정상")
-	
-	local data = ClientGlobalStorage:GetData()
-	local inventory = data[StatusType.Inventory]
+		if not ClientGlobalStorage:EquipTool(PlayerId,tool) then
+			Debug.Assert(false, "장착하지 못했습니다.")
+			return
+		end
+	end)
 
-	if not inventory:AddToolToSlot(slotIndex, tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return
-	end
+	UnequipToolSTC.OnClientEvent:Connect(function(tool)
+		Debug.Assert(tool, "도구 비정상")
 
-	GuiController:SetInventoryToolSlot(slotIndex, tool)
-end)
+		if not ClientGlobalStorage:UnequipTool(PlayerId, tool) then
+			Debug.Assert(false, "장착 해제하지 못했습니다.")
+			return
+		end
+	end)
 
-RemoveToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
-	
-	Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
-	Debug.Assert(tool, "도구 비정상")
-	
-	local data = ClientGlobalStorage:GetData()
-	local inventory = data[StatusType.Inventory]
+	AddToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
+		
+		Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
+		Debug.Assert(tool, "도구 비정상")
+		
+		local data = ClientGlobalStorage:GetData()
+		local inventory = data[StatusType.Inventory]
 
-	if not inventory:RemoveToolFromSlot(slotIndex, tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return
-	end
+		if not inventory:AddToolToSlot(slotIndex, tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 
-	GuiController:SetInventoryToolSlot(slotIndex, nil)
-end)
+		guiController:SetInventoryToolSlot(slotIndex, tool)
+	end)
 
+	RemoveToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
+		
+		Debug.Assert(slotIndex, "슬롯 인덱스 비정상")
+		Debug.Assert(tool, "도구 비정상")
+		
+		local data = ClientGlobalStorage:GetData()
+		local inventory = data[StatusType.Inventory]
 
+		if not inventory:RemoveToolFromSlot(slotIndex, tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 
+		guiController:SetInventoryToolSlot(slotIndex, nil)
+	end)
 
+	NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerReward)
+		guiController:SetWinnerMessage(winnerType, winnerName, winnerReward)
+	end)
 
-function ClientGlobalStorage:Initialize()
+	ChangeGameStateSTC.OnClientEvent:Connect(function(gameState, ...)
+		guiController:ChangeGameState(gameState, {...})
+	end)
+
+end
+
+function ClientGlobalStorage:Initialize(guiController)
 	self:SetClientMode()
 	self:AddPlayer(LocalPlayer) -- 본인거는 서버도 통보안해준다.
+
+	Debug.Assert(guiController, "비정상입니다.")
+	self.GuiController = guiController
+
+	self:RegisterOnClientEvent(guiController)
+end
+
+
+-- CTS
+function ClientGlobalStorage:SendSelectToolCTS(slotIndex, tool)
+	if not slotIndex or not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	SelectToolCTS:FireServer(slotIndex, tool)
+	return true
 end
 
 function ClientGlobalStorage:GetData()
@@ -8586,14 +8632,11 @@ function ClientGlobalStorage:SwapQuickSlot(quickSlotIndex1, quickSlotIndex2)
 	return true
 end
 
-
-
 ClientGlobalStorage.__index = Utility.Inheritable__index
 ClientGlobalStorage.__newindex = Utility.Inheritable__newindex
 --setmetatable(ClientGlobalStorage, CommonGlobalStorage)
 
-ClientGlobalStorage:Initialize()
-
+--ClientGlobalStorage:Initialize()
 return ClientGlobalStorage
 ]]></ProtectedString>
 						<int64 name="SourceAssetId">-1</int64>
@@ -8890,26 +8933,6 @@ UserInputService.InputBegan:Connect(onInputBegan)
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="LocalScript" referent="787">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<bool name="Disabled">false</bool>
-					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">ClientModuleLoader</string>
-					<token name="RunContext">0</token>
-					<string name="ScriptGuid">{EC0D4B59-E5C2-4C45-A81D-6D0186CAEA73}</string>
-					<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
-local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
-local ClientModule = StarterPlayerScripts:WaitForChild("ClientModule")
-
-require(ClientModule:WaitForChild("KeyBinder"))
-require(ClientModule:WaitForChild("ClientGlobalStorage"))
-]]></ProtectedString>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">5aa7e1dcf1e0b1b002f570c400020bc8</UniqueId>
-				</Properties>
-			</Item>
 			<Item class="LocalScript" referent="788">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -9036,6 +9059,61 @@ end)]]></ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">5aa7e1dcf1e0b1b002f570c400020bca</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXEFA1278CC2B347448576C08226B838D6">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">ClientModuleFacade</string>
+					<string name="ScriptGuid">{0126BFEF-3D65-4C8D-A9E6-23B68E8B2DF1}</string>
+					<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
+
+local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModule = StarterPlayerScripts:WaitForChild("ClientModule")
+
+local ClientGlobalStorage = require(ClientModule:WaitForChild("ClientGlobalStorage"))
+local KeyBinder = require(ClientModule:WaitForChild("KeyBinder"))
+
+
+local ClientModuleFacade = {
+	KeyBinder = KeyBinder,
+	ClientGlobalStorage = ClientGlobalStorage
+}
+
+setmetatable(ClientModuleFacade, CommonModuleFacade)
+ClientModuleFacade.__index = ClientModuleFacade.Utility.Inheritable__index
+
+return ClientModuleFacade
+]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">6ddc2487c8ec557b02f9458100170210</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="LocalScript" referent="RBX740024F389EE4557BF6DD6B7F759647B">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<bool name="Disabled">false</bool>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">ClientModuleLoader</string>
+					<token name="RunContext">0</token>
+					<string name="ScriptGuid">{D33326DD-2761-4DBC-94C6-41949976F12C}</string>
+					<ProtectedString name="Source"><![CDATA[--[[
+local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModule = StarterPlayerScripts:WaitForChild("ClientModule")
+--]]
+
+local LocalPlayer = game.Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+require(PlayerGui:WaitForChild("GuiController"))
+]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">6ddc2487c8ec557b02f94581002ccadc</UniqueId>
 				</Properties>
 			</Item>
 		</Item>
@@ -9610,65 +9688,79 @@ end)]]></ProtectedString>
 				<Content name="LinkedSource"><null></null></Content>
 				<string name="Name">GuiController</string>
 				<string name="ScriptGuid">{C2B28F14-5150-4407-A32E-9B611CDFFE9D}</string>
-				<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+				<ProtectedString name="Source"><![CDATA[local PlayerGui = script.Parent
 
+local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
 
-local PlayerGui = script.Parent
-
-local GuiController = {}
-GuiController.GuiInventoryController = require(script:WaitForChild("GuiInventoryController"))
-GuiController.GuiEquipSlotsController = require(script:WaitForChild("GuiEquipSlotsController"))
-
-local GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
-local GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
-
-local GuiBoard = PlayerGui:WaitForChild("GuiBoard")
-local GuiPlayersLeftCountText = GuiBoard:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
-local GuiKilledCountText = GuiBoard:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
-local GuiCurrentGameLengthText = GuiBoard:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
-
-local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
-local Debug = CommonModuleFacade.Debug
-local GameStateType = CommonModuleFacade.CommonEnum.GameStateType
-local WinnerType = CommonModuleFacade.CommonEnum.WinnerType
+local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
+local Debug = ClientModuleFacade.Debug
+local GameStateType = ClientModuleFacade.CommonEnum.GameStateType
+local WinnerType = ClientModuleFacade.CommonEnum.WinnerType
 
 
 -- 리플리케이션 저장소 변수
-
-
---local GuiMainMessage = ReplicatedStorage:WaitForChild("GuiMainMessage")
---GuiMainMessageText.Text = GuiMainMessage.Value
-
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RemoteValues = ReplicatedStorage:WaitForChild("RemoteValues")
 
 local PlayersLeftCount = RemoteValues:WaitForChild("PlayersLeftCount")
-GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
-
 local CurrentGameLength = RemoteValues:WaitForChild("CurrentGameLength")
-GuiCurrentGameLengthText.Text = CurrentGameLength.Value
 
-PlayersLeftCount:GetPropertyChangedSignal("Value"):Connect(function()
-	GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
-end)
-
-CurrentGameLength:GetPropertyChangedSignal("Value"):Connect(function()
-	GuiCurrentGameLengthText.Text = CurrentGameLength.Value
-end)
-
-
+local GuiController = {}
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
-function ToggleInGameGui(isEnabled)
-	GuiPlayersLeftCountText.Parent.Enabled = isEnabled
-	GuiCurrentGameLengthText.Parent.Enabled = isEnabled
-	GuiKilledCountText.Parent.Enabled = isEnabled
+function GuiController:Initialize()
+	GuiController.GuiInventoryController = require(script:WaitForChild("GuiInventoryController"))
+	GuiController.GuiEquipSlotsController = require(script:WaitForChild("GuiEquipSlotsController"))
+	
+	self.GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
+	self.GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
+	
+	local GuiBoard = PlayerGui:WaitForChild("GuiBoard")
+	self.GuiPlayersLeftCountText = GuiBoard:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
+	self.GuiKilledCountText = GuiBoard:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
+	self.GuiCurrentGameLengthText = GuiBoard:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
+
+	self.GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
+	self.GuiCurrentGameLengthText.Text = CurrentGameLength.Value
+	
+	PlayersLeftCount:GetPropertyChangedSignal("Value"):Connect(function()
+		self.GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
+	end)
+
+	CurrentGameLength:GetPropertyChangedSignal("Value"):Connect(function()
+		self.GuiCurrentGameLengthText.Text = CurrentGameLength.Value
+	end)
+
+	self.GameStateProcessSelector = {
+		[GameStateType.Waiting] = self.ProcessWaiting,
+		[GameStateType.Starting] = self.ProcessStarting,
+		[GameStateType.Playing] = self.ProcessPlaying,
+		[GameStateType.Dead] = self.ProcessDead,
+		[GameStateType.WaitingForFinishing] = self.ProcessWaitingForFinishing,
+	}
+	
+	self.WinnerProcessSelector = {
+		[WinnerType.Player] = "Winner is ",
+		[WinnerType.NoOne_TimeIsUp] = "Time is up",
+		[WinnerType.NoOne_AllPlayersWereDead] = "No one won the game",
+		[WinnerType.Ai] = "Winner is AI",
+	}
+
+	ClientGlobalStorage:Initialize(self)
 end
 
+function GuiController:ToggleInGameGui(isEnabled)
+	self.GuiPlayersLeftCountText.Parent.Enabled = isEnabled
+	self.GuiCurrentGameLengthText.Parent.Enabled = isEnabled
+	self.GuiKilledCountText.Parent.Enabled = isEnabled
+end
 
-function SetGuiMainMessage(inputText)
+function GuiController:SetGuiMainMessage(inputText)
 	if inputText == "" then
-		GuiMainMessageText.Parent.Enabled = false
+		self.GuiMainMessageText.Parent.Enabled = false
 	else
 --[[
 		local length = inputText:len()
@@ -9682,84 +9774,73 @@ function SetGuiMainMessage(inputText)
 			GuiMainMessageText.Position = UDim2.new(GuiMainMessageText.Position.X.Scale, -(boxSize/2), GuiMainMessageText.Position.Y.Offset, GuiMainMessageText.Position.Y.Scale)
 		end
 --]]
-		GuiMainMessageText.Text = inputText
-		GuiMainMessageText.Parent.Enabled = true
+		self.GuiMainMessageText.Text = inputText
+		self.GuiMainMessageText.Parent.Enabled = true
 	end
 end
 
-function SetGuiEventMessage(inputText)
+function GuiController:SetGuiEventMessage(inputText)
 	
 	if inputText == "" then
-		GuiEventMessageText.Parent.Enabled = false
+		self.GuiEventMessageText.Parent.Enabled = false
 	else
-		GuiEventMessageText.Text = inputText
-		GuiEventMessageText.Parent.Enabled = true
+		self.GuiEventMessageText.Text = inputText
+		self.GuiEventMessageText.Parent.Enabled = true
 		wait(3)
-		GuiEventMessageText.Parent.Enabled = false
+		self.GuiEventMessageText.Parent.Enabled = false
 	end
 end
 
-function ProcessWaiting(arguments)
+function GuiController:ProcessWaiting(arguments)
 	print("GameStateType.Waiting in client")
-	SetGuiMainMessage("Waiting ... ")
-	GuiPlayersLeftCountText.Parent.Enabled = false
-	GuiCurrentGameLengthText.Parent.Enabled = false
-	GuiKilledCountText.Parent.Enabled = false
+	self:SetGuiMainMessage("Waiting ... ")
+	self.GuiPlayersLeftCountText.Parent.Enabled = false
+	self.GuiCurrentGameLengthText.Parent.Enabled = false
+	self.GuiKilledCountText.Parent.Enabled = false
 	
 end
 
-function ProcessStarting(arguments)
+function GuiController:ProcessStarting(arguments)
 	print("GameStateType.Starting in client")
 	for i = 5, 1, -1 do
-		SetGuiMainMessage(tostring(i))
+		self:SetGuiMainMessage(tostring(i))
 		wait(1)
 	end
 end
 
-function ProcessPlaying(arguments)
+function GuiController:ProcessPlaying(arguments)
 	local mapName = arguments[1]
-	SetGuiMainMessage(mapName .. " is selected")
+	self:SetGuiMainMessage(mapName .. " is selected")
 	
 	wait(2)
 	
-	SetGuiMainMessage("Get ready to play")
-	GuiPlayersLeftCountText.Parent.Enabled = true
-	GuiCurrentGameLengthText.Parent.Enabled = true
-	GuiKilledCountText.Parent.Enabled = true
+	self:SetGuiMainMessage("Get ready to play")
+	self.GuiPlayersLeftCountText.Parent.Enabled = true
+	self.GuiCurrentGameLengthText.Parent.Enabled = true
+	self.GuiKilledCountText.Parent.Enabled = true
 	
 	wait(2)
 	
-	SetGuiMainMessage("")
+	self:SetGuiMainMessage("")
 end
 
-function ProcessDead(arguments)
-	SetGuiMainMessage("You Died")
+function GuiController:ProcessDead(arguments)
+	self:SetGuiMainMessage("You Died")
 end
 
-function ProcessWaitingForFinishing(arguments)
-	ProcessWaiting()
+function GuiController:ProcessWaitingForFinishing(arguments)
+	self:ProcessWaiting()
 end
 
-local GameStateProcessSelector = {
-	[GameStateType.Waiting] = ProcessWaiting,
-	[GameStateType.Starting] = ProcessStarting,
-	[GameStateType.Playing] = ProcessPlaying,
-	[GameStateType.Dead] = ProcessDead,
-	[GameStateType.WaitingForFinishing] = ProcessWaitingForFinishing,
-}
-function GuiController:OnChangeGameStateSTC(gameState, arguments)
+
+function GuiController:ChangeGameState(gameState, arguments)
 	--print("GameStateType : " .. gameState)
-	GameStateProcessSelector[gameState](arguments)
+	self.GameStateProcessSelector[gameState](self, arguments)
 end
 
-local WinnerProcessSelector = {
-	[WinnerType.Player] = "Winner is ",
-	[WinnerType.NoOne_TimeIsUp] = "Time is up",
-	[WinnerType.NoOne_AllPlayersWereDead] = "No one won the game",
-	[WinnerType.Ai] = "Winner is AI",
-}
-function GuiController:OnNotifyWinnerSTC(winnerType, winnerName, winnerReward)
-	local winnerMessageString = WinnerProcessSelector[winnerType]
+
+function GuiController:SetWinnerMessage(winnerType, winnerName, winnerReward)
+	local winnerMessageString = self.WinnerProcessSelector[winnerType]
 	local rewardMessageString = ""
 	
 	if winnerName ~= nil then
@@ -9769,11 +9850,11 @@ function GuiController:OnNotifyWinnerSTC(winnerType, winnerName, winnerReward)
 		end
 	end
 	
-	SetGuiMainMessage(winnerMessageString)
+	self:SetGuiMainMessage(winnerMessageString)
 	wait(3)
 	
 	if rewardMessageString then
-		SetGuiMainMessage(rewardMessageString)
+		self:SetGuiMainMessage(rewardMessageString)
 	end
 end
 
@@ -9783,8 +9864,7 @@ function GuiController:SetInventoryToolSlot(slotIndex, tool)
 	end
 end
 
-
-
+GuiController:Initialize()
 return GuiController
 
 -- 실행 코드 ------------------------------------------------------------------------------------------------------
@@ -9817,12 +9897,14 @@ return module
 					<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonMoudleFacade.Debug
+local Utility = CommonMoudleFacade.Utility
+local ToolUtility = CommonMoudleFacade.ToolUtility
 local CommonConstant = CommonMoudleFacade.CommonConstant
-
 
 local MaxInventorySlotCount = CommonConstant.MaxInventorySlotCount
 local GuiInventorySlotCountPerLine = CommonConstant.GuiInventorySlotCountPerLine
 local GuiInventorySlotOffset = CommonConstant.GuiInventorySlotOffset
+
 
 
 local player = game.Players.LocalPlayer
@@ -9833,11 +9915,16 @@ local GuiEquipSlots = GuiPlayerStatusWindow:WaitForChild("GuiEquipSlots")
 local GuiInventory = GuiPlayerStatusWindow:WaitForChild("GuiInventory")
 local GuiToolSlot = GuiPlayerStatusWindow:WaitForChild("GuiToolSlot")
 local GuiToolSlotController = require(script.Parent:WaitForChild("GuiToolSlotController"))
+local GuiTooltipController = require(script.Parent:WaitForChild("GuiTooltipController"))
 
-
+local GuiInventoryRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
+GuiInventoryRaw:Initialize(MaxInventorySlotCount)
 local GuiInventoryController = {
-    GuiInventoryRaw = {}
+	GuiInventoryRaw = GuiInventoryRaw
 }
+
+GuiToolSlotController.GuiInventoryController = GuiInventoryController
+GuiTooltipController.GuiInventoryController = GuiInventoryController
 
 function GuiInventoryController:InitializeGuiToolSlots()
 	local GuiInventorySize = GuiInventory.AbsoluteWindowSize
@@ -9877,25 +9964,31 @@ function GuiInventoryController:InitializeGuiToolSlots()
 			newGuiToolSlot.Parent = GuiInventory
 			newGuiToolSlot.Name = tostring(slotIndex)
 
-            self.GuiInventoryRaw[slotIndex] = GuiToolSlotController:new(slotIndex, newGuiToolSlot)
+			self.GuiInventoryRaw:Set(slotIndex, GuiToolSlotController:new(slotIndex, newGuiToolSlot))
 		end
 	end
 end
 
-function GuiInventoryController:SetToolSlot(slotIndex, tool)
+function GuiInventoryController:GetToolSlot(slotIndex)
     if not slotIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+end
+
+function GuiInventoryController:SetToolSlot(slotIndex, tool)
+	if not slotIndex then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-    if not self.GuiInventoryRaw[slotIndex] then
+	local targetGuiToolSlotController = self.GuiInventoryRaw:Get(slotIndex)
+	if not targetGuiToolSlotController then
 		Debug.Assert(false, "비정상입니다.")
 		return false
-    end
+	end
 
-    local guiToolSlotController = self.GuiInventoryRaw[slotIndex]
-
-	if not guiToolSlotController:SetTool(tool) then
+	if not targetGuiToolSlotController:SetTool(tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -9934,7 +10027,7 @@ local GuiToolSlot = GuiPlayerStatusWindow:WaitForChild("GuiToolSlot")
 local GuiToolSlotController = {}
 
 function GuiToolSlotController:new(slotIndex, newGuiToolSlot)
-	local newGuiToolSlotController = Utility:DeepCopy(self)
+	local newGuiToolSlotController = Utility:ShallowCopy(self)
 
 	if not newGuiToolSlot then
 		newGuiToolSlot = GuiToolSlot:Clone()
@@ -9978,9 +10071,8 @@ function GuiToolSlotController:new(slotIndex, newGuiToolSlot)
 		if not targetTool then
 			return
 		end
-		GuiTooltipController:SetTool(targetTool)
+		GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
 	end)
-	
 	
 	newGuiToolSlotController:ClearToolData()
 	return newGuiToolSlotController
@@ -9998,12 +10090,19 @@ end
 
 function GuiToolSlotController:ClearToolData()
 	self:SetToolImage(nil)
-
 	self.GuiToolName.Text = ""
 	self.GuiToolCount.Text = ""
+
+	self.Tool = nil
 end
 
+function GuiToolSlotController:GetSlotIndex()
+	return self.SlotIndex
+end
 
+function GuiToolSlotController:GetTool()
+	return self.Tool
+end
 
 function GuiToolSlotController:SetTool(tool)
 	if not tool then
@@ -10027,7 +10126,7 @@ function GuiToolSlotController:SetTool(tool)
 	return true
 end
 
-return GuiToolSlotController:new(GuiToolSlot)
+return GuiToolSlotController:new(-1, GuiToolSlot)
 ]]></ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
@@ -10040,35 +10139,19 @@ return GuiToolSlotController:new(GuiToolSlot)
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">GuiTooltipController</string>
 					<string name="ScriptGuid">{056F0D13-A9EF-4E59-8344-192FC6361A23}</string>
-					<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
-local Debug = CommonMoudleFacade.Debug
-local ToolUtility = CommonMoudleFacade.ToolUtility
-local CommonEnum = CommonMoudleFacade.CommonEnum
-local ToolTypeConverter = CommonEnum.ToolType.Converter
+					<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
 
-local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
-local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
+local Debug = ClientModuleFacade.Debug
+local ToolUtility = ClientModuleFacade.ToolUtility
+local CommonEnum = ClientModuleFacade.CommonEnum
+local ToolTypeConverter = CommonEnum.ToolType.Converter
+local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
 
 local LocalPlayer = game.Players.LocalPlayer
 
 local GuiTooltipController = {}
-
-
-
-
-local a = {}
-local b = {}
-setmetatable(a, b)
-b.__mode = "k"         -- now `a' has weak keys
-local key = {}               -- creates first key
-a[key] = 1
-key = {}               -- creates second key
-a[key] = 2
---collectgarbage()       -- forces a garbage collection cycle
-for k, v in pairs(a) do print(v) end
---> 2
-
 
 
 function GuiTooltipController:SetToolImage(image)
@@ -10165,6 +10248,7 @@ function GuiTooltipController:ClearToolData()
 	--]]
 
 	self.Tool = nil
+	self.InventorySlotIndex = -1
 	self.GuiTooltip.Enabled = false
 end
 
@@ -10215,12 +10299,26 @@ function GuiTooltipController:Initialize()
 	self.GuiRemoveButton = GuiRemoveButton
 
 	GuiSelectButton.Activated:connect(function(inputObject)
-		if not self.Tool then
+		if not self.ToolSlot then
+			self:ClearToolData()
 			return
 		end
 
-		if self.Tool.Parent ~= LocalPlayer.Backpack then
-			Debug.Assert(false, "없을 수 있는 지 확인해야합니다.")
+		local tool = self.ToolSlot:GetTool()
+		if not tool then
+			self:ClearToolData()
+			return
+		end
+
+		if tool.Parent ~= LocalPlayer.Backpack then
+			Debug.Assert(false, "어떤 경우인지 확인해봐야 합니다.")
+			self:ClearToolData()
+			return
+		end
+		
+		if not ClientGlobalStorage:SendSelectToolCTS(self.ToolSlot:GetSlotIndex(), tool) then
+			Debug.Assert(false, "비정상입니다.")
+			self:ClearToolData()
 		end
 
 	end)
@@ -10228,13 +10326,14 @@ function GuiTooltipController:Initialize()
 	self:ClearToolData()
 end
 
-function GuiTooltipController:SetTool(tool)
-	if not tool then
+function GuiTooltipController:InitializeByToolSlot(toolSlot)
+	if not toolSlot then
 		self:ClearToolData()
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
+	local tool = toolSlot:GetTool()
 	local toolGameData = ToolUtility:GetToolGameData(tool)
 	if not toolGameData then
 		self:ClearToolData()
@@ -10242,7 +10341,7 @@ function GuiTooltipController:SetTool(tool)
 		return false
 	end
 
-	self.Tool = tool
+	self.ToolSlot = toolSlot
 	self.GuiToolName.Text = tool.Name
 	self:SetToolImage(toolGameData.Image)
 	self:SetToolType(toolGameData.ToolType)
@@ -14970,24 +15069,20 @@ local Initializer = require(script:WaitForChild("Initializer"))
 local MapController = require(script:WaitForChild("MapController"))
 
 
--- 함수 정의 ------------------------------------------------------------------------------------------------------
-
-
-
-
-
 function ClearGui()
 	CurrentGameLength.Value = 0
 	PlayersLeftCount.Value = 0
 	MainMessage.Value = ""
 end
 
-
-
-
--- 실행 코드 ------------------------------------------------------------------------------------------------------
 Initializer:InitializeGame()
 
+--[[
+local tempObject = workspace:WaitForChild("TempObject")
+local sword = tempObject:WaitForChild("Sword")
+
+sword:Destroy()
+--]]
 
 while true  do
 	
@@ -15334,28 +15429,30 @@ function Initializer:StartGame(playersInGame)
 		--axe:WaitForChild("Key")
 		axe.Parent = player.Backpack
 
-		
-		local sword = ServerStorage.Tools.Sword:Clone()
-		--sword:WaitForChild("Key")
-		sword.Parent = player.Backpack
+		if false then
+			local sword = ServerStorage.Tools.Sword:Clone()
+			--sword:WaitForChild("Key")
+			sword.Parent = player.Backpack
+	
+			local axe = ServerStorage.Tools.Axe:Clone()
+			--axe:WaitForChild("Key")
+			axe.Parent = player.Backpack
+	
+			
+			local sword = ServerStorage.Tools.Sword:Clone()
+			--sword:WaitForChild("Key")
+			sword.Parent = player.Backpack
+	
+			local axe = ServerStorage.Tools.Axe:Clone()
+			--axe:WaitForChild("Key")
+			axe.Parent = player.Backpack
+	
+			
+			local sword = ServerStorage.Tools.Sword:Clone()
+			--sword:WaitForChild("Key")
+			sword.Parent = player.Backpack
+		end
 
-		local axe = ServerStorage.Tools.Axe:Clone()
-		--axe:WaitForChild("Key")
-		axe.Parent = player.Backpack
-
-		
-		local sword = ServerStorage.Tools.Sword:Clone()
-		--sword:WaitForChild("Key")
-		sword.Parent = player.Backpack
-
-		local axe = ServerStorage.Tools.Axe:Clone()
-		--axe:WaitForChild("Key")
-		axe.Parent = player.Backpack
-
-		
-		local sword = ServerStorage.Tools.Sword:Clone()
-		--sword:WaitForChild("Key")
-		sword.Parent = player.Backpack
 		--[[
 		local boolValue = Instance.new("BoolValue")
 		boolValue.Name = "BoolValue!!"
@@ -49314,7 +49411,7 @@ ToolBase.__newindex = Utility.Inheritable__newindex
 
 -- Tool에 붙은 데이터들을 플레이어에게 적용하기
 
-function onEquipped(toolBase)
+function OnEquipped(toolBase)
 
 	local tool = toolBase.Root()
 	--local temp = getmetatable(toolBase)
@@ -49323,31 +49420,31 @@ function onEquipped(toolBase)
 	
 	-- 캐릭터가 장착중인 상태 -- Character의 Parent는 Workspace이다 주의해야한다.
 	-- tool =(parent)> Character
+	
 	local character = tool.Parent
-	ServerGlobalStorage:AddGameData(character, toolBase.GetGameData())
-		
+	local player = game.Players:GetPlayerFromCharacter(character)
+	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
 end
 
 
-function onUnequipped(toolBase)
+function OnUnequipped(toolBase)
 	
+	local temp = 3
 	local tool = toolBase.Root()
-	local temp = getmetatable(toolBase)
+	--local temp = getmetatable(toolBase)
 	
 	--Backpack에 존재 
 	-- tool =(parent)> Backpack =(parent)> Player > Character
-	local character = tool.Parent.Parent.Character
-	ServerGlobalStorage:RemoveGameData(character, toolBase.GetGameDataType())
-	
+	local player = tool.Parent.Parent
+	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
 end
 
 function ToolBase:InitializeAll(gameDataType, tool)
 	
 	self:Initialize(gameDataType, tool)
 	
-	tool.Equipped:Connect(function() onEquipped(self) end)
-	tool.Unequipped:Connect(function() onUnequipped(self) end)
-	
+	tool.Equipped:Connect(function() OnEquipped(self) end)
+	tool.Unequipped:Connect(function() OnUnequipped(self) end)
 end
 
 
@@ -49647,6 +49744,7 @@ return setmetatable({}, WorldInteractorGameData)
 local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonModuleFacade.Debug
 local Utility = CommonModuleFacade.Utility
+local ToolUtility = CommonModuleFacade.ToolUtility
 local CommonGlobalStorage = CommonModuleFacade.CommonGlobalStorage
 
 local ServerStorage = game:GetService("ServerStorage")
@@ -49659,11 +49757,76 @@ local ToolType = ServerEnum.ToolType
 local ArmorType = ServerEnum.ArmorType
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
+
+-- STC
 local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
+local EquipToolSTC = RemoteEvents:WaitForChild("EquipToolSTC")
+local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
 
+-- CTS
+local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
 
 local ServerGlobalStorage = CommonGlobalStorage
+
+SelectToolCTS.OnServerEvent:Connect(function(player, inventorySlotIndex, tool)
+	if not inventorySlotIndex or not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+	
+	if player.Backpack ~= tool.Parent then
+		Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
+		return
+	end
+
+	local character = player.Character
+	if not character then
+		Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+		return
+	end
+
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid then
+		Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+		return
+	end
+
+	-- 임시
+	wait(3)
+	humanoid:EquipTool(tool)
+end)
+
+-- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
+function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
+	if not ToolUtility:CheckWeaponTool(tool) then
+		return false
+	end
+	
+	if not self:EquipTool(playerId, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local player = game.Players:GetPlayerByUserId(playerId)
+	EquipToolSTC:FireClient(player, tool)
+	return true
+end
+
+function ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId, tool)
+	if not ToolUtility:CheckWeaponTool(tool) then
+		return false
+	end
+	
+	if not self:UnequipTool(playerId, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local player = game.Players:GetPlayerByUserId(playerId)
+	UnequipToolSTC:FireClient(player, tool)
+	return true
+end
 
 function ServerGlobalStorage:AddTool(playerId, tool)
 	local player = game.Players:GetPlayerByUserId(playerId)
@@ -51915,34 +52078,8 @@ function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
 	return true
 end
 
--- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
-function CommonGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
-	if not self.CheckPlayer(playerId) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
-	if not equipSlots:CheckWeaponTool(tool) then
-		return false
-	end
-
-	local prevToolGameData, currentToolGameData = equipSlots:EquipTool(tool)
-	if not currentToolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	if prevToolGameData then
-		self:UpdateRemovedToolGameData(playerId, prevToolGameData)
-	end
-	
-	self:UpdateAddedToolGameData(playerId, currentToolGameData)
-	return true
-end
-
 function CommonGlobalStorage:EquipTool(playerId, tool)
-	if not self.CheckPlayer(playerId) then
+	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -51962,6 +52099,24 @@ function CommonGlobalStorage:EquipTool(playerId, tool)
 	return true
 end
 
+function CommonGlobalStorage:UnequipTool(playerId, tool)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
+	local prevToolGameData = equipSlots:UnequipTool(tool)
+	if not prevToolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	self:UpdateRemovedToolGameData(playerId, prevToolGameData)
+	return true
+end
+
+--[[
 function CommonGlobalStorage:CheckAndGetArmorData(armor)
 	if not armor then
 		Debug.Assert(false, "비정상입니다.")
@@ -52009,7 +52164,7 @@ function CommonGlobalStorage:EquipArmor(playerId, armor)
 	
 	return true
 end
-
+--]]
 
 CommonGlobalStorage.__index = Utility.Inheritable__index
 CommonGlobalStorage.__newindex = Utility.Inheritable__newindex
@@ -52103,8 +52258,73 @@ local EquipSlots = {}
 EquipSlots.ArmorSlotsRaw = ArmorSlotsRaw
 EquipSlots.WeaponSlot = nil
 
+function EquipSlots:UnequipToolByToolGameData(toolGameData)
+    if not toolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+    if not ToolUtility:CheckEquipableToolGameData(toolGameData) then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
+    
+    local targetToolType = toolGameData.ToolType
+    local prevTool = nil
+    if  targetToolType == ToolType.Armor then
+        local targetArmorType = toolGameData.ArmorType
+        prevTool = self.ArmorSlotsRaw:Get(targetArmorType)
+        if not prevTool then
+            Debug.Assert(false, "장착된 도구가 없습니다.")
+        else
+            self.ArmorSlotsRaw:Set(targetArmorType, nil)
+        end
+    else
+        prevTool = self.WeaponSlot
+        if not prevTool then
+            Debug.Assert(false, "장착된 도구가 없습니다.")
+        else
+            self.WeaponSlot = nil
+        end
+    end
+
+    local prevToolGameData = nil
+    if prevTool then
+        prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+        if not prevToolGameData then
+            Debug.Assert(false, "도구는 존재하지만 데이터가 존재하지 않습니다.")
+        end
+    end
+    return prevToolGameData
+end
+
+function EquipSlots:UnequipTool(tool)
+    if not tool then
+        Debug.Assert(false, "비정상입니다.")
+		return nil
+    end
+
+    local toolGameData = ToolUtility:GetToolGameData(tool)
+    if not toolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+    local prevToolGameData = self:UnequipToolByToolGameData(toolGameData)
+    if not prevToolGameData then
+        Debug.Assert(false, "비정상입니다.")
+		return nil
+    end
+
+    return prevToolGameData
+end
 
 function EquipSlots:EquipTool(tool, withCheck)
+    if not tool then
+        Debug.Assert(false, "비정상입니다.")
+		return nil, nil
+    end
+
     local toolGameData = ToolUtility:GetToolGameData(tool)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
@@ -52123,7 +52343,7 @@ function EquipSlots:EquipTool(tool, withCheck)
     if  targetToolType == ToolType.Armor then
         local targetArmorType = toolGameData.ArmorType
         prevTool = self.ArmorSlotsRaw:Get(targetArmorType)
-        self.ArmorSlotsRaw:Set(tool)
+        self.ArmorSlotsRaw:Set(targetArmorType, tool)
     else
         if self.WeaponSlot then
             prevTool = self.WeaponSlot
@@ -52363,25 +52583,33 @@ end
 function PlayerStatistic:UpdateRemovedToolGameData(toolGameData)
 	if not toolGameData then
         Debug.Assert(false, "비정상입니다.")
-		return
+		return false
 	end
 	
     local toolGameDataRaw = getmetatable(toolGameData)
 	for attribute, value in pairs(toolGameDataRaw) do
+		if not self.Value[attribute] then
+			continue
+		end
         self.Value[attribute] -= value
 	end
+	return true
 end
 
 function PlayerStatistic:UpdateAddedToolGameData(toolGameData)
 	if not toolGameData then
         Debug.Assert(false, "비정상입니다.")
-		return
+		return false
 	end
 	
     local toolGameDataRaw = getmetatable(toolGameData)
 	for attribute, value in pairs(toolGameDataRaw) do
+		if not self.Value[attribute] then
+			continue
+		end
         self.Value[attribute] += value
 	end
+	return true
 end
 
 PlayerStatistic:ClearData()
@@ -52975,6 +53203,18 @@ local Utility = {
 Utility.__index = Inheritable__index
 Utility.__newindex = Immutable__newindex
 
+function Utility:ShallowCopy(original)
+	local originalType = type(original)
+	local copy = {}
+
+	if originalType == 'table' then
+		for key, value in next, original, nil do
+			copy[key] = value
+		end
+	end
+
+	return copy
+end
 
 function Utility:DeepCopy(original)
 
@@ -53144,40 +53384,31 @@ return CommonModuleFacade
 					<UniqueId name="UniqueId">5aa7e1dcf1e0b1b002f570c4000208d5</UniqueId>
 				</Properties>
 			</Item>
-			<Item class="RemoteEvent" referent="RBXD2CE86B245284D8280F533CCA7A07E79">
+			<Item class="RemoteEvent" referent="RBX32F2969F750A40039E229BDF8B928A5D">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">SelectToolCTS</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">3648f01d2fff3e3502f9335200072ab3</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="RemoteEvent" referent="RBXC82A2309974E4F00B242FE53A70AB31C">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">EquipToolSTC</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">4e2b3717fd997fc602f5884b00097e46</UniqueId>
+					<UniqueId name="UniqueId">6ddc2487c8ec557b02f945810017020f</UniqueId>
 				</Properties>
 			</Item>
-			<Item class="RemoteEvent" referent="RBXC63B1A66F5234BA28F678ADBA5233BF9">
+			<Item class="RemoteEvent" referent="RBX9F2CC96B463F473AA37DF03F0DF1288E">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">EquipArmorSTC</string>
+					<string name="Name">UnequipToolSTC</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">4e2b3717fd997fc602f5884b00097e47</UniqueId>
-				</Properties>
-			</Item>
-			<Item class="RemoteEvent" referent="RBXB055DA562CD7456AB5478B28CED3FE6F">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">EquipArmorCTS</string>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">4e2b3717fd997fc602f5884b00097e48</UniqueId>
-				</Properties>
-			</Item>
-			<Item class="RemoteEvent" referent="RBXD0CEB54DCA8D433F9C199281AA1F98EE">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">EquipToolCTS</string>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">4e2b3717fd997fc602f5884b00097e49</UniqueId>
+					<UniqueId name="UniqueId">6ddc2487c8ec557b02f94581001f9c24</UniqueId>
 				</Properties>
 			</Item>
 		</Item>

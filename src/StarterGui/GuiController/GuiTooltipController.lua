@@ -1,12 +1,12 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
-local Debug = CommonMoudleFacade.Debug
-local ToolUtility = CommonMoudleFacade.ToolUtility
-local CommonEnum = CommonMoudleFacade.CommonEnum
-local ToolTypeConverter = CommonEnum.ToolType.Converter
+local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
 
-local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
-local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
+local Debug = ClientModuleFacade.Debug
+local ToolUtility = ClientModuleFacade.ToolUtility
+local CommonEnum = ClientModuleFacade.CommonEnum
+local ToolTypeConverter = CommonEnum.ToolType.Converter
+local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
 
 local LocalPlayer = game.Players.LocalPlayer
 
@@ -107,6 +107,7 @@ function GuiTooltipController:ClearToolData()
 	--]]
 
 	self.Tool = nil
+	self.InventorySlotIndex = -1
 	self.GuiTooltip.Enabled = false
 end
 
@@ -157,12 +158,26 @@ function GuiTooltipController:Initialize()
 	self.GuiRemoveButton = GuiRemoveButton
 
 	GuiSelectButton.Activated:connect(function(inputObject)
-		if not self.Tool then
+		if not self.ToolSlot then
+			self:ClearToolData()
 			return
 		end
 
-		if self.Tool.Parent ~= LocalPlayer.Backpack then
-			Debug.Assert(false, "없을 수 있는 지 확인해야합니다.")
+		local tool = self.ToolSlot:GetTool()
+		if not tool then
+			self:ClearToolData()
+			return
+		end
+
+		if tool.Parent ~= LocalPlayer.Backpack then
+			Debug.Assert(false, "어떤 경우인지 확인해봐야 합니다.")
+			self:ClearToolData()
+			return
+		end
+		
+		if not ClientGlobalStorage:SendSelectToolCTS(self.ToolSlot:GetSlotIndex(), tool) then
+			Debug.Assert(false, "비정상입니다.")
+			self:ClearToolData()
 		end
 
 	end)
@@ -170,13 +185,14 @@ function GuiTooltipController:Initialize()
 	self:ClearToolData()
 end
 
-function GuiTooltipController:SetTool(tool)
-	if not tool then
+function GuiTooltipController:InitializeByToolSlot(toolSlot)
+	if not toolSlot then
 		self:ClearToolData()
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
+	local tool = toolSlot:GetTool()
 	local toolGameData = ToolUtility:GetToolGameData(tool)
 	if not toolGameData then
 		self:ClearToolData()
@@ -184,7 +200,7 @@ function GuiTooltipController:SetTool(tool)
 		return false
 	end
 
-	self.Tool = tool
+	self.ToolSlot = toolSlot
 	self.GuiToolName.Text = tool.Name
 	self:SetToolImage(toolGameData.Image)
 	self:SetToolType(toolGameData.ToolType)

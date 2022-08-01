@@ -21,7 +21,7 @@ ToolBase.__newindex = Utility.Inheritable__newindex
 
 -- Tool에 붙은 데이터들을 플레이어에게 적용하기
 
-function onEquipped(toolBase)
+function OnEquipped(toolBase)
 
 	local tool = toolBase.Root()
 	--local temp = getmetatable(toolBase)
@@ -30,31 +30,30 @@ function onEquipped(toolBase)
 	
 	-- 캐릭터가 장착중인 상태 -- Character의 Parent는 Workspace이다 주의해야한다.
 	-- tool =(parent)> Character
+	
 	local character = tool.Parent
-	ServerGlobalStorage:AddGameData(character, toolBase.GetGameData())
-		
+	local player = game.Players:GetPlayerFromCharacter(character)
+	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
 end
 
 
-function onUnequipped(toolBase)
+function OnUnequipped(toolBase)
 	
 	local tool = toolBase.Root()
-	local temp = getmetatable(toolBase)
+	--local temp = getmetatable(toolBase)
 	
 	--Backpack에 존재 
 	-- tool =(parent)> Backpack =(parent)> Player > Character
-	local character = tool.Parent.Parent.Character
-	ServerGlobalStorage:RemoveGameData(character, toolBase.GetGameDataType())
-	
+	local player = tool.Parent.Parent
+	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
 end
 
 function ToolBase:InitializeAll(gameDataType, tool)
 	
 	self:Initialize(gameDataType, tool)
 	
-	tool.Equipped:Connect(function() onEquipped(self) end)
-	tool.Unequipped:Connect(function() onUnequipped(self) end)
-	
+	tool.Equipped:Connect(function() OnEquipped(self) end)
+	tool.Unequipped:Connect(function() OnUnequipped(self) end)
 end
 
 

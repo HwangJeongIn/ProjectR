@@ -15,7 +15,7 @@ local GuiToolSlot = GuiPlayerStatusWindow:WaitForChild("GuiToolSlot")
 local GuiToolSlotController = {}
 
 function GuiToolSlotController:new(slotIndex, newGuiToolSlot)
-	local newGuiToolSlotController = Utility:DeepCopy(self)
+	local newGuiToolSlotController = Utility:ShallowCopy(self)
 
 	if not newGuiToolSlot then
 		newGuiToolSlot = GuiToolSlot:Clone()
@@ -59,9 +59,8 @@ function GuiToolSlotController:new(slotIndex, newGuiToolSlot)
 		if not targetTool then
 			return
 		end
-		GuiTooltipController:SetTool(targetTool)
+		GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
 	end)
-	
 	
 	newGuiToolSlotController:ClearToolData()
 	return newGuiToolSlotController
@@ -79,12 +78,19 @@ end
 
 function GuiToolSlotController:ClearToolData()
 	self:SetToolImage(nil)
-
 	self.GuiToolName.Text = ""
 	self.GuiToolCount.Text = ""
+
+	self.Tool = nil
 end
 
+function GuiToolSlotController:GetSlotIndex()
+	return self.SlotIndex
+end
 
+function GuiToolSlotController:GetTool()
+	return self.Tool
+end
 
 function GuiToolSlotController:SetTool(tool)
 	if not tool then
@@ -108,4 +114,4 @@ function GuiToolSlotController:SetTool(tool)
 	return true
 end
 
-return GuiToolSlotController:new(GuiToolSlot)
+return GuiToolSlotController:new(-1, GuiToolSlot)
