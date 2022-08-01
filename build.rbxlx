@@ -1037,25 +1037,33 @@ end
 function PlayerStatistic:UpdateRemovedToolGameData(toolGameData)
 	if not toolGameData then
         Debug.Assert(false, "비정상입니다.")
-		return
+		return false
 	end
 	
     local toolGameDataRaw = getmetatable(toolGameData)
 	for attribute, value in pairs(toolGameDataRaw) do
+		if not self.Value[attribute] then
+			continue
+		end
         self.Value[attribute] -= value
 	end
+	return true
 end
 
 function PlayerStatistic:UpdateAddedToolGameData(toolGameData)
 	if not toolGameData then
         Debug.Assert(false, "비정상입니다.")
-		return
+		return false
 	end
 	
     local toolGameDataRaw = getmetatable(toolGameData)
 	for attribute, value in pairs(toolGameDataRaw) do
+		if not self.Value[attribute] then
+			continue
+		end
         self.Value[attribute] += value
 	end
+	return true
 end
 
 PlayerStatistic:ClearData()
@@ -1825,6 +1833,7 @@ local testValue = GameDataManager.CharacterGameData[key].STR
 -- 서버와 모든 플레이어에게 보인다.
 -- GUI를 업데이트 하기 위한 MainMessage, MainMessage value 등이 들어간다.
 
+local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 
@@ -1884,13 +1893,6 @@ function ClearGui()
 end
 
 Initializer:InitializeGame()
-
---[[
-local tempObject = workspace:WaitForChild("TempObject")
-local sword = tempObject:WaitForChild("Sword")
-
-sword:Destroy()
---]]
 
 while true  do
 	
@@ -2039,9 +2041,10 @@ while true  do
 	
 	-- 맵 정리
 	
+	wait(20)
 	Initializer:ClearPlayers(playersInGame)
 	ClearGui()
-	clonedMap:Destroy()
+	Debris:AddItem(clonedMap, 0)
 	
 	wait(5)
 end</string>
@@ -2049,7 +2052,8 @@ end</string>
       <Item class="ModuleScript" referent="46">
         <Properties>
           <string name="Name">Initializer</string>
-          <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+          <string name="Source"><![CDATA[local Debris = game:GetService("Debris")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
@@ -2104,7 +2108,7 @@ function ClearPlayer(player)
 	if character then
 		-- 데이터 기반으로 수정해야 된다.
 		if character:FindFirstChild("AliveTag") then
-			character.AliveTag:Destroy()
+			Debris:AddItem(character.AliveTag,0)
 		end
 		
 		local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -2116,19 +2120,20 @@ function ClearPlayer(player)
 	end
 	
 	-- 플레이어 가방 정리
+	--ServerGlobalStorage:Un
 	local allTools = player.Backpack:GetChildren()
 	for _, targetTool in pairs(allTools) do
-		targetTool:Destroy()
 		targetTool.Parent = nil
 	end
 	--player.Backpack:ClearAllChildren()
 
 	-- 플레이어 데이터 정리
+	--[[
 	if not ServerGlobalStorage:ClearPlayer(player) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
-	
+	--]]
 	return true
 end
 
@@ -2148,7 +2153,7 @@ function OnCharacterAdded(player, character)
 	character.Humanoid.Died:Connect(function()
 		-- 죽었을 때
 		if character:FindFirstChild("AliveTag")  then
-			character.AliveTag:Destroy()
+			Debris:AddItem(character.AliveTag, 0)
 		end
 		ChangeGameStateSTC:FireClient(player, GameStateType.Dead)
 		--player:LoadCharacterBlocking()
@@ -2222,6 +2227,7 @@ function Initializer:StartGame(playersInGame)
 			continue
 		end
 		
+
 		-- 기본 도구
 		local sword = ServerStorage.Tools.Sword:Clone()
 		--sword:WaitForChild("Key")
@@ -2231,28 +2237,30 @@ function Initializer:StartGame(playersInGame)
 		--axe:WaitForChild("Key")
 		axe.Parent = player.Backpack
 
-		
-		local sword = ServerStorage.Tools.Sword:Clone()
-		--sword:WaitForChild("Key")
-		sword.Parent = player.Backpack
+		if false then
+			local sword = ServerStorage.Tools.Sword:Clone()
+			--sword:WaitForChild("Key")
+			sword.Parent = player.Backpack
+	
+			local axe = ServerStorage.Tools.Axe:Clone()
+			--axe:WaitForChild("Key")
+			axe.Parent = player.Backpack
+	
+			
+			local sword = ServerStorage.Tools.Sword:Clone()
+			--sword:WaitForChild("Key")
+			sword.Parent = player.Backpack
+	
+			local axe = ServerStorage.Tools.Axe:Clone()
+			--axe:WaitForChild("Key")
+			axe.Parent = player.Backpack
+	
+			
+			local sword = ServerStorage.Tools.Sword:Clone()
+			--sword:WaitForChild("Key")
+			sword.Parent = player.Backpack
+		end
 
-		local axe = ServerStorage.Tools.Axe:Clone()
-		--axe:WaitForChild("Key")
-		axe.Parent = player.Backpack
-
-		
-		local sword = ServerStorage.Tools.Sword:Clone()
-		--sword:WaitForChild("Key")
-		sword.Parent = player.Backpack
-
-		local axe = ServerStorage.Tools.Axe:Clone()
-		--axe:WaitForChild("Key")
-		axe.Parent = player.Backpack
-
-		
-		local sword = ServerStorage.Tools.Sword:Clone()
-		--sword:WaitForChild("Key")
-		sword.Parent = player.Backpack
 		--[[
 		local boolValue = Instance.new("BoolValue")
 		boolValue.Name = "BoolValue!!"
@@ -35790,8 +35798,8 @@ function ToolBase:InitializeAll(gameDataType, tool)
 	
 	self:Initialize(gameDataType, tool)
 	
-	tool.Equipped:Connect(function() OnEquipped(self) end)
-	tool.Unequipped:Connect(function() OnUnequipped(self) end)
+	--tool.Equipped:Connect(function() OnEquipped(self) end)
+	--tool.Unequipped:Connect(function() OnUnequipped(self) end)
 end
 
 
@@ -36033,7 +36041,8 @@ return setmetatable({}, WorldInteractorGameData)
       <Item class="ModuleScript" referent="688">
         <Properties>
           <string name="Name">ServerGlobalStorage</string>
-          <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+          <string name="Source"><![CDATA[local Debris = game:GetService("Debris")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonModuleFacade.Debug
 local Utility = CommonModuleFacade.Utility
@@ -36086,6 +36095,7 @@ SelectToolCTS.OnServerEvent:Connect(function(player, inventorySlotIndex, tool)
 	end
 
 	humanoid:EquipTool(tool)
+	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
 end)
 
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
@@ -36166,7 +36176,25 @@ function ServerGlobalStorage:RemoveTool(playerId, tool)
 	end
 
 	RemoveToolSTC:FireClient(player, slotIndex, tool)
-	tool:Destroy()
+	Debris:AddItem(tool, 0)
+	return true
+end
+
+function ServerGlobalStorage:UnregisterPlayerEvent(player)
+	if not player then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local playerId = player.UserId
+	player.Backpack.ChildAdded:Connect(function(tool)
+		self:AddTool(playerId, tool)
+	end)
+
+	player.Backpack.ChildRemoved:Connect(function(tool)
+		self:RemoveTool(playerId, tool)
+	end)
+	
 	return true
 end
 
@@ -38929,9 +38957,9 @@ function GuiTooltipController:Initialize()
 		
 		if not ClientGlobalStorage:SendSelectToolCTS(self.ToolSlot:GetSlotIndex(), tool) then
 			Debug.Assert(false, "비정상입니다.")
-			self:ClearToolData()
 		end
 
+		self:ClearToolData()
 	end)
 
 	self:ClearToolData()
@@ -43325,8 +43353,8 @@ function ClientGlobalStorage:RegisterOnClientEvent(guiController)
 	-- STC
 	EquipToolSTC.OnClientEvent:Connect(function(tool)
 		Debug.Assert(tool, "도구 비정상")
-
-		if not ClientGlobalStorage:EquipTool(tool) then
+		
+		if not ClientGlobalStorage:EquipTool(PlayerId,tool) then
 			Debug.Assert(false, "장착하지 못했습니다.")
 			return
 		end
@@ -43335,8 +43363,8 @@ function ClientGlobalStorage:RegisterOnClientEvent(guiController)
 	UnequipToolSTC.OnClientEvent:Connect(function(tool)
 		Debug.Assert(tool, "도구 비정상")
 
-		if not ClientGlobalStorage:UnequipTool(tool) then
-			Debug.Assert(false, "장착하지 못했습니다.")
+		if not ClientGlobalStorage:UnequipTool(PlayerId, tool) then
+			Debug.Assert(false, "장착 해제하지 못했습니다.")
 			return
 		end
 	end)
@@ -43400,6 +43428,12 @@ function ClientGlobalStorage:SendSelectToolCTS(slotIndex, tool)
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
+
+	--[[
+	local character = LocalPlayer.Character
+	local humanoid = character:FindFirstChild("Humanoid")
+	humanoid:EquipTool(tool)
+	--]]
 
 	SelectToolCTS:FireServer(slotIndex, tool)
 	return true

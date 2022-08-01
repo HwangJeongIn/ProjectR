@@ -40,6 +40,12 @@ local CommonEnum = {
 		Boots = 4,
 		Count = 5
 	},
+
+	SlotType = {
+		InventorySlot = 1,
+		EquipSlot = 2,
+		QuickSLot = 3
+	},
 	
 	StatusType = {
 		Statistic = 1,

@@ -4,17 +4,22 @@ local Debug = CommonMoudleFacade.Debug
 local Utility = CommonMoudleFacade.Utility
 local ToolUtility = CommonMoudleFacade.ToolUtility
 
+local CommonEnum = CommonMoudleFacade.CommonEnum
+local SlotType = CommonEnum.SlotType
+
 local GuiTooltipController = require(script.Parent:WaitForChild("GuiTooltipController"))
 
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiPlayerStatus = PlayerGui:WaitForChild("GuiPlayerStatus")
 local GuiPlayerStatusWindow = GuiPlayerStatus:WaitForChild("GuiPlayerStatusWindow")
-local GuiToolSlot = GuiPlayerStatusWindow:WaitForChild("GuiToolSlot")
+
+local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
+local GuiToolSlot = GuiTemplate:WaitForChild("GuiToolSlot")
 
 local GuiToolSlotController = {}
 
-function GuiToolSlotController:new(slotIndex, newGuiToolSlot)
+function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 	local newGuiToolSlotController = Utility:ShallowCopy(self)
 
 	if not newGuiToolSlot then
@@ -29,8 +34,10 @@ function GuiToolSlotController:new(slotIndex, newGuiToolSlot)
 	newGuiToolSlotController.GuiToolImage = newGuiToolImage
 	newGuiToolSlotController.GuiToolName = newGuiToolName
 	newGuiToolSlotController.GuiToolCount = newGuiToolCount
-	newGuiToolSlotController.Tool = nil
 	newGuiToolSlotController.SlotIndex = slotIndex
+	newGuiToolSlotController.SlotType = slotType
+	
+	newGuiToolSlotController.Tool = nil
 
 	newGuiToolSlotController.GuiToolSlot.MouseEnter:connect(function(x,y)
 		newGuiToolSlotController.GuiToolSlot.ImageTransparency = 0.5
@@ -53,14 +60,17 @@ function GuiToolSlotController:new(slotIndex, newGuiToolSlot)
 	end)
 	--]]
 
-	newGuiToolSlotController.GuiToolSlot.Activated:connect(function(inputObject)
-		local targetTool = newGuiToolSlotController.Tool
-		local targetSlotIndex = newGuiToolSlotController.SlotIndex
-		if not targetTool then
-			return
-		end
-		GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
-	end)
+	if newGuiToolSlotController.SlotType == SlotType.InventorySlot then
+		newGuiToolSlotController.GuiToolSlot.Activated:connect(function(inputObject)
+			local targetTool = newGuiToolSlotController.Tool
+			local targetSlotIndex = newGuiToolSlotController.SlotIndex
+			if not targetTool then
+				return
+			end
+			GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
+		end)
+	end
+
 	
 	newGuiToolSlotController:ClearToolData()
 	return newGuiToolSlotController
@@ -114,4 +124,4 @@ function GuiToolSlotController:SetTool(tool)
 	return true
 end
 
-return GuiToolSlotController:new(-1, GuiToolSlot)
+return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)

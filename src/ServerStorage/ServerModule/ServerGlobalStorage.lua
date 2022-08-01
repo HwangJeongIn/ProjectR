@@ -133,25 +133,11 @@ function ServerGlobalStorage:RemoveTool(playerId, tool)
 	end
 
 	RemoveToolSTC:FireClient(player, slotIndex, tool)
-	Debris:AddItem(tool, 0)
-	return true
-end
 
-function ServerGlobalStorage:UnregisterPlayerEvent(player)
-	if not player then
-		Debug.Assert(false, "비정상입니다.")
-		return false
+	-- 삭제하려면 Parent가 nil이다.
+	if not tool.Parent then
+		Debris:AddItem(tool, 0)
 	end
-
-	local playerId = player.UserId
-	player.Backpack.ChildAdded:Connect(function(tool)
-		self:AddTool(playerId, tool)
-	end)
-
-	player.Backpack.ChildRemoved:Connect(function(tool)
-		self:RemoveTool(playerId, tool)
-	end)
-	
 	return true
 end
 

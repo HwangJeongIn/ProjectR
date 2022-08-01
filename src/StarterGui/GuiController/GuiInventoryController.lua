@@ -9,6 +9,8 @@ local MaxInventorySlotCount = CommonConstant.MaxInventorySlotCount
 local GuiInventorySlotCountPerLine = CommonConstant.GuiInventorySlotCountPerLine
 local GuiInventorySlotOffset = CommonConstant.GuiInventorySlotOffset
 
+local CommonEnum = CommonMoudleFacade.CommonEnum
+local SlotType = CommonEnum.SlotType
 
 
 local player = game.Players.LocalPlayer
@@ -17,7 +19,9 @@ local GuiPlayerStatus = PlayerGui:WaitForChild("GuiPlayerStatus")
 local GuiPlayerStatusWindow = GuiPlayerStatus:WaitForChild("GuiPlayerStatusWindow")
 local GuiEquipSlots = GuiPlayerStatusWindow:WaitForChild("GuiEquipSlots")
 local GuiInventory = GuiPlayerStatusWindow:WaitForChild("GuiInventory")
-local GuiToolSlot = GuiPlayerStatusWindow:WaitForChild("GuiToolSlot")
+
+local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
+local GuiToolSlotTemplate = GuiTemplate:WaitForChild("GuiToolSlot")
 local GuiToolSlotController = require(script.Parent:WaitForChild("GuiToolSlotController"))
 local GuiTooltipController = require(script.Parent:WaitForChild("GuiTooltipController"))
 
@@ -59,7 +63,7 @@ function GuiInventoryController:InitializeGuiToolSlots()
 	for y = 0, (GuiInventorySlotLineCount -1) do
 		for x = 0, (GuiInventorySlotCountPerLine - 1) do
 			
-			local newGuiToolSlot = GuiToolSlot:Clone()
+			local newGuiToolSlot = GuiToolSlotTemplate:Clone()
 			local slotIndex = y * GuiInventorySlotCountPerLine + x + 1
 			
 			newGuiToolSlot.Size = slotSize
@@ -68,7 +72,7 @@ function GuiInventoryController:InitializeGuiToolSlots()
 			newGuiToolSlot.Parent = GuiInventory
 			newGuiToolSlot.Name = tostring(slotIndex)
 
-			self.GuiInventoryRaw:Set(slotIndex, GuiToolSlotController:new(slotIndex, newGuiToolSlot))
+			self.GuiInventoryRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.InventorySlot, slotIndex, newGuiToolSlot))
 		end
 	end
 end

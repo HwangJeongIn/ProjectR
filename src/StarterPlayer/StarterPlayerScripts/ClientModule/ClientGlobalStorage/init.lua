@@ -43,16 +43,6 @@ function ClientGlobalStorage:RegisterOnClientEvent(guiController)
 	EquipToolSTC.OnClientEvent:Connect(function(tool)
 		Debug.Assert(tool, "도구 비정상")
 		
-		wait(0)
-		local temp = LocalPlayer.Backpack:GetChildren()
-		Debug.Print(tool)
-
-		for key,value in pairs(temp) do
-			Debug.Print(tostring(key) .. " : ")
-			Debug.Print(value)
-		end
-
-		tool:WaitForChild("Key")
 		if not ClientGlobalStorage:EquipTool(PlayerId,tool) then
 			Debug.Assert(false, "장착하지 못했습니다.")
 			return
@@ -133,7 +123,7 @@ function ClientGlobalStorage:SendSelectToolCTS(slotIndex, tool)
 	local humanoid = character:FindFirstChild("Humanoid")
 	humanoid:EquipTool(tool)
 	--]]
-	
+
 	SelectToolCTS:FireServer(slotIndex, tool)
 	return true
 end
