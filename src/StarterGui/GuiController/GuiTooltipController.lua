@@ -177,9 +177,9 @@ function GuiTooltipController:Initialize()
 		
 		if not ClientGlobalStorage:SendSelectToolCTS(self.ToolSlot:GetSlotIndex(), tool) then
 			Debug.Assert(false, "비정상입니다.")
-			self:ClearToolData()
 		end
 
+		self:ClearToolData()
 	end)
 
 	self:ClearToolData()

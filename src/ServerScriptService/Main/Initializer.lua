@@ -55,7 +55,6 @@ function ClearPlayer(player)
 		-- 데이터 기반으로 수정해야 된다.
 		if character:FindFirstChild("AliveTag") then
 			Debris:AddItem(character.AliveTag,0)
-			--character.AliveTag:Destroy()
 		end
 		
 		local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -67,21 +66,20 @@ function ClearPlayer(player)
 	end
 	
 	-- 플레이어 가방 정리
+	--ServerGlobalStorage:Un
 	local allTools = player.Backpack:GetChildren()
 	for _, targetTool in pairs(allTools) do
-		Debris:AddItem(targetTool,0)
-		
-		--targetTool:Destroy()
-		--targetTool.Parent = nil
+		targetTool.Parent = nil
 	end
 	--player.Backpack:ClearAllChildren()
 
 	-- 플레이어 데이터 정리
+	--[[
 	if not ServerGlobalStorage:ClearPlayer(player) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
-	
+	--]]
 	return true
 end
 
@@ -101,7 +99,7 @@ function OnCharacterAdded(player, character)
 	character.Humanoid.Died:Connect(function()
 		-- 죽었을 때
 		if character:FindFirstChild("AliveTag")  then
-			character.AliveTag:Destroy()
+			Debris:AddItem(character.AliveTag, 0)
 		end
 		ChangeGameStateSTC:FireClient(player, GameStateType.Dead)
 		--player:LoadCharacterBlocking()

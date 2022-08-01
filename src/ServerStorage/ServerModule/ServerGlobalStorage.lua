@@ -1,3 +1,4 @@
+local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonModuleFacade.Debug
@@ -50,8 +51,9 @@ SelectToolCTS.OnServerEvent:Connect(function(player, inventorySlotIndex, tool)
 		return
 	end
 
-	-- 임시
+	--ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
 	humanoid:EquipTool(tool)
+	wait(3)
 end)
 
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
@@ -132,7 +134,25 @@ function ServerGlobalStorage:RemoveTool(playerId, tool)
 	end
 
 	RemoveToolSTC:FireClient(player, slotIndex, tool)
-	tool:Destroy()
+	Debris:AddItem(tool, 0)
+	return true
+end
+
+function ServerGlobalStorage:UnregisterPlayerEvent(player)
+	if not player then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local playerId = player.UserId
+	player.Backpack.ChildAdded:Connect(function(tool)
+		self:AddTool(playerId, tool)
+	end)
+
+	player.Backpack.ChildRemoved:Connect(function(tool)
+		self:RemoveTool(playerId, tool)
+	end)
+	
 	return true
 end
 

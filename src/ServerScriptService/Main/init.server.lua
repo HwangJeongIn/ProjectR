@@ -4,6 +4,7 @@
 -- 서버와 모든 플레이어에게 보인다.
 -- GUI를 업데이트 하기 위한 MainMessage, MainMessage value 등이 들어간다.
 
+local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 
@@ -213,7 +214,7 @@ while true  do
 	
 	Initializer:ClearPlayers(playersInGame)
 	ClearGui()
-	clonedMap:Destroy()
+	Debris:AddItem(clonedMap, 0)
 	
 	wait(5)
 end
