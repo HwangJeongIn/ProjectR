@@ -11,7 +11,8 @@ local CommonConstant = {
 	MaxEquipSlotCount = EquipSlotCount,
 	GuiInventorySlotCountPerLine = 5,
 	GuiInventorySlotOffset = 5,
-	GuiEquipSlotCountPerLine = 4,
+	GuiEquipSlotCountPerRow = 3,
+	GuiEquipSlotCountPerColumn = 4,
 	GuiEquipSlotOffset = 10,
 	
 	UndefinedElementValue = false
