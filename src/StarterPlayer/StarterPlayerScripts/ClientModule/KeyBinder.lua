@@ -14,11 +14,9 @@ local GuiPlayerStatus = PlayerGui:WaitForChild("GuiPlayerStatus")
 local GuiPlayerStatusWindow = GuiPlayerStatus:WaitForChild("GuiPlayerStatusWindow")
 
 
-
 local KeyBinder = {}
 KeyBinder.__index = Utility.Inheritable__index
 KeyBinder.__newindex = Utility.Inheritable__newindex
-
 
 local KeyToActionMappingTable = {
 	[Enum.KeyCode.One] = {},
@@ -32,48 +30,19 @@ local KeyToActionMappingTable = {
 	[Enum.KeyCode.R] = {}
 }
 
-
-local TweenService = game:GetService("TweenService")
-
-local part = Instance.new("Part")
-part.Position = Vector3.new(0, 10, 0)
-part.Anchored = true
-part.Parent = game.Workspace
-
-local GuiPlayerStatusGuiTweenInfo = TweenInfo.new(
-	.5, -- Time
-	Enum.EasingStyle.Linear,--Enum.EasingStyle.Back, --Enum.EasingStyle.Linear, -- EasingStyle
-	Enum.EasingDirection.In, -- EasingDirection
-	0, -- RepeatCount (when less than zero the tween will loop indefinitely)
-	false, -- Reverses (tween will reverse once reaching it's goal)
-	0 -- DelayTime
-)
-
---local tween = TweenService:Create(part, GuiInventoryTweenInfo, {Position = Vector3.new(0, 0, 0)})
-
-function BindDefaultAction()
+function KeyBinder:BindCustomAction(keyCode, userInputState, customActionName, customAction)
 	ContextActionService:BindAction(
-		"GuiPlayerStatusToggleKey",
+		customActionName,
 		function(actionName, inputState, inputObject)
-			if (inputState == Enum.UserInputState.Begin) then
-				if GuiPlayerStatus.Enabled then
-					GuiPlayerStatusWindow.Position = UDim2.new(0.3,0,.5,0)
-					--local tween = TweenService:Create(GuiPlayerStatusWindow, GuiPlayerStatusGuiTweenInfo, { Position = UDim2.new(0,0,.5,0)})
-					--tween:Play()
-				else
-					local tween = TweenService:Create(GuiPlayerStatusWindow, GuiPlayerStatusGuiTweenInfo, { Position = UDim2.new(.5,0,.5,0)})
-					tween:Play()
-
-				end
-				GuiPlayerStatus.Enabled = not GuiPlayerStatus.Enabled
+			if (inputState == userInputState) then
+				customAction(actionName, inputState, inputObject)
 			end
 		end,
-		true, Enum.KeyCode.Backquote)
+		true,
+		keyCode)
 end
 
 function KeyBinder:Initialize()
-	
-	BindDefaultAction()
 	
 	for keyCode, actionTable in pairs(KeyToActionMappingTable) do
 		
@@ -101,7 +70,6 @@ function KeyBinder:Initialize()
 		--]]
 	end
 end
-
 
 function KeyBinder:CheckKey(keyCode)
 	if not KeyToActionMappingTable[keyCode] then

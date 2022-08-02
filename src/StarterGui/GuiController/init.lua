@@ -9,6 +9,8 @@ local Debug = ClientModuleFacade.Debug
 local GameStateType = ClientModuleFacade.CommonEnum.GameStateType
 local WinnerType = ClientModuleFacade.CommonEnum.WinnerType
 
+local KeyBinder = ClientModuleFacade.KeyBinder
+
 
 -- 리플리케이션 저장소 변수
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -21,10 +23,46 @@ local GuiController = {}
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
-function GuiController:Initialize()
-	GuiController.GuiInventoryController = require(script:WaitForChild("GuiInventoryController"))
-	GuiController.GuiEquipSlotsController = require(script:WaitForChild("GuiEquipSlotsController"))
+function GuiController:BindGuiKeys()
+
+	-- Service
+	local TweenService = game:GetService("TweenService")
+
+	-- Gui
+	local GuiPlayerStatus = PlayerGui:WaitForChild("GuiPlayerStatus")
+	local GuiPlayerStatusWindow = GuiPlayerStatus:WaitForChild("GuiPlayerStatusWindow")
+
+	-- GuiController
+	local GuiTooltipController = require(script:WaitForChild("GuiTooltipController"))
+
+	local GuiPlayerStatusGuiTweenInfo = TweenInfo.new(
+		.5, -- Time
+		Enum.EasingStyle.Linear,--Enum.EasingStyle.Back, --Enum.EasingStyle.Linear, -- EasingStyle
+		Enum.EasingDirection.In, -- EasingDirection
+		0, -- RepeatCount (when less than zero the tween will loop indefinitely)
+		false, -- Reverses (tween will reverse once reaching it's goal)
+		0 -- DelayTime
+	)
+	--local tween = TweenService:Create(part, GuiInventoryTweenInfo, {Position = Vector3.new(0, 0, 0)})
+	--local tween = TweenService:Create(GuiPlayerStatusWindow, GuiPlayerStatusGuiTweenInfo, { Position = UDim2.new(0,0,.5,0)})
+	local GuiPlayerStatusGuiTween = TweenService:Create(GuiPlayerStatusWindow, GuiPlayerStatusGuiTweenInfo, { Position = UDim2.new(.5,0,.5,0)})
 	
+	KeyBinder:BindCustomAction(Enum.KeyCode.Backquote, Enum.UserInputState.Begin, "GuiPlayerStatusToggleKey", 
+	function(actionName, inputState, inputObject)
+		if GuiPlayerStatus.Enabled then
+			GuiPlayerStatusWindow.Position = UDim2.new(0.3,0,.5,0)
+			GuiTooltipController:ClearToolData()
+		else
+			GuiPlayerStatusGuiTween:Play()
+		end
+		GuiPlayerStatus.Enabled = not GuiPlayerStatus.Enabled
+	end)
+end
+
+function GuiController:Initialize()
+	self.GuiInventoryController = require(script:WaitForChild("GuiInventoryController"))
+	self.GuiEquipSlotsController = require(script:WaitForChild("GuiEquipSlotsController"))
+
 	self.GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
 	self.GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
 	
@@ -59,6 +97,7 @@ function GuiController:Initialize()
 		[WinnerType.Ai] = "Winner is AI",
 	}
 
+	self:BindGuiKeys()
 	ClientGlobalStorage:Initialize(self)
 end
 
