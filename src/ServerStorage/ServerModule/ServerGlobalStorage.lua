@@ -36,16 +36,39 @@ UnequipToolCTS.OnServerEvent:Connect(function(player, equipType)
 		Debug.Assert(false, "비정상입니다.")
 		return
 	end
-	
-	local playerId = player.UserId
-	local prevTool = ServerGlobalStorage:UnequipTool(playerId, equipType)
-	
-	if not prevTool then
-		Debug.Assert(false, "비정상입니다.")
+
+	local character = player.Character
+	if not character then
+		Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 장착할 수 없습니다.")
 		return
 	end
 	
-	prevTool.Parent = player.Backpack
+	local playerId = player.UserId
+	local prevTool = nil
+	if equipType == EquipType.Weapon then
+		local humanoid = character:FindFirstChild("Humanoid")
+		if not humanoid then
+			Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+			return
+		end
+
+		prevTool = ServerGlobalStorage:UnequipTool(playerId, equipType)
+		if not prevTool then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+
+		humanoid:UnequipTool(prevTool)
+	else
+		prevTool = ServerGlobalStorage:UnequipTool(playerId, equipType)
+		if not prevTool then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+
+		prevTool.Parent = player.Backpack
+	end
+
 	UnequipToolSTC:FireClient(player, equipType)
 end)
 
