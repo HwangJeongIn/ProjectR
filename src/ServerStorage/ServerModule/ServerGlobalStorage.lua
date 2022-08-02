@@ -31,6 +31,7 @@ local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 local ServerGlobalStorage = CommonGlobalStorage
 
 
+
 UnequipToolCTS.OnServerEvent:Connect(function(player, equipType)
 	if not equipType then
 		Debug.Assert(false, "비정상입니다.")
@@ -58,7 +59,7 @@ UnequipToolCTS.OnServerEvent:Connect(function(player, equipType)
 			return
 		end
 
-		humanoid:UnequipTool(prevTool)
+		humanoid:UnequipTools()
 	else
 		prevTool = ServerGlobalStorage:UnequipTool(playerId, equipType)
 		if not prevTool then
@@ -66,7 +67,10 @@ UnequipToolCTS.OnServerEvent:Connect(function(player, equipType)
 			return
 		end
 
-		prevTool.Parent = player.Backpack
+		if not ServerGlobalStorage:DetachArmorFromPlayer(player, prevTool) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 	end
 
 	UnequipToolSTC:FireClient(player, equipType)
@@ -114,12 +118,13 @@ EquipToolCTS.OnServerEvent:Connect(function(player, equipType, tool)
 			return
 		end
 
-		humanoid:EquipTool(tool)
 		prevTool, currentTool = ServerGlobalStorage:EquipTool(playerId, equipType, tool)
 		if not currentTool then
 			Debug.Assert(false, "비정상입니다.")
 			return
 		end
+		
+		humanoid:EquipTool(tool)
 	else
 		tool.Parent = character
 		prevTool, currentTool = ServerGlobalStorage:EquipTool(playerId, equipType, tool)
@@ -129,7 +134,15 @@ EquipToolCTS.OnServerEvent:Connect(function(player, equipType, tool)
 		end
 
 		if prevTool then
-			prevTool.Parent = player.Backpack
+			if not ServerGlobalStorage:DetachArmorFromPlayer(player, prevTool) then
+				Debug.Assert(false, "비정상입니다.")
+				return
+			end
+		end
+
+		if not ServerGlobalStorage:AttachArmorFromPlayer(player, currentTool) then
+			Debug.Assert(false, "비정상입니다.")
+			return
 		end
 	end
 	
@@ -159,9 +172,23 @@ SelectToolCTS.OnServerEvent:Connect(function(player, inventorySlotIndex, tool)
 		return
 	end
 
-	humanoid:EquipTool(tool)
 	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
+	humanoid:EquipTool(tool)
 end)
+
+function ServerGlobalStorage:GetEquipBone(player, equipType)
+	
+end
+
+function ServerGlobalStorage:DetachArmorFromPlayer(player, armor)
+	armor.Parent = player.Backpack
+	return true
+end
+
+function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
+	armor.Parent = player.Character
+	return true
+end
 
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
 function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
@@ -281,9 +308,6 @@ function ServerGlobalStorage:InitializePlayer(player)
 
 	return true
 end
-
-
-
 
 
 ServerGlobalStorage.__index = Utility.Inheritable__index
