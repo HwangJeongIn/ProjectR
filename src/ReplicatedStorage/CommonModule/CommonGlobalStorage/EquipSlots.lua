@@ -11,15 +11,44 @@ local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local ToolType = CommonEnum.ToolType
 
 local Container = CommonModule:WaitForChild("Container")
-local ArmorSlotsRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
-ArmorSlotsRaw:Initialize(MaxEquipSlotCount)
+local EquipSlotsRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
+EquipSlotsRaw:Initialize(MaxEquipSlotCount)
 
 local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
 local EquipSlots = {}
-EquipSlots.ArmorSlotsRaw = ArmorSlotsRaw
-EquipSlots.WeaponSlot = nil
+EquipSlots.EquipSlotsRaw = EquipSlotsRaw
 
-function EquipSlots:UnequipToolByToolGameData(toolGameData)
+function EquipSlots:UnequipTool(equipType)
+    if not equipType then
+        Debug.Assert(false, "타입이 비정상입니다.")
+        return nil
+    end
+
+    local prevTool = self.EquipSlotsRaw:Get(equipType)
+    if not prevTool then
+        Debug.Assert(false, "장착된 도구가 없습니다.")
+        return nil
+    else
+        self.EquipSlotsRaw:Set(equipType, nil)
+    end
+
+    --[[
+    local prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+    if not prevToolGameData then
+        Debug.Assert(false, "도구는 존재하지만 데이터가 존재하지 않습니다.")
+        return nil
+    end
+    --]]
+    return prevTool
+end
+
+function EquipSlots:UnequipToolByTool(tool)
+    if not tool then
+        Debug.Assert(false, "비정상입니다.")
+		return nil
+    end
+
+    local toolGameData = ToolUtility:GetToolGameData(tool)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
@@ -30,25 +59,43 @@ function EquipSlots:UnequipToolByToolGameData(toolGameData)
         return nil
     end
     
-    local targetToolType = toolGameData.ToolType
-    local prevTool = nil
-    if  targetToolType == ToolType.Armor then
-        local targetArmorType = toolGameData.ArmorType
-        prevTool = self.ArmorSlotsRaw:Get(targetArmorType)
-        if not prevTool then
-            Debug.Assert(false, "장착된 도구가 없습니다.")
-        else
-            self.ArmorSlotsRaw:Set(targetArmorType, nil)
-        end
-    else
-        prevTool = self.WeaponSlot
-        if not prevTool then
-            Debug.Assert(false, "장착된 도구가 없습니다.")
-        else
-            self.WeaponSlot = nil
-        end
+    local equipType = toolGameData.EquipType
+    local prevTool = self.EquipSlotsRaw:Get(equipType)
+    if prevTool ~= tool then
+        Debug.Assert(false, "해제하려는 장비와 장착중인 장비가 다릅니다. 코드 버그입니다.")
+        return nil
     end
 
+    local prevTool = self:UnequipTool(equipType)
+    if not prevTool then
+        Debug.Assert(false, "장착된 도구가 없습니다.")
+        return nil
+    end
+
+    return prevTool
+end
+
+function EquipSlots:EquipTool(equipType, tool)
+    if not equipType or not tool then
+        Debug.Assert(false, "비정상입니다.")
+		return nil, nil
+    end
+
+    local toolGameData = ToolUtility:GetToolGameData(tool)
+    if not toolGameData then
+        Debug.Assert(false, "비정상입니다.")
+        return nil, nil
+    end
+
+    if not ToolUtility:CheckEquipableToolGameData(toolGameData) then
+        Debug.Assert(false, "비정상입니다.")
+        return nil, nil
+    end
+
+    local prevTool = self.EquipSlotsRaw:Get(equipType)
+    self.EquipSlotsRaw:Set(equipType, tool)
+
+    --[[
     local prevToolGameData = nil
     if prevTool then
         prevToolGameData = ToolUtility:GetToolGameData(prevTool)
@@ -56,71 +103,10 @@ function EquipSlots:UnequipToolByToolGameData(toolGameData)
             Debug.Assert(false, "도구는 존재하지만 데이터가 존재하지 않습니다.")
         end
     end
-    return prevToolGameData
+    --]]
+
+    return prevTool, tool
 end
 
-function EquipSlots:UnequipTool(tool)
-    if not tool then
-        Debug.Assert(false, "비정상입니다.")
-		return nil
-    end
-
-    local toolGameData = ToolUtility:GetToolGameData(tool)
-    if not toolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return nil
-	end
-
-    local prevToolGameData = self:UnequipToolByToolGameData(toolGameData)
-    if not prevToolGameData then
-        Debug.Assert(false, "비정상입니다.")
-		return nil
-    end
-
-    return prevToolGameData
-end
-
-function EquipSlots:EquipTool(tool, withCheck)
-    if not tool then
-        Debug.Assert(false, "비정상입니다.")
-		return nil, nil
-    end
-
-    local toolGameData = ToolUtility:GetToolGameData(tool)
-    if not toolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return nil, nil
-	end
-
-    if withCheck then
-        if not ToolUtility:CheckEquipableToolGameData(toolGameData) then
-            Debug.Assert(false, "비정상입니다.")
-            return nil, nil
-        end
-    end
-
-    local targetToolType = toolGameData.ToolType
-    local prevTool = nil
-    if  targetToolType == ToolType.Armor then
-        local targetArmorType = toolGameData.ArmorType
-        prevTool = self.ArmorSlotsRaw:Get(targetArmorType)
-        self.ArmorSlotsRaw:Set(targetArmorType, tool)
-    else
-        if self.WeaponSlot then
-            prevTool = self.WeaponSlot
-        end
-        self.WeaponSlot = tool
-    end
-
-    local prevToolGameData = nil
-    if prevTool then
-        prevToolGameData = ToolUtility:GetToolGameData(prevTool)
-        if not prevToolGameData then
-            Debug.Assert(false, "도구는 존재하지만 데이터가 존재하지 않습니다.")
-        end
-    end
-
-    return prevToolGameData, toolGameData
-end
 
 return EquipSlots

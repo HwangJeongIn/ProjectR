@@ -82,9 +82,9 @@
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>18.1776333</X>
-					<Y>14.0647564</Y>
-					<Z>17.2880383</Z>
+					<X>23.0355492</X>
+					<Y>13.3910046</Y>
+					<Z>13.7511988</Z>
 					<R00>0.774945259</R00>
 					<R01>-0.27765581</R01>
 					<R02>0.567773819</R02>
@@ -100,9 +100,9 @@
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>-5</Z>
+					<X>21.9000015</X>
+					<Y>12.5123863</Y>
+					<Z>12.3588762</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -8457,7 +8457,7 @@ local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
 local StatusType = CommonEnum.StatusType
 local ToolType = CommonEnum.ToolType
-local ArmorType = CommonEnum.ArmorType
+local EquipType = CommonEnum.EquipType
 
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
@@ -8466,13 +8466,13 @@ local CommonGlobalStorage = require(CommonModule:WaitForChild("CommonGlobalStora
 local LocalPlayer = game.Players.LocalPlayer
 local PlayerId = LocalPlayer.UserId
 
-
-
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 
 -- CTS
 local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
+local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
+local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 
 -- STC
 local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
@@ -8487,20 +8487,33 @@ local ClientGlobalStorage = CommonGlobalStorage
 -- 초기화 코드
 function ClientGlobalStorage:RegisterOnClientEvent(guiController)
 	-- STC
-	EquipToolSTC.OnClientEvent:Connect(function(tool)
+	EquipToolSTC.OnClientEvent:Connect(function(equipType, tool)
+		Debug.Assert(equipType, "장착 슬롯 비정상")
 		Debug.Assert(tool, "도구 비정상")
 		
-		if not ClientGlobalStorage:EquipTool(PlayerId,tool) then
+		local prevTool, currentTool = ClientGlobalStorage:EquipTool(PlayerId, equipType, tool)
+		if not currentTool then
 			Debug.Assert(false, "장착하지 못했습니다.")
+			return
+		end
+
+		if not guiController:SetEquipToolSlot(equipType, tool) then
+			Debug.Assert(false, "비정상입니다.")
 			return
 		end
 	end)
 
-	UnequipToolSTC.OnClientEvent:Connect(function(tool)
-		Debug.Assert(tool, "도구 비정상")
+	UnequipToolSTC.OnClientEvent:Connect(function(equipType)
+		Debug.Assert(equipType, "장착 슬롯 비정상")
 
-		if not ClientGlobalStorage:UnequipTool(PlayerId, tool) then
+		local prevTool = ClientGlobalStorage:UnequipTool(PlayerId, equipType)
+		if not prevTool then
 			Debug.Assert(false, "장착 해제하지 못했습니다.")
+			return
+		end
+
+		if not guiController:SetEquipToolSlot(equipType, nil) then
+			Debug.Assert(false, "비정상입니다.")
 			return
 		end
 	end)
@@ -8518,7 +8531,10 @@ function ClientGlobalStorage:RegisterOnClientEvent(guiController)
 			return
 		end
 
-		guiController:SetInventoryToolSlot(slotIndex, tool)
+		if not guiController:SetInventoryToolSlot(slotIndex, tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 	end)
 
 	RemoveToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
@@ -8534,7 +8550,10 @@ function ClientGlobalStorage:RegisterOnClientEvent(guiController)
 			return
 		end
 
-		guiController:SetInventoryToolSlot(slotIndex, nil)
+		if not guiController:SetInventoryToolSlot(slotIndex, nil) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 	end)
 
 	NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerReward)
@@ -8565,15 +8584,30 @@ function ClientGlobalStorage:SendSelectToolCTS(slotIndex, tool)
 		return false
 	end
 
-	--[[
-	local character = LocalPlayer.Character
-	local humanoid = character:FindFirstChild("Humanoid")
-	humanoid:EquipTool(tool)
-	--]]
-
 	SelectToolCTS:FireServer(slotIndex, tool)
 	return true
 end
+
+function ClientGlobalStorage:SendEquipToolCTS(equipType, tool)
+	if not equipType or not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	EquipToolCTS:FireServer(equipType, tool)
+	return true
+end
+
+function ClientGlobalStorage:SendUnequipToolCTS(equipType)
+	if not equipType then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	UnequipToolCTS:FireServer(equipType)
+	return true
+end
+
 
 function ClientGlobalStorage:GetData()
 	return self.PlayerTable[PlayerId]
@@ -9859,11 +9893,32 @@ function GuiController:SetWinnerMessage(winnerType, winnerName, winnerReward)
 end
 
 function GuiController:SetInventoryToolSlot(slotIndex, tool)
+	if not slotIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
 	if not self.GuiInventoryController:SetToolSlot(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
+		return false
 	end
+
+	return true
 end
 
+function GuiController:SetEquipToolSlot(equipType, tool)
+	if not equipType then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self.GuiEquipSlotsController:SetToolSlot(equipType, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
 GuiController:Initialize()
 return GuiController
 
@@ -9887,9 +9942,11 @@ local ToolUtility = CommonMoudleFacade.ToolUtility
 local CommonConstant = CommonMoudleFacade.CommonConstant
 local CommonEnum = CommonMoudleFacade.CommonEnum
 local SlotType = CommonEnum.SlotType
+local EquipType = CommonEnum.EquipType
 
 local MaxEquipSlotCount = CommonConstant.MaxEquipSlotCount
 local GuiEquipSlotCountPerColumn = CommonConstant.GuiEquipSlotCountPerColumn
+local GuiEquipSlotCountPerRow = CommonConstant.GuiEquipSlotCountPerRow
 local GuiEquipSlotOffset = CommonConstant.GuiEquipSlotOffset
 
 
@@ -9911,63 +9968,99 @@ local GuiEquipSlotsController = {
 	GuiEquipSlotsRaw = GuiEquipSlotsRaw
 }
 
+function GuiEquipSlotsController:AddSlotDataToGuiEquipSlotsMetaData(metaData, slotPositionIndex, equipType)
+	if not metaData or not slotPositionIndex or not equipType then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+
+	metaData[slotPositionIndex] = equipType
+end
+
+function GuiEquipSlotsController:InitializeGuiEquipSlotsMetaData(metaData)
+	if not metaData then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+
+	--[[
+		1	2	3
+		4	5	6
+		7	8	9
+		10	11	12
+	--]]
+	self:AddSlotDataToGuiEquipSlotsMetaData(metaData, 4, EquipType.Weapon) -- 4번 무기
+
+	self:AddSlotDataToGuiEquipSlotsMetaData(metaData, 2, EquipType.Helmet) -- 2번 헬멧
+	self:AddSlotDataToGuiEquipSlotsMetaData(metaData, 5, EquipType.Chestplate) -- 5번 갑옷
+	self:AddSlotDataToGuiEquipSlotsMetaData(metaData, 8, EquipType.Leggings) -- 8번 바지
+	self:AddSlotDataToGuiEquipSlotsMetaData(metaData, 11, EquipType.Boots) -- 11번 신발
+end
+
 function GuiEquipSlotsController:InitializeGuiToolSlots()
-	local GuiEquipSlotsSize = GuiEquipSlots.AbsoluteWindowSize
-	local finalGuiInventoryWidth = GuiEquipSlotsSize.X
-	local GuiInventoryWidth = GuiInventory.AbsoluteSize.X
-	
-	local finalSlotSize = (finalGuiInventoryWidth - (GuiInventorySlotCountPerLine + 1) * GuiInventorySlotOffset) / GuiInventorySlotCountPerLine
-	
-	local GuiInventorySlotLineCount = math.ceil(MaxInventorySlotCount / GuiInventorySlotCountPerLine)
-	
-	local finalGuiInventoryHeight = finalSlotSize * GuiInventorySlotLineCount + GuiInventorySlotOffset * (GuiInventorySlotLineCount + 1)
-	
-	local slotRateX = finalSlotSize / GuiInventoryWidth
+
+	local GuiEquipSlotsMetaData = {}
+	self:InitializeGuiEquipSlotsMetaData(GuiEquipSlotsMetaData)
+
+	local GuiEquipSlotWidth = GuiEquipSlots.AbsoluteSize.X
+	local GuiEquipSlotHeight = GuiEquipSlots.AbsoluteSize.Y
+
+	local finalSlotSize = 0
+	local GuiEquipSlotOffsetX = 0
+	local GuiEquipSlotOffsetY = 0
+
+	if (GuiEquipSlotWidth / GuiEquipSlotCountPerRow) < (GuiEquipSlotHeight / GuiEquipSlotCountPerColumn) then
+		finalSlotSize = (GuiEquipSlotWidth - (GuiEquipSlotCountPerRow + 1) * GuiEquipSlotOffset) / GuiEquipSlotCountPerRow
+		GuiEquipSlotOffsetX = GuiEquipSlotOffset
+		GuiEquipSlotOffsetY = (GuiEquipSlotHeight - (finalSlotSize * GuiEquipSlotCountPerColumn)) / (GuiEquipSlotCountPerColumn + 1)
+	else
+		finalSlotSize = (GuiEquipSlotHeight - (GuiEquipSlotCountPerColumn + 1) * GuiEquipSlotOffset) / GuiEquipSlotCountPerColumn
+		GuiEquipSlotOffsetX = (GuiEquipSlotWidth - (finalSlotSize * GuiEquipSlotCountPerRow)) / (GuiEquipSlotCountPerRow + 1)
+		GuiEquipSlotOffsetY = GuiEquipSlotOffset
+	end
+
+	local slotRateX = finalSlotSize / GuiEquipSlotWidth
 	local halfSlotRateX = slotRateX / 2
-	local slotRateY = finalSlotSize / finalGuiInventoryHeight
+	local slotRateY = finalSlotSize / GuiEquipSlotHeight
 	local halfSlotRateY = slotRateY / 2
-	
-	local GuiInventoryOffsetRateX =  GuiInventorySlotOffset / GuiInventoryWidth
-	local GuiInventoryOffsetRateY =  GuiInventorySlotOffset / finalGuiInventoryHeight
+
+	local GuiEquipSlotOffsetRateX =  GuiEquipSlotOffsetX / GuiEquipSlotWidth
+	local GuiEquipSlotOffsetRateY =  GuiEquipSlotOffsetY / GuiEquipSlotHeight
 	
 	local slotSize = UDim2.new(slotRateX, 0, slotRateY, 0)
 	local slotAnchorPoint = Vector2.new(0.5, 0.5)
-	local FirstslotPosition = UDim2.new(GuiInventoryOffsetRateX + halfSlotRateX, 0, GuiInventoryOffsetRateY + halfSlotRateY, 0)
+	local FirstslotPosition = UDim2.new(GuiEquipSlotOffsetRateX + halfSlotRateX, 0, GuiEquipSlotOffsetRateY + halfSlotRateY, 0)
 
 	
-	GuiInventory.CanvasSize = UDim2.new(0, 0, finalGuiInventoryHeight / GuiInventorySize.Y, 0)
-	
-	for y = 0, (GuiInventorySlotLineCount -1) do
-		for x = 0, (GuiInventorySlotCountPerLine - 1) do
+	for y = 0, (GuiEquipSlotCountPerColumn -1) do
+		for x = 0, (GuiEquipSlotCountPerRow - 1) do
 			
 			local newGuiToolSlot = GuiToolSlotTemplate:Clone()
-			local slotIndex = y * GuiInventorySlotCountPerLine + x + 1
+			local slotPositionIndex = y * GuiEquipSlotCountPerRow + x + 1
 			
+			local equipType = GuiEquipSlotsMetaData[slotPositionIndex]
+			if not equipType  then
+				continue
+			end
+
 			newGuiToolSlot.Size = slotSize
 			newGuiToolSlot.AnchorPoint = slotAnchorPoint
-			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiInventoryOffsetRateX + slotRateX) * x, 0, (GuiInventoryOffsetRateY + slotRateY) * y, 0)
-			newGuiToolSlot.Parent = GuiInventory
-			newGuiToolSlot.Name = tostring(slotIndex)
+			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiEquipSlotOffsetRateX + slotRateX) * x, 0, (GuiEquipSlotOffsetRateY + slotRateY) * y, 0)
+			newGuiToolSlot.Parent = GuiEquipSlots
+			newGuiToolSlot.Name = tostring(equipType)
 
-			self.GuiInventoryRaw:Set(slotIndex, GuiToolSlotController:new(slotIndex, newGuiToolSlot))
+			self.GuiEquipSlotsRaw:Set(equipType, GuiToolSlotController:new(SlotType.EquipSlot, equipType, newGuiToolSlot))
 		end
 	end
 end
 
-function GuiEquipSlotsController:GetToolSlot(slotIndex)
-    if not slotIndex then
-		Debug.Assert(false, "비정상입니다.")
-		return nil
-	end
-end
-
-function GuiEquipSlotsController:SetToolSlot(slotIndex, tool)
-	if not slotIndex then
+function GuiEquipSlotsController:SetToolSlot(equipType, tool)
+	if not equipType then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-	local targetGuiToolSlotController = self.GuiInventoryRaw:Get(slotIndex)
+	local targetGuiToolSlotController = self.GuiEquipSlotsRaw:Get(equipType)
 	if not targetGuiToolSlotController then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -10180,15 +10273,24 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 	if newGuiToolSlotController.SlotType == SlotType.InventorySlot then
 		newGuiToolSlotController.GuiToolSlot.Activated:connect(function(inputObject)
 			local targetTool = newGuiToolSlotController.Tool
-			local targetSlotIndex = newGuiToolSlotController.SlotIndex
 			if not targetTool then
 				return
 			end
 			GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
 		end)
+	elseif newGuiToolSlotController.SlotType == SlotType.EquipSlot then
+		newGuiToolSlotController.GuiToolSlot.Activated:connect(function(inputObject)
+			local targetTool = newGuiToolSlotController.Tool
+			if not targetTool then
+				return
+			end
+			GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
+		end)
+
+	elseif newGuiToolSlotController.SlotType == SlotType.QuickSlot then
+
 	end
 
-	
 	newGuiToolSlotController:ClearToolData()
 	return newGuiToolSlotController
 end
@@ -10234,9 +10336,12 @@ function GuiToolSlotController:SetTool(tool)
 
 	self:SetToolImage(toolGameData.Image)
 	self.GuiToolName.Text = tool.Name
-	-- 여러개 소유할 수 있다면 변경될 수 있다.
-	self.GuiToolCount.Text = "1"
 	self.Tool = tool
+
+	-- 여러개 소유할 수 있다면 변경될 수 있다.
+	if not self.SlotType == SlotType.EquipSlot then
+		self.GuiToolCount.Text = "1"
+	end
 
 	return true
 end
@@ -10261,7 +10366,12 @@ local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModu
 local Debug = ClientModuleFacade.Debug
 local ToolUtility = ClientModuleFacade.ToolUtility
 local CommonEnum = ClientModuleFacade.CommonEnum
+
+local SlotType = CommonEnum.SlotType
 local ToolTypeConverter = CommonEnum.ToolType.Converter
+
+local EquipType = CommonEnum.EquipType
+local EquipTypeConverter = CommonEnum.EquipType.Converter
 local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
 
 local LocalPlayer = game.Players.LocalPlayer
@@ -10363,7 +10473,7 @@ function GuiTooltipController:ClearToolData()
 	--]]
 
 	self.Tool = nil
-	self.InventorySlotIndex = -1
+	--self.SlotIndex = -1
 	self.GuiTooltip.Enabled = false
 end
 
@@ -10387,7 +10497,7 @@ function GuiTooltipController:Initialize()
 	self.GuiToolType = GuiToolType
 
 	local GuiExitButton = GuiTooltipBaseData:WaitForChild("GuiExitButton")
-	GuiExitButton.Activated:connect(function(inputObject)
+	GuiExitButton.Activated:Connect(function(inputObject)
 		self:ClearToolData()
 	end)
 
@@ -10405,40 +10515,209 @@ function GuiTooltipController:Initialize()
 
 	-- ButtonData
 	local GuiTooltipButtons = GuiTooltipWindow:WaitForChild("GuiTooltipButtons")
-	local GuiSelectButton = GuiTooltipButtons:WaitForChild("GuiSelectButton")
-	local GuiUseButton = GuiTooltipButtons:WaitForChild("GuiUseButton")
-	local GuiRemoveButton = GuiTooltipButtons:WaitForChild("GuiRemoveButton")
+	local GuiButton1 = GuiTooltipButtons:WaitForChild("GuiButton1")
+	local GuiButton2 = GuiTooltipButtons:WaitForChild("GuiButton2")
+	local GuiButton3 = GuiTooltipButtons:WaitForChild("GuiButton3")
+	local GuiButton4 = GuiTooltipButtons:WaitForChild("GuiButton4")
 
-	self.GuiSelectButton = GuiSelectButton
-	self.GuiUseButton = GuiUseButton
-	self.GuiRemoveButton = GuiRemoveButton
 
-	GuiSelectButton.Activated:connect(function(inputObject)
-		if not self.ToolSlot then
-			self:ClearToolData()
-			return
-		end
+	self.GuiButtons = {
+		[1] = {Button = GuiButton1, ButtonText = GuiButton1:FindFirstChild("GuiText"), ButtonAction = nil},
+		[2] = {Button = GuiButton2, ButtonText = GuiButton2:FindFirstChild("GuiText"), ButtonAction = nil},
+		[3] = {Button = GuiButton3, ButtonText = GuiButton3:FindFirstChild("GuiText"), ButtonAction = nil},
+		[4] = {Button = GuiButton4, ButtonText = GuiButton4:FindFirstChild("GuiText"), ButtonAction = nil}
+	}
 
-		local tool = self.ToolSlot:GetTool()
-		if not tool then
-			self:ClearToolData()
-			return
-		end
+	for _, buttonWrapper in pairs(self.GuiButtons) do
+		local button = buttonWrapper.Button
 
-		if tool.Parent ~= LocalPlayer.Backpack then
-			Debug.Assert(false, "어떤 경우인지 확인해봐야 합니다.")
-			self:ClearToolData()
-			return
-		end
+		button.MouseEnter:connect(function(x,y)
+			button.Transparency = 0.5
+		end)
 		
-		if not ClientGlobalStorage:SendSelectToolCTS(self.ToolSlot:GetSlotIndex(), tool) then
-			Debug.Assert(false, "비정상입니다.")
+		button.MouseLeave:connect(function()
+			button.Transparency = 0
+		end)
+	end
+
+
+	self:ClearToolData()
+end
+
+function GuiTooltipController:CheckToolSlot()
+	if not self.ToolSlot then
+		return false
+	end
+
+	local tool = self.ToolSlot:GetTool()
+	if not tool then
+		return false
+	end
+
+	return true
+end
+
+function SelectToolAction(tooltip, inputObject)
+	if not tooltip:CheckToolSlot() then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local tool = tooltip.ToolSlot:GetTool()
+	if tool.Parent ~= LocalPlayer.Backpack then
+		Debug.Assert(false, "어떤 경우인지 확인해봐야 합니다.")
+		return false
+	end
+	
+	if not ClientGlobalStorage:SendSelectToolCTS(tooltip.ToolSlot:GetSlotIndex(), tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+function EquipToolAction(tooltip, inputObject)
+	if not tooltip:CheckToolSlot() then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local tool = tooltip.ToolSlot:GetTool()
+	local equipType = ToolUtility:GetEquipType(tool)
+	if not equipType or not EquipTypeConverter[equipType] then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	if tool.Parent ~= LocalPlayer.Backpack then
+		Debug.Assert(false, "어떤 경우인지 확인해봐야 합니다.")
+		return false
+	end
+	
+	if not ClientGlobalStorage:SendEquipToolCTS(equipType, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+function UnequipToolAction(tooltip, inputObject)
+	if not tooltip:CheckToolSlot() then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local tool = tooltip.ToolSlot:GetTool()
+	local equipType = ToolUtility:GetEquipType(tool)
+	if not equipType or not EquipTypeConverter[equipType] then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	if tool.Parent ~= LocalPlayer.Character then
+		Debug.Assert(false, "해당 툴이 캐릭터 하위에 존재하지 않습니다.")
+		return false
+	end
+	
+	if not ClientGlobalStorage:SendUnequipToolCTS(equipType) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+function GuiTooltipController:ClearButtons()
+	for _, buttonWrapper in pairs(self.GuiButtons) do
+		if buttonWrapper.ButtonAction then
+			buttonWrapper.ButtonAction:Disconnect()
+			buttonWrapper.ButtonAction = nil
 		end
 
+		buttonWrapper.ButtonText.Text = ""
+		buttonWrapper.Button.Visible = false
+	end
+end
+
+function GuiTooltipController:SetButton(buttonIndex, buttonText, buttonAction)
+	if not buttonIndex or not buttonText or not buttonAction then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local targetButtonWrapper = self.GuiButtons[buttonIndex]
+	if not targetButtonWrapper then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local buttonActionTypeString = type(buttonAction)
+	if buttonActionTypeString ~= "function" then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local targetButton = targetButtonWrapper.Button
+	local targetButtonText = targetButtonWrapper.ButtonText
+
+	targetButtonWrapper.ButtonAction = targetButton.Activated:Connect(function(inputObject)
+		if not buttonAction(self, inputObject) then
+			Debug.Assert(false, "버튼 동작이 실패했습니다.")
+		end
 		self:ClearToolData()
 	end)
 
-	self:ClearToolData()
+	targetButtonText.Text = buttonText
+	targetButton.Visible = true
+	return true
+end
+
+function GuiTooltipController:InitializeButton(slotType, toolGameData)
+	self:ClearButtons()
+
+	local equipType = toolGameData.EquipType
+	if slotType == SlotType.InventorySlot then
+		if equipType then
+			if equipType == EquipType.Weapon then
+				if not self:SetButton(4, "Equip", EquipToolAction) then
+					Debug.Assert(false, "비정상입니다.")
+					return false
+				end
+			else
+				if not self:SetButton(4, "Select", SelectToolAction) then
+					Debug.Assert(false, "비정상입니다.")
+					return false
+				end
+
+				if not self:SetButton(3, "Equip", EquipToolAction) then
+					Debug.Assert(false, "비정상입니다.")
+					return false
+				end
+			end
+		else
+			if not self:SetButton(4, "Select", SelectToolAction) then
+				Debug.Assert(false, "비정상입니다.")
+				return false
+			end
+		end
+	elseif slotType == SlotType.EquipSlot then
+		if not equipType then
+			Debug.Assert(equipType, "비정상입니다. 게임데이터를 확인해야합니다.")
+			return false
+		end
+
+		if not self:SetButton(4, "Unequip", UnequipToolAction) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+
+	elseif slotType == SlotType.QuickSlot then
+
+	end
+
+	return true
 end
 
 function GuiTooltipController:InitializeByToolSlot(toolSlot)
@@ -10451,6 +10730,12 @@ function GuiTooltipController:InitializeByToolSlot(toolSlot)
 	local tool = toolSlot:GetTool()
 	local toolGameData = ToolUtility:GetToolGameData(tool)
 	if not toolGameData then
+		self:ClearToolData()
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self:InitializeButton(toolSlot.SlotType, toolGameData) then
 		self:ClearToolData()
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -10962,8 +11247,8 @@ return GuiTooltipController]]></ProtectedString>
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<bool name="AutoLocalize">true</bool>
-				<int name="DisplayOrder">0</int>
-				<bool name="Enabled">false</bool>
+				<int name="DisplayOrder">2</int>
+				<bool name="Enabled">true</bool>
 				<bool name="IgnoreGuiInset">false</bool>
 				<string name="Name">GuiTooltip</string>
 				<bool name="ResetOnSpawn">true</bool>
@@ -12300,7 +12585,7 @@ return GuiTooltipController]]></ProtectedString>
 							<float name="LineHeight">1</float>
 							<int name="MaxVisibleGraphemes">-1</int>
 							<bool name="Modal">false</bool>
-							<string name="Name">GuiSelectButton</string>
+							<string name="Name">GuiButton4</string>
 							<Ref name="NextSelectionDown">null</Ref>
 							<Ref name="NextSelectionLeft">null</Ref>
 							<Ref name="NextSelectionRight">null</Ref>
@@ -12484,7 +12769,7 @@ return GuiTooltipController]]></ProtectedString>
 							<float name="LineHeight">1</float>
 							<int name="MaxVisibleGraphemes">-1</int>
 							<bool name="Modal">false</bool>
-							<string name="Name">GuiUseButton</string>
+							<string name="Name">GuiButton3</string>
 							<Ref name="NextSelectionDown">null</Ref>
 							<Ref name="NextSelectionLeft">null</Ref>
 							<Ref name="NextSelectionRight">null</Ref>
@@ -12668,7 +12953,7 @@ return GuiTooltipController]]></ProtectedString>
 							<float name="LineHeight">1</float>
 							<int name="MaxVisibleGraphemes">-1</int>
 							<bool name="Modal">false</bool>
-							<string name="Name">GuiTempButton</string>
+							<string name="Name">GuiButton2</string>
 							<Ref name="NextSelectionDown">null</Ref>
 							<Ref name="NextSelectionLeft">null</Ref>
 							<Ref name="NextSelectionRight">null</Ref>
@@ -12852,7 +13137,7 @@ return GuiTooltipController]]></ProtectedString>
 							<float name="LineHeight">1</float>
 							<int name="MaxVisibleGraphemes">-1</int>
 							<bool name="Modal">false</bool>
-							<string name="Name">GuiRemoveButton</string>
+							<string name="Name">GuiButton1</string>
 							<Ref name="NextSelectionDown">null</Ref>
 							<Ref name="NextSelectionLeft">null</Ref>
 							<Ref name="NextSelectionRight">null</Ref>
@@ -13189,1271 +13474,6 @@ return GuiTooltipController]]></ProtectedString>
 						<bool name="Visible">true</bool>
 						<int name="ZIndex">1</int>
 					</Properties>
-					<Item class="Frame" referent="RBXA11C08FFC73E44318DCE773563DA0B36">
-						<Properties>
-							<bool name="Active">false</bool>
-							<Vector2 name="AnchorPoint">
-								<X>0.5</X>
-								<Y>0.5</Y>
-							</Vector2>
-							<BinaryString name="AttributesSerialize"></BinaryString>
-							<bool name="AutoLocalize">true</bool>
-							<token name="AutomaticSize">0</token>
-							<Color3 name="BackgroundColor3">
-								<R>1</R>
-								<G>1</G>
-								<B>1</B>
-							</Color3>
-							<float name="BackgroundTransparency">0</float>
-							<Color3 name="BorderColor3">
-								<R>0.105882362</R>
-								<G>0.164705887</G>
-								<B>0.207843155</B>
-							</Color3>
-							<token name="BorderMode">0</token>
-							<int name="BorderSizePixel">1</int>
-							<bool name="ClipsDescendants">false</bool>
-							<bool name="Draggable">false</bool>
-							<int name="LayoutOrder">0</int>
-							<string name="Name">GuiChestplateSlot</string>
-							<Ref name="NextSelectionDown">null</Ref>
-							<Ref name="NextSelectionLeft">null</Ref>
-							<Ref name="NextSelectionRight">null</Ref>
-							<Ref name="NextSelectionUp">null</Ref>
-							<UDim2 name="Position">
-								<XS>0.5</XS>
-								<XO>0</XO>
-								<YS>0.5</YS>
-								<YO>0</YO>
-							</UDim2>
-							<Ref name="RootLocalizationTable">null</Ref>
-							<float name="Rotation">0</float>
-							<bool name="Selectable">false</bool>
-							<token name="SelectionBehaviorDown">0</token>
-							<token name="SelectionBehaviorLeft">0</token>
-							<token name="SelectionBehaviorRight">0</token>
-							<token name="SelectionBehaviorUp">0</token>
-							<bool name="SelectionGroup">false</bool>
-							<Ref name="SelectionImageObject">null</Ref>
-							<int name="SelectionOrder">0</int>
-							<UDim2 name="Size">
-								<XS>0.210412428</XS>
-								<XO>0</XO>
-								<YS>0.189926475</YS>
-								<YO>0</YO>
-							</UDim2>
-							<token name="SizeConstraint">0</token>
-							<int64 name="SourceAssetId">-1</int64>
-							<token name="Style">0</token>
-							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb00162116</UniqueId>
-							<bool name="Visible">true</bool>
-							<int name="ZIndex">1</int>
-						</Properties>
-						<Item class="ImageButton" referent="RBX71ACDD85B9CA46CB99EB49164C6A0B6E">
-							<Properties>
-								<bool name="Active">true</bool>
-								<Vector2 name="AnchorPoint">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<BinaryString name="AttributesSerialize"></BinaryString>
-								<bool name="AutoButtonColor">true</bool>
-								<bool name="AutoLocalize">true</bool>
-								<token name="AutomaticSize">0</token>
-								<Color3 name="BackgroundColor3">
-									<R>1</R>
-									<G>1</G>
-									<B>1</B>
-								</Color3>
-								<float name="BackgroundTransparency">0</float>
-								<Color3 name="BorderColor3">
-									<R>0.105882362</R>
-									<G>0.164705887</G>
-									<B>0.207843155</B>
-								</Color3>
-								<token name="BorderMode">0</token>
-								<int name="BorderSizePixel">1</int>
-								<bool name="ClipsDescendants">false</bool>
-								<bool name="Draggable">false</bool>
-								<Content name="HoverImage"><null></null></Content>
-								<Content name="Image"><url>rbxasset://textures/ui/GuiImagePlaceholder.png</url></Content>
-								<Color3 name="ImageColor3">
-									<R>1</R>
-									<G>1</G>
-									<B>1</B>
-								</Color3>
-								<Vector2 name="ImageRectOffset">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<Vector2 name="ImageRectSize">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<float name="ImageTransparency">0</float>
-								<int name="LayoutOrder">0</int>
-								<bool name="Modal">false</bool>
-								<string name="Name">GuiItemImage</string>
-								<Ref name="NextSelectionDown">null</Ref>
-								<Ref name="NextSelectionLeft">null</Ref>
-								<Ref name="NextSelectionRight">null</Ref>
-								<Ref name="NextSelectionUp">null</Ref>
-								<UDim2 name="Position">
-									<XS>0</XS>
-									<XO>0</XO>
-									<YS>0</YS>
-									<YO>0</YO>
-								</UDim2>
-								<Content name="PressedImage"><null></null></Content>
-								<token name="ResampleMode">0</token>
-								<Ref name="RootLocalizationTable">null</Ref>
-								<float name="Rotation">0</float>
-								<token name="ScaleType">0</token>
-								<bool name="Selectable">true</bool>
-								<bool name="Selected">false</bool>
-								<token name="SelectionBehaviorDown">0</token>
-								<token name="SelectionBehaviorLeft">0</token>
-								<token name="SelectionBehaviorRight">0</token>
-								<token name="SelectionBehaviorUp">0</token>
-								<bool name="SelectionGroup">false</bool>
-								<Ref name="SelectionImageObject">null</Ref>
-								<int name="SelectionOrder">0</int>
-								<UDim2 name="Size">
-									<XS>1</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<token name="SizeConstraint">0</token>
-								<Rect2D name="SliceCenter">
-									<min>
-										<X>0</X>
-										<Y>0</Y>
-									</min>
-									<max>
-										<X>0</X>
-										<Y>0</Y>
-									</max>
-								</Rect2D>
-								<float name="SliceScale">1</float>
-								<int64 name="SourceAssetId">-1</int64>
-								<token name="Style">0</token>
-								<BinaryString name="Tags"></BinaryString>
-								<UDim2 name="TileSize">
-									<XS>1</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb00162117</UniqueId>
-								<bool name="Visible">true</bool>
-								<int name="ZIndex">1</int>
-							</Properties>
-							<Item class="TextLabel" referent="RBX4954AC93688D4C9C82998D9959A8EEF6">
-								<Properties>
-									<bool name="Active">false</bool>
-									<Vector2 name="AnchorPoint">
-										<X>0</X>
-										<Y>0</Y>
-									</Vector2>
-									<BinaryString name="AttributesSerialize"></BinaryString>
-									<bool name="AutoLocalize">true</bool>
-									<token name="AutomaticSize">0</token>
-									<Color3 name="BackgroundColor3">
-										<R>1</R>
-										<G>1</G>
-										<B>1</B>
-									</Color3>
-									<float name="BackgroundTransparency">1</float>
-									<Color3 name="BorderColor3">
-										<R>0.105882362</R>
-										<G>0.164705887</G>
-										<B>0.207843155</B>
-									</Color3>
-									<token name="BorderMode">0</token>
-									<int name="BorderSizePixel">1</int>
-									<bool name="ClipsDescendants">false</bool>
-									<bool name="Draggable">false</bool>
-									<token name="Font">3</token>
-									<Font name="FontFace">
-										<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
-										<Weight>400</Weight>
-										<Style>Normal</Style>
-										<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
-									</Font>
-									<int name="LayoutOrder">0</int>
-									<float name="LineHeight">1</float>
-									<int name="MaxVisibleGraphemes">-1</int>
-									<string name="Name">ItemName</string>
-									<Ref name="NextSelectionDown">null</Ref>
-									<Ref name="NextSelectionLeft">null</Ref>
-									<Ref name="NextSelectionRight">null</Ref>
-									<Ref name="NextSelectionUp">null</Ref>
-									<UDim2 name="Position">
-										<XS>0</XS>
-										<XO>0</XO>
-										<YS>0.800000012</YS>
-										<YO>0</YO>
-									</UDim2>
-									<bool name="RichText">false</bool>
-									<Ref name="RootLocalizationTable">null</Ref>
-									<float name="Rotation">0</float>
-									<bool name="Selectable">false</bool>
-									<token name="SelectionBehaviorDown">0</token>
-									<token name="SelectionBehaviorLeft">0</token>
-									<token name="SelectionBehaviorRight">0</token>
-									<token name="SelectionBehaviorUp">0</token>
-									<bool name="SelectionGroup">false</bool>
-									<Ref name="SelectionImageObject">null</Ref>
-									<int name="SelectionOrder">0</int>
-									<UDim2 name="Size">
-										<XS>1</XS>
-										<XO>0</XO>
-										<YS>0.200000003</YS>
-										<YO>0</YO>
-									</UDim2>
-									<token name="SizeConstraint">0</token>
-									<int64 name="SourceAssetId">-1</int64>
-									<BinaryString name="Tags"></BinaryString>
-									<string name="Text">Temp</string>
-									<Color3 name="TextColor3">
-										<R>0</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<bool name="TextScaled">true</bool>
-									<float name="TextSize">14</float>
-									<Color3 name="TextStrokeColor3">
-										<R>0</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<float name="TextStrokeTransparency">1</float>
-									<float name="TextTransparency">0</float>
-									<token name="TextTruncate">0</token>
-									<bool name="TextWrapped">true</bool>
-									<token name="TextXAlignment">2</token>
-									<token name="TextYAlignment">1</token>
-									<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb00162118</UniqueId>
-									<bool name="Visible">true</bool>
-									<int name="ZIndex">1</int>
-								</Properties>
-							</Item>
-						</Item>
-					</Item>
-					<Item class="Frame" referent="RBXCFD404CB877B4E10B6B716BA2D10408D">
-						<Properties>
-							<bool name="Active">false</bool>
-							<Vector2 name="AnchorPoint">
-								<X>0.5</X>
-								<Y>0.5</Y>
-							</Vector2>
-							<BinaryString name="AttributesSerialize"></BinaryString>
-							<bool name="AutoLocalize">true</bool>
-							<token name="AutomaticSize">0</token>
-							<Color3 name="BackgroundColor3">
-								<R>1</R>
-								<G>1</G>
-								<B>1</B>
-							</Color3>
-							<float name="BackgroundTransparency">0</float>
-							<Color3 name="BorderColor3">
-								<R>0.105882362</R>
-								<G>0.164705887</G>
-								<B>0.207843155</B>
-							</Color3>
-							<token name="BorderMode">0</token>
-							<int name="BorderSizePixel">1</int>
-							<bool name="ClipsDescendants">false</bool>
-							<bool name="Draggable">false</bool>
-							<int name="LayoutOrder">0</int>
-							<string name="Name">GuiLeggingsSlot</string>
-							<Ref name="NextSelectionDown">null</Ref>
-							<Ref name="NextSelectionLeft">null</Ref>
-							<Ref name="NextSelectionRight">null</Ref>
-							<Ref name="NextSelectionUp">null</Ref>
-							<UDim2 name="Position">
-								<XS>0.5</XS>
-								<XO>0</XO>
-								<YS>0.75</YS>
-								<YO>0</YO>
-							</UDim2>
-							<Ref name="RootLocalizationTable">null</Ref>
-							<float name="Rotation">0</float>
-							<bool name="Selectable">false</bool>
-							<token name="SelectionBehaviorDown">0</token>
-							<token name="SelectionBehaviorLeft">0</token>
-							<token name="SelectionBehaviorRight">0</token>
-							<token name="SelectionBehaviorUp">0</token>
-							<bool name="SelectionGroup">false</bool>
-							<Ref name="SelectionImageObject">null</Ref>
-							<int name="SelectionOrder">0</int>
-							<UDim2 name="Size">
-								<XS>0.210412428</XS>
-								<XO>0</XO>
-								<YS>0.189926475</YS>
-								<YO>0</YO>
-							</UDim2>
-							<token name="SizeConstraint">0</token>
-							<int64 name="SourceAssetId">-1</int64>
-							<token name="Style">0</token>
-							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb00162119</UniqueId>
-							<bool name="Visible">true</bool>
-							<int name="ZIndex">1</int>
-						</Properties>
-						<Item class="ImageButton" referent="RBXE38195F898354473A9D2EB3F52B66720">
-							<Properties>
-								<bool name="Active">true</bool>
-								<Vector2 name="AnchorPoint">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<BinaryString name="AttributesSerialize"></BinaryString>
-								<bool name="AutoButtonColor">true</bool>
-								<bool name="AutoLocalize">true</bool>
-								<token name="AutomaticSize">0</token>
-								<Color3 name="BackgroundColor3">
-									<R>1</R>
-									<G>1</G>
-									<B>1</B>
-								</Color3>
-								<float name="BackgroundTransparency">0</float>
-								<Color3 name="BorderColor3">
-									<R>0.105882362</R>
-									<G>0.164705887</G>
-									<B>0.207843155</B>
-								</Color3>
-								<token name="BorderMode">0</token>
-								<int name="BorderSizePixel">1</int>
-								<bool name="ClipsDescendants">false</bool>
-								<bool name="Draggable">false</bool>
-								<Content name="HoverImage"><null></null></Content>
-								<Content name="Image"><url>rbxasset://textures/ui/GuiImagePlaceholder.png</url></Content>
-								<Color3 name="ImageColor3">
-									<R>1</R>
-									<G>1</G>
-									<B>1</B>
-								</Color3>
-								<Vector2 name="ImageRectOffset">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<Vector2 name="ImageRectSize">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<float name="ImageTransparency">0</float>
-								<int name="LayoutOrder">0</int>
-								<bool name="Modal">false</bool>
-								<string name="Name">GuiItemImage</string>
-								<Ref name="NextSelectionDown">null</Ref>
-								<Ref name="NextSelectionLeft">null</Ref>
-								<Ref name="NextSelectionRight">null</Ref>
-								<Ref name="NextSelectionUp">null</Ref>
-								<UDim2 name="Position">
-									<XS>0</XS>
-									<XO>0</XO>
-									<YS>0</YS>
-									<YO>0</YO>
-								</UDim2>
-								<Content name="PressedImage"><null></null></Content>
-								<token name="ResampleMode">0</token>
-								<Ref name="RootLocalizationTable">null</Ref>
-								<float name="Rotation">0</float>
-								<token name="ScaleType">0</token>
-								<bool name="Selectable">true</bool>
-								<bool name="Selected">false</bool>
-								<token name="SelectionBehaviorDown">0</token>
-								<token name="SelectionBehaviorLeft">0</token>
-								<token name="SelectionBehaviorRight">0</token>
-								<token name="SelectionBehaviorUp">0</token>
-								<bool name="SelectionGroup">false</bool>
-								<Ref name="SelectionImageObject">null</Ref>
-								<int name="SelectionOrder">0</int>
-								<UDim2 name="Size">
-									<XS>1</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<token name="SizeConstraint">0</token>
-								<Rect2D name="SliceCenter">
-									<min>
-										<X>0</X>
-										<Y>0</Y>
-									</min>
-									<max>
-										<X>0</X>
-										<Y>0</Y>
-									</max>
-								</Rect2D>
-								<float name="SliceScale">1</float>
-								<int64 name="SourceAssetId">-1</int64>
-								<token name="Style">0</token>
-								<BinaryString name="Tags"></BinaryString>
-								<UDim2 name="TileSize">
-									<XS>1</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb0016211a</UniqueId>
-								<bool name="Visible">true</bool>
-								<int name="ZIndex">1</int>
-							</Properties>
-							<Item class="TextLabel" referent="RBX68DC915391F04B2CB7381F53FDDE8608">
-								<Properties>
-									<bool name="Active">false</bool>
-									<Vector2 name="AnchorPoint">
-										<X>0</X>
-										<Y>0</Y>
-									</Vector2>
-									<BinaryString name="AttributesSerialize"></BinaryString>
-									<bool name="AutoLocalize">true</bool>
-									<token name="AutomaticSize">0</token>
-									<Color3 name="BackgroundColor3">
-										<R>1</R>
-										<G>1</G>
-										<B>1</B>
-									</Color3>
-									<float name="BackgroundTransparency">1</float>
-									<Color3 name="BorderColor3">
-										<R>0.105882362</R>
-										<G>0.164705887</G>
-										<B>0.207843155</B>
-									</Color3>
-									<token name="BorderMode">0</token>
-									<int name="BorderSizePixel">1</int>
-									<bool name="ClipsDescendants">false</bool>
-									<bool name="Draggable">false</bool>
-									<token name="Font">3</token>
-									<Font name="FontFace">
-										<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
-										<Weight>400</Weight>
-										<Style>Normal</Style>
-										<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
-									</Font>
-									<int name="LayoutOrder">0</int>
-									<float name="LineHeight">1</float>
-									<int name="MaxVisibleGraphemes">-1</int>
-									<string name="Name">ItemName</string>
-									<Ref name="NextSelectionDown">null</Ref>
-									<Ref name="NextSelectionLeft">null</Ref>
-									<Ref name="NextSelectionRight">null</Ref>
-									<Ref name="NextSelectionUp">null</Ref>
-									<UDim2 name="Position">
-										<XS>0</XS>
-										<XO>0</XO>
-										<YS>0.800000012</YS>
-										<YO>0</YO>
-									</UDim2>
-									<bool name="RichText">false</bool>
-									<Ref name="RootLocalizationTable">null</Ref>
-									<float name="Rotation">0</float>
-									<bool name="Selectable">false</bool>
-									<token name="SelectionBehaviorDown">0</token>
-									<token name="SelectionBehaviorLeft">0</token>
-									<token name="SelectionBehaviorRight">0</token>
-									<token name="SelectionBehaviorUp">0</token>
-									<bool name="SelectionGroup">false</bool>
-									<Ref name="SelectionImageObject">null</Ref>
-									<int name="SelectionOrder">0</int>
-									<UDim2 name="Size">
-										<XS>1</XS>
-										<XO>0</XO>
-										<YS>0.200000003</YS>
-										<YO>0</YO>
-									</UDim2>
-									<token name="SizeConstraint">0</token>
-									<int64 name="SourceAssetId">-1</int64>
-									<BinaryString name="Tags"></BinaryString>
-									<string name="Text">Temp</string>
-									<Color3 name="TextColor3">
-										<R>0</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<bool name="TextScaled">true</bool>
-									<float name="TextSize">14</float>
-									<Color3 name="TextStrokeColor3">
-										<R>0</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<float name="TextStrokeTransparency">1</float>
-									<float name="TextTransparency">0</float>
-									<token name="TextTruncate">0</token>
-									<bool name="TextWrapped">true</bool>
-									<token name="TextXAlignment">2</token>
-									<token name="TextYAlignment">1</token>
-									<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb0016211b</UniqueId>
-									<bool name="Visible">true</bool>
-									<int name="ZIndex">1</int>
-								</Properties>
-							</Item>
-						</Item>
-					</Item>
-					<Item class="Frame" referent="RBX9865E389A156407A9BF0A1981620F9F3">
-						<Properties>
-							<bool name="Active">false</bool>
-							<Vector2 name="AnchorPoint">
-								<X>0.5</X>
-								<Y>0.5</Y>
-							</Vector2>
-							<BinaryString name="AttributesSerialize"></BinaryString>
-							<bool name="AutoLocalize">true</bool>
-							<token name="AutomaticSize">0</token>
-							<Color3 name="BackgroundColor3">
-								<R>1</R>
-								<G>1</G>
-								<B>1</B>
-							</Color3>
-							<float name="BackgroundTransparency">0</float>
-							<Color3 name="BorderColor3">
-								<R>0.105882362</R>
-								<G>0.164705887</G>
-								<B>0.207843155</B>
-							</Color3>
-							<token name="BorderMode">0</token>
-							<int name="BorderSizePixel">1</int>
-							<bool name="ClipsDescendants">false</bool>
-							<bool name="Draggable">false</bool>
-							<int name="LayoutOrder">0</int>
-							<string name="Name">GuiBootsSlot</string>
-							<Ref name="NextSelectionDown">null</Ref>
-							<Ref name="NextSelectionLeft">null</Ref>
-							<Ref name="NextSelectionRight">null</Ref>
-							<Ref name="NextSelectionUp">null</Ref>
-							<UDim2 name="Position">
-								<XS>0.75</XS>
-								<XO>0</XO>
-								<YS>0.75</YS>
-								<YO>0</YO>
-							</UDim2>
-							<Ref name="RootLocalizationTable">null</Ref>
-							<float name="Rotation">0</float>
-							<bool name="Selectable">false</bool>
-							<token name="SelectionBehaviorDown">0</token>
-							<token name="SelectionBehaviorLeft">0</token>
-							<token name="SelectionBehaviorRight">0</token>
-							<token name="SelectionBehaviorUp">0</token>
-							<bool name="SelectionGroup">false</bool>
-							<Ref name="SelectionImageObject">null</Ref>
-							<int name="SelectionOrder">0</int>
-							<UDim2 name="Size">
-								<XS>0.210412428</XS>
-								<XO>0</XO>
-								<YS>0.189926475</YS>
-								<YO>0</YO>
-							</UDim2>
-							<token name="SizeConstraint">0</token>
-							<int64 name="SourceAssetId">-1</int64>
-							<token name="Style">0</token>
-							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb0016211c</UniqueId>
-							<bool name="Visible">true</bool>
-							<int name="ZIndex">1</int>
-						</Properties>
-						<Item class="ImageButton" referent="RBX412F944C8C0A46C99767812550103398">
-							<Properties>
-								<bool name="Active">true</bool>
-								<Vector2 name="AnchorPoint">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<BinaryString name="AttributesSerialize"></BinaryString>
-								<bool name="AutoButtonColor">true</bool>
-								<bool name="AutoLocalize">true</bool>
-								<token name="AutomaticSize">0</token>
-								<Color3 name="BackgroundColor3">
-									<R>1</R>
-									<G>1</G>
-									<B>1</B>
-								</Color3>
-								<float name="BackgroundTransparency">0</float>
-								<Color3 name="BorderColor3">
-									<R>0.105882362</R>
-									<G>0.164705887</G>
-									<B>0.207843155</B>
-								</Color3>
-								<token name="BorderMode">0</token>
-								<int name="BorderSizePixel">1</int>
-								<bool name="ClipsDescendants">false</bool>
-								<bool name="Draggable">false</bool>
-								<Content name="HoverImage"><null></null></Content>
-								<Content name="Image"><url>rbxasset://textures/ui/GuiImagePlaceholder.png</url></Content>
-								<Color3 name="ImageColor3">
-									<R>1</R>
-									<G>1</G>
-									<B>1</B>
-								</Color3>
-								<Vector2 name="ImageRectOffset">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<Vector2 name="ImageRectSize">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<float name="ImageTransparency">0</float>
-								<int name="LayoutOrder">0</int>
-								<bool name="Modal">false</bool>
-								<string name="Name">GuiItemImage</string>
-								<Ref name="NextSelectionDown">null</Ref>
-								<Ref name="NextSelectionLeft">null</Ref>
-								<Ref name="NextSelectionRight">null</Ref>
-								<Ref name="NextSelectionUp">null</Ref>
-								<UDim2 name="Position">
-									<XS>0</XS>
-									<XO>0</XO>
-									<YS>0</YS>
-									<YO>0</YO>
-								</UDim2>
-								<Content name="PressedImage"><null></null></Content>
-								<token name="ResampleMode">0</token>
-								<Ref name="RootLocalizationTable">null</Ref>
-								<float name="Rotation">0</float>
-								<token name="ScaleType">0</token>
-								<bool name="Selectable">true</bool>
-								<bool name="Selected">false</bool>
-								<token name="SelectionBehaviorDown">0</token>
-								<token name="SelectionBehaviorLeft">0</token>
-								<token name="SelectionBehaviorRight">0</token>
-								<token name="SelectionBehaviorUp">0</token>
-								<bool name="SelectionGroup">false</bool>
-								<Ref name="SelectionImageObject">null</Ref>
-								<int name="SelectionOrder">0</int>
-								<UDim2 name="Size">
-									<XS>1</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<token name="SizeConstraint">0</token>
-								<Rect2D name="SliceCenter">
-									<min>
-										<X>0</X>
-										<Y>0</Y>
-									</min>
-									<max>
-										<X>0</X>
-										<Y>0</Y>
-									</max>
-								</Rect2D>
-								<float name="SliceScale">1</float>
-								<int64 name="SourceAssetId">-1</int64>
-								<token name="Style">0</token>
-								<BinaryString name="Tags"></BinaryString>
-								<UDim2 name="TileSize">
-									<XS>1</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb0016211d</UniqueId>
-								<bool name="Visible">true</bool>
-								<int name="ZIndex">1</int>
-							</Properties>
-							<Item class="TextLabel" referent="RBX3618320E4FCC4470BA4616E7305CD114">
-								<Properties>
-									<bool name="Active">false</bool>
-									<Vector2 name="AnchorPoint">
-										<X>0</X>
-										<Y>0</Y>
-									</Vector2>
-									<BinaryString name="AttributesSerialize"></BinaryString>
-									<bool name="AutoLocalize">true</bool>
-									<token name="AutomaticSize">0</token>
-									<Color3 name="BackgroundColor3">
-										<R>1</R>
-										<G>1</G>
-										<B>1</B>
-									</Color3>
-									<float name="BackgroundTransparency">1</float>
-									<Color3 name="BorderColor3">
-										<R>0.105882362</R>
-										<G>0.164705887</G>
-										<B>0.207843155</B>
-									</Color3>
-									<token name="BorderMode">0</token>
-									<int name="BorderSizePixel">1</int>
-									<bool name="ClipsDescendants">false</bool>
-									<bool name="Draggable">false</bool>
-									<token name="Font">3</token>
-									<Font name="FontFace">
-										<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
-										<Weight>400</Weight>
-										<Style>Normal</Style>
-										<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
-									</Font>
-									<int name="LayoutOrder">0</int>
-									<float name="LineHeight">1</float>
-									<int name="MaxVisibleGraphemes">-1</int>
-									<string name="Name">ItemName</string>
-									<Ref name="NextSelectionDown">null</Ref>
-									<Ref name="NextSelectionLeft">null</Ref>
-									<Ref name="NextSelectionRight">null</Ref>
-									<Ref name="NextSelectionUp">null</Ref>
-									<UDim2 name="Position">
-										<XS>0</XS>
-										<XO>0</XO>
-										<YS>0.800000012</YS>
-										<YO>0</YO>
-									</UDim2>
-									<bool name="RichText">false</bool>
-									<Ref name="RootLocalizationTable">null</Ref>
-									<float name="Rotation">0</float>
-									<bool name="Selectable">false</bool>
-									<token name="SelectionBehaviorDown">0</token>
-									<token name="SelectionBehaviorLeft">0</token>
-									<token name="SelectionBehaviorRight">0</token>
-									<token name="SelectionBehaviorUp">0</token>
-									<bool name="SelectionGroup">false</bool>
-									<Ref name="SelectionImageObject">null</Ref>
-									<int name="SelectionOrder">0</int>
-									<UDim2 name="Size">
-										<XS>1</XS>
-										<XO>0</XO>
-										<YS>0.200000003</YS>
-										<YO>0</YO>
-									</UDim2>
-									<token name="SizeConstraint">0</token>
-									<int64 name="SourceAssetId">-1</int64>
-									<BinaryString name="Tags"></BinaryString>
-									<string name="Text">Temp</string>
-									<Color3 name="TextColor3">
-										<R>0</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<bool name="TextScaled">true</bool>
-									<float name="TextSize">14</float>
-									<Color3 name="TextStrokeColor3">
-										<R>0</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<float name="TextStrokeTransparency">1</float>
-									<float name="TextTransparency">0</float>
-									<token name="TextTruncate">0</token>
-									<bool name="TextWrapped">true</bool>
-									<token name="TextXAlignment">2</token>
-									<token name="TextYAlignment">1</token>
-									<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb0016211e</UniqueId>
-									<bool name="Visible">true</bool>
-									<int name="ZIndex">1</int>
-								</Properties>
-							</Item>
-						</Item>
-					</Item>
-					<Item class="Frame" referent="RBXC58FBEA53E5D49068E1FA8342F2BA6D3">
-						<Properties>
-							<bool name="Active">false</bool>
-							<Vector2 name="AnchorPoint">
-								<X>0.5</X>
-								<Y>0.5</Y>
-							</Vector2>
-							<BinaryString name="AttributesSerialize"></BinaryString>
-							<bool name="AutoLocalize">true</bool>
-							<token name="AutomaticSize">0</token>
-							<Color3 name="BackgroundColor3">
-								<R>1</R>
-								<G>1</G>
-								<B>1</B>
-							</Color3>
-							<float name="BackgroundTransparency">0</float>
-							<Color3 name="BorderColor3">
-								<R>0.105882362</R>
-								<G>0.164705887</G>
-								<B>0.207843155</B>
-							</Color3>
-							<token name="BorderMode">0</token>
-							<int name="BorderSizePixel">1</int>
-							<bool name="ClipsDescendants">false</bool>
-							<bool name="Draggable">false</bool>
-							<int name="LayoutOrder">0</int>
-							<string name="Name">GuiHelmetSlot</string>
-							<Ref name="NextSelectionDown">null</Ref>
-							<Ref name="NextSelectionLeft">null</Ref>
-							<Ref name="NextSelectionRight">null</Ref>
-							<Ref name="NextSelectionUp">null</Ref>
-							<UDim2 name="Position">
-								<XS>0.5</XS>
-								<XO>0</XO>
-								<YS>0.25</YS>
-								<YO>0</YO>
-							</UDim2>
-							<Ref name="RootLocalizationTable">null</Ref>
-							<float name="Rotation">0</float>
-							<bool name="Selectable">false</bool>
-							<token name="SelectionBehaviorDown">0</token>
-							<token name="SelectionBehaviorLeft">0</token>
-							<token name="SelectionBehaviorRight">0</token>
-							<token name="SelectionBehaviorUp">0</token>
-							<bool name="SelectionGroup">false</bool>
-							<Ref name="SelectionImageObject">null</Ref>
-							<int name="SelectionOrder">0</int>
-							<UDim2 name="Size">
-								<XS>0.210412428</XS>
-								<XO>0</XO>
-								<YS>0.189926475</YS>
-								<YO>0</YO>
-							</UDim2>
-							<token name="SizeConstraint">0</token>
-							<int64 name="SourceAssetId">-1</int64>
-							<token name="Style">0</token>
-							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb0016211f</UniqueId>
-							<bool name="Visible">true</bool>
-							<int name="ZIndex">1</int>
-						</Properties>
-						<Item class="ImageButton" referent="RBX74A395BEDE0A429EB564A740BB6D2A23">
-							<Properties>
-								<bool name="Active">true</bool>
-								<Vector2 name="AnchorPoint">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<BinaryString name="AttributesSerialize"></BinaryString>
-								<bool name="AutoButtonColor">true</bool>
-								<bool name="AutoLocalize">true</bool>
-								<token name="AutomaticSize">0</token>
-								<Color3 name="BackgroundColor3">
-									<R>1</R>
-									<G>1</G>
-									<B>1</B>
-								</Color3>
-								<float name="BackgroundTransparency">0</float>
-								<Color3 name="BorderColor3">
-									<R>0.105882362</R>
-									<G>0.164705887</G>
-									<B>0.207843155</B>
-								</Color3>
-								<token name="BorderMode">0</token>
-								<int name="BorderSizePixel">1</int>
-								<bool name="ClipsDescendants">false</bool>
-								<bool name="Draggable">false</bool>
-								<Content name="HoverImage"><null></null></Content>
-								<Content name="Image"><url>rbxasset://textures/ui/GuiImagePlaceholder.png</url></Content>
-								<Color3 name="ImageColor3">
-									<R>1</R>
-									<G>1</G>
-									<B>1</B>
-								</Color3>
-								<Vector2 name="ImageRectOffset">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<Vector2 name="ImageRectSize">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<float name="ImageTransparency">0</float>
-								<int name="LayoutOrder">0</int>
-								<bool name="Modal">false</bool>
-								<string name="Name">GuiItemImage</string>
-								<Ref name="NextSelectionDown">null</Ref>
-								<Ref name="NextSelectionLeft">null</Ref>
-								<Ref name="NextSelectionRight">null</Ref>
-								<Ref name="NextSelectionUp">null</Ref>
-								<UDim2 name="Position">
-									<XS>0</XS>
-									<XO>0</XO>
-									<YS>0</YS>
-									<YO>0</YO>
-								</UDim2>
-								<Content name="PressedImage"><null></null></Content>
-								<token name="ResampleMode">0</token>
-								<Ref name="RootLocalizationTable">null</Ref>
-								<float name="Rotation">0</float>
-								<token name="ScaleType">0</token>
-								<bool name="Selectable">true</bool>
-								<bool name="Selected">false</bool>
-								<token name="SelectionBehaviorDown">0</token>
-								<token name="SelectionBehaviorLeft">0</token>
-								<token name="SelectionBehaviorRight">0</token>
-								<token name="SelectionBehaviorUp">0</token>
-								<bool name="SelectionGroup">false</bool>
-								<Ref name="SelectionImageObject">null</Ref>
-								<int name="SelectionOrder">0</int>
-								<UDim2 name="Size">
-									<XS>1</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<token name="SizeConstraint">0</token>
-								<Rect2D name="SliceCenter">
-									<min>
-										<X>0</X>
-										<Y>0</Y>
-									</min>
-									<max>
-										<X>0</X>
-										<Y>0</Y>
-									</max>
-								</Rect2D>
-								<float name="SliceScale">1</float>
-								<int64 name="SourceAssetId">-1</int64>
-								<token name="Style">0</token>
-								<BinaryString name="Tags"></BinaryString>
-								<UDim2 name="TileSize">
-									<XS>1</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb00162120</UniqueId>
-								<bool name="Visible">true</bool>
-								<int name="ZIndex">1</int>
-							</Properties>
-							<Item class="TextLabel" referent="RBXADF9138E383F411FB22328E26B540F04">
-								<Properties>
-									<bool name="Active">false</bool>
-									<Vector2 name="AnchorPoint">
-										<X>0</X>
-										<Y>0</Y>
-									</Vector2>
-									<BinaryString name="AttributesSerialize"></BinaryString>
-									<bool name="AutoLocalize">true</bool>
-									<token name="AutomaticSize">0</token>
-									<Color3 name="BackgroundColor3">
-										<R>1</R>
-										<G>1</G>
-										<B>1</B>
-									</Color3>
-									<float name="BackgroundTransparency">1</float>
-									<Color3 name="BorderColor3">
-										<R>0.105882362</R>
-										<G>0.164705887</G>
-										<B>0.207843155</B>
-									</Color3>
-									<token name="BorderMode">0</token>
-									<int name="BorderSizePixel">1</int>
-									<bool name="ClipsDescendants">false</bool>
-									<bool name="Draggable">false</bool>
-									<token name="Font">3</token>
-									<Font name="FontFace">
-										<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
-										<Weight>400</Weight>
-										<Style>Normal</Style>
-										<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
-									</Font>
-									<int name="LayoutOrder">0</int>
-									<float name="LineHeight">1</float>
-									<int name="MaxVisibleGraphemes">-1</int>
-									<string name="Name">ItemName</string>
-									<Ref name="NextSelectionDown">null</Ref>
-									<Ref name="NextSelectionLeft">null</Ref>
-									<Ref name="NextSelectionRight">null</Ref>
-									<Ref name="NextSelectionUp">null</Ref>
-									<UDim2 name="Position">
-										<XS>0</XS>
-										<XO>0</XO>
-										<YS>0.800000012</YS>
-										<YO>0</YO>
-									</UDim2>
-									<bool name="RichText">false</bool>
-									<Ref name="RootLocalizationTable">null</Ref>
-									<float name="Rotation">0</float>
-									<bool name="Selectable">false</bool>
-									<token name="SelectionBehaviorDown">0</token>
-									<token name="SelectionBehaviorLeft">0</token>
-									<token name="SelectionBehaviorRight">0</token>
-									<token name="SelectionBehaviorUp">0</token>
-									<bool name="SelectionGroup">false</bool>
-									<Ref name="SelectionImageObject">null</Ref>
-									<int name="SelectionOrder">0</int>
-									<UDim2 name="Size">
-										<XS>1</XS>
-										<XO>0</XO>
-										<YS>0.200000003</YS>
-										<YO>0</YO>
-									</UDim2>
-									<token name="SizeConstraint">0</token>
-									<int64 name="SourceAssetId">-1</int64>
-									<BinaryString name="Tags"></BinaryString>
-									<string name="Text">Temp</string>
-									<Color3 name="TextColor3">
-										<R>0</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<bool name="TextScaled">true</bool>
-									<float name="TextSize">14</float>
-									<Color3 name="TextStrokeColor3">
-										<R>0</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<float name="TextStrokeTransparency">1</float>
-									<float name="TextTransparency">0</float>
-									<token name="TextTruncate">0</token>
-									<bool name="TextWrapped">true</bool>
-									<token name="TextXAlignment">2</token>
-									<token name="TextYAlignment">1</token>
-									<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb00162121</UniqueId>
-									<bool name="Visible">true</bool>
-									<int name="ZIndex">1</int>
-								</Properties>
-							</Item>
-						</Item>
-					</Item>
-					<Item class="Frame" referent="RBX67679CED3D0F4CC5BD851E8EC3020A3E">
-						<Properties>
-							<bool name="Active">false</bool>
-							<Vector2 name="AnchorPoint">
-								<X>0.5</X>
-								<Y>0.5</Y>
-							</Vector2>
-							<BinaryString name="AttributesSerialize"></BinaryString>
-							<bool name="AutoLocalize">true</bool>
-							<token name="AutomaticSize">0</token>
-							<Color3 name="BackgroundColor3">
-								<R>1</R>
-								<G>1</G>
-								<B>1</B>
-							</Color3>
-							<float name="BackgroundTransparency">0</float>
-							<Color3 name="BorderColor3">
-								<R>0.105882362</R>
-								<G>0.164705887</G>
-								<B>0.207843155</B>
-							</Color3>
-							<token name="BorderMode">0</token>
-							<int name="BorderSizePixel">1</int>
-							<bool name="ClipsDescendants">false</bool>
-							<bool name="Draggable">false</bool>
-							<int name="LayoutOrder">0</int>
-							<string name="Name">GuiWeaponSlot</string>
-							<Ref name="NextSelectionDown">null</Ref>
-							<Ref name="NextSelectionLeft">null</Ref>
-							<Ref name="NextSelectionRight">null</Ref>
-							<Ref name="NextSelectionUp">null</Ref>
-							<UDim2 name="Position">
-								<XS>0.25</XS>
-								<XO>0</XO>
-								<YS>0.5</YS>
-								<YO>0</YO>
-							</UDim2>
-							<Ref name="RootLocalizationTable">null</Ref>
-							<float name="Rotation">0</float>
-							<bool name="Selectable">false</bool>
-							<token name="SelectionBehaviorDown">0</token>
-							<token name="SelectionBehaviorLeft">0</token>
-							<token name="SelectionBehaviorRight">0</token>
-							<token name="SelectionBehaviorUp">0</token>
-							<bool name="SelectionGroup">false</bool>
-							<Ref name="SelectionImageObject">null</Ref>
-							<int name="SelectionOrder">0</int>
-							<UDim2 name="Size">
-								<XS>0.210412428</XS>
-								<XO>0</XO>
-								<YS>0.189926475</YS>
-								<YO>0</YO>
-							</UDim2>
-							<token name="SizeConstraint">0</token>
-							<int64 name="SourceAssetId">-1</int64>
-							<token name="Style">0</token>
-							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb00162122</UniqueId>
-							<bool name="Visible">true</bool>
-							<int name="ZIndex">1</int>
-						</Properties>
-						<Item class="ImageButton" referent="RBX1746F8E070E64608A8C998C8564F1BB3">
-							<Properties>
-								<bool name="Active">true</bool>
-								<Vector2 name="AnchorPoint">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<BinaryString name="AttributesSerialize"></BinaryString>
-								<bool name="AutoButtonColor">true</bool>
-								<bool name="AutoLocalize">true</bool>
-								<token name="AutomaticSize">0</token>
-								<Color3 name="BackgroundColor3">
-									<R>1</R>
-									<G>1</G>
-									<B>1</B>
-								</Color3>
-								<float name="BackgroundTransparency">0</float>
-								<Color3 name="BorderColor3">
-									<R>0.105882362</R>
-									<G>0.164705887</G>
-									<B>0.207843155</B>
-								</Color3>
-								<token name="BorderMode">0</token>
-								<int name="BorderSizePixel">1</int>
-								<bool name="ClipsDescendants">false</bool>
-								<bool name="Draggable">false</bool>
-								<Content name="HoverImage"><null></null></Content>
-								<Content name="Image"><url>rbxasset://textures/ui/GuiImagePlaceholder.png</url></Content>
-								<Color3 name="ImageColor3">
-									<R>1</R>
-									<G>1</G>
-									<B>1</B>
-								</Color3>
-								<Vector2 name="ImageRectOffset">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<Vector2 name="ImageRectSize">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<float name="ImageTransparency">0</float>
-								<int name="LayoutOrder">0</int>
-								<bool name="Modal">false</bool>
-								<string name="Name">GuiItemImage</string>
-								<Ref name="NextSelectionDown">null</Ref>
-								<Ref name="NextSelectionLeft">null</Ref>
-								<Ref name="NextSelectionRight">null</Ref>
-								<Ref name="NextSelectionUp">null</Ref>
-								<UDim2 name="Position">
-									<XS>0</XS>
-									<XO>0</XO>
-									<YS>0</YS>
-									<YO>0</YO>
-								</UDim2>
-								<Content name="PressedImage"><null></null></Content>
-								<token name="ResampleMode">0</token>
-								<Ref name="RootLocalizationTable">null</Ref>
-								<float name="Rotation">0</float>
-								<token name="ScaleType">0</token>
-								<bool name="Selectable">true</bool>
-								<bool name="Selected">false</bool>
-								<token name="SelectionBehaviorDown">0</token>
-								<token name="SelectionBehaviorLeft">0</token>
-								<token name="SelectionBehaviorRight">0</token>
-								<token name="SelectionBehaviorUp">0</token>
-								<bool name="SelectionGroup">false</bool>
-								<Ref name="SelectionImageObject">null</Ref>
-								<int name="SelectionOrder">0</int>
-								<UDim2 name="Size">
-									<XS>1</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<token name="SizeConstraint">0</token>
-								<Rect2D name="SliceCenter">
-									<min>
-										<X>0</X>
-										<Y>0</Y>
-									</min>
-									<max>
-										<X>0</X>
-										<Y>0</Y>
-									</max>
-								</Rect2D>
-								<float name="SliceScale">1</float>
-								<int64 name="SourceAssetId">-1</int64>
-								<token name="Style">0</token>
-								<BinaryString name="Tags"></BinaryString>
-								<UDim2 name="TileSize">
-									<XS>1</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb00162123</UniqueId>
-								<bool name="Visible">true</bool>
-								<int name="ZIndex">1</int>
-							</Properties>
-							<Item class="TextLabel" referent="RBX82DA97410BA34AF49E96D613DA267C08">
-								<Properties>
-									<bool name="Active">false</bool>
-									<Vector2 name="AnchorPoint">
-										<X>0</X>
-										<Y>0</Y>
-									</Vector2>
-									<BinaryString name="AttributesSerialize"></BinaryString>
-									<bool name="AutoLocalize">true</bool>
-									<token name="AutomaticSize">0</token>
-									<Color3 name="BackgroundColor3">
-										<R>1</R>
-										<G>1</G>
-										<B>1</B>
-									</Color3>
-									<float name="BackgroundTransparency">1</float>
-									<Color3 name="BorderColor3">
-										<R>0.105882362</R>
-										<G>0.164705887</G>
-										<B>0.207843155</B>
-									</Color3>
-									<token name="BorderMode">0</token>
-									<int name="BorderSizePixel">1</int>
-									<bool name="ClipsDescendants">false</bool>
-									<bool name="Draggable">false</bool>
-									<token name="Font">3</token>
-									<Font name="FontFace">
-										<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
-										<Weight>400</Weight>
-										<Style>Normal</Style>
-										<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
-									</Font>
-									<int name="LayoutOrder">0</int>
-									<float name="LineHeight">1</float>
-									<int name="MaxVisibleGraphemes">-1</int>
-									<string name="Name">ItemName</string>
-									<Ref name="NextSelectionDown">null</Ref>
-									<Ref name="NextSelectionLeft">null</Ref>
-									<Ref name="NextSelectionRight">null</Ref>
-									<Ref name="NextSelectionUp">null</Ref>
-									<UDim2 name="Position">
-										<XS>0</XS>
-										<XO>0</XO>
-										<YS>0.800000012</YS>
-										<YO>0</YO>
-									</UDim2>
-									<bool name="RichText">false</bool>
-									<Ref name="RootLocalizationTable">null</Ref>
-									<float name="Rotation">0</float>
-									<bool name="Selectable">false</bool>
-									<token name="SelectionBehaviorDown">0</token>
-									<token name="SelectionBehaviorLeft">0</token>
-									<token name="SelectionBehaviorRight">0</token>
-									<token name="SelectionBehaviorUp">0</token>
-									<bool name="SelectionGroup">false</bool>
-									<Ref name="SelectionImageObject">null</Ref>
-									<int name="SelectionOrder">0</int>
-									<UDim2 name="Size">
-										<XS>1</XS>
-										<XO>0</XO>
-										<YS>0.200000003</YS>
-										<YO>0</YO>
-									</UDim2>
-									<token name="SizeConstraint">0</token>
-									<int64 name="SourceAssetId">-1</int64>
-									<BinaryString name="Tags"></BinaryString>
-									<string name="Text">Temp</string>
-									<Color3 name="TextColor3">
-										<R>0</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<bool name="TextScaled">true</bool>
-									<float name="TextSize">14</float>
-									<Color3 name="TextStrokeColor3">
-										<R>0</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<float name="TextStrokeTransparency">1</float>
-									<float name="TextTransparency">0</float>
-									<token name="TextTruncate">0</token>
-									<bool name="TextWrapped">true</bool>
-									<token name="TextXAlignment">2</token>
-									<token name="TextYAlignment">1</token>
-									<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb00162124</UniqueId>
-									<bool name="Visible">true</bool>
-									<int name="ZIndex">1</int>
-								</Properties>
-							</Item>
-						</Item>
-					</Item>
 				</Item>
 				<Item class="ScrollingFrame" referent="RBX3AEDE9FED45B4F94855370BF53EE8467">
 					<Properties>
@@ -14482,7 +13502,7 @@ return GuiTooltipController]]></ProtectedString>
 						<Content name="BottomImage"><url>rbxasset://textures/ui/Scroll/scroll-bottom.png</url></Content>
 						<Vector2 name="CanvasPosition">
 							<X>0</X>
-							<Y>0</Y>
+							<Y>150</Y>
 						</Vector2>
 						<UDim2 name="CanvasSize">
 							<XS>0</XS>
@@ -14550,7 +13570,7 @@ return GuiTooltipController]]></ProtectedString>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<bool name="AutoLocalize">true</bool>
 				<int name="DisplayOrder">0</int>
-				<bool name="Enabled">true</bool>
+				<bool name="Enabled">false</bool>
 				<bool name="IgnoreGuiInset">false</bool>
 				<string name="Name">GuiTemplate</string>
 				<bool name="ResetOnSpawn">true</bool>
@@ -15234,7 +14254,7 @@ while true  do
 		end
 	end
 
-	
+	wait(3)
 
 	-- 플레이어 저장
 	
@@ -15325,7 +14345,6 @@ while true  do
 		
 		-- 게임 종료 조건 확인
 		if #playersInGame == 1 then
-			
 			--local reward = (playersInGame[1].KilledCount + (finalPlayerCount / 2)) * DefaultReward
 			local reward = (finalPlayerCount / 2) * DefaultReward
 
@@ -15337,18 +14356,16 @@ while true  do
 			break
 			
 		elseif #playersInGame == 0 then
-			
 			winnerType = WinnerType.NoOne_AllPlayersWereDead
 			break
 			
 		elseif currentGameLength <= 0 then
-			
 			winnerType = WinnerType.NoOne_TimeIsUp
 			break
 		end
 	end
 
-	wait(5)
+	wait(100)
 	if winnerType == WinnerType.Player then
 		NotifyWinnerSTC:FireAllClients(winnerType, winnerName, winnerReward)
 	else
@@ -15356,7 +14373,7 @@ while true  do
 	end
 	
 	if IsTestMode then
-		wait(10)
+		wait(3)
 	end
 	
 	-- 맵 정리
@@ -49890,7 +48907,7 @@ local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local GameDataType = ServerEnum.GameDataType
 local StatusType = ServerEnum.StatusType
 local ToolType = ServerEnum.ToolType
-local ArmorType = ServerEnum.ArmorType
+local EquipType = ServerEnum.EquipType
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 
@@ -49902,8 +48919,93 @@ local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
 
 -- CTS
 local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
+local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
+local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 
 local ServerGlobalStorage = CommonGlobalStorage
+
+
+UnequipToolCTS.OnServerEvent:Connect(function(player, equipType)
+	if not equipType then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+	
+	local playerId = player.UserId
+	local prevTool = ServerGlobalStorage:UnequipTool(playerId, equipType)
+	
+	if not prevTool then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+	
+	prevTool.Parent = player.Backpack
+	UnequipToolSTC:FireClient(player, equipType)
+end)
+
+EquipToolCTS.OnServerEvent:Connect(function(player, equipType, tool)
+	if not equipType or not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+
+	local finalEquipType = ToolUtility:GetEquipType(tool)
+	if finalEquipType ~= equipType then
+		Debug.Assert(false, "클라이언트에서 보낸 정보와 실제 정보가 다릅니다.")
+		return
+	end
+
+	if player.Backpack ~= tool.Parent then
+		Debug.Assert(false, "해당 플레이어가 소유한 도구가 아닙니다.")
+		return
+	end
+
+	local character = player.Character
+	if not character then
+		Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 장착할 수 없습니다.")
+		return
+	end
+
+	local playerId = player.UserId
+	local prevTool = nil
+	local currentTool = nil
+
+	--[[
+		* 무기의 경우
+			Roblox의 EquipTool 호출 시 알아서 Character 하위로 옮겨진다.
+			Roblox의 EquipTool 호출 시 이전에 장착중인 Tool은 Player.Backpack으로 옮겨진다.
+
+		* 방어구의 경우(자체 구현)
+			무기에서 하는 것들을 행동을 수동으로 해줘야 한다.
+	--]]
+	if equipType == EquipType.Weapon then
+		local humanoid = character:FindFirstChild("Humanoid")
+		if not humanoid then
+			Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+			return
+		end
+
+		humanoid:EquipTool(tool)
+		prevTool, currentTool = ServerGlobalStorage:EquipTool(playerId, equipType, tool)
+		if not currentTool then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+	else
+		tool.Parent = character
+		prevTool, currentTool = ServerGlobalStorage:EquipTool(playerId, equipType, tool)
+		if not currentTool then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+
+		if prevTool then
+			prevTool.Parent = player.Backpack
+		end
+	end
+	
+	EquipToolSTC:FireClient(player, equipType, tool)
+end)
 
 SelectToolCTS.OnServerEvent:Connect(function(player, inventorySlotIndex, tool)
 	if not inventorySlotIndex or not tool then
@@ -49934,32 +49036,36 @@ end)
 
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
 function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
-	if not ToolUtility:CheckWeaponTool(tool) then
+	local equipType = ToolUtility:GetEquipType(tool)
+	if not equipType or equipType ~= EquipType.Weapon then
 		return false
 	end
 	
-	if not self:EquipTool(playerId, tool) then
+	local prevTool, currentTool = self:EquipTool(playerId, equipType, tool)
+	if not currentTool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
 	local player = game.Players:GetPlayerByUserId(playerId)
-	EquipToolSTC:FireClient(player, tool)
+	EquipToolSTC:FireClient(player, equipType, tool)
 	return true
 end
 
 function ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId, tool)
-	if not ToolUtility:CheckWeaponTool(tool) then
+	local equipType = ToolUtility:GetEquipType(tool)
+	if not equipType or equipType ~= EquipType.Weapon then
 		return false
 	end
 	
-	if not self:UnequipTool(playerId, tool) then
+	local prevTool = self:UnequipTool(playerId, equipType) 
+	if not prevTool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
 	local player = game.Players:GetPlayerByUserId(playerId)
-	UnequipToolSTC:FireClient(player, tool)
+	UnequipToolSTC:FireClient(player, equipType)
 	return true
 end
 
@@ -51751,7 +50857,7 @@ tool.Attacker.Touched:Connect(onTouched)]]></ProtectedString>
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
-local EquipSlotCount = CommonEnum.ArmorType.Count - 1
+local EquipSlotCount = CommonEnum.EquipType.Count - 1
 
 
 local CommonConstant = {
@@ -51760,6 +50866,7 @@ local CommonConstant = {
 	MaxEquipSlotCount = EquipSlotCount,
 	GuiInventorySlotCountPerLine = 5,
 	GuiInventorySlotOffset = 5,
+	GuiEquipSlotCountPerRow = 3,
 	GuiEquipSlotCountPerColumn = 4,
 	GuiEquipSlotOffset = 10,
 	
@@ -51817,18 +50924,19 @@ local CommonEnum = {
 		Consumable = 4
 	},
 
-	ArmorType = {
-		Helmet = 1,
-		Chestplate = 2,
-		Leggings = 3,
-		Boots = 4,
-		Count = 5
+	EquipType = {
+		Weapon = 1,
+		Helmet = 2,
+		Chestplate = 3,
+		Leggings = 4,
+		Boots = 5,
+		Count = 6
 	},
 
 	SlotType = {
 		InventorySlot = 1,
 		EquipSlot = 2,
-		QuickSLot = 3
+		QuickSlot = 3
 	},
 	
 	StatusType = {
@@ -51846,6 +50954,15 @@ CommonEnum.ToolType.Converter = {
 	[CommonEnum.ToolType.Armor] = "Armor",
 	[CommonEnum.ToolType.Consumable] = "Consumable",
 }
+
+CommonEnum.EquipType.Converter = {
+	[CommonEnum.EquipType.Weapon] = "Weapon",
+	[CommonEnum.EquipType.Helmet] = "Helmet",
+	[CommonEnum.EquipType.Chestplate] = "Chestplate",
+	[CommonEnum.EquipType.Leggings] = "Leggings",
+	[CommonEnum.EquipType.Boots] = "Boots"
+}
+
 
 CommonEnum.__index = Utility.Inheritable__index
 CommonEnum.__newindex = Utility.Inheritable__newindex
@@ -51905,7 +51022,7 @@ local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
 local ToolTypeSelector = CommonEnum.ToolType
-local ArmorTypeSelector = CommonEnum.ArmorType
+local EquipTypeSelector = CommonEnum.EquipType
 
 
 local Utility = require(CommonModule:WaitForChild("Utility"))
@@ -51931,16 +51048,16 @@ Sight : 시야
 --]]
 
 -- 무기 종류
---[[ 기본 무기 	--]] ToolGameData:InsertData(1, {ToolType = ToolTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10, Skill = ""})
---[[ 검 			--]] ToolGameData:InsertData(2, {ToolType = ToolTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, Skill = ""})
---[[ 도끼		--]] ToolGameData:InsertData(3, {ToolType = ToolTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10, Skill = ""})
+--[[ 기본 무기 	--]] ToolGameData:InsertData(1, {ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10, Skill = ""})
+--[[ 검 			--]] ToolGameData:InsertData(2, {ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, Skill = ""})
+--[[ 도끼		--]] ToolGameData:InsertData(3, {ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10, Skill = ""})
 
 
 -- 방어구 종류
---[[ 기본 머리	--]] ToolGameData:InsertData(101, {ToolType = ToolTypeSelector.Weapon, ArmorType = ArmorTypeSelector.Helmet, DEF = 15})
---[[ 기본 가슴	--]] ToolGameData:InsertData(102, {ToolType = ToolTypeSelector.Weapon, ArmorType = ArmorTypeSelector.Chestplate, DEF = 30, Move = -5})
---[[ 기본 다리	--]] ToolGameData:InsertData(103, {ToolType = ToolTypeSelector.Weapon, ArmorType = ArmorTypeSelector.Leggings, DEF = 20, Move = 5})
---[[ 기본 발		--]] ToolGameData:InsertData(104, {ToolType = ToolTypeSelector.Weapon, ArmorType = ArmorTypeSelector.Boots, DEF = 10, Move = 10})
+--[[ 기본 머리	--]] ToolGameData:InsertData(101, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Helmet, DEF = 15})
+--[[ 기본 가슴	--]] ToolGameData:InsertData(102, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 30, Move = -5})
+--[[ 기본 다리	--]] ToolGameData:InsertData(103, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 20, Move = 5})
+--[[ 기본 발		--]] ToolGameData:InsertData(104, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 10})
 
 
 
@@ -52069,7 +51186,7 @@ local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
 local StatusType = CommonEnum.StatusType
 local ToolType = CommonEnum.ToolType
-local ArmorType = CommonEnum.ArmorType
+local EquipType = CommonEnum.EquipType
 
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
@@ -52109,10 +51226,10 @@ function CommonGlobalStorage:CreateEmptyData()
 		--[[
 		[StatusType.ArmorSlot] = {
 			-- 그냥 명시적으로 표현
-			[ArmorType.Helmet] = {Value = nil, ToolGameData = nil},
-			[ArmorType.Chestplate] = {Value = nil, ToolGameData = nil},
-			[ArmorType.Leggings] = {Value = nil, ToolGameData = nil},
-			[ArmorType.Boots] = {Value = nil, ToolGameData = nil}
+			[EquipType.Helmet] = {Value = nil, ToolGameData = nil},
+			[EquipType.Chestplate] = {Value = nil, ToolGameData = nil},
+			[EquipType.Leggings] = {Value = nil, ToolGameData = nil},
+			[EquipType.Boots] = {Value = nil, ToolGameData = nil}
 		},
 
 		-- 그냥 명시적으로 표현
@@ -52226,17 +51343,32 @@ function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
 	return true
 end
 
-function CommonGlobalStorage:EquipTool(playerId, tool)
+function CommonGlobalStorage:EquipTool(playerId, equipType, tool)
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
-		return false
+		return nil, nil
 	end
 
 	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
-	local prevToolGameData, currentToolGameData = equipSlots:EquipTool(tool, true)
+	local prevTool, currentTool = equipSlots:EquipTool(equipType, tool)
+	if not currentTool then
+		Debug.Assert(false, "비정상입니다.")
+		return nil, nil
+	end
+
+	local currentToolGameData = ToolUtility:GetToolGameData(currentTool)
 	if not currentToolGameData then
 		Debug.Assert(false, "비정상입니다.")
-		return false
+		return nil, nil
+	end
+
+	local prevToolGameData = nil
+	if prevTool then
+		prevToolGameData = ToolUtility:GetToolGameData(currentTool)
+		if not prevToolGameData then
+			Debug.Assert(false, "비정상입니다.")
+			return nil, nil
+		end
 	end
 
 	if prevToolGameData then
@@ -52244,24 +51376,53 @@ function CommonGlobalStorage:EquipTool(playerId, tool)
 	end
 	
 	self:UpdateAddedToolGameData(playerId, currentToolGameData)
-	return true
+	return prevTool, currentTool
 end
 
-function CommonGlobalStorage:UnequipTool(playerId, tool)
+function CommonGlobalStorage:UnequipTool(playerId, equipType)
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
 	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
-	local prevToolGameData = equipSlots:UnequipTool(tool)
-	if not prevToolGameData then
+	local prevTool = equipSlots:UnequipTool(equipType)
+	if not prevTool then
 		Debug.Assert(false, "비정상입니다.")
-		return false
+		return nil
 	end
 
+	local prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+	if not prevToolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
 	self:UpdateRemovedToolGameData(playerId, prevToolGameData)
-	return true
+
+	return prevTool
+end
+
+function CommonGlobalStorage:UnequipToolByTool(playerId, tool)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
+	local prevTool = equipSlots:UnequipToolByTool(tool)
+	if not prevTool then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+	if not prevToolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+	self:UpdateRemovedToolGameData(playerId, prevToolGameData)
+
+	return prevTool
 end
 
 --[[
@@ -52282,13 +51443,13 @@ function CommonGlobalStorage:CheckAndGetArmorData(armor)
 		return nil
 	end
 
-	local armorType = toolGameData.ArmorType
-	if not ArmorType[armorType] then
-		Debug.Assert(false, "비정상입니다. [ArmorType] => " .. tostring(armorType))
+	local EquipType = toolGameData.EquipType
+	if not EquipType[EquipType] then
+		Debug.Assert(false, "비정상입니다. [EquipType] => " .. tostring(EquipType))
 		return nil
 	end
 	
-	return toolGameData, armorType
+	return toolGameData, EquipType
 end
 
 function CommonGlobalStorage:EquipArmor(playerId, armor)
@@ -52298,7 +51459,7 @@ function CommonGlobalStorage:EquipArmor(playerId, armor)
 		return false
 	end
 	
-	local toolGameData, armorType = self:CheckAndGetArmorData(armor)
+	local toolGameData, EquipType = self:CheckAndGetArmorData(armor)
 	if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -52307,8 +51468,8 @@ function CommonGlobalStorage:EquipArmor(playerId, armor)
 	self:UpdateRemovedToolGameData(self.PlayerTable[playerId][StatusType.WeaponSlot].ToolGameData)
 	self:UpdateAddedToolGameData(toolGameData)
 	
-	self.PlayerTable[playerId][StatusType.ArmorSlot][armorType].Value = armor
-	self.PlayerTable[playerId][StatusType.ArmorSlot][armorType].ToolGameData = toolGameData
+	self.PlayerTable[playerId][StatusType.ArmorSlot][EquipType].Value = armor
+	self.PlayerTable[playerId][StatusType.ArmorSlot][EquipType].ToolGameData = toolGameData
 	
 	return true
 end
@@ -52398,15 +51559,44 @@ local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local ToolType = CommonEnum.ToolType
 
 local Container = CommonModule:WaitForChild("Container")
-local ArmorSlotsRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
-ArmorSlotsRaw:Initialize(MaxEquipSlotCount)
+local EquipSlotsRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
+EquipSlotsRaw:Initialize(MaxEquipSlotCount)
 
 local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
 local EquipSlots = {}
-EquipSlots.ArmorSlotsRaw = ArmorSlotsRaw
-EquipSlots.WeaponSlot = nil
+EquipSlots.EquipSlotsRaw = EquipSlotsRaw
 
-function EquipSlots:UnequipToolByToolGameData(toolGameData)
+function EquipSlots:UnequipTool(equipType)
+    if not equipType then
+        Debug.Assert(false, "타입이 비정상입니다.")
+        return nil
+    end
+
+    local prevTool = self.EquipSlotsRaw:Get(equipType)
+    if not prevTool then
+        Debug.Assert(false, "장착된 도구가 없습니다.")
+        return nil
+    else
+        self.EquipSlotsRaw:Set(equipType, nil)
+    end
+
+    --[[
+    local prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+    if not prevToolGameData then
+        Debug.Assert(false, "도구는 존재하지만 데이터가 존재하지 않습니다.")
+        return nil
+    end
+    --]]
+    return prevTool
+end
+
+function EquipSlots:UnequipToolByTool(tool)
+    if not tool then
+        Debug.Assert(false, "비정상입니다.")
+		return nil
+    end
+
+    local toolGameData = ToolUtility:GetToolGameData(tool)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
@@ -52417,25 +51607,43 @@ function EquipSlots:UnequipToolByToolGameData(toolGameData)
         return nil
     end
     
-    local targetToolType = toolGameData.ToolType
-    local prevTool = nil
-    if  targetToolType == ToolType.Armor then
-        local targetArmorType = toolGameData.ArmorType
-        prevTool = self.ArmorSlotsRaw:Get(targetArmorType)
-        if not prevTool then
-            Debug.Assert(false, "장착된 도구가 없습니다.")
-        else
-            self.ArmorSlotsRaw:Set(targetArmorType, nil)
-        end
-    else
-        prevTool = self.WeaponSlot
-        if not prevTool then
-            Debug.Assert(false, "장착된 도구가 없습니다.")
-        else
-            self.WeaponSlot = nil
-        end
+    local equipType = toolGameData.EquipType
+    local prevTool = self.EquipSlotsRaw:Get(equipType)
+    if prevTool ~= tool then
+        Debug.Assert(false, "해제하려는 장비와 장착중인 장비가 다릅니다. 코드 버그입니다.")
+        return nil
     end
 
+    local prevTool = self:UnequipTool(equipType)
+    if not prevTool then
+        Debug.Assert(false, "장착된 도구가 없습니다.")
+        return nil
+    end
+
+    return prevTool
+end
+
+function EquipSlots:EquipTool(equipType, tool)
+    if not equipType or not tool then
+        Debug.Assert(false, "비정상입니다.")
+		return nil, nil
+    end
+
+    local toolGameData = ToolUtility:GetToolGameData(tool)
+    if not toolGameData then
+        Debug.Assert(false, "비정상입니다.")
+        return nil, nil
+    end
+
+    if not ToolUtility:CheckEquipableToolGameData(toolGameData) then
+        Debug.Assert(false, "비정상입니다.")
+        return nil, nil
+    end
+
+    local prevTool = self.EquipSlotsRaw:Get(equipType)
+    self.EquipSlotsRaw:Set(equipType, tool)
+
+    --[[
     local prevToolGameData = nil
     if prevTool then
         prevToolGameData = ToolUtility:GetToolGameData(prevTool)
@@ -52443,72 +51651,11 @@ function EquipSlots:UnequipToolByToolGameData(toolGameData)
             Debug.Assert(false, "도구는 존재하지만 데이터가 존재하지 않습니다.")
         end
     end
-    return prevToolGameData
+    --]]
+
+    return prevTool, tool
 end
 
-function EquipSlots:UnequipTool(tool)
-    if not tool then
-        Debug.Assert(false, "비정상입니다.")
-		return nil
-    end
-
-    local toolGameData = ToolUtility:GetToolGameData(tool)
-    if not toolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return nil
-	end
-
-    local prevToolGameData = self:UnequipToolByToolGameData(toolGameData)
-    if not prevToolGameData then
-        Debug.Assert(false, "비정상입니다.")
-		return nil
-    end
-
-    return prevToolGameData
-end
-
-function EquipSlots:EquipTool(tool, withCheck)
-    if not tool then
-        Debug.Assert(false, "비정상입니다.")
-		return nil, nil
-    end
-
-    local toolGameData = ToolUtility:GetToolGameData(tool)
-    if not toolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return nil, nil
-	end
-
-    if withCheck then
-        if not ToolUtility:CheckEquipableToolGameData(toolGameData) then
-            Debug.Assert(false, "비정상입니다.")
-            return nil, nil
-        end
-    end
-
-    local targetToolType = toolGameData.ToolType
-    local prevTool = nil
-    if  targetToolType == ToolType.Armor then
-        local targetArmorType = toolGameData.ArmorType
-        prevTool = self.ArmorSlotsRaw:Get(targetArmorType)
-        self.ArmorSlotsRaw:Set(targetArmorType, tool)
-    else
-        if self.WeaponSlot then
-            prevTool = self.WeaponSlot
-        end
-        self.WeaponSlot = tool
-    end
-
-    local prevToolGameData = nil
-    if prevTool then
-        prevToolGameData = ToolUtility:GetToolGameData(prevTool)
-        if not prevToolGameData then
-            Debug.Assert(false, "도구는 존재하지만 데이터가 존재하지 않습니다.")
-        end
-    end
-
-    return prevToolGameData, toolGameData
-end
 
 return EquipSlots
 ]]></ProtectedString>
@@ -52849,6 +51996,16 @@ function ToolUtility:CheckEquipableTool(tool)
     return true
 end
 
+function ToolUtility:GetEquipType(tool)
+    local toolGameData = self:GetToolGameData(tool)
+    if not toolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+    return toolGameData.EquipType
+end
+
 function ToolUtility:CheckWeaponToolGameData(toolGameData)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
@@ -52865,11 +52022,6 @@ end
 
 function ToolUtility:CheckWeaponTool(tool)
     local toolGameData = self:GetToolGameData(tool)
-    if not toolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
     if not self:CheckWeaponToolGameData(toolGameData) then
         Debug.Assert(false, "비정상입니다.")
 		return false
@@ -53557,6 +52709,24 @@ return CommonModuleFacade
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">1d5cbd170c6c3b6102f99fbb000208d7</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="RemoteEvent" referent="RBXBDEAC3CB55D04355BC1F74424D3E485C">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">EquipToolCTS</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">3f0e5a3d77528e3d02fa989000168614</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="RemoteEvent" referent="RBXA9C53E63D0694E9A8C3B7F17332B3725">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">UnequipToolCTS</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">3f0e5a3d77528e3d02fa989000168615</UniqueId>
 				</Properties>
 			</Item>
 		</Item>

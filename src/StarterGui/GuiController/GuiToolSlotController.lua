@@ -63,15 +63,24 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 	if newGuiToolSlotController.SlotType == SlotType.InventorySlot then
 		newGuiToolSlotController.GuiToolSlot.Activated:connect(function(inputObject)
 			local targetTool = newGuiToolSlotController.Tool
-			local targetSlotIndex = newGuiToolSlotController.SlotIndex
 			if not targetTool then
 				return
 			end
 			GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
 		end)
+	elseif newGuiToolSlotController.SlotType == SlotType.EquipSlot then
+		newGuiToolSlotController.GuiToolSlot.Activated:connect(function(inputObject)
+			local targetTool = newGuiToolSlotController.Tool
+			if not targetTool then
+				return
+			end
+			GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
+		end)
+
+	elseif newGuiToolSlotController.SlotType == SlotType.QuickSlot then
+
 	end
 
-	
 	newGuiToolSlotController:ClearToolData()
 	return newGuiToolSlotController
 end
@@ -117,9 +126,12 @@ function GuiToolSlotController:SetTool(tool)
 
 	self:SetToolImage(toolGameData.Image)
 	self.GuiToolName.Text = tool.Name
-	-- 여러개 소유할 수 있다면 변경될 수 있다.
-	self.GuiToolCount.Text = "1"
 	self.Tool = tool
+
+	-- 여러개 소유할 수 있다면 변경될 수 있다.
+	if not self.SlotType == SlotType.EquipSlot then
+		self.GuiToolCount.Text = "1"
+	end
 
 	return true
 end

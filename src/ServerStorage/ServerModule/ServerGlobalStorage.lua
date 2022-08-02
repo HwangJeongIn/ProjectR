@@ -13,7 +13,7 @@ local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local GameDataType = ServerEnum.GameDataType
 local StatusType = ServerEnum.StatusType
 local ToolType = ServerEnum.ToolType
-local ArmorType = ServerEnum.ArmorType
+local EquipType = ServerEnum.EquipType
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 
@@ -25,8 +25,93 @@ local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
 
 -- CTS
 local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
+local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
+local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 
 local ServerGlobalStorage = CommonGlobalStorage
+
+
+UnequipToolCTS.OnServerEvent:Connect(function(player, equipType)
+	if not equipType then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+	
+	local playerId = player.UserId
+	local prevTool = ServerGlobalStorage:UnequipTool(playerId, equipType)
+	
+	if not prevTool then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+	
+	prevTool.Parent = player.Backpack
+	UnequipToolSTC:FireClient(player, equipType)
+end)
+
+EquipToolCTS.OnServerEvent:Connect(function(player, equipType, tool)
+	if not equipType or not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+
+	local finalEquipType = ToolUtility:GetEquipType(tool)
+	if finalEquipType ~= equipType then
+		Debug.Assert(false, "클라이언트에서 보낸 정보와 실제 정보가 다릅니다.")
+		return
+	end
+
+	if player.Backpack ~= tool.Parent then
+		Debug.Assert(false, "해당 플레이어가 소유한 도구가 아닙니다.")
+		return
+	end
+
+	local character = player.Character
+	if not character then
+		Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 장착할 수 없습니다.")
+		return
+	end
+
+	local playerId = player.UserId
+	local prevTool = nil
+	local currentTool = nil
+
+	--[[
+		* 무기의 경우
+			Roblox의 EquipTool 호출 시 알아서 Character 하위로 옮겨진다.
+			Roblox의 EquipTool 호출 시 이전에 장착중인 Tool은 Player.Backpack으로 옮겨진다.
+
+		* 방어구의 경우(자체 구현)
+			무기에서 하는 것들을 행동을 수동으로 해줘야 한다.
+	--]]
+	if equipType == EquipType.Weapon then
+		local humanoid = character:FindFirstChild("Humanoid")
+		if not humanoid then
+			Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+			return
+		end
+
+		humanoid:EquipTool(tool)
+		prevTool, currentTool = ServerGlobalStorage:EquipTool(playerId, equipType, tool)
+		if not currentTool then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+	else
+		tool.Parent = character
+		prevTool, currentTool = ServerGlobalStorage:EquipTool(playerId, equipType, tool)
+		if not currentTool then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+
+		if prevTool then
+			prevTool.Parent = player.Backpack
+		end
+	end
+	
+	EquipToolSTC:FireClient(player, equipType, tool)
+end)
 
 SelectToolCTS.OnServerEvent:Connect(function(player, inventorySlotIndex, tool)
 	if not inventorySlotIndex or not tool then
@@ -57,32 +142,36 @@ end)
 
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
 function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
-	if not ToolUtility:CheckWeaponTool(tool) then
+	local equipType = ToolUtility:GetEquipType(tool)
+	if not equipType or equipType ~= EquipType.Weapon then
 		return false
 	end
 	
-	if not self:EquipTool(playerId, tool) then
+	local prevTool, currentTool = self:EquipTool(playerId, equipType, tool)
+	if not currentTool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
 	local player = game.Players:GetPlayerByUserId(playerId)
-	EquipToolSTC:FireClient(player, tool)
+	EquipToolSTC:FireClient(player, equipType, tool)
 	return true
 end
 
 function ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId, tool)
-	if not ToolUtility:CheckWeaponTool(tool) then
+	local equipType = ToolUtility:GetEquipType(tool)
+	if not equipType or equipType ~= EquipType.Weapon then
 		return false
 	end
 	
-	if not self:UnequipTool(playerId, tool) then
+	local prevTool = self:UnequipTool(playerId, equipType) 
+	if not prevTool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
 	local player = game.Players:GetPlayerByUserId(playerId)
-	UnequipToolSTC:FireClient(player, tool)
+	UnequipToolSTC:FireClient(player, equipType)
 	return true
 end
 

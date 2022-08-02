@@ -4,7 +4,7 @@ local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
 local ToolTypeSelector = CommonEnum.ToolType
-local ArmorTypeSelector = CommonEnum.ArmorType
+local EquipTypeSelector = CommonEnum.EquipType
 
 
 local Utility = require(CommonModule:WaitForChild("Utility"))
@@ -30,16 +30,16 @@ Sight : 시야
 --]]
 
 -- 무기 종류
---[[ 기본 무기 	--]] ToolGameData:InsertData(1, {ToolType = ToolTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10, Skill = ""})
---[[ 검 			--]] ToolGameData:InsertData(2, {ToolType = ToolTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, Skill = ""})
---[[ 도끼		--]] ToolGameData:InsertData(3, {ToolType = ToolTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10, Skill = ""})
+--[[ 기본 무기 	--]] ToolGameData:InsertData(1, {ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10, Skill = ""})
+--[[ 검 			--]] ToolGameData:InsertData(2, {ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, Skill = ""})
+--[[ 도끼		--]] ToolGameData:InsertData(3, {ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10, Skill = ""})
 
 
 -- 방어구 종류
---[[ 기본 머리	--]] ToolGameData:InsertData(101, {ToolType = ToolTypeSelector.Weapon, ArmorType = ArmorTypeSelector.Helmet, DEF = 15})
---[[ 기본 가슴	--]] ToolGameData:InsertData(102, {ToolType = ToolTypeSelector.Weapon, ArmorType = ArmorTypeSelector.Chestplate, DEF = 30, Move = -5})
---[[ 기본 다리	--]] ToolGameData:InsertData(103, {ToolType = ToolTypeSelector.Weapon, ArmorType = ArmorTypeSelector.Leggings, DEF = 20, Move = 5})
---[[ 기본 발		--]] ToolGameData:InsertData(104, {ToolType = ToolTypeSelector.Weapon, ArmorType = ArmorTypeSelector.Boots, DEF = 10, Move = 10})
+--[[ 기본 머리	--]] ToolGameData:InsertData(101, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Helmet, DEF = 15})
+--[[ 기본 가슴	--]] ToolGameData:InsertData(102, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 30, Move = -5})
+--[[ 기본 다리	--]] ToolGameData:InsertData(103, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 20, Move = 5})
+--[[ 기본 발		--]] ToolGameData:InsertData(104, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 10})
 
 
 

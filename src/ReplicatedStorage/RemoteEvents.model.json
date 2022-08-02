@@ -3,10 +3,6 @@
   "Children": [
 
     {
-      "Name": "SelectToolCTS",
-      "ClassName": "RemoteEvent"
-    },
-    {
       "Name": "EquipToolSTC",
       "ClassName": "RemoteEvent"
     },
@@ -36,6 +32,19 @@
     },
     {
       "Name": "UpdateKillCountSTC",
+      "ClassName": "RemoteEvent"
+    },
+
+    {
+      "Name": "EquipToolCTS",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "UnequipToolCTS",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "SelectToolCTS",
       "ClassName": "RemoteEvent"
     },
 

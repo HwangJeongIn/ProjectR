@@ -72,6 +72,16 @@ function ToolUtility:CheckEquipableTool(tool)
     return true
 end
 
+function ToolUtility:GetEquipType(tool)
+    local toolGameData = self:GetToolGameData(tool)
+    if not toolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+    return toolGameData.EquipType
+end
+
 function ToolUtility:CheckWeaponToolGameData(toolGameData)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
@@ -88,11 +98,6 @@ end
 
 function ToolUtility:CheckWeaponTool(tool)
     local toolGameData = self:GetToolGameData(tool)
-    if not toolGameData then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
     if not self:CheckWeaponToolGameData(toolGameData) then
         Debug.Assert(false, "비정상입니다.")
 		return false

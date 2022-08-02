@@ -85,7 +85,7 @@ while true  do
 		end
 	end
 
-	
+	wait(3)
 
 	-- 플레이어 저장
 	
@@ -176,7 +176,6 @@ while true  do
 		
 		-- 게임 종료 조건 확인
 		if #playersInGame == 1 then
-			
 			--local reward = (playersInGame[1].KilledCount + (finalPlayerCount / 2)) * DefaultReward
 			local reward = (finalPlayerCount / 2) * DefaultReward
 
@@ -188,18 +187,16 @@ while true  do
 			break
 			
 		elseif #playersInGame == 0 then
-			
 			winnerType = WinnerType.NoOne_AllPlayersWereDead
 			break
 			
 		elseif currentGameLength <= 0 then
-			
 			winnerType = WinnerType.NoOne_TimeIsUp
 			break
 		end
 	end
 
-	wait(5)
+	wait(100)
 	if winnerType == WinnerType.Player then
 		NotifyWinnerSTC:FireAllClients(winnerType, winnerName, winnerReward)
 	else
@@ -207,7 +204,7 @@ while true  do
 	end
 	
 	if IsTestMode then
-		wait(10)
+		wait(3)
 	end
 	
 	-- 맵 정리

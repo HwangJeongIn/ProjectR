@@ -33,12 +33,13 @@ local CommonEnum = {
 		Consumable = 4
 	},
 
-	ArmorType = {
-		Helmet = 1,
-		Chestplate = 2,
-		Leggings = 3,
-		Boots = 4,
-		Count = 5
+	EquipType = {
+		Weapon = 1,
+		Helmet = 2,
+		Chestplate = 3,
+		Leggings = 4,
+		Boots = 5,
+		Count = 6
 	},
 
 	SlotType = {
@@ -62,6 +63,15 @@ CommonEnum.ToolType.Converter = {
 	[CommonEnum.ToolType.Armor] = "Armor",
 	[CommonEnum.ToolType.Consumable] = "Consumable",
 }
+
+CommonEnum.EquipType.Converter = {
+	[CommonEnum.EquipType.Weapon] = "Weapon",
+	[CommonEnum.EquipType.Helmet] = "Helmet",
+	[CommonEnum.EquipType.Chestplate] = "Chestplate",
+	[CommonEnum.EquipType.Leggings] = "Leggings",
+	[CommonEnum.EquipType.Boots] = "Boots"
+}
+
 
 CommonEnum.__index = Utility.Inheritable__index
 CommonEnum.__newindex = Utility.Inheritable__newindex

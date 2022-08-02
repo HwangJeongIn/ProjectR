@@ -169,11 +169,32 @@ function GuiController:SetWinnerMessage(winnerType, winnerName, winnerReward)
 end
 
 function GuiController:SetInventoryToolSlot(slotIndex, tool)
+	if not slotIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
 	if not self.GuiInventoryController:SetToolSlot(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
+		return false
 	end
+
+	return true
 end
 
+function GuiController:SetEquipToolSlot(equipType, tool)
+	if not equipType then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self.GuiEquipSlotsController:SetToolSlot(equipType, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
 GuiController:Initialize()
 return GuiController
 

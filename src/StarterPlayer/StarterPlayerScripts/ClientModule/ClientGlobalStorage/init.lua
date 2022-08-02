@@ -10,7 +10,7 @@ local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
 local StatusType = CommonEnum.StatusType
 local ToolType = CommonEnum.ToolType
-local ArmorType = CommonEnum.ArmorType
+local EquipType = CommonEnum.EquipType
 
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
@@ -19,13 +19,13 @@ local CommonGlobalStorage = require(CommonModule:WaitForChild("CommonGlobalStora
 local LocalPlayer = game.Players.LocalPlayer
 local PlayerId = LocalPlayer.UserId
 
-
-
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 
 -- CTS
 local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
+local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
+local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 
 -- STC
 local ChangeGameStateSTC = RemoteEvents:WaitForChild("ChangeGameStateSTC")
@@ -40,20 +40,33 @@ local ClientGlobalStorage = CommonGlobalStorage
 -- 초기화 코드
 function ClientGlobalStorage:RegisterOnClientEvent(guiController)
 	-- STC
-	EquipToolSTC.OnClientEvent:Connect(function(tool)
+	EquipToolSTC.OnClientEvent:Connect(function(equipType, tool)
+		Debug.Assert(equipType, "장착 슬롯 비정상")
 		Debug.Assert(tool, "도구 비정상")
 		
-		if not ClientGlobalStorage:EquipTool(PlayerId,tool) then
+		local prevTool, currentTool = ClientGlobalStorage:EquipTool(PlayerId, equipType, tool)
+		if not currentTool then
 			Debug.Assert(false, "장착하지 못했습니다.")
+			return
+		end
+
+		if not guiController:SetEquipToolSlot(equipType, tool) then
+			Debug.Assert(false, "비정상입니다.")
 			return
 		end
 	end)
 
-	UnequipToolSTC.OnClientEvent:Connect(function(tool)
-		Debug.Assert(tool, "도구 비정상")
+	UnequipToolSTC.OnClientEvent:Connect(function(equipType)
+		Debug.Assert(equipType, "장착 슬롯 비정상")
 
-		if not ClientGlobalStorage:UnequipTool(PlayerId, tool) then
+		local prevTool = ClientGlobalStorage:UnequipTool(PlayerId, equipType)
+		if not prevTool then
 			Debug.Assert(false, "장착 해제하지 못했습니다.")
+			return
+		end
+
+		if not guiController:SetEquipToolSlot(equipType, nil) then
+			Debug.Assert(false, "비정상입니다.")
 			return
 		end
 	end)
@@ -71,7 +84,10 @@ function ClientGlobalStorage:RegisterOnClientEvent(guiController)
 			return
 		end
 
-		guiController:SetInventoryToolSlot(slotIndex, tool)
+		if not guiController:SetInventoryToolSlot(slotIndex, tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 	end)
 
 	RemoveToolSTC.OnClientEvent:Connect(function(slotIndex, tool)
@@ -87,7 +103,10 @@ function ClientGlobalStorage:RegisterOnClientEvent(guiController)
 			return
 		end
 
-		guiController:SetInventoryToolSlot(slotIndex, nil)
+		if not guiController:SetInventoryToolSlot(slotIndex, nil) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 	end)
 
 	NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerReward)
@@ -118,15 +137,30 @@ function ClientGlobalStorage:SendSelectToolCTS(slotIndex, tool)
 		return false
 	end
 
-	--[[
-	local character = LocalPlayer.Character
-	local humanoid = character:FindFirstChild("Humanoid")
-	humanoid:EquipTool(tool)
-	--]]
-
 	SelectToolCTS:FireServer(slotIndex, tool)
 	return true
 end
+
+function ClientGlobalStorage:SendEquipToolCTS(equipType, tool)
+	if not equipType or not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	EquipToolCTS:FireServer(equipType, tool)
+	return true
+end
+
+function ClientGlobalStorage:SendUnequipToolCTS(equipType)
+	if not equipType then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	UnequipToolCTS:FireServer(equipType)
+	return true
+end
+
 
 function ClientGlobalStorage:GetData()
 	return self.PlayerTable[PlayerId]

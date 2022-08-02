@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
-local EquipSlotCount = CommonEnum.ArmorType.Count - 1
+local EquipSlotCount = CommonEnum.EquipType.Count - 1
 
 
 local CommonConstant = {

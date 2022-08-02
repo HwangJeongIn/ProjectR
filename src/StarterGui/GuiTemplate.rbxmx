@@ -2,12 +2,12 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="ScreenGui" referent="RBX5DB0A7DAE00E4C778A37026AD005BFF5">
+	<Item class="ScreenGui" referent="RBX0CDA1D5DBAA34A2B8180215F1F46932C">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<bool name="AutoLocalize">true</bool>
 			<int name="DisplayOrder">0</int>
-			<bool name="Enabled">true</bool>
+			<bool name="Enabled">false</bool>
 			<bool name="IgnoreGuiInset">false</bool>
 			<string name="Name">GuiTemplate</string>
 			<bool name="ResetOnSpawn">true</bool>
@@ -21,7 +21,7 @@
 			<BinaryString name="Tags"></BinaryString>
 			<token name="ZIndexBehavior">1</token>
 		</Properties>
-		<Item class="ImageButton" referent="760">
+		<Item class="ImageButton" referent="RBXFDFCAD2441B144C99AB25785FB568B6B">
 			<Properties>
 				<bool name="Active">true</bool>
 				<Vector2 name="AnchorPoint">
@@ -120,7 +120,7 @@
 				<bool name="Visible">true</bool>
 				<int name="ZIndex">1</int>
 			</Properties>
-			<Item class="ImageLabel" referent="761">
+			<Item class="ImageLabel" referent="RBXC22787D7E5124D8889D149C46235D84A">
 				<Properties>
 					<bool name="Active">false</bool>
 					<Vector2 name="AnchorPoint">
@@ -213,7 +213,7 @@
 					<bool name="Visible">true</bool>
 					<int name="ZIndex">1</int>
 				</Properties>
-				<Item class="TextLabel" referent="762">
+				<Item class="TextLabel" referent="RBXF5FA4454999343AEBD4E83B3DE48ADD9">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -302,7 +302,7 @@
 						<int name="ZIndex">1</int>
 					</Properties>
 				</Item>
-				<Item class="TextLabel" referent="763">
+				<Item class="TextLabel" referent="RBX3A3DE65F2C5D4E9FB1F882978DF8AEEB">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">

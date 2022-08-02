@@ -11,7 +11,7 @@ local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
 local StatusType = CommonEnum.StatusType
 local ToolType = CommonEnum.ToolType
-local ArmorType = CommonEnum.ArmorType
+local EquipType = CommonEnum.EquipType
 
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
@@ -51,10 +51,10 @@ function CommonGlobalStorage:CreateEmptyData()
 		--[[
 		[StatusType.ArmorSlot] = {
 			-- 그냥 명시적으로 표현
-			[ArmorType.Helmet] = {Value = nil, ToolGameData = nil},
-			[ArmorType.Chestplate] = {Value = nil, ToolGameData = nil},
-			[ArmorType.Leggings] = {Value = nil, ToolGameData = nil},
-			[ArmorType.Boots] = {Value = nil, ToolGameData = nil}
+			[EquipType.Helmet] = {Value = nil, ToolGameData = nil},
+			[EquipType.Chestplate] = {Value = nil, ToolGameData = nil},
+			[EquipType.Leggings] = {Value = nil, ToolGameData = nil},
+			[EquipType.Boots] = {Value = nil, ToolGameData = nil}
 		},
 
 		-- 그냥 명시적으로 표현
@@ -168,17 +168,32 @@ function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
 	return true
 end
 
-function CommonGlobalStorage:EquipTool(playerId, tool)
+function CommonGlobalStorage:EquipTool(playerId, equipType, tool)
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
-		return false
+		return nil, nil
 	end
 
 	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
-	local prevToolGameData, currentToolGameData = equipSlots:EquipTool(tool, true)
+	local prevTool, currentTool = equipSlots:EquipTool(equipType, tool)
+	if not currentTool then
+		Debug.Assert(false, "비정상입니다.")
+		return nil, nil
+	end
+
+	local currentToolGameData = ToolUtility:GetToolGameData(currentTool)
 	if not currentToolGameData then
 		Debug.Assert(false, "비정상입니다.")
-		return false
+		return nil, nil
+	end
+
+	local prevToolGameData = nil
+	if prevTool then
+		prevToolGameData = ToolUtility:GetToolGameData(currentTool)
+		if not prevToolGameData then
+			Debug.Assert(false, "비정상입니다.")
+			return nil, nil
+		end
 	end
 
 	if prevToolGameData then
@@ -186,24 +201,53 @@ function CommonGlobalStorage:EquipTool(playerId, tool)
 	end
 	
 	self:UpdateAddedToolGameData(playerId, currentToolGameData)
-	return true
+	return prevTool, currentTool
 end
 
-function CommonGlobalStorage:UnequipTool(playerId, tool)
+function CommonGlobalStorage:UnequipTool(playerId, equipType)
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
 	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
-	local prevToolGameData = equipSlots:UnequipTool(tool)
-	if not prevToolGameData then
+	local prevTool = equipSlots:UnequipTool(equipType)
+	if not prevTool then
 		Debug.Assert(false, "비정상입니다.")
-		return false
+		return nil
 	end
 
+	local prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+	if not prevToolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
 	self:UpdateRemovedToolGameData(playerId, prevToolGameData)
-	return true
+
+	return prevTool
+end
+
+function CommonGlobalStorage:UnequipToolByTool(playerId, tool)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
+	local prevTool = equipSlots:UnequipToolByTool(tool)
+	if not prevTool then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+	if not prevToolGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+	self:UpdateRemovedToolGameData(playerId, prevToolGameData)
+
+	return prevTool
 end
 
 --[[
@@ -224,13 +268,13 @@ function CommonGlobalStorage:CheckAndGetArmorData(armor)
 		return nil
 	end
 
-	local armorType = toolGameData.ArmorType
-	if not ArmorType[armorType] then
-		Debug.Assert(false, "비정상입니다. [ArmorType] => " .. tostring(armorType))
+	local EquipType = toolGameData.EquipType
+	if not EquipType[EquipType] then
+		Debug.Assert(false, "비정상입니다. [EquipType] => " .. tostring(EquipType))
 		return nil
 	end
 	
-	return toolGameData, armorType
+	return toolGameData, EquipType
 end
 
 function CommonGlobalStorage:EquipArmor(playerId, armor)
@@ -240,7 +284,7 @@ function CommonGlobalStorage:EquipArmor(playerId, armor)
 		return false
 	end
 	
-	local toolGameData, armorType = self:CheckAndGetArmorData(armor)
+	local toolGameData, EquipType = self:CheckAndGetArmorData(armor)
 	if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -249,8 +293,8 @@ function CommonGlobalStorage:EquipArmor(playerId, armor)
 	self:UpdateRemovedToolGameData(self.PlayerTable[playerId][StatusType.WeaponSlot].ToolGameData)
 	self:UpdateAddedToolGameData(toolGameData)
 	
-	self.PlayerTable[playerId][StatusType.ArmorSlot][armorType].Value = armor
-	self.PlayerTable[playerId][StatusType.ArmorSlot][armorType].ToolGameData = toolGameData
+	self.PlayerTable[playerId][StatusType.ArmorSlot][EquipType].Value = armor
+	self.PlayerTable[playerId][StatusType.ArmorSlot][EquipType].ToolGameData = toolGameData
 	
 	return true
 end
