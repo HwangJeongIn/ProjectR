@@ -131,7 +131,7 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
                 end
             end
     
-            if not ServerGlobalStorage:AttachArmorFromPlayer(player, currentTool) then
+            if not ServerGlobalStorage:AttachArmorToPlayer(player, currentTool) then
                 Debug.Assert(false, "비정상입니다.")
                 return
             end

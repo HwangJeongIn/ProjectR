@@ -54,8 +54,8 @@ function ToolBase:InitializeAll(gameDataType, tool)
 	
 	--tool.Equipped:Connect(function() OnEquipped(self) end)
 	--tool.Unequipped:Connect(function() OnUnequipped(self) end)
-	tool.Equipped:Connect(function() Debug.Print("OnEquipped") end)
-	tool.Unequipped:Connect(function() Debug.Print("OnUnequipped") end)
+	tool.Equipped:Connect(function() Debug.Print("OnEquipped : " .. tostring(tool)) end)
+	tool.Unequipped:Connect(function() Debug.Print("OnUnequipped : ".. tostring(tool)) end)
 
 end
 

@@ -91,7 +91,11 @@ function OnCharacterAdded(player, character)
 	end
 	ServerGlobalStorage:AddGameData(character, characterGameData)
 	--]]
-	
+
+	local armorsFolder = Instance.new("Folder")
+	armorsFolder.Name = "Armors"
+	armorsFolder.Parent = character
+
 	if not ServerGlobalStorage:RegisterPlayerEvent(player) then
 		Debug.Assert(false, "비정상입니다.")
 	end
