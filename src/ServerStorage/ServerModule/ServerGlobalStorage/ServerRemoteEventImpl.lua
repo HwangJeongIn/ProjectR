@@ -31,7 +31,7 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
     
         local character = player.Character
         if not character then
-            Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 장착할 수 없습니다.")
+            Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 장착 해제할 수 없습니다.")
             return
         end
         
@@ -117,7 +117,6 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
             
             humanoid:EquipTool(tool)
         else
-            tool.Parent = character
             prevTool, currentTool = ServerGlobalStorage:EquipTool(playerId, equipType, tool)
             if not currentTool then
                 Debug.Assert(false, "비정상입니다.")

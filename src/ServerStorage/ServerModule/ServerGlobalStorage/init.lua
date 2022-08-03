@@ -63,37 +63,31 @@ function ServerGlobalStorage:GetBonesByEquipType(character, equipType)
 	return targetBones
 end
 
-function ServerGlobalStorage:FindAllAttachments(armor, handle)
-	if not armor then
+function ServerGlobalStorage:FindAllAttachments(object, output)
+	if not object then
 		Debug.Assert(false, "비정상입니다.")
-		return nil
+		return false
 	end
 
-	--local handle = armor:FindFirstChild("Handle")
-	if not handle then
+	if not object:IsA("Instance") then
 		Debug.Assert(false, "비정상입니다.")
-		return nil
+		return false
 	end
 
-	local attachments = {}
-	local attachmentCount = 0
-
-	local armorChildren = handle:GetChildren()
-	for _, armorChild in armorChildren do
-		if not armorChild:IsA("Attachment") then
-			continue
+	local children = object:GetChildren()
+	for _, child in children do
+		if child:IsA("Instance") then
+			if not self:FindAllAttachments(child, output) then
+				return false
+			end
 		end
-		
-		table.insert(attachments, armorChild)
-		attachmentCount += 1
+
+		if child:IsA("Attachment") then
+			table.insert(output, child)
+		end
 	end
 
-	if attachmentCount == 0 then
-		Debug.Assert(false, "방어구에 부착 위치가 존재하지 않습니다.")
-		return nil
-	end
-
-	return attachments
+	return true
 end
 
 function ServerGlobalStorage:DetachArmorFromPlayer(player, armor)
@@ -122,14 +116,19 @@ function ServerGlobalStorage:DetachArmorFromPlayer(player, armor)
 	end
 	
 	armor.Parent = player.Backpack
-	local handle = armor:FindFirstChild("_Handle")
+	local handle = armor:FindFirstChild("Handle")
 	Debug.Assert(handle, "핸들이 없습니다.")
-	handle.Name = "Handle"
-	--handle.CanCollide = true
-	--handle.CanTouch = true
 
-	local attachments = self:FindAllAttachments(armor, handle)
-	if not attachments then
+	handle.CanCollide = true
+	handle.CanTouch = true
+
+	local attachments = {}
+	if not self:FindAllAttachments(armor, attachments) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if #attachments == 0 then
 		Debug.Assert(false, "방어구에 부착 위치가 존재하지 않습니다.")
 		return false
 	end
@@ -177,9 +176,9 @@ function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
 	
 	local handle = armor:FindFirstChild("Handle")
 	Debug.Assert(handle, "핸들이 없습니다.")
-	handle.Name = "_Handle"
-	--handle.CanCollide = false
-	--handle.CanTouch = false
+
+	handle.CanCollide = false
+	handle.CanTouch = false
 
 	armor.Parent = characterArmorsFolder
 
@@ -194,8 +193,13 @@ function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
 		--]]
 	end
 
-	local attachments = self:FindAllAttachments(armor, handle)
-	if not attachments then
+	local attachments = {}
+	if not self:FindAllAttachments(armor, attachments) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if #attachments == 0 then
 		Debug.Assert(false, "방어구에 부착 위치가 존재하지 않습니다.")
 		return false
 	end
@@ -204,8 +208,9 @@ function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
 		for _, attachment in attachments do
 			local boneAttachment = targetBone:FindFirstChild(attachment.Name)
 			if not boneAttachment then
-				Debug.Assert(false, "해당 본에 다음의 부착 위치가 존재하지 않습니다. => " .. targetBones.Name " : " .. attachment.Name)
-				return false
+				continue
+				--Debug.Assert(false, "해당 본에 다음의 부착 위치가 존재하지 않습니다. => " .. targetBones.Name " : " .. attachment.Name)
+				--return false
 			end
 			local tempWeld = Instance.new("RigidConstraint")
 			tempWeld.Name = "TempRigidConstraint"

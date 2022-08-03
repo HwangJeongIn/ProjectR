@@ -255,11 +255,25 @@ function UnequipToolAction(tooltip, inputObject)
 		return false
 	end
 	
-	if tool.Parent ~= LocalPlayer.Character then
-		Debug.Assert(false, "해당 툴이 캐릭터 하위에 존재하지 않습니다.")
+	local character = LocalPlayer.Character
+	if not character then
+		Debug.Assert(false, "캐릭터가 존재하지 않습니다.")
 		return false
 	end
-	
+
+	if equipType == EquipType.Weapon then
+		if tool.Parent ~= character then
+			Debug.Assert(false, "해당 무기가 캐릭터 하위에 존재하지 않습니다.")
+			return false
+		end
+	else
+		local characterArmorsFolder = character:FindFirstChild("Armors")
+		if tool.Parent ~= characterArmorsFolder then
+			Debug.Assert(false, "해당 방어구가 캐릭터 방어구 하위에 존재하지 않습니다.")
+			return false
+		end
+	end
+
 	if not ClientGlobalStorage:SendUnequipToolCTS(equipType) then
 		Debug.Assert(false, "비정상입니다.")
 		return false

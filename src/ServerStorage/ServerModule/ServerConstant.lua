@@ -19,7 +19,7 @@ local ServerConstant = {
 	EquipTypeToBoneMappingTable = {
 		[EquipType.Helmet] = {[1] = "Head"},
 		[EquipType.Chestplate] = {[1] = "UpperTorso"},
-		[EquipType.Leggings] = {[1] = "LeftLowerLeg", [1] = "RightLowerLeg"},
+		[EquipType.Leggings] = {[1] = "LeftLowerLeg", [2] = "RightLowerLeg"},
 		[EquipType.Boots] = {[1] = "LeftFoot", [2] = "RightFoot"},
 	},
 }
