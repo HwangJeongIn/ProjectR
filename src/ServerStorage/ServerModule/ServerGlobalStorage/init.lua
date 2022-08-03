@@ -63,7 +63,66 @@ function ServerGlobalStorage:GetBonesByEquipType(character, equipType)
 	return targetBones
 end
 
-function ServerGlobalStorage:FindAllAttachments(object, output)
+function ServerGlobalStorage:SetArmorHandleEnabled(armor, enabled)
+	if not armor then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local handle = armor:FindFirstChild("Handle")
+	if not handle then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local toolBinder = handle:FindFirstChild("ToolBinder")
+	if not toolBinder then
+		Debug.Assert(false, "ToolBinder가 없습니다.")
+		return false
+	end
+	
+	local weldContraints = toolBinder:GetChildren()
+	for _, weldConstraint in weldContraints do
+		weldConstraint.Enabled = enabled
+	end
+
+	handle.CanCollide = enabled
+	handle.CanTouch = enabled
+
+	return true
+end
+
+function ServerGlobalStorage:FindArmorAllAttachments(armor, output)
+	if not armor then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local mesh = armor:FindFirstChild("Mesh")
+	local parts = mesh:FindFirstChild("Parts")
+
+	local allParts = parts:GetChildren()
+
+	for _, part in allParts do
+		local mainPart = part:FindFirstChild("MainPart")
+		if not mainPart then
+			Debug.Assert(false, "MainPart가 없습니다.")
+			return false
+		end
+
+		local attachment = mainPart:FindFirstChildOfClass("Attachment")
+		if not attachment then
+			Debug.Assert(false, "해당 Part의 장착 위치를 결정하기 위해 Attachment를 추가하세요.")
+			return false
+		end
+		table.insert(output, attachment)
+	end
+
+	return true
+end
+
+--[[
+function ServerGlobalStorage:FindArmorAllAttachments(object, output)
 	if not object then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -77,7 +136,7 @@ function ServerGlobalStorage:FindAllAttachments(object, output)
 	local children = object:GetChildren()
 	for _, child in children do
 		if child:IsA("Instance") then
-			if not self:FindAllAttachments(child, output) then
+			if not self:FindArmorAllAttachments(child, output) then
 				return false
 			end
 		end
@@ -89,6 +148,7 @@ function ServerGlobalStorage:FindAllAttachments(object, output)
 
 	return true
 end
+--]]
 
 function ServerGlobalStorage:DetachArmorFromPlayer(player, armor)
 	if not player or not armor then
@@ -116,14 +176,14 @@ function ServerGlobalStorage:DetachArmorFromPlayer(player, armor)
 	end
 	
 	armor.Parent = player.Backpack
-	local handle = armor:FindFirstChild("Handle")
-	Debug.Assert(handle, "핸들이 없습니다.")
 
-	handle.CanCollide = true
-	handle.CanTouch = true
+	if not self:SetArmorHandleEnabled(armor, true) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
 
 	local attachments = {}
-	if not self:FindAllAttachments(armor, attachments) then
+	if not self:FindArmorAllAttachments(armor, attachments) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -174,11 +234,10 @@ function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
 		return false
 	end
 	
-	local handle = armor:FindFirstChild("Handle")
-	Debug.Assert(handle, "핸들이 없습니다.")
-
-	handle.CanCollide = false
-	handle.CanTouch = false
+	if not self:SetArmorHandleEnabled(armor, false) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
 
 	armor.Parent = characterArmorsFolder
 
@@ -194,7 +253,7 @@ function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
 	end
 
 	local attachments = {}
-	if not self:FindAllAttachments(armor, attachments) then
+	if not self:FindArmorAllAttachments(armor, attachments) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
