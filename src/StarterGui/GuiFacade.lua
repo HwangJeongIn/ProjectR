@@ -44,6 +44,14 @@ function GuiFacade:Initialize()
         GuiToolSlot = GuiToolSlotTemplate
     }
     
+
+    -- Tooltip
+    local GuiTooltip = PlayerGui:WaitForChild("GuiTooltip")
+    local GuiTooltipWindow = GuiTooltip:WaitForChild("GuiTooltipWindow")
+
+    self.GuiTooltip = GuiTooltip
+    self.GuiTooltipWindow = GuiTooltipWindow
+
 end
 
 GuiFacade:Initialize()

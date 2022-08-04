@@ -18,7 +18,7 @@ local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 local GuiInventory = GuiFacade.GuiInventory
 
-local GuiToolSlotTemplate = GuiInventory.GuiTemplate.GuiToolSlot
+local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiToolSlot
 local GuiToolSlotController = require(script.Parent:WaitForChild("GuiToolSlotController"))
 local GuiTooltipController = require(script.Parent:WaitForChild("GuiTooltipController"))
 

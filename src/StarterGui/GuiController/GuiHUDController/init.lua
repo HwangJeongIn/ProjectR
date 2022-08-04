@@ -6,18 +6,11 @@ local MaxQuickSlotCount = CommonConstant.MaxQuickSlotCount
 
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
-local GuiHUD = PlayerGui:WaitForChild("GuiHUD")
+local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
-local GuiPlayerMain = GuiHUD:WaitForChild("GuiPlayerMain")
-local GuiMinimap = GuiHUD:WaitForChild("GuiMinimap")
-
-local GuiBarsWindow = GuiPlayerMain:WaitForChild("GuiBarsWindow")
-local GuiSlotsWindow = GuiPlayerMain:WaitForChild("GuiSlotsWindow")
-
-local GuiHpBar = GuiBarsWindow:WaitForChild("GuiHpBar")
-
-local GuiQuickSlots = GuiSlotsWindow:WaitForChild("GuiQuickSlots")
-local GuiSkillSlots = GuiSlotsWindow:WaitForChild("GuiSkillSlots")
+local GuiHUD = GuiFacade.GuiHUD
+local GuiPlayerMain = GuiFacade.GuiPlayerMain
+local GuiMinimap = GuiFacade.GuiPlayerMain
 
 local GuiHUDController = {}
 
