@@ -6,8 +6,6 @@ local EquipSlotCount = CommonEnum.EquipType.Count - 1
 
 
 local CommonConstant = {
-
-
 	-- Inventory
 	MaxInventorySlotCount = 30,
 	GuiInventorySlotCountPerLine = 5,
@@ -21,6 +19,7 @@ local CommonConstant = {
 
 	-- QuickSlots
 	MaxQuickSlotCount = 5,
+	GuiQuickSlotOffsetRatio = 0.025,
 
 	-- SkillSlots
 	MaxSkillCount = 3,

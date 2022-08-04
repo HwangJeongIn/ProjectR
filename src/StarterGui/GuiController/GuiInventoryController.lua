@@ -19,17 +19,13 @@ local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 local GuiInventory = GuiFacade.GuiInventory
 
 local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiToolSlot
-local GuiToolSlotController = require(script.Parent:WaitForChild("GuiToolSlotController"))
-local GuiTooltipController = require(script.Parent:WaitForChild("GuiTooltipController"))
+local GuiToolSlotController = GuiFacade.GuiTemplateController.GuiToolSlotController
 
 local GuiInventoryRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
 GuiInventoryRaw:Initialize(MaxInventorySlotCount)
 local GuiInventoryController = {
 	GuiInventoryRaw = GuiInventoryRaw
 }
-
-GuiToolSlotController.GuiInventoryController = GuiInventoryController
-GuiTooltipController.GuiInventoryController = GuiInventoryController
 
 function GuiInventoryController:Initialize()
 	local GuiInventorySize = GuiInventory.AbsoluteWindowSize
@@ -53,7 +49,7 @@ function GuiInventoryController:Initialize()
 	
 	local slotSize = UDim2.new(slotRatioX, 0, slotRatioY, 0)
 	local slotAnchorPoint = Vector2.new(0.5, 0.5)
-	local FirstslotPosition = UDim2.new(GuiInventoryOffsetRatioX + halfSlotRatioX, 0, GuiInventoryOffsetRatioY + halfSlotRatioY, 0)
+	local firstSlotPosition = UDim2.new(GuiInventoryOffsetRatioX + halfSlotRatioX, 0, GuiInventoryOffsetRatioY + halfSlotRatioY, 0)
 
 	
 	GuiInventory.CanvasSize = UDim2.new(0, 0, finalGuiInventoryHeight / GuiInventorySize.Y, 0)
@@ -66,7 +62,7 @@ function GuiInventoryController:Initialize()
 			
 			newGuiToolSlot.Size = slotSize
 			newGuiToolSlot.AnchorPoint = slotAnchorPoint
-			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiInventoryOffsetRatioX + slotRatioX) * x, 0, (GuiInventoryOffsetRatioY + slotRatioY) * y, 0)
+			newGuiToolSlot.Position = firstSlotPosition + UDim2.new((GuiInventoryOffsetRatioX + slotRatioX) * x, 0, (GuiInventoryOffsetRatioY + slotRatioY) * y, 0)
 			newGuiToolSlot.Parent = GuiInventory
 			newGuiToolSlot.Name = tostring(slotIndex)
 

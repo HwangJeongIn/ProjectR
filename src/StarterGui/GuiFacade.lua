@@ -4,7 +4,11 @@ function GuiFacade:Initialize()
     local player = game.Players.LocalPlayer
     local PlayerGui = player:WaitForChild("PlayerGui")
     
-    -- HUD
+    -- GUiTemplate
+    local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
+    local GuiToolSlotTemplate = GuiTemplate:WaitForChild("GuiToolSlot")
+
+    -- GuiHUD
     local GuiHUD = PlayerGui:WaitForChild("GuiHUD")
     
     local GuiPlayerMain = GuiHUD:WaitForChild("GuiPlayerMain")
@@ -27,14 +31,11 @@ function GuiFacade:Initialize()
     self.GuiQuickSlots = GuiQuickSlots
     self.GuiSkillSlots = GuiSkillSlots
 
-    -- PlayerStatus
+    -- GuiPlayerStatus
     local GuiPlayerStatus = PlayerGui:WaitForChild("GuiPlayerStatus")
     local GuiPlayerStatusWindow = GuiPlayerStatus:WaitForChild("GuiPlayerStatusWindow")
     local GuiEquipSlots = GuiPlayerStatusWindow:WaitForChild("GuiEquipSlots")
     local GuiInventory = GuiPlayerStatusWindow:WaitForChild("GuiInventory")
-    
-    local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
-    local GuiToolSlotTemplate = GuiTemplate:WaitForChild("GuiToolSlot")
 
     self.GuiPlayerStatus = GuiPlayerStatus
     self.GuiPlayerStatusWindow = GuiPlayerStatusWindow
@@ -44,13 +45,24 @@ function GuiFacade:Initialize()
         GuiToolSlot = GuiToolSlotTemplate
     }
     
-
-    -- Tooltip
+    -- GuiTooltip
     local GuiTooltip = PlayerGui:WaitForChild("GuiTooltip")
     local GuiTooltipWindow = GuiTooltip:WaitForChild("GuiTooltipWindow")
 
     self.GuiTooltip = GuiTooltip
     self.GuiTooltipWindow = GuiTooltipWindow
+
+    -- GuiTemplateControllers
+    local GuiTemplateControllers = PlayerGui:WaitForChild("GuiTemplateControllers")
+    local GuiToolSlotController = require(GuiTemplateControllers:WaitForChild("GuiToolSlotController"))
+    self.GuiTemplateController = {
+        GuiToolSlotController = GuiToolSlotController
+    }
+
+    -- GuiPopupWindowControllers
+    local GuiPopupWindowControllers = PlayerGui:WaitForChild("GuiPopupWindowControllers")
+    local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("GuiTooltipController"))
+    self.GuiTooltipController = GuiTooltipController
 
 end
 

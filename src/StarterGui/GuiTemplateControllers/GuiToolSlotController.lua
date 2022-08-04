@@ -7,12 +7,14 @@ local ToolUtility = CommonMoudleFacade.ToolUtility
 local CommonEnum = CommonMoudleFacade.CommonEnum
 local SlotType = CommonEnum.SlotType
 
-local GuiTooltipController = require(script.Parent:WaitForChild("GuiTooltipController"))
-
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
-local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
-local GuiToolSlot = GuiFacade.GuiTemplate.GuiToolSlot
+local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
+local GuiToolSlot = GuiTemplate:WaitForChild("GuiToolSlot")
+
+local GuiPopupWindowControllers = PlayerGui:WaitForChild("GuiPopupWindowControllers")
+local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("GuiTooltipController"))
+
 
 local GuiToolSlotController = {}
 

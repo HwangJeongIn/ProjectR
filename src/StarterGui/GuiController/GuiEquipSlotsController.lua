@@ -21,7 +21,7 @@ local GuiEquipSlots = GuiFacade.GuiEquipSlots
 
 local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiToolSlot
 
-local GuiToolSlotController = require(script.Parent:WaitForChild("GuiToolSlotController"))
+local GuiToolSlotController = GuiFacade.GuiTemplateController.GuiToolSlotController
 
 local GuiEquipSlotsRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
 GuiEquipSlotsRaw:Initialize(MaxEquipSlotCount)
@@ -92,7 +92,7 @@ function GuiEquipSlotsController:Initialize()
 	
 	local slotSize = UDim2.new(slotRatioX, 0, slotRatioY, 0)
 	local slotAnchorPoint = Vector2.new(0.5, 0.5)
-	local FirstslotPosition = UDim2.new(GuiEquipSlotOffsetRatioX + halfSlotRatioX, 0, GuiEquipSlotOffsetRatioY + halfSlotRatioY, 0)
+	local firstSlotPosition = UDim2.new(GuiEquipSlotOffsetRatioX + halfSlotRatioX, 0, GuiEquipSlotOffsetRatioY + halfSlotRatioY, 0)
 
 	
 	for y = 0, (GuiEquipSlotCountPerColumn -1) do
@@ -108,7 +108,7 @@ function GuiEquipSlotsController:Initialize()
 
 			newGuiToolSlot.Size = slotSize
 			newGuiToolSlot.AnchorPoint = slotAnchorPoint
-			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiEquipSlotOffsetRatioX + slotRatioX) * x, 0, (GuiEquipSlotOffsetRatioY + slotRatioY) * y, 0)
+			newGuiToolSlot.Position = firstSlotPosition + UDim2.new((GuiEquipSlotOffsetRatioX + slotRatioX) * x, 0, (GuiEquipSlotOffsetRatioY + slotRatioY) * y, 0)
 			newGuiToolSlot.Parent = GuiEquipSlots
 			newGuiToolSlot.Name = tostring(equipType)
 

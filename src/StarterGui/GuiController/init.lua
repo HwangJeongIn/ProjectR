@@ -1,5 +1,3 @@
-local PlayerGui = script.Parent
-
 local StarterPlayer = game:GetService("StarterPlayer")
 local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
 local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
@@ -19,6 +17,12 @@ local RemoteValues = ReplicatedStorage:WaitForChild("RemoteValues")
 local PlayersLeftCount = RemoteValues:WaitForChild("PlayersLeftCount")
 local CurrentGameLength = RemoteValues:WaitForChild("CurrentGameLength")
 
+
+local player = game.Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
+
+
 local GuiController = {}
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
@@ -29,11 +33,11 @@ function GuiController:BindGuiKeys()
 	local TweenService = game:GetService("TweenService")
 
 	-- Gui
-	local GuiPlayerStatus = PlayerGui:WaitForChild("GuiPlayerStatus")
-	local GuiPlayerStatusWindow = GuiPlayerStatus:WaitForChild("GuiPlayerStatusWindow")
+	local GuiPlayerStatus = GuiFacade.GuiPlayerStatus
+	local GuiPlayerStatusWindow = GuiFacade.GuiPlayerStatusWindow
 
 	-- GuiController
-	local GuiTooltipController = require(script:WaitForChild("GuiTooltipController"))
+	local GuiTooltipController = GuiFacade.GuiTooltipController
 
 	local GuiPlayerStatusGuiTweenInfo = TweenInfo.new(
 		.5, -- Time

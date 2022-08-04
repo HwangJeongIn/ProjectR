@@ -1,3 +1,14 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
+local Debug = CommonMoudleFacade.Debug
+--local Utility = CommonMoudleFacade.Utility
+local ToolUtility = CommonMoudleFacade.ToolUtility
+local CommonConstant = CommonMoudleFacade.CommonConstant
+
+local MaxQuickSlotCount = CommonConstant.MaxQuickSlotCount
+local GuiQuickSlotOffsetRatio = CommonConstant.GuiQuickSlotOffsetRatio
+
+
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
@@ -5,50 +16,53 @@ local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 local GuiQuickSlots = GuiFacade.GuiQuickSlots
 local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiToolSlot
 
+
 local GuiQuickSlotsController = {}
 
 function GuiQuickSlotsController:Initialize()
-
-    -- Constant
-    local MaxQuickSlotCount = 5
-    local GuiQuickSlotOffsetRatio = 0.01
-
-
-    --local GuiEquipSlotsMetaData = {}
-	--self:InitializeGuiEquipSlotsMetaData(GuiEquipSlotsMetaData)
-
-	local GuiQuickSlotsWidth = GuiQuickSlots.AbsoluteSize.X
 	local GuiQuickSlotsHeight = GuiQuickSlots.AbsoluteSize.Y
 
-	local GuiQuickSlotOffsetX = 0
-	local GuiQuickSlotOffsetY = GuiQuickSlotOffset
+    local GuiSlotsWindow = GuiQuickSlots.Parent
+    local GuiSlotsWindowWidth = GuiSlotsWindow.AbsoluteSize.X
 
-	local finalSlotSize = GuiQuickSlotsHeight - (GuiQuickSlotOffsetY * 2)
+	local GuiQuickSlotOffset = GuiQuickSlotOffsetRatio * GuiQuickSlotsHeight
 
+	local finalSlotSize = GuiQuickSlotsHeight - (GuiQuickSlotOffset * 2)
+    local GuiQuickSlotsWidth = GuiQuickSlotOffset * (MaxQuickSlotCount + 1) + finalSlotSize * MaxQuickSlotCount
+    if GuiQuickSlotsWidth > GuiSlotsWindowWidth then
+        Debug.Assert(false, "부모 객체의 사이즈가 너무 작습니다. Gui가 비정상입니다.")
+        return
+    end
 
     --[[
-	if (GuiEquipSlotWidth / GuiEquipSlotCountPerRow) < (GuiEquipSlotHeight / GuiEquipSlotCountPerColumn) then
-		finalSlotSize = (GuiEquipSlotWidth - (GuiEquipSlotCountPerRow + 1) * GuiEquipSlotOffset) / GuiEquipSlotCountPerRow
-		GuiEquipSlotOffsetX = GuiEquipSlotOffset
-		GuiEquipSlotOffsetY = (GuiEquipSlotHeight - (finalSlotSize * GuiEquipSlotCountPerColumn)) / (GuiEquipSlotCountPerColumn + 1)
-	else
-		finalSlotSize = (GuiEquipSlotHeight - (GuiEquipSlotCountPerColumn + 1) * GuiEquipSlotOffset) / GuiEquipSlotCountPerColumn
-		GuiEquipSlotOffsetX = (GuiEquipSlotWidth - (finalSlotSize * GuiEquipSlotCountPerRow)) / (GuiEquipSlotCountPerRow + 1)
-		GuiEquipSlotOffsetY = GuiEquipSlotOffset
-	end
+    local finalSize = GuiQuickSlots.Size
+	finalSize.X.Scale = GuiQuickSlotsWidth / GuiSlotsWindowWidth
+	GuiQuickSlots.Size = finalSize
 
-	local slotRatioX = finalSlotSize / GuiEquipSlotWidth
+	local slotRatioX = finalSlotSize / GuiQuickSlotsWidth
 	local halfSlotRatioX = slotRatioX / 2
-	local slotRatioY = finalSlotSize / GuiEquipSlotHeight
+	local slotRatioY = finalSlotSize / GuiQuickSlotsHeight
 	local halfSlotRatioY = slotRatioY / 2
 
-	local GuiEquipSlotOffsetRatioX =  GuiEquipSlotOffsetX / GuiEquipSlotWidth
-	local GuiEquipSlotOffsetRatioY =  GuiEquipSlotOffsetY / GuiEquipSlotHeight
+	local GuiQuickSlotOffsetRatioX =  GuiQuickSlotOffset / GuiQuickSlotsWidth
+	local GuiQuickSlotOffsetRatioY =  GuiQuickSlotOffset / GuiQuickSlotsHeight
 	
 	local slotSize = UDim2.new(slotRatioX, 0, slotRatioY, 0)
 	local slotAnchorPoint = Vector2.new(0.5, 0.5)
-	local FirstslotPosition = UDim2.new(GuiEquipSlotOffsetRatioX + halfSlotRatioX, 0, GuiEquipSlotOffsetRatioY + halfSlotRatioY, 0)
-    --]]
+	local firstSlotPosition = UDim2.new(GuiQuickSlotOffsetRatioX + halfSlotRatioX, 0, GuiQuickSlotOffsetRatioY + halfSlotRatioY, 0)
+	
+    for slotIndex = 1, MaxQuickSlotCount do
+        local newGuiToolSlot = GuiToolSlotTemplate:Clone()
+        
+        newGuiToolSlot.Size = slotSize
+        newGuiToolSlot.AnchorPoint = slotAnchorPoint
+        newGuiToolSlot.Position = firstSlotPosition + UDim2.new((GuiQuickSlotOffsetRatioX + slotRatioX) * (slotIndex - 1), 0, 0, 0)
+        newGuiToolSlot.Parent = GuiQuickSlots
+        newGuiToolSlot.Name = tostring(slotIndex)
+
+        self.GuiEquipSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.QuickSlot, slotIndex, newGuiToolSlot))
+    end
+--]]
 end
 
 GuiQuickSlotsController:Initialize()

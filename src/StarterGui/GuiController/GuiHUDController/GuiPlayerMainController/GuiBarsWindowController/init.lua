@@ -1,10 +1,8 @@
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
-local GuiHUD = PlayerGui:WaitForChild("GuiHUD")
+local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
-local GuiPlayerMain = GuiHUD:WaitForChild("GuiPlayerMain")
-
-local GuiBarsWindow = GuiPlayerMain:WaitForChild("GuiBarsWindow")
+local GuiBarsWindow = GuiFacade.GuiBarsWindow
 
 
 local GuiBarsWindowController = {}
