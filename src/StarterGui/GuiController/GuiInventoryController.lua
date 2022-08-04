@@ -34,7 +34,7 @@ local GuiInventoryController = {
 GuiToolSlotController.GuiInventoryController = GuiInventoryController
 GuiTooltipController.GuiInventoryController = GuiInventoryController
 
-function GuiInventoryController:InitializeGuiToolSlots()
+function GuiInventoryController:Initialize()
 	local GuiInventorySize = GuiInventory.AbsoluteWindowSize
 	local finalGuiInventoryWidth = GuiInventorySize.X
 	local GuiInventoryWidth = GuiInventory.AbsoluteSize.X
@@ -104,5 +104,5 @@ function GuiInventoryController:SetToolSlot(slotIndex, tool)
 	return true
 end
 
-GuiInventoryController:InitializeGuiToolSlots()
+GuiInventoryController:Initialize()
 return GuiInventoryController

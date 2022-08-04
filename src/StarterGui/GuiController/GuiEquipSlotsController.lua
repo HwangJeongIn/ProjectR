@@ -24,7 +24,6 @@ local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
 local GuiToolSlotTemplate = GuiTemplate:WaitForChild("GuiToolSlot")
 
 local GuiToolSlotController = require(script.Parent:WaitForChild("GuiToolSlotController"))
-local GuiTooltipController = require(script.Parent:WaitForChild("GuiTooltipController"))
 
 local GuiEquipSlotsRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
 GuiEquipSlotsRaw:Initialize(MaxEquipSlotCount)
@@ -61,7 +60,7 @@ function GuiEquipSlotsController:InitializeGuiEquipSlotsMetaData(metaData)
 	self:AddSlotDataToGuiEquipSlotsMetaData(metaData, 11, EquipType.Boots) -- 11번 신발
 end
 
-function GuiEquipSlotsController:InitializeGuiToolSlots()
+function GuiEquipSlotsController:Initialize()
 
 	local GuiEquipSlotsMetaData = {}
 	self:InitializeGuiEquipSlotsMetaData(GuiEquipSlotsMetaData)
@@ -138,5 +137,5 @@ function GuiEquipSlotsController:SetToolSlot(equipType, tool)
 	return true
 end
 
-GuiEquipSlotsController:InitializeGuiToolSlots()
+GuiEquipSlotsController:Initialize()
 return GuiEquipSlotsController

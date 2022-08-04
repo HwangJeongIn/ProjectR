@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 local Debug = require(CommonModule:WaitForChild("Debug"))
 local Utility = require(CommonModule:WaitForChild("Utility"))

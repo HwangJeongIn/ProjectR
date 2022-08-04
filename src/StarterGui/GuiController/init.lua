@@ -62,9 +62,9 @@ end
 function GuiController:Initialize()
 	self.GuiInventoryController = require(script:WaitForChild("GuiInventoryController"))
 	self.GuiEquipSlotsController = require(script:WaitForChild("GuiEquipSlotsController"))
-	local GuiExecutableSlotsController = require(script:WaitForChild("GuiExecutableSlotsController"))
-	self.GuiQuickSlotsController = GuiExecutableSlotsController.GuiQuickSlotsController
-	self.GuiSkillSlotsController = GuiExecutableSlotsController.GuiSkillSlotsController
+	local GuiHUDController = require(script:WaitForChild("GuiHUDController"))
+	self.GuiQuickSlotsController = GuiHUDController.GuiQuickSlotsController
+	self.GuiSkillSlotsController = GuiHUDController.GuiSkillSlotsController
 
 	self.GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
 	self.GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
