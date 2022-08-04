@@ -15,13 +15,10 @@ local SlotType = CommonEnum.SlotType
 
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
-local GuiPlayerStatus = PlayerGui:WaitForChild("GuiPlayerStatus")
-local GuiPlayerStatusWindow = GuiPlayerStatus:WaitForChild("GuiPlayerStatusWindow")
-local GuiEquipSlots = GuiPlayerStatusWindow:WaitForChild("GuiEquipSlots")
-local GuiInventory = GuiPlayerStatusWindow:WaitForChild("GuiInventory")
+local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
+local GuiInventory = GuiFacade.GuiInventory
 
-local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
-local GuiToolSlotTemplate = GuiTemplate:WaitForChild("GuiToolSlot")
+local GuiToolSlotTemplate = GuiInventory.GuiTemplate.GuiToolSlot
 local GuiToolSlotController = require(script.Parent:WaitForChild("GuiToolSlotController"))
 local GuiTooltipController = require(script.Parent:WaitForChild("GuiTooltipController"))
 

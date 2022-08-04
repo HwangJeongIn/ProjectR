@@ -119,8 +119,9 @@ end
 function GuiTooltipController:Initialize()
 	local player = game.Players.LocalPlayer
 	local PlayerGui = player:WaitForChild("PlayerGui")
-	local GuiTooltip = PlayerGui:WaitForChild("GuiTooltip")
-	local GuiTooltipWindow = GuiTooltip:WaitForChild("GuiTooltipWindow")
+	local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
+	local GuiTooltip = GuiFacade.GuiTooltip
+	local GuiTooltipWindow = GuiFacade.GuiTooltipWindow
 	
 	self.GuiTooltip = GuiTooltip
 	self.Tool = nil

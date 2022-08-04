@@ -40,8 +40,10 @@ function GuiFacade:Initialize()
     self.GuiPlayerStatusWindow = GuiPlayerStatusWindow
     self.GuiEquipSlots = GuiEquipSlots
     self.GuiInventory = GuiInventory
-    self.GuiTemplate = GuiTemplate
-    self.GuiToolSlotTemplate = GuiToolSlotTemplate
+    self.GuiTemplate = {
+        GuiToolSlot = GuiToolSlotTemplate
+    }
+    
 end
 
 GuiFacade:Initialize()
