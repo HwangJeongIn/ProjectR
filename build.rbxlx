@@ -139,6 +139,7 @@ local CommonConstant = {
 
 	-- SkillSlots
 	MaxSkillCount = 3,
+	GuiSkillSlotOffsetRatio = 0.025,
 	
 	UndefinedElementValue = false
 }
@@ -39342,10 +39343,14 @@ return GuiSlotsWindowController
                 <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonMoudleFacade.Debug
---local Utility = CommonMoudleFacade.Utility
+local Utility = CommonMoudleFacade.Utility
 local ToolUtility = CommonMoudleFacade.ToolUtility
-local CommonConstant = CommonMoudleFacade.CommonConstant
 
+local CommonEnum = CommonMoudleFacade.CommonEnum
+local SlotType = CommonEnum.SlotType
+--local EquipType = CommonEnum.EquipType
+
+local CommonConstant = CommonMoudleFacade.CommonConstant
 local MaxQuickSlotCount = CommonConstant.MaxQuickSlotCount
 local GuiQuickSlotOffsetRatio = CommonConstant.GuiQuickSlotOffsetRatio
 
@@ -39356,9 +39361,14 @@ local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
 local GuiQuickSlots = GuiFacade.GuiQuickSlots
 local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiToolSlot
+local GuiToolSlotController = GuiFacade.GuiTemplateController.GuiToolSlotController
 
 
-local GuiQuickSlotsController = {}
+local GuiQuickSlotsRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
+GuiQuickSlotsRaw:Initialize(MaxQuickSlotCount)
+local GuiQuickSlotsController = {
+	GuiQuickSlotsRaw = GuiQuickSlotsRaw
+}
 
 function GuiQuickSlotsController:Initialize()
 	local GuiQuickSlotsHeight = GuiQuickSlots.AbsoluteSize.Y
@@ -39375,10 +39385,9 @@ function GuiQuickSlotsController:Initialize()
         return
     end
 
-    --[[
-    local finalSize = GuiQuickSlots.Size
-	finalSize.X.Scale = GuiQuickSlotsWidth / GuiSlotsWindowWidth
-	GuiQuickSlots.Size = finalSize
+    
+    local prevSize = GuiQuickSlots.Size
+	GuiQuickSlots.Size = UDim2.new(GuiQuickSlotsWidth / GuiSlotsWindowWidth, 0, prevSize.Y.Scale, 0)
 
 	local slotRatioX = finalSlotSize / GuiQuickSlotsWidth
 	local halfSlotRatioX = slotRatioX / 2
@@ -39401,9 +39410,9 @@ function GuiQuickSlotsController:Initialize()
         newGuiToolSlot.Parent = GuiQuickSlots
         newGuiToolSlot.Name = tostring(slotIndex)
 
-        self.GuiEquipSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.QuickSlot, slotIndex, newGuiToolSlot))
+        self.GuiQuickSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.QuickSlot, slotIndex, newGuiToolSlot))
     end
---]]
+
 end
 
 GuiQuickSlotsController:Initialize()
@@ -39414,15 +39423,79 @@ return GuiQuickSlotsController
             <Item class="ModuleScript" referent="741">
               <Properties>
                 <string name="Name">GuiSkillSlotsController</string>
-                <string name="Source"><![CDATA[local player = game.Players.LocalPlayer
+                <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
+local Debug = CommonMoudleFacade.Debug
+local Utility = CommonMoudleFacade.Utility
+local ToolUtility = CommonMoudleFacade.ToolUtility
+
+local CommonEnum = CommonMoudleFacade.CommonEnum
+local SlotType = CommonEnum.SlotType
+--local EquipType = CommonEnum.EquipType
+
+local CommonConstant = CommonMoudleFacade.CommonConstant
+local MaxSkillCount = CommonConstant.MaxSkillCount
+local GuiSkillSlotOffsetRatio = CommonConstant.GuiSkillSlotOffsetRatio
+
+
+local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
 local GuiSkillSlots = GuiFacade.GuiSkillSlots
+local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiToolSlot
+local GuiToolSlotController = GuiFacade.GuiTemplateController.GuiToolSlotController
 
-local GuiSkillSlotsController = {}
+
+local GuiSkillSlotsRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
+GuiSkillSlotsRaw:Initialize(MaxSkillCount)
+local GuiSkillSlotsController = {
+	GuiSkillSlotsRaw = GuiSkillSlotsRaw
+}
 
 function GuiSkillSlotsController:Initialize()
+	local GuiSkillSlotsHeight = GuiSkillSlots.AbsoluteSize.Y
+
+    local GuiSlotsWindow = GuiSkillSlots.Parent
+    local GuiSlotsWindowWidth = GuiSlotsWindow.AbsoluteSize.X
+
+	local GuiSkillSlotOffset = GuiSkillSlotOffsetRatio * GuiSkillSlotsHeight
+
+	local finalSlotSize = GuiSkillSlotsHeight - (GuiSkillSlotOffset * 2)
+    local GuiSkillSlotsWidth = GuiSkillSlotOffset * (MaxSkillCount + 1) + finalSlotSize * MaxSkillCount
+    if GuiSkillSlotsWidth > GuiSlotsWindowWidth then
+        Debug.Assert(false, "부모 객체의 사이즈가 너무 작습니다. Gui가 비정상입니다.")
+        return
+    end
+
+    
+    local prevSize = GuiSkillSlots.Size
+	GuiSkillSlots.Size = UDim2.new(GuiSkillSlotsWidth / GuiSlotsWindowWidth, 0, prevSize.Y.Scale, 0)
+
+	local slotRatioX = finalSlotSize / GuiSkillSlotsWidth
+	local halfSlotRatioX = slotRatioX / 2
+	local slotRatioY = finalSlotSize / GuiSkillSlotsHeight
+	local halfSlotRatioY = slotRatioY / 2
+
+	local GuiSkillSlotOffsetRatioX =  GuiSkillSlotOffset / GuiSkillSlotsWidth
+	local GuiSkillSlotOffsetRatioY =  GuiSkillSlotOffset / GuiSkillSlotsHeight
+	
+	local slotSize = UDim2.new(slotRatioX, 0, slotRatioY, 0)
+	local slotAnchorPoint = Vector2.new(0.5, 0.5)
+	local firstSlotPosition = UDim2.new(GuiSkillSlotOffsetRatioX + halfSlotRatioX, 0, GuiSkillSlotOffsetRatioY + halfSlotRatioY, 0)
+	
+    for slotIndex = 1, MaxSkillCount do
+        local newGuiToolSlot = GuiToolSlotTemplate:Clone()
+        
+        newGuiToolSlot.Size = slotSize
+        newGuiToolSlot.AnchorPoint = slotAnchorPoint
+        newGuiToolSlot.Position = firstSlotPosition + UDim2.new((GuiSkillSlotOffsetRatioX + slotRatioX) * (slotIndex - 1), 0, 0, 0)
+        newGuiToolSlot.Parent = GuiSkillSlots
+        newGuiToolSlot.Name = tostring(slotIndex)
+
+        self.GuiSkillSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.SkillSlot, slotIndex, newGuiToolSlot))
+    end
+
 end
 
 GuiSkillSlotsController:Initialize()
@@ -41151,26 +41224,6 @@ return GuiTooltipController</string>
     </Item>
     <Item class="ScreenGui" referent="765">
       <Properties>
-        <string name="Name">GuiQuickSlots</string>
-        <BinaryString name="AttributesSerialize"></BinaryString>
-        <bool name="AutoLocalize">true</bool>
-        <int name="DisplayOrder">0</int>
-        <bool name="Enabled">true</bool>
-        <bool name="IgnoreGuiInset">false</bool>
-        <bool name="ResetOnSpawn">true</bool>
-        <Ref name="RootLocalizationTable">null</Ref>
-        <token name="SelectionBehaviorDown">0</token>
-        <token name="SelectionBehaviorLeft">0</token>
-        <token name="SelectionBehaviorRight">0</token>
-        <token name="SelectionBehaviorUp">0</token>
-        <bool name="SelectionGroup">false</bool>
-        <int64 name="SourceAssetId">-1</int64>
-        <BinaryString name="Tags"></BinaryString>
-        <token name="ZIndexBehavior">1</token>
-      </Properties>
-    </Item>
-    <Item class="ScreenGui" referent="766">
-      <Properties>
         <string name="Name">GuiTemplate</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
         <bool name="AutoLocalize">true</bool>
@@ -41188,7 +41241,7 @@ return GuiTooltipController</string>
         <BinaryString name="Tags"></BinaryString>
         <token name="ZIndexBehavior">1</token>
       </Properties>
-      <Item class="ImageButton" referent="767">
+      <Item class="ImageButton" referent="766">
         <Properties>
           <string name="Name">GuiToolSlot</string>
           <bool name="Active">true</bool>
@@ -41295,7 +41348,7 @@ return GuiTooltipController</string>
           <bool name="Visible">true</bool>
           <int name="ZIndex">1</int>
         </Properties>
-        <Item class="ImageLabel" referent="768">
+        <Item class="ImageLabel" referent="767">
           <Properties>
             <string name="Name">GuiToolImage</string>
             <bool name="Active">false</bool>
@@ -41390,7 +41443,7 @@ return GuiTooltipController</string>
             <bool name="Visible">true</bool>
             <int name="ZIndex">1</int>
           </Properties>
-          <Item class="TextLabel" referent="769">
+          <Item class="TextLabel" referent="768">
             <Properties>
               <string name="Name">GuiToolName</string>
               <bool name="Active">false</bool>
@@ -41473,7 +41526,7 @@ return GuiTooltipController</string>
               <int name="ZIndex">1</int>
             </Properties>
           </Item>
-          <Item class="TextLabel" referent="770">
+          <Item class="TextLabel" referent="769">
             <Properties>
               <string name="Name">GuiToolCount</string>
               <bool name="Active">false</bool>
@@ -41559,11 +41612,11 @@ return GuiTooltipController</string>
         </Item>
       </Item>
     </Item>
-    <Item class="Folder" referent="771">
+    <Item class="Folder" referent="770">
       <Properties>
         <string name="Name">GuiTemplateControllers</string>
       </Properties>
-      <Item class="ModuleScript" referent="772">
+      <Item class="ModuleScript" referent="771">
         <Properties>
           <string name="Name">GuiToolSlotController</string>
           <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -41708,7 +41761,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
         </Properties>
       </Item>
     </Item>
-    <Item class="ScreenGui" referent="773">
+    <Item class="ScreenGui" referent="772">
       <Properties>
         <string name="Name">GuiTooltip</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -41727,7 +41780,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
         <BinaryString name="Tags"></BinaryString>
         <token name="ZIndexBehavior">1</token>
       </Properties>
-      <Item class="Frame" referent="774">
+      <Item class="Frame" referent="773">
         <Properties>
           <string name="Name">GuiTooltipWindow</string>
           <bool name="Active">false</bool>
@@ -41787,7 +41840,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
           <bool name="Visible">true</bool>
           <int name="ZIndex">1</int>
         </Properties>
-        <Item class="Frame" referent="775">
+        <Item class="Frame" referent="774">
           <Properties>
             <string name="Name">GuiTooltipBaseData</string>
             <bool name="Active">false</bool>
@@ -41847,7 +41900,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
             <bool name="Visible">true</bool>
             <int name="ZIndex">1</int>
           </Properties>
-          <Item class="TextLabel" referent="776">
+          <Item class="TextLabel" referent="775">
             <Properties>
               <string name="Name">GuiToolName</string>
               <bool name="Active">false</bool>
@@ -41930,7 +41983,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <int name="ZIndex">1</int>
             </Properties>
           </Item>
-          <Item class="ImageLabel" referent="777">
+          <Item class="ImageLabel" referent="776">
             <Properties>
               <string name="Name">GuiToolImage</string>
               <bool name="Active">false</bool>
@@ -42026,7 +42079,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <int name="ZIndex">1</int>
             </Properties>
           </Item>
-          <Item class="Frame" referent="778">
+          <Item class="Frame" referent="777">
             <Properties>
               <string name="Name">GuiLine</string>
               <bool name="Active">false</bool>
@@ -42087,7 +42140,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <int name="ZIndex">1</int>
             </Properties>
           </Item>
-          <Item class="TextLabel" referent="779">
+          <Item class="TextLabel" referent="778">
             <Properties>
               <string name="Name">GuiToolType</string>
               <bool name="Active">false</bool>
@@ -42170,7 +42223,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <int name="ZIndex">1</int>
             </Properties>
           </Item>
-          <Item class="TextButton" referent="780">
+          <Item class="TextButton" referent="779">
             <Properties>
               <string name="Name">GuiExitButton</string>
               <bool name="Active">true</bool>
@@ -42258,7 +42311,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
             </Properties>
           </Item>
         </Item>
-        <Item class="Frame" referent="781">
+        <Item class="Frame" referent="780">
           <Properties>
             <string name="Name">GuiTooltipDetailData</string>
             <bool name="Active">false</bool>
@@ -42318,7 +42371,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
             <bool name="Visible">true</bool>
             <int name="ZIndex">1</int>
           </Properties>
-          <Item class="Frame" referent="782">
+          <Item class="Frame" referent="781">
             <Properties>
               <string name="Name">GuiLine</string>
               <bool name="Active">false</bool>
@@ -42379,7 +42432,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <int name="ZIndex">1</int>
             </Properties>
           </Item>
-          <Item class="Frame" referent="783">
+          <Item class="Frame" referent="782">
             <Properties>
               <string name="Name">GuiToolDescription</string>
               <bool name="Active">false</bool>
@@ -42439,7 +42492,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="TextLabel" referent="784">
+            <Item class="TextLabel" referent="783">
               <Properties>
                 <string name="Name">GuiText</string>
                 <bool name="Active">false</bool>
@@ -42522,7 +42575,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
                 <int name="ZIndex">1</int>
               </Properties>
             </Item>
-            <Item class="Frame" referent="785">
+            <Item class="Frame" referent="784">
               <Properties>
                 <string name="Name">GuiLine</string>
                 <bool name="Active">false</bool>
@@ -42583,7 +42636,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
                 <int name="ZIndex">1</int>
               </Properties>
             </Item>
-            <Item class="TextLabel" referent="786">
+            <Item class="TextLabel" referent="785">
               <Properties>
                 <string name="Name">GuiToolDescriptionText</string>
                 <bool name="Active">false</bool>
@@ -42667,7 +42720,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               </Properties>
             </Item>
           </Item>
-          <Item class="Frame" referent="787">
+          <Item class="Frame" referent="786">
             <Properties>
               <string name="Name">GuiToolStatus</string>
               <bool name="Active">false</bool>
@@ -42727,7 +42780,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="TextLabel" referent="788">
+            <Item class="TextLabel" referent="787">
               <Properties>
                 <string name="Name">GuiText</string>
                 <bool name="Active">false</bool>
@@ -42810,7 +42863,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
                 <int name="ZIndex">1</int>
               </Properties>
             </Item>
-            <Item class="TextLabel" referent="789">
+            <Item class="TextLabel" referent="788">
               <Properties>
                 <string name="Name">GuiToolStatusText</string>
                 <bool name="Active">false</bool>
@@ -42895,7 +42948,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
             </Item>
           </Item>
         </Item>
-        <Item class="Frame" referent="790">
+        <Item class="Frame" referent="789">
           <Properties>
             <string name="Name">GuiTooltipButtons</string>
             <bool name="Active">false</bool>
@@ -42955,7 +43008,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
             <bool name="Visible">true</bool>
             <int name="ZIndex">1</int>
           </Properties>
-          <Item class="TextButton" referent="791">
+          <Item class="TextButton" referent="790">
             <Properties>
               <string name="Name">GuiButton4</string>
               <bool name="Active">true</bool>
@@ -43041,7 +43094,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="TextLabel" referent="792">
+            <Item class="TextLabel" referent="791">
               <Properties>
                 <string name="Name">GuiText</string>
                 <bool name="Active">false</bool>
@@ -43125,7 +43178,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               </Properties>
             </Item>
           </Item>
-          <Item class="TextButton" referent="793">
+          <Item class="TextButton" referent="792">
             <Properties>
               <string name="Name">GuiButton3</string>
               <bool name="Active">true</bool>
@@ -43211,7 +43264,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="TextLabel" referent="794">
+            <Item class="TextLabel" referent="793">
               <Properties>
                 <string name="Name">GuiText</string>
                 <bool name="Active">false</bool>
@@ -43295,7 +43348,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               </Properties>
             </Item>
           </Item>
-          <Item class="TextButton" referent="795">
+          <Item class="TextButton" referent="794">
             <Properties>
               <string name="Name">GuiButton2</string>
               <bool name="Active">true</bool>
@@ -43381,7 +43434,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <bool name="Visible">false</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="TextLabel" referent="796">
+            <Item class="TextLabel" referent="795">
               <Properties>
                 <string name="Name">GuiText</string>
                 <bool name="Active">false</bool>
@@ -43465,7 +43518,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               </Properties>
             </Item>
           </Item>
-          <Item class="TextButton" referent="797">
+          <Item class="TextButton" referent="796">
             <Properties>
               <string name="Name">GuiButton1</string>
               <bool name="Active">true</bool>
@@ -43551,7 +43604,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
               <bool name="Visible">true</bool>
               <int name="ZIndex">1</int>
             </Properties>
-            <Item class="TextLabel" referent="798">
+            <Item class="TextLabel" referent="797">
               <Properties>
                 <string name="Name">GuiText</string>
                 <bool name="Active">false</bool>
@@ -43638,14 +43691,14 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
         </Item>
       </Item>
     </Item>
-    <Item class="Folder" referent="799">
+    <Item class="Folder" referent="798">
       <Properties>
         <string name="Name">TempResource</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
         <int64 name="SourceAssetId">-1</int64>
         <BinaryString name="Tags"></BinaryString>
       </Properties>
-      <Item class="Decal" referent="800">
+      <Item class="Decal" referent="799">
         <Properties>
           <string name="Name">t_DefaultTool</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -43664,7 +43717,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
           <int name="ZIndex">1</int>
         </Properties>
       </Item>
-      <Item class="Decal" referent="801">
+      <Item class="Decal" referent="800">
         <Properties>
           <string name="Name">t_ToolSlot</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -43685,24 +43738,24 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPack" referent="802">
+  <Item class="StarterPack" referent="801">
     <Properties>
       <string name="Name">StarterPack</string>
     </Properties>
   </Item>
-  <Item class="StarterPlayer" referent="803">
+  <Item class="StarterPlayer" referent="802">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="804">
+    <Item class="StarterPlayerScripts" referent="803">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="805">
+      <Item class="Folder" referent="804">
         <Properties>
           <string name="Name">ClientModule</string>
         </Properties>
-        <Item class="ModuleScript" referent="806">
+        <Item class="ModuleScript" referent="805">
           <Properties>
             <string name="Name">ClientGlobalStorage</string>
             <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -43845,7 +43898,7 @@ ClientGlobalStorage.__newindex = Utility.Inheritable__newindex
 return ClientGlobalStorage
 ]]></string>
           </Properties>
-          <Item class="ModuleScript" referent="807">
+          <Item class="ModuleScript" referent="806">
             <Properties>
               <string name="Name">ClientRemoteEventImpl</string>
               <string name="Source">local ClientRemoteEventImpl = {}
@@ -43959,14 +44012,14 @@ end
 return ClientRemoteEventImpl</string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="808">
+          <Item class="ModuleScript" referent="807">
             <Properties>
               <string name="Name">QuickSlots</string>
               <string name="Source"></string>
             </Properties>
           </Item>
         </Item>
-        <Item class="ModuleScript" referent="809">
+        <Item class="ModuleScript" referent="808">
           <Properties>
             <string name="Name">KeyBinder</string>
             <string name="Source">game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
@@ -44205,7 +44258,7 @@ UserInputService.InputBegan:Connect(onInputBegan)
           </Properties>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="810">
+      <Item class="ModuleScript" referent="809">
         <Properties>
           <string name="Name">ClientModuleFacade</string>
           <string name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -44231,7 +44284,7 @@ return ClientModuleFacade
 ]]></string>
         </Properties>
       </Item>
-      <Item class="LocalScript" referent="811">
+      <Item class="LocalScript" referent="810">
         <Properties>
           <string name="Name">ClientModuleLoader</string>
           <string name="Source"><![CDATA[--[[
@@ -44246,7 +44299,7 @@ require(PlayerGui:WaitForChild("GuiController"))
 ]]></string>
         </Properties>
       </Item>
-      <Item class="LocalScript" referent="812">
+      <Item class="LocalScript" referent="811">
         <Properties>
           <string name="Name">CustomInventory</string>
           <string name="Source"><![CDATA[--[[
@@ -44305,7 +44358,7 @@ UserInputService.InputEnded:Connect(onInputEnded)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="LocalScript" referent="813">
+      <Item class="LocalScript" referent="812">
         <Properties>
           <string name="Name">PickupManager</string>
           <string name="Source">local UIS = game:GetService("UserInputService")
@@ -44360,16 +44413,16 @@ end)</string>
       </Item>
     </Item>
   </Item>
-  <Item class="TestService" referent="814">
+  <Item class="TestService" referent="813">
     <Properties>
       <string name="Name">TestService</string>
     </Properties>
   </Item>
-  <Item class="TextChatService" referent="815">
+  <Item class="TextChatService" referent="814">
     <Properties>
       <string name="Name">TextChatService</string>
     </Properties>
-    <Item class="ChatInputBarConfiguration" referent="816">
+    <Item class="ChatInputBarConfiguration" referent="815">
       <Properties>
         <string name="Name">ChatInputBarConfiguration</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -44379,7 +44432,7 @@ end)</string>
         <Ref name="TargetTextChannel">null</Ref>
       </Properties>
     </Item>
-    <Item class="ChatWindowConfiguration" referent="817">
+    <Item class="ChatWindowConfiguration" referent="816">
       <Properties>
         <string name="Name">ChatWindowConfiguration</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -44389,16 +44442,16 @@ end)</string>
       </Properties>
     </Item>
   </Item>
-  <Item class="VoiceChatService" referent="818">
+  <Item class="VoiceChatService" referent="817">
     <Properties>
       <string name="Name">VoiceChatService</string>
     </Properties>
   </Item>
-  <Item class="Workspace" referent="819">
+  <Item class="Workspace" referent="818">
     <Properties>
       <string name="Name">Workspace</string>
     </Properties>
-    <Item class="SpawnLocation" referent="820">
+    <Item class="SpawnLocation" referent="819">
       <Properties>
         <string name="Name">SpawnLocation</string>
         <bool name="AllowTeamChangeOnTouch">false</bool>
@@ -44497,7 +44550,7 @@ end)</string>
         </Vector3>
       </Properties>
     </Item>
-    <Item class="Model" referent="821">
+    <Item class="Model" referent="820">
       <Properties>
         <string name="Name">TempObject</string>
         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -44529,7 +44582,7 @@ end)</string>
         <OptionalCoordinateFrame name="WorldPivotData">
         </OptionalCoordinateFrame>
       </Properties>
-      <Item class="Tool" referent="822">
+      <Item class="Tool" referent="821">
         <Properties>
           <string name="Name">Sword</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -44559,7 +44612,7 @@ end)</string>
           </Content>
           <string name="ToolTip"></string>
         </Properties>
-        <Item class="Part" referent="823">
+        <Item class="Part" referent="822">
           <Properties>
             <string name="Name">Mesh1</string>
             <bool name="Anchored">false</bool>
@@ -44652,7 +44705,7 @@ end)</string>
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="SpecialMesh" referent="824">
+          <Item class="SpecialMesh" referent="823">
             <Properties>
               <string name="Name">Mesh</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -44685,7 +44738,7 @@ end)</string>
             </Properties>
           </Item>
         </Item>
-        <Item class="Part" referent="825">
+        <Item class="Part" referent="824">
           <Properties>
             <string name="Name">Attacker</string>
             <bool name="Anchored">false</bool>
@@ -44779,7 +44832,7 @@ end)</string>
             </Vector3>
           </Properties>
         </Item>
-        <Item class="Part" referent="826">
+        <Item class="Part" referent="825">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -44872,7 +44925,7 @@ end)</string>
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="WeldConstraint" referent="827">
+          <Item class="WeldConstraint" referent="826">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -44890,14 +44943,14 @@ end)</string>
                 <R21>0</R21>
                 <R22>-0</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">826</Ref>
-              <Ref name="Part1Internal">825</Ref>
+              <Ref name="Part0Internal">825</Ref>
+              <Ref name="Part1Internal">824</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="WeldConstraint" referent="828">
+          <Item class="WeldConstraint" referent="827">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -44915,15 +44968,15 @@ end)</string>
                 <R21>0</R21>
                 <R22>-0</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">826</Ref>
-              <Ref name="Part1Internal">823</Ref>
+              <Ref name="Part0Internal">825</Ref>
+              <Ref name="Part1Internal">822</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
         </Item>
-        <Item class="Script" referent="829">
+        <Item class="Script" referent="828">
           <Properties>
             <string name="Name">WeaponController</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -44986,7 +45039,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="Animation" referent="830">
+        <Item class="Animation" referent="829">
           <Properties>
             <string name="Name">anim1</string>
             <Content name="AnimationId">
@@ -44997,7 +45050,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="IntValue" referent="831">
+        <Item class="IntValue" referent="830">
           <Properties>
             <string name="Name">Key</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45006,7 +45059,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
             <int64 name="Value">2</int64>
           </Properties>
         </Item>
-        <Item class="BoolValue" referent="832">
+        <Item class="BoolValue" referent="831">
           <Properties>
             <string name="Name">Damager</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45015,7 +45068,7 @@ tool.Attacker.Touched:Connect(onTouched)</string>
             <bool name="Value">false</bool>
           </Properties>
         </Item>
-        <Item class="Script" referent="833">
+        <Item class="Script" referent="832">
           <Properties>
             <string name="Name">Damager</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45226,7 +45279,7 @@ Tool.Attacker.Touched:Connect(onTouched)
           </Properties>
         </Item>
       </Item>
-      <Item class="Tool" referent="834">
+      <Item class="Tool" referent="833">
         <Properties>
           <string name="Name">Tool</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45256,7 +45309,7 @@ Tool.Attacker.Touched:Connect(onTouched)
           </Content>
           <string name="ToolTip"></string>
         </Properties>
-        <Item class="Part" referent="835">
+        <Item class="Part" referent="834">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -45349,7 +45402,7 @@ Tool.Attacker.Touched:Connect(onTouched)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="Script" referent="836">
+          <Item class="Script" referent="835">
             <Properties>
               <string name="Name">Script</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45395,7 +45448,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Attachment" referent="837">
+          <Item class="Attachment" referent="836">
             <Properties>
               <string name="Name">Attachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45419,7 +45472,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="Part" referent="838">
+        <Item class="Part" referent="837">
           <Properties>
             <string name="Name">Part</string>
             <bool name="Anchored">false</bool>
@@ -45512,7 +45565,7 @@ end)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="Attachment" referent="839">
+          <Item class="Attachment" referent="838">
             <Properties>
               <string name="Name">Attachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45536,11 +45589,11 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="RigidConstraint" referent="840">
+        <Item class="RigidConstraint" referent="839">
           <Properties>
             <string name="Name">RigidConstraint</string>
-            <Ref name="Attachment0">837</Ref>
-            <Ref name="Attachment1">839</Ref>
+            <Ref name="Attachment0">836</Ref>
+            <Ref name="Attachment1">838</Ref>
             <BinaryString name="AttributesSerialize"></BinaryString>
             <int name="Color">194</int>
             <bool name="Enabled">true</bool>
@@ -45550,7 +45603,7 @@ end)
           </Properties>
         </Item>
       </Item>
-      <Item class="Model" referent="841">
+      <Item class="Model" referent="840">
         <Properties>
           <string name="Name">Dummy</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45576,13 +45629,13 @@ end)
             <Z>0</Z>
           </Vector3>
           <bool name="NeedsPivotMigration">false</bool>
-          <Ref name="PrimaryPart">842</Ref>
+          <Ref name="PrimaryPart">841</Ref>
           <int64 name="SourceAssetId">-1</int64>
           <BinaryString name="Tags"></BinaryString>
           <OptionalCoordinateFrame name="WorldPivotData">
           </OptionalCoordinateFrame>
         </Properties>
-        <Item class="Part" referent="842">
+        <Item class="Part" referent="841">
           <Properties>
             <string name="Name">HumanoidRootPart</string>
             <bool name="Anchored">true</bool>
@@ -45675,7 +45728,7 @@ end)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="Attachment" referent="843">
+          <Item class="Attachment" referent="842">
             <Properties>
               <string name="Name">RootRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45697,7 +45750,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="844">
+            <Item class="Vector3Value" referent="843">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45711,7 +45764,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Vector3Value" referent="845">
+          <Item class="Vector3Value" referent="844">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45725,7 +45778,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="846">
+        <Item class="MeshPart" referent="845">
           <Properties>
             <string name="Name">LeftHand</string>
             <bool name="Anchored">false</bool>
@@ -45844,7 +45897,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="847">
+          <Item class="Attachment" referent="846">
             <Properties>
               <string name="Name">LeftWristRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45866,7 +45919,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="848">
+            <Item class="Vector3Value" referent="847">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45880,7 +45933,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="849">
+          <Item class="Attachment" referent="848">
             <Properties>
               <string name="Name">LeftGripAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45902,7 +45955,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="850">
+            <Item class="Vector3Value" referent="849">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45916,7 +45969,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="851">
+          <Item class="Motor6D" referent="850">
             <Properties>
               <string name="Name">LeftWrist</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45951,13 +46004,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">852</Ref>
-              <Ref name="Part1">846</Ref>
+              <Ref name="Part0">851</Ref>
+              <Ref name="Part1">845</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="853">
+          <Item class="Vector3Value" referent="852">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -45971,7 +46024,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="852">
+        <Item class="MeshPart" referent="851">
           <Properties>
             <string name="Name">LeftLowerArm</string>
             <bool name="Anchored">false</bool>
@@ -46090,7 +46143,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="854">
+          <Item class="Attachment" referent="853">
             <Properties>
               <string name="Name">LeftElbowRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46112,7 +46165,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="855">
+            <Item class="Vector3Value" referent="854">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46126,7 +46179,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="856">
+          <Item class="Attachment" referent="855">
             <Properties>
               <string name="Name">LeftWristRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46148,7 +46201,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="857">
+            <Item class="Vector3Value" referent="856">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46162,7 +46215,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="858">
+          <Item class="Motor6D" referent="857">
             <Properties>
               <string name="Name">LeftElbow</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46197,13 +46250,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">859</Ref>
-              <Ref name="Part1">852</Ref>
+              <Ref name="Part0">858</Ref>
+              <Ref name="Part1">851</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="860">
+          <Item class="Vector3Value" referent="859">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46217,7 +46270,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="859">
+        <Item class="MeshPart" referent="858">
           <Properties>
             <string name="Name">LeftUpperArm</string>
             <bool name="Anchored">false</bool>
@@ -46336,7 +46389,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="861">
+          <Item class="Attachment" referent="860">
             <Properties>
               <string name="Name">LeftShoulderRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46358,7 +46411,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="862">
+            <Item class="Vector3Value" referent="861">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46372,7 +46425,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="863">
+          <Item class="Attachment" referent="862">
             <Properties>
               <string name="Name">LeftElbowRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46394,7 +46447,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="864">
+            <Item class="Vector3Value" referent="863">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46408,7 +46461,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="865">
+          <Item class="Attachment" referent="864">
             <Properties>
               <string name="Name">LeftShoulderAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46430,7 +46483,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="866">
+            <Item class="Vector3Value" referent="865">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46444,7 +46497,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="867">
+          <Item class="Motor6D" referent="866">
             <Properties>
               <string name="Name">LeftShoulder</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46479,13 +46532,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">868</Ref>
-              <Ref name="Part1">859</Ref>
+              <Ref name="Part0">867</Ref>
+              <Ref name="Part1">858</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="869">
+          <Item class="Vector3Value" referent="868">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46499,7 +46552,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="870">
+        <Item class="MeshPart" referent="869">
           <Properties>
             <string name="Name">RightHand</string>
             <bool name="Anchored">false</bool>
@@ -46618,7 +46671,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="871">
+          <Item class="Attachment" referent="870">
             <Properties>
               <string name="Name">RightWristRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46640,7 +46693,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="872">
+            <Item class="Vector3Value" referent="871">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46654,7 +46707,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="873">
+          <Item class="Attachment" referent="872">
             <Properties>
               <string name="Name">RightGripAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46676,7 +46729,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="874">
+            <Item class="Vector3Value" referent="873">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46690,7 +46743,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="875">
+          <Item class="Motor6D" referent="874">
             <Properties>
               <string name="Name">RightWrist</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46725,13 +46778,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">876</Ref>
-              <Ref name="Part1">870</Ref>
+              <Ref name="Part0">875</Ref>
+              <Ref name="Part1">869</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="877">
+          <Item class="Vector3Value" referent="876">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46745,7 +46798,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="876">
+        <Item class="MeshPart" referent="875">
           <Properties>
             <string name="Name">RightLowerArm</string>
             <bool name="Anchored">false</bool>
@@ -46864,7 +46917,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="878">
+          <Item class="Attachment" referent="877">
             <Properties>
               <string name="Name">RightElbowRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46886,7 +46939,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="879">
+            <Item class="Vector3Value" referent="878">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46900,7 +46953,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="880">
+          <Item class="Attachment" referent="879">
             <Properties>
               <string name="Name">RightWristRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46922,7 +46975,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="881">
+            <Item class="Vector3Value" referent="880">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46936,7 +46989,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="882">
+          <Item class="Motor6D" referent="881">
             <Properties>
               <string name="Name">RightElbow</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46971,13 +47024,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">883</Ref>
-              <Ref name="Part1">876</Ref>
+              <Ref name="Part0">882</Ref>
+              <Ref name="Part1">875</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="884">
+          <Item class="Vector3Value" referent="883">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -46991,7 +47044,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="883">
+        <Item class="MeshPart" referent="882">
           <Properties>
             <string name="Name">RightUpperArm</string>
             <bool name="Anchored">false</bool>
@@ -47110,7 +47163,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="885">
+          <Item class="Attachment" referent="884">
             <Properties>
               <string name="Name">RightShoulderRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47132,7 +47185,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="886">
+            <Item class="Vector3Value" referent="885">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47146,7 +47199,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="887">
+          <Item class="Attachment" referent="886">
             <Properties>
               <string name="Name">RightElbowRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47168,7 +47221,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="888">
+            <Item class="Vector3Value" referent="887">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47182,7 +47235,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="889">
+          <Item class="Attachment" referent="888">
             <Properties>
               <string name="Name">RightShoulderAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47204,7 +47257,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="890">
+            <Item class="Vector3Value" referent="889">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47218,7 +47271,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="891">
+          <Item class="Motor6D" referent="890">
             <Properties>
               <string name="Name">RightShoulder</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47253,13 +47306,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">868</Ref>
-              <Ref name="Part1">883</Ref>
+              <Ref name="Part0">867</Ref>
+              <Ref name="Part1">882</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="892">
+          <Item class="Vector3Value" referent="891">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47273,7 +47326,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="868">
+        <Item class="MeshPart" referent="867">
           <Properties>
             <string name="Name">UpperTorso</string>
             <bool name="Anchored">false</bool>
@@ -47392,7 +47445,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="893">
+          <Item class="Attachment" referent="892">
             <Properties>
               <string name="Name">WaistRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47414,7 +47467,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="894">
+            <Item class="Vector3Value" referent="893">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47428,7 +47481,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="895">
+          <Item class="Attachment" referent="894">
             <Properties>
               <string name="Name">NeckRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47450,7 +47503,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="896">
+            <Item class="Vector3Value" referent="895">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47464,7 +47517,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="897">
+          <Item class="Attachment" referent="896">
             <Properties>
               <string name="Name">LeftShoulderRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47486,7 +47539,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="898">
+            <Item class="Vector3Value" referent="897">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47500,7 +47553,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="899">
+          <Item class="Attachment" referent="898">
             <Properties>
               <string name="Name">RightShoulderRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47522,7 +47575,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="900">
+            <Item class="Vector3Value" referent="899">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47536,7 +47589,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="901">
+          <Item class="Attachment" referent="900">
             <Properties>
               <string name="Name">BodyFrontAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47558,7 +47611,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="902">
+            <Item class="Vector3Value" referent="901">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47572,7 +47625,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="903">
+          <Item class="Attachment" referent="902">
             <Properties>
               <string name="Name">BodyBackAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47594,7 +47647,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="904">
+            <Item class="Vector3Value" referent="903">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47608,7 +47661,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="905">
+          <Item class="Attachment" referent="904">
             <Properties>
               <string name="Name">LeftCollarAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47630,7 +47683,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="906">
+            <Item class="Vector3Value" referent="905">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47644,7 +47697,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="907">
+          <Item class="Attachment" referent="906">
             <Properties>
               <string name="Name">RightCollarAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47666,7 +47719,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="908">
+            <Item class="Vector3Value" referent="907">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47680,7 +47733,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="909">
+          <Item class="Attachment" referent="908">
             <Properties>
               <string name="Name">NeckAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47702,7 +47755,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="910">
+            <Item class="Vector3Value" referent="909">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47716,7 +47769,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="911">
+          <Item class="Motor6D" referent="910">
             <Properties>
               <string name="Name">Waist</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47751,13 +47804,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">912</Ref>
-              <Ref name="Part1">868</Ref>
+              <Ref name="Part0">911</Ref>
+              <Ref name="Part1">867</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="913">
+          <Item class="Vector3Value" referent="912">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47771,7 +47824,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="914">
+        <Item class="MeshPart" referent="913">
           <Properties>
             <string name="Name">LeftFoot</string>
             <bool name="Anchored">false</bool>
@@ -47890,7 +47943,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="915">
+          <Item class="Attachment" referent="914">
             <Properties>
               <string name="Name">LeftAnkleRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47912,7 +47965,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="916">
+            <Item class="Vector3Value" referent="915">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47926,7 +47979,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="917">
+          <Item class="Motor6D" referent="916">
             <Properties>
               <string name="Name">LeftAnkle</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47961,13 +48014,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">918</Ref>
-              <Ref name="Part1">914</Ref>
+              <Ref name="Part0">917</Ref>
+              <Ref name="Part1">913</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="919">
+          <Item class="Vector3Value" referent="918">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -47981,7 +48034,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="918">
+        <Item class="MeshPart" referent="917">
           <Properties>
             <string name="Name">LeftLowerLeg</string>
             <bool name="Anchored">false</bool>
@@ -48100,7 +48153,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="920">
+          <Item class="Attachment" referent="919">
             <Properties>
               <string name="Name">LeftKneeRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48122,7 +48175,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="921">
+            <Item class="Vector3Value" referent="920">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48136,7 +48189,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="922">
+          <Item class="Attachment" referent="921">
             <Properties>
               <string name="Name">LeftAnkleRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48158,7 +48211,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="923">
+            <Item class="Vector3Value" referent="922">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48172,7 +48225,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="924">
+          <Item class="Motor6D" referent="923">
             <Properties>
               <string name="Name">LeftKnee</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48207,13 +48260,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">925</Ref>
-              <Ref name="Part1">918</Ref>
+              <Ref name="Part0">924</Ref>
+              <Ref name="Part1">917</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="926">
+          <Item class="Vector3Value" referent="925">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48227,7 +48280,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="925">
+        <Item class="MeshPart" referent="924">
           <Properties>
             <string name="Name">LeftUpperLeg</string>
             <bool name="Anchored">false</bool>
@@ -48346,7 +48399,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="927">
+          <Item class="Attachment" referent="926">
             <Properties>
               <string name="Name">LeftHipRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48368,7 +48421,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="928">
+            <Item class="Vector3Value" referent="927">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48382,7 +48435,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="929">
+          <Item class="Attachment" referent="928">
             <Properties>
               <string name="Name">LeftKneeRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48404,7 +48457,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="930">
+            <Item class="Vector3Value" referent="929">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48418,7 +48471,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="931">
+          <Item class="Motor6D" referent="930">
             <Properties>
               <string name="Name">LeftHip</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48453,13 +48506,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">912</Ref>
-              <Ref name="Part1">925</Ref>
+              <Ref name="Part0">911</Ref>
+              <Ref name="Part1">924</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="932">
+          <Item class="Vector3Value" referent="931">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48473,7 +48526,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="933">
+        <Item class="MeshPart" referent="932">
           <Properties>
             <string name="Name">RightFoot</string>
             <bool name="Anchored">false</bool>
@@ -48592,7 +48645,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="934">
+          <Item class="Attachment" referent="933">
             <Properties>
               <string name="Name">RightAnkleRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48614,7 +48667,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="935">
+            <Item class="Vector3Value" referent="934">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48628,7 +48681,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="936">
+          <Item class="Motor6D" referent="935">
             <Properties>
               <string name="Name">RightAnkle</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48663,13 +48716,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">937</Ref>
-              <Ref name="Part1">933</Ref>
+              <Ref name="Part0">936</Ref>
+              <Ref name="Part1">932</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="938">
+          <Item class="Vector3Value" referent="937">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48683,7 +48736,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="937">
+        <Item class="MeshPart" referent="936">
           <Properties>
             <string name="Name">RightLowerLeg</string>
             <bool name="Anchored">false</bool>
@@ -48802,7 +48855,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="939">
+          <Item class="Attachment" referent="938">
             <Properties>
               <string name="Name">RightKneeRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48824,7 +48877,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="940">
+            <Item class="Vector3Value" referent="939">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48838,7 +48891,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="941">
+          <Item class="Attachment" referent="940">
             <Properties>
               <string name="Name">RightAnkleRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48860,7 +48913,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="942">
+            <Item class="Vector3Value" referent="941">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48874,7 +48927,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="943">
+          <Item class="Motor6D" referent="942">
             <Properties>
               <string name="Name">RightKnee</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48909,13 +48962,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">944</Ref>
-              <Ref name="Part1">937</Ref>
+              <Ref name="Part0">943</Ref>
+              <Ref name="Part1">936</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="945">
+          <Item class="Vector3Value" referent="944">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -48929,7 +48982,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="944">
+        <Item class="MeshPart" referent="943">
           <Properties>
             <string name="Name">RightUpperLeg</string>
             <bool name="Anchored">false</bool>
@@ -49048,7 +49101,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="946">
+          <Item class="Attachment" referent="945">
             <Properties>
               <string name="Name">RightHipRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49070,7 +49123,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="947">
+            <Item class="Vector3Value" referent="946">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49084,7 +49137,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="948">
+          <Item class="Attachment" referent="947">
             <Properties>
               <string name="Name">RightKneeRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49106,7 +49159,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="949">
+            <Item class="Vector3Value" referent="948">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49120,7 +49173,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="950">
+          <Item class="Motor6D" referent="949">
             <Properties>
               <string name="Name">RightHip</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49155,13 +49208,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">912</Ref>
-              <Ref name="Part1">944</Ref>
+              <Ref name="Part0">911</Ref>
+              <Ref name="Part1">943</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="951">
+          <Item class="Vector3Value" referent="950">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49175,7 +49228,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="MeshPart" referent="912">
+        <Item class="MeshPart" referent="911">
           <Properties>
             <string name="Name">LowerTorso</string>
             <bool name="Anchored">false</bool>
@@ -49294,7 +49347,7 @@ end)
             </Vector3>
             <int name="VertexCount">0</int>
           </Properties>
-          <Item class="Attachment" referent="952">
+          <Item class="Attachment" referent="951">
             <Properties>
               <string name="Name">RootRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49316,7 +49369,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="953">
+            <Item class="Vector3Value" referent="952">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49330,7 +49383,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="954">
+          <Item class="Attachment" referent="953">
             <Properties>
               <string name="Name">WaistRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49352,7 +49405,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="955">
+            <Item class="Vector3Value" referent="954">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49366,7 +49419,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="956">
+          <Item class="Attachment" referent="955">
             <Properties>
               <string name="Name">LeftHipRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49388,7 +49441,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="957">
+            <Item class="Vector3Value" referent="956">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49402,7 +49455,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="958">
+          <Item class="Attachment" referent="957">
             <Properties>
               <string name="Name">RightHipRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49424,7 +49477,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="959">
+            <Item class="Vector3Value" referent="958">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49438,7 +49491,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="960">
+          <Item class="Attachment" referent="959">
             <Properties>
               <string name="Name">WaistCenterAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49460,7 +49513,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="961">
+            <Item class="Vector3Value" referent="960">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49474,7 +49527,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="962">
+          <Item class="Attachment" referent="961">
             <Properties>
               <string name="Name">WaistFrontAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49496,7 +49549,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="963">
+            <Item class="Vector3Value" referent="962">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49510,7 +49563,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="964">
+          <Item class="Attachment" referent="963">
             <Properties>
               <string name="Name">WaistBackAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49532,7 +49585,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="965">
+            <Item class="Vector3Value" referent="964">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49546,7 +49599,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Motor6D" referent="966">
+          <Item class="Motor6D" referent="965">
             <Properties>
               <string name="Name">Root</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49581,13 +49634,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">842</Ref>
-              <Ref name="Part1">912</Ref>
+              <Ref name="Part0">841</Ref>
+              <Ref name="Part1">911</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="967">
+          <Item class="Vector3Value" referent="966">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49601,7 +49654,7 @@ end)
             </Properties>
           </Item>
         </Item>
-        <Item class="Humanoid" referent="968">
+        <Item class="Humanoid" referent="967">
           <Properties>
             <string name="Name">Humanoid</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49636,7 +49689,7 @@ end)
             <float name="WalkSpeed">16</float>
           </Properties>
         </Item>
-        <Item class="Part" referent="969">
+        <Item class="Part" referent="968">
           <Properties>
             <string name="Name">Head</string>
             <bool name="Anchored">false</bool>
@@ -49729,7 +49782,7 @@ end)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="SpecialMesh" referent="970">
+          <Item class="SpecialMesh" referent="969">
             <Properties>
               <string name="Name">Mesh</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49763,7 +49816,7 @@ end)
               </Vector3>
             </Properties>
           </Item>
-          <Item class="Attachment" referent="971">
+          <Item class="Attachment" referent="970">
             <Properties>
               <string name="Name">FaceCenterAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49785,7 +49838,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="972">
+            <Item class="Vector3Value" referent="971">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49799,7 +49852,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="973">
+          <Item class="Attachment" referent="972">
             <Properties>
               <string name="Name">FaceFrontAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49821,7 +49874,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="974">
+            <Item class="Vector3Value" referent="973">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49835,7 +49888,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="975">
+          <Item class="Attachment" referent="974">
             <Properties>
               <string name="Name">HairAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49857,7 +49910,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="976">
+            <Item class="Vector3Value" referent="975">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49871,7 +49924,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="977">
+          <Item class="Attachment" referent="976">
             <Properties>
               <string name="Name">HatAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49893,7 +49946,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="978">
+            <Item class="Vector3Value" referent="977">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49907,7 +49960,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Attachment" referent="979">
+          <Item class="Attachment" referent="978">
             <Properties>
               <string name="Name">NeckRigAttachment</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49929,7 +49982,7 @@ end)
               <BinaryString name="Tags"></BinaryString>
               <bool name="Visible">false</bool>
             </Properties>
-            <Item class="Vector3Value" referent="980">
+            <Item class="Vector3Value" referent="979">
               <Properties>
                 <string name="Name">OriginalPosition</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49943,7 +49996,7 @@ end)
               </Properties>
             </Item>
           </Item>
-          <Item class="Decal" referent="981">
+          <Item class="Decal" referent="980">
             <Properties>
               <string name="Name">face</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49962,7 +50015,7 @@ end)
               <int name="ZIndex">1</int>
             </Properties>
           </Item>
-          <Item class="Motor6D" referent="982">
+          <Item class="Motor6D" referent="981">
             <Properties>
               <string name="Name">Neck</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -49997,13 +50050,13 @@ end)
               <float name="DesiredAngle">0</float>
               <bool name="Enabled">true</bool>
               <float name="MaxVelocity">0</float>
-              <Ref name="Part0">868</Ref>
-              <Ref name="Part1">969</Ref>
+              <Ref name="Part0">867</Ref>
+              <Ref name="Part1">968</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Vector3Value" referent="983">
+          <Item class="Vector3Value" referent="982">
             <Properties>
               <string name="Name">OriginalSize</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50018,7 +50071,7 @@ end)
           </Item>
         </Item>
       </Item>
-      <Item class="Model" referent="984">
+      <Item class="Model" referent="983">
         <Properties>
           <string name="Name">_base</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50050,7 +50103,7 @@ end)
           <OptionalCoordinateFrame name="WorldPivotData">
           </OptionalCoordinateFrame>
         </Properties>
-        <Item class="Part" referent="985">
+        <Item class="Part" referent="984">
           <Properties>
             <string name="Name">Baseplate</string>
             <bool name="Anchored">true</bool>
@@ -50143,7 +50196,7 @@ end)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="Texture" referent="986">
+          <Item class="Texture" referent="985">
             <Properties>
               <string name="Name">Texture</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50168,7 +50221,7 @@ end)
           </Item>
         </Item>
       </Item>
-      <Item class="Part" referent="987">
+      <Item class="Part" referent="986">
         <Properties>
           <string name="Name">Baseplate</string>
           <bool name="Anchored">true</bool>
@@ -50261,7 +50314,7 @@ end)
             <Z>0</Z>
           </Vector3>
         </Properties>
-        <Item class="Texture" referent="988">
+        <Item class="Texture" referent="987">
           <Properties>
             <string name="Name">Texture</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50284,7 +50337,7 @@ end)
             <int name="ZIndex">1</int>
           </Properties>
         </Item>
-        <Item class="Script" referent="989">
+        <Item class="Script" referent="988">
           <Properties>
             <string name="Name">Script</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50361,7 +50414,7 @@ local b = 2</string>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="Script" referent="990">
+        <Item class="Script" referent="989">
           <Properties>
             <string name="Name">Script1</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50428,7 +50481,7 @@ local b = 2</string>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
         </Item>
-        <Item class="Script" referent="991">
+        <Item class="Script" referent="990">
           <Properties>
             <string name="Name">Script2</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50479,7 +50532,7 @@ print(w.x)
           </Properties>
         </Item>
       </Item>
-      <Item class="Tool" referent="992">
+      <Item class="Tool" referent="991">
         <Properties>
           <string name="Name">Boots</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50509,7 +50562,7 @@ print(w.x)
           </Content>
           <string name="ToolTip"></string>
         </Properties>
-        <Item class="Part" referent="993">
+        <Item class="Part" referent="992">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -50602,7 +50655,7 @@ print(w.x)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="WeldConstraint" referent="994">
+          <Item class="WeldConstraint" referent="993">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50620,21 +50673,21 @@ print(w.x)
                 <R21>0</R21>
                 <R22>1</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">993</Ref>
-              <Ref name="Part1Internal">995</Ref>
+              <Ref name="Part0Internal">992</Ref>
+              <Ref name="Part1Internal">994</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Folder" referent="996">
+          <Item class="Folder" referent="995">
             <Properties>
               <string name="Name">ToolBinder</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
-            <Item class="WeldConstraint" referent="997">
+            <Item class="WeldConstraint" referent="996">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50652,8 +50705,8 @@ print(w.x)
                   <R21>0</R21>
                   <R22>1</R22>
                 </CoordinateFrame>
-                <Ref name="Part0Internal">993</Ref>
-                <Ref name="Part1Internal">998</Ref>
+                <Ref name="Part0Internal">992</Ref>
+                <Ref name="Part1Internal">997</Ref>
                 <int64 name="SourceAssetId">-1</int64>
                 <int name="State">3</int>
                 <BinaryString name="Tags"></BinaryString>
@@ -50661,7 +50714,7 @@ print(w.x)
             </Item>
           </Item>
         </Item>
-        <Item class="IntValue" referent="999">
+        <Item class="IntValue" referent="998">
           <Properties>
             <string name="Name">Key</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50670,28 +50723,28 @@ print(w.x)
             <int64 name="Value">104</int64>
           </Properties>
         </Item>
-        <Item class="Folder" referent="1000">
+        <Item class="Folder" referent="999">
           <Properties>
             <string name="Name">Mesh</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
             <int64 name="SourceAssetId">-1</int64>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
-          <Item class="Folder" referent="1001">
+          <Item class="Folder" referent="1000">
             <Properties>
               <string name="Name">Parts</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
-            <Item class="Folder" referent="1002">
+            <Item class="Folder" referent="1001">
               <Properties>
                 <string name="Name">LeftFoot</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <int64 name="SourceAssetId">-1</int64>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
-              <Item class="Folder" referent="1003">
+              <Item class="Folder" referent="1002">
                 <Properties>
                   <string name="Name">Weld</string>
                   <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50699,7 +50752,7 @@ print(w.x)
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
               </Item>
-              <Item class="Part" referent="995">
+              <Item class="Part" referent="994">
                 <Properties>
                   <string name="Name">MainPart</string>
                   <bool name="Anchored">false</bool>
@@ -50792,7 +50845,7 @@ print(w.x)
                     <Z>0</Z>
                   </Vector3>
                 </Properties>
-                <Item class="Attachment" referent="1004">
+                <Item class="Attachment" referent="1003">
                   <Properties>
                     <string name="Name">LeftAnkleRigAttachment</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50814,7 +50867,7 @@ print(w.x)
                     <BinaryString name="Tags"></BinaryString>
                     <bool name="Visible">false</bool>
                   </Properties>
-                  <Item class="Vector3Value" referent="1005">
+                  <Item class="Vector3Value" referent="1004">
                     <Properties>
                       <string name="Name">OriginalPosition</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50830,14 +50883,14 @@ print(w.x)
                 </Item>
               </Item>
             </Item>
-            <Item class="Folder" referent="1006">
+            <Item class="Folder" referent="1005">
               <Properties>
                 <string name="Name">RightFoot</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <int64 name="SourceAssetId">-1</int64>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
-              <Item class="Folder" referent="1007">
+              <Item class="Folder" referent="1006">
                 <Properties>
                   <string name="Name">Weld</string>
                   <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50845,7 +50898,7 @@ print(w.x)
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
               </Item>
-              <Item class="Part" referent="998">
+              <Item class="Part" referent="997">
                 <Properties>
                   <string name="Name">MainPart</string>
                   <bool name="Anchored">false</bool>
@@ -50938,7 +50991,7 @@ print(w.x)
                     <Z>0</Z>
                   </Vector3>
                 </Properties>
-                <Item class="Attachment" referent="1008">
+                <Item class="Attachment" referent="1007">
                   <Properties>
                     <string name="Name">RightAnkleRigAttachment</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50960,7 +51013,7 @@ print(w.x)
                     <BinaryString name="Tags"></BinaryString>
                     <bool name="Visible">false</bool>
                   </Properties>
-                  <Item class="Vector3Value" referent="1009">
+                  <Item class="Vector3Value" referent="1008">
                     <Properties>
                       <string name="Name">OriginalPosition</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
@@ -50979,7 +51032,7 @@ print(w.x)
           </Item>
         </Item>
       </Item>
-      <Item class="Tool" referent="1010">
+      <Item class="Tool" referent="1009">
         <Properties>
           <string name="Name">Chestplate</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51009,7 +51062,7 @@ print(w.x)
           </Content>
           <string name="ToolTip"></string>
         </Properties>
-        <Item class="IntValue" referent="1011">
+        <Item class="IntValue" referent="1010">
           <Properties>
             <string name="Name">Key</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51018,7 +51071,7 @@ print(w.x)
             <int64 name="Value">102</int64>
           </Properties>
         </Item>
-        <Item class="Part" referent="1012">
+        <Item class="Part" referent="1011">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -51111,7 +51164,7 @@ print(w.x)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="Folder" referent="1013">
+          <Item class="Folder" referent="1012">
             <Properties>
               <string name="Name">ToolBinder</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51119,7 +51172,7 @@ print(w.x)
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="WeldConstraint" referent="1014">
+          <Item class="WeldConstraint" referent="1013">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51137,36 +51190,36 @@ print(w.x)
                 <R21>0</R21>
                 <R22>1</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">1012</Ref>
-              <Ref name="Part1Internal">1015</Ref>
+              <Ref name="Part0Internal">1011</Ref>
+              <Ref name="Part1Internal">1014</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
         </Item>
-        <Item class="Folder" referent="1016">
+        <Item class="Folder" referent="1015">
           <Properties>
             <string name="Name">Mesh</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
             <int64 name="SourceAssetId">-1</int64>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
-          <Item class="Folder" referent="1017">
+          <Item class="Folder" referent="1016">
             <Properties>
               <string name="Name">Parts</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
-            <Item class="Folder" referent="1018">
+            <Item class="Folder" referent="1017">
               <Properties>
                 <string name="Name">UpperTorso</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <int64 name="SourceAssetId">-1</int64>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
-              <Item class="Part" referent="1015">
+              <Item class="Part" referent="1014">
                 <Properties>
                   <string name="Name">MainPart</string>
                   <bool name="Anchored">false</bool>
@@ -51259,7 +51312,7 @@ print(w.x)
                     <Z>0</Z>
                   </Vector3>
                 </Properties>
-                <Item class="Attachment" referent="1019">
+                <Item class="Attachment" referent="1018">
                   <Properties>
                     <string name="Name">BodyFrontAttachment</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51281,7 +51334,7 @@ print(w.x)
                     <BinaryString name="Tags"></BinaryString>
                     <bool name="Visible">false</bool>
                   </Properties>
-                  <Item class="Vector3Value" referent="1020">
+                  <Item class="Vector3Value" referent="1019">
                     <Properties>
                       <string name="Name">OriginalPosition</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51296,7 +51349,7 @@ print(w.x)
                   </Item>
                 </Item>
               </Item>
-              <Item class="Part" referent="1021">
+              <Item class="Part" referent="1020">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -51390,7 +51443,7 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Part" referent="1022">
+              <Item class="Part" referent="1021">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -51484,7 +51537,7 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Part" referent="1023">
+              <Item class="Part" referent="1022">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -51578,14 +51631,14 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Folder" referent="1024">
+              <Item class="Folder" referent="1023">
                 <Properties>
                   <string name="Name">Weld</string>
                   <BinaryString name="AttributesSerialize"></BinaryString>
                   <int64 name="SourceAssetId">-1</int64>
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
-                <Item class="WeldConstraint" referent="1025">
+                <Item class="WeldConstraint" referent="1024">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51603,14 +51656,14 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1015</Ref>
-                    <Ref name="Part1Internal">1023</Ref>
+                    <Ref name="Part0Internal">1014</Ref>
+                    <Ref name="Part1Internal">1022</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
                   </Properties>
                 </Item>
-                <Item class="WeldConstraint" referent="1026">
+                <Item class="WeldConstraint" referent="1025">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51628,14 +51681,14 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1015</Ref>
-                    <Ref name="Part1Internal">1022</Ref>
+                    <Ref name="Part0Internal">1014</Ref>
+                    <Ref name="Part1Internal">1021</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
                   </Properties>
                 </Item>
-                <Item class="WeldConstraint" referent="1027">
+                <Item class="WeldConstraint" referent="1026">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51653,8 +51706,8 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1015</Ref>
-                    <Ref name="Part1Internal">1021</Ref>
+                    <Ref name="Part0Internal">1014</Ref>
+                    <Ref name="Part1Internal">1020</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
@@ -51665,7 +51718,7 @@ print(w.x)
           </Item>
         </Item>
       </Item>
-      <Item class="Tool" referent="1028">
+      <Item class="Tool" referent="1027">
         <Properties>
           <string name="Name">Helmet</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51695,7 +51748,7 @@ print(w.x)
           </Content>
           <string name="ToolTip"></string>
         </Properties>
-        <Item class="IntValue" referent="1029">
+        <Item class="IntValue" referent="1028">
           <Properties>
             <string name="Name">Key</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51704,7 +51757,7 @@ print(w.x)
             <int64 name="Value">101</int64>
           </Properties>
         </Item>
-        <Item class="Part" referent="1030">
+        <Item class="Part" referent="1029">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -51797,7 +51850,7 @@ print(w.x)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="WeldConstraint" referent="1031">
+          <Item class="WeldConstraint" referent="1030">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51815,14 +51868,14 @@ print(w.x)
                 <R21>0</R21>
                 <R22>1</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">1030</Ref>
-              <Ref name="Part1Internal">1032</Ref>
+              <Ref name="Part0Internal">1029</Ref>
+              <Ref name="Part1Internal">1031</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="Folder" referent="1033">
+          <Item class="Folder" referent="1032">
             <Properties>
               <string name="Name">ToolBinder</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -51831,28 +51884,28 @@ print(w.x)
             </Properties>
           </Item>
         </Item>
-        <Item class="Folder" referent="1034">
+        <Item class="Folder" referent="1033">
           <Properties>
             <string name="Name">Mesh</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
             <int64 name="SourceAssetId">-1</int64>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
-          <Item class="Folder" referent="1035">
+          <Item class="Folder" referent="1034">
             <Properties>
               <string name="Name">Parts</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
-            <Item class="Folder" referent="1036">
+            <Item class="Folder" referent="1035">
               <Properties>
                 <string name="Name">Head</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <int64 name="SourceAssetId">-1</int64>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
-              <Item class="Part" referent="1037">
+              <Item class="Part" referent="1036">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -51946,7 +51999,7 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Part" referent="1032">
+              <Item class="Part" referent="1031">
                 <Properties>
                   <string name="Name">MainPart</string>
                   <bool name="Anchored">false</bool>
@@ -52039,7 +52092,7 @@ print(w.x)
                     <Z>0</Z>
                   </Vector3>
                 </Properties>
-                <Item class="Attachment" referent="1038">
+                <Item class="Attachment" referent="1037">
                   <Properties>
                     <string name="Name">FaceCenterAttachment</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52063,7 +52116,7 @@ print(w.x)
                   </Properties>
                 </Item>
               </Item>
-              <Item class="Part" referent="1039">
+              <Item class="Part" referent="1038">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -52157,7 +52210,7 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Part" referent="1040">
+              <Item class="Part" referent="1039">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -52251,14 +52304,14 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Folder" referent="1041">
+              <Item class="Folder" referent="1040">
                 <Properties>
                   <string name="Name">Weld</string>
                   <BinaryString name="AttributesSerialize"></BinaryString>
                   <int64 name="SourceAssetId">-1</int64>
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
-                <Item class="WeldConstraint" referent="1042">
+                <Item class="WeldConstraint" referent="1041">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52276,14 +52329,14 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1032</Ref>
-                    <Ref name="Part1Internal">1037</Ref>
+                    <Ref name="Part0Internal">1031</Ref>
+                    <Ref name="Part1Internal">1036</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
                   </Properties>
                 </Item>
-                <Item class="WeldConstraint" referent="1043">
+                <Item class="WeldConstraint" referent="1042">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52301,14 +52354,14 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1032</Ref>
-                    <Ref name="Part1Internal">1039</Ref>
+                    <Ref name="Part0Internal">1031</Ref>
+                    <Ref name="Part1Internal">1038</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
                   </Properties>
                 </Item>
-                <Item class="WeldConstraint" referent="1044">
+                <Item class="WeldConstraint" referent="1043">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52326,8 +52379,8 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1032</Ref>
-                    <Ref name="Part1Internal">1040</Ref>
+                    <Ref name="Part0Internal">1031</Ref>
+                    <Ref name="Part1Internal">1039</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
@@ -52338,7 +52391,7 @@ print(w.x)
           </Item>
         </Item>
       </Item>
-      <Item class="Tool" referent="1045">
+      <Item class="Tool" referent="1044">
         <Properties>
           <string name="Name">Leggings</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52368,7 +52421,7 @@ print(w.x)
           </Content>
           <string name="ToolTip"></string>
         </Properties>
-        <Item class="IntValue" referent="1046">
+        <Item class="IntValue" referent="1045">
           <Properties>
             <string name="Name">Key</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52377,7 +52430,7 @@ print(w.x)
             <int64 name="Value">103</int64>
           </Properties>
         </Item>
-        <Item class="Part" referent="1047">
+        <Item class="Part" referent="1046">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -52470,14 +52523,14 @@ print(w.x)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="Folder" referent="1048">
+          <Item class="Folder" referent="1047">
             <Properties>
               <string name="Name">ToolBinder</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
-            <Item class="WeldConstraint" referent="1049">
+            <Item class="WeldConstraint" referent="1048">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52495,15 +52548,15 @@ print(w.x)
                   <R21>0</R21>
                   <R22>1</R22>
                 </CoordinateFrame>
-                <Ref name="Part0Internal">1047</Ref>
-                <Ref name="Part1Internal">1050</Ref>
+                <Ref name="Part0Internal">1046</Ref>
+                <Ref name="Part1Internal">1049</Ref>
                 <int64 name="SourceAssetId">-1</int64>
                 <int name="State">3</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
           </Item>
-          <Item class="WeldConstraint" referent="1051">
+          <Item class="WeldConstraint" referent="1050">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52521,36 +52574,36 @@ print(w.x)
                 <R21>0</R21>
                 <R22>1</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">1047</Ref>
-              <Ref name="Part1Internal">1052</Ref>
+              <Ref name="Part0Internal">1046</Ref>
+              <Ref name="Part1Internal">1051</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
         </Item>
-        <Item class="Folder" referent="1053">
+        <Item class="Folder" referent="1052">
           <Properties>
             <string name="Name">Mesh</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
             <int64 name="SourceAssetId">-1</int64>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
-          <Item class="Folder" referent="1054">
+          <Item class="Folder" referent="1053">
             <Properties>
               <string name="Name">Parts</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
-            <Item class="Folder" referent="1055">
+            <Item class="Folder" referent="1054">
               <Properties>
                 <string name="Name">LeftLegging</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <int64 name="SourceAssetId">-1</int64>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
-              <Item class="Part" referent="1056">
+              <Item class="Part" referent="1055">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -52644,7 +52697,7 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Part" referent="1057">
+              <Item class="Part" referent="1056">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -52738,7 +52791,7 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Part" referent="1052">
+              <Item class="Part" referent="1051">
                 <Properties>
                   <string name="Name">MainPart</string>
                   <bool name="Anchored">false</bool>
@@ -52831,7 +52884,7 @@ print(w.x)
                     <Z>0</Z>
                   </Vector3>
                 </Properties>
-                <Item class="Attachment" referent="1058">
+                <Item class="Attachment" referent="1057">
                   <Properties>
                     <string name="Name">LeftKneeRigAttachment</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52855,7 +52908,7 @@ print(w.x)
                   </Properties>
                 </Item>
               </Item>
-              <Item class="Part" referent="1059">
+              <Item class="Part" referent="1058">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -52949,14 +53002,14 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Folder" referent="1060">
+              <Item class="Folder" referent="1059">
                 <Properties>
                   <string name="Name">Weld</string>
                   <BinaryString name="AttributesSerialize"></BinaryString>
                   <int64 name="SourceAssetId">-1</int64>
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
-                <Item class="WeldConstraint" referent="1061">
+                <Item class="WeldConstraint" referent="1060">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52974,14 +53027,14 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1052</Ref>
-                    <Ref name="Part1Internal">1057</Ref>
+                    <Ref name="Part0Internal">1051</Ref>
+                    <Ref name="Part1Internal">1056</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
                   </Properties>
                 </Item>
-                <Item class="WeldConstraint" referent="1062">
+                <Item class="WeldConstraint" referent="1061">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -52999,14 +53052,14 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1057</Ref>
-                    <Ref name="Part1Internal">1059</Ref>
+                    <Ref name="Part0Internal">1056</Ref>
+                    <Ref name="Part1Internal">1058</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
                   </Properties>
                 </Item>
-                <Item class="WeldConstraint" referent="1063">
+                <Item class="WeldConstraint" referent="1062">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -53024,8 +53077,8 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1059</Ref>
-                    <Ref name="Part1Internal">1056</Ref>
+                    <Ref name="Part0Internal">1058</Ref>
+                    <Ref name="Part1Internal">1055</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
@@ -53033,14 +53086,14 @@ print(w.x)
                 </Item>
               </Item>
             </Item>
-            <Item class="Folder" referent="1064">
+            <Item class="Folder" referent="1063">
               <Properties>
                 <string name="Name">RightLegging</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <int64 name="SourceAssetId">-1</int64>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
-              <Item class="Part" referent="1065">
+              <Item class="Part" referent="1064">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -53134,7 +53187,7 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Part" referent="1050">
+              <Item class="Part" referent="1049">
                 <Properties>
                   <string name="Name">MainPart</string>
                   <bool name="Anchored">false</bool>
@@ -53227,7 +53280,7 @@ print(w.x)
                     <Z>0</Z>
                   </Vector3>
                 </Properties>
-                <Item class="Attachment" referent="1066">
+                <Item class="Attachment" referent="1065">
                   <Properties>
                     <string name="Name">RightKneeRigAttachment</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -53251,7 +53304,7 @@ print(w.x)
                   </Properties>
                 </Item>
               </Item>
-              <Item class="Part" referent="1067">
+              <Item class="Part" referent="1066">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -53345,7 +53398,7 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Part" referent="1068">
+              <Item class="Part" referent="1067">
                 <Properties>
                   <string name="Name">Part</string>
                   <bool name="Anchored">false</bool>
@@ -53439,14 +53492,14 @@ print(w.x)
                   </Vector3>
                 </Properties>
               </Item>
-              <Item class="Folder" referent="1069">
+              <Item class="Folder" referent="1068">
                 <Properties>
                   <string name="Name">Weld</string>
                   <BinaryString name="AttributesSerialize"></BinaryString>
                   <int64 name="SourceAssetId">-1</int64>
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
-                <Item class="WeldConstraint" referent="1070">
+                <Item class="WeldConstraint" referent="1069">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -53464,14 +53517,14 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1068</Ref>
-                    <Ref name="Part1Internal">1067</Ref>
+                    <Ref name="Part0Internal">1067</Ref>
+                    <Ref name="Part1Internal">1066</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
                   </Properties>
                 </Item>
-                <Item class="WeldConstraint" referent="1071">
+                <Item class="WeldConstraint" referent="1070">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -53489,14 +53542,14 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1050</Ref>
-                    <Ref name="Part1Internal">1068</Ref>
+                    <Ref name="Part0Internal">1049</Ref>
+                    <Ref name="Part1Internal">1067</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
                   </Properties>
                 </Item>
-                <Item class="WeldConstraint" referent="1072">
+                <Item class="WeldConstraint" referent="1071">
                   <Properties>
                     <string name="Name">WeldConstraint</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -53514,8 +53567,8 @@ print(w.x)
                       <R21>0</R21>
                       <R22>1</R22>
                     </CoordinateFrame>
-                    <Ref name="Part0Internal">1067</Ref>
-                    <Ref name="Part1Internal">1065</Ref>
+                    <Ref name="Part0Internal">1066</Ref>
+                    <Ref name="Part1Internal">1064</Ref>
                     <int64 name="SourceAssetId">-1</int64>
                     <int name="State">3</int>
                     <BinaryString name="Tags"></BinaryString>
@@ -53526,7 +53579,7 @@ print(w.x)
           </Item>
         </Item>
       </Item>
-      <Item class="Tool" referent="1073">
+      <Item class="Tool" referent="1072">
         <Properties>
           <string name="Name">_ArmorToolTemplate</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
@@ -53556,7 +53609,7 @@ print(w.x)
           </Content>
           <string name="ToolTip"></string>
         </Properties>
-        <Item class="IntValue" referent="1074">
+        <Item class="IntValue" referent="1073">
           <Properties>
             <string name="Name">Key</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
@@ -53565,7 +53618,7 @@ print(w.x)
             <int64 name="Value">101</int64>
           </Properties>
         </Item>
-        <Item class="Part" referent="1075">
+        <Item class="Part" referent="1074">
           <Properties>
             <string name="Name">Handle</string>
             <bool name="Anchored">false</bool>
@@ -53658,7 +53711,7 @@ print(w.x)
               <Z>0</Z>
             </Vector3>
           </Properties>
-          <Item class="Folder" referent="1076">
+          <Item class="Folder" referent="1075">
             <Properties>
               <string name="Name">ToolBinder</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -53666,7 +53719,7 @@ print(w.x)
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
-          <Item class="WeldConstraint" referent="1077">
+          <Item class="WeldConstraint" referent="1076">
             <Properties>
               <string name="Name">WeldConstraint</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
@@ -53684,36 +53737,36 @@ print(w.x)
                 <R21>0</R21>
                 <R22>1</R22>
               </CoordinateFrame>
-              <Ref name="Part0Internal">1075</Ref>
-              <Ref name="Part1Internal">1078</Ref>
+              <Ref name="Part0Internal">1074</Ref>
+              <Ref name="Part1Internal">1077</Ref>
               <int64 name="SourceAssetId">-1</int64>
               <int name="State">3</int>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
           </Item>
         </Item>
-        <Item class="Folder" referent="1079">
+        <Item class="Folder" referent="1078">
           <Properties>
             <string name="Name">Mesh</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
             <int64 name="SourceAssetId">-1</int64>
             <BinaryString name="Tags"></BinaryString>
           </Properties>
-          <Item class="Folder" referent="1080">
+          <Item class="Folder" referent="1079">
             <Properties>
               <string name="Name">Parts</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
             </Properties>
-            <Item class="Folder" referent="1081">
+            <Item class="Folder" referent="1080">
               <Properties>
                 <string name="Name">Part1</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <int64 name="SourceAssetId">-1</int64>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
-              <Item class="Part" referent="1078">
+              <Item class="Part" referent="1077">
                 <Properties>
                   <string name="Name">MainPart</string>
                   <bool name="Anchored">false</bool>
@@ -53806,7 +53859,7 @@ print(w.x)
                     <Z>0</Z>
                   </Vector3>
                 </Properties>
-                <Item class="Attachment" referent="1082">
+                <Item class="Attachment" referent="1081">
                   <Properties>
                     <string name="Name">Attachment</string>
                     <BinaryString name="AttributesSerialize"></BinaryString>
@@ -53830,7 +53883,7 @@ print(w.x)
                   </Properties>
                 </Item>
               </Item>
-              <Item class="Folder" referent="1083">
+              <Item class="Folder" referent="1082">
                 <Properties>
                   <string name="Name">Weld</string>
                   <BinaryString name="AttributesSerialize"></BinaryString>

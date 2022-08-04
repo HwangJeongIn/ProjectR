@@ -23,6 +23,7 @@ local CommonConstant = {
 
 	-- SkillSlots
 	MaxSkillCount = 3,
+	GuiSkillSlotOffsetRatio = 0.025,
 	
 	UndefinedElementValue = false
 }

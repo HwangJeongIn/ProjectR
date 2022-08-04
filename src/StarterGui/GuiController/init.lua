@@ -73,7 +73,7 @@ function GuiController:Initialize()
 	self.GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
 	self.GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
 	
-	local GuiBoard = PlayerGui:WaitForChild("GuiBoard")
+	self.GuiBoard = GuiFacade.GuiBoard
 	self.GuiPlayersLeftCountText = GuiBoard:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
 	self.GuiKilledCountText = GuiBoard:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
 	self.GuiCurrentGameLengthText = GuiBoard:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
@@ -150,9 +150,8 @@ end
 function GuiController:ProcessWaiting(arguments)
 	print("GameStateType.Waiting in client")
 	self:SetGuiMainMessage("Waiting ... ")
-	self.GuiPlayersLeftCountText.Parent.Enabled = false
-	self.GuiCurrentGameLengthText.Parent.Enabled = false
-	self.GuiKilledCountText.Parent.Enabled = false
+
+	self.GuiBoard.Enabled = false
 	
 end
 
@@ -171,9 +170,8 @@ function GuiController:ProcessPlaying(arguments)
 	wait(2)
 	
 	self:SetGuiMainMessage("Get ready to play")
-	self.GuiPlayersLeftCountText.Parent.Enabled = true
-	self.GuiCurrentGameLengthText.Parent.Enabled = true
-	self.GuiKilledCountText.Parent.Enabled = true
+
+	self.GuiBoard.Enabled = true
 	
 	wait(2)
 	

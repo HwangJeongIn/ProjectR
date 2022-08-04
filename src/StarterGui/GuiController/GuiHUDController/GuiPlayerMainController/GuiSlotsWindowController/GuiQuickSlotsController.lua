@@ -1,10 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonMoudleFacade.Debug
---local Utility = CommonMoudleFacade.Utility
+local Utility = CommonMoudleFacade.Utility
 local ToolUtility = CommonMoudleFacade.ToolUtility
-local CommonConstant = CommonMoudleFacade.CommonConstant
 
+local CommonEnum = CommonMoudleFacade.CommonEnum
+local SlotType = CommonEnum.SlotType
+--local EquipType = CommonEnum.EquipType
+
+local CommonConstant = CommonMoudleFacade.CommonConstant
 local MaxQuickSlotCount = CommonConstant.MaxQuickSlotCount
 local GuiQuickSlotOffsetRatio = CommonConstant.GuiQuickSlotOffsetRatio
 
@@ -15,9 +19,14 @@ local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
 local GuiQuickSlots = GuiFacade.GuiQuickSlots
 local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiToolSlot
+local GuiToolSlotController = GuiFacade.GuiTemplateController.GuiToolSlotController
 
 
-local GuiQuickSlotsController = {}
+local GuiQuickSlotsRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
+GuiQuickSlotsRaw:Initialize(MaxQuickSlotCount)
+local GuiQuickSlotsController = {
+	GuiQuickSlotsRaw = GuiQuickSlotsRaw
+}
 
 function GuiQuickSlotsController:Initialize()
 	local GuiQuickSlotsHeight = GuiQuickSlots.AbsoluteSize.Y
@@ -34,10 +43,9 @@ function GuiQuickSlotsController:Initialize()
         return
     end
 
-    --[[
-    local finalSize = GuiQuickSlots.Size
-	finalSize.X.Scale = GuiQuickSlotsWidth / GuiSlotsWindowWidth
-	GuiQuickSlots.Size = finalSize
+    
+    local prevSize = GuiQuickSlots.Size
+	GuiQuickSlots.Size = UDim2.new(GuiQuickSlotsWidth / GuiSlotsWindowWidth, 0, prevSize.Y.Scale, 0)
 
 	local slotRatioX = finalSlotSize / GuiQuickSlotsWidth
 	local halfSlotRatioX = slotRatioX / 2
@@ -60,9 +68,9 @@ function GuiQuickSlotsController:Initialize()
         newGuiToolSlot.Parent = GuiQuickSlots
         newGuiToolSlot.Name = tostring(slotIndex)
 
-        self.GuiEquipSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.QuickSlot, slotIndex, newGuiToolSlot))
+        self.GuiQuickSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.QuickSlot, slotIndex, newGuiToolSlot))
     end
---]]
+
 end
 
 GuiQuickSlotsController:Initialize()

@@ -13,6 +13,7 @@ function GuiFacade:Initialize()
     
     local GuiPlayerMain = GuiHUD:WaitForChild("GuiPlayerMain")
     local GuiMinimap = GuiHUD:WaitForChild("GuiMinimap")
+    local GuiBoard = GuiHUD:WaitForChild("GuiBoard")
     
     local GuiBarsWindow = GuiPlayerMain:WaitForChild("GuiBarsWindow")
     local GuiSlotsWindow = GuiPlayerMain:WaitForChild("GuiSlotsWindow")
@@ -25,6 +26,7 @@ function GuiFacade:Initialize()
     self.GuiHUD = GuiHUD
     self.GuiPlayerMain = GuiPlayerMain
     self.GuiMinimap = GuiMinimap
+    self.GuiBoard = GuiBoard
     self.GuiBarsWindow = GuiBarsWindow
     self.GuiSlotsWindow = GuiSlotsWindow
     self.GuiHpBar = GuiHpBar

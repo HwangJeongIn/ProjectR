@@ -1,4 +1,33 @@
-game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+local StarterGui = game:GetService("StarterGui")
+
+--StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+--StarterGui:SetCore("TopbarEnabled", false)
+
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
+
+local TOPBAR_COLOR = Color3.fromRGB(0, 0, 0)
+local TOPBAR_TRANSPARENCY = 0.2
+ 
+local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+ 
+-- Create a "Fake" replacement topbar with a ScreenGui and Frame
+local screenGui = Instance.new("ScreenGui")
+local frame = Instance.new("Frame")
+ 
+-- Move (0, 0) to the actual top left corner of the screen, instead of under the topbar
+screenGui.IgnoreGuiInset = true
+-- The topbar is 36 pixels tall, and spans the entire width of the screen
+frame.Size = UDim2.new(1, 0, 0, 36) 
+-- Style the topbar
+frame.BackgroundColor3 = TOPBAR_COLOR
+frame.BackgroundTransparency = TOPBAR_TRANSPARENCY
+frame.BorderSizePixel = 0
+ 
+frame.Parent = screenGui
+screenGui.Parent = playerGui
+
+
 
 local UserInputService = game:GetService("UserInputService")			-- 선택해야한다.
 local ContextActionService = game:GetService("ContextActionService")	-- 선택해야한다.
