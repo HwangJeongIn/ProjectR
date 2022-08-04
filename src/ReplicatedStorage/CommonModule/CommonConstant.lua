@@ -6,17 +6,24 @@ local EquipSlotCount = CommonEnum.EquipType.Count - 1
 
 
 local CommonConstant = {
+
+
+	-- Inventory
 	MaxInventorySlotCount = 30,
-	MaxEquipSlotCount = EquipSlotCount,
-
-	MaxQuickSlotCount = 5,
-	MaxSkillCount = 3,
-
 	GuiInventorySlotCountPerLine = 5,
-	GuiInventorySlotOffset = 2.5,
+	GuiInventorySlotOffsetRatio = 0.005,
+
+	-- EquipSlots
+	MaxEquipSlotCount = EquipSlotCount,
 	GuiEquipSlotCountPerRow = 3,
 	GuiEquipSlotCountPerColumn = 4,
-	GuiEquipSlotOffset = 10,
+	GuiEquipSlotOffsetRatio = 0.025,
+
+	-- QuickSlots
+	MaxQuickSlotCount = 5,
+
+	-- SkillSlots
+	MaxSkillCount = 3,
 	
 	UndefinedElementValue = false
 }

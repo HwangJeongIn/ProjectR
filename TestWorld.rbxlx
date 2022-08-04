@@ -11708,17 +11708,17 @@ function GuiEquipSlotsController:Initialize()
 		GuiEquipSlotOffsetY = GuiEquipSlotOffset
 	end
 
-	local slotRateX = finalSlotSize / GuiEquipSlotWidth
-	local halfSlotRateX = slotRateX / 2
-	local slotRateY = finalSlotSize / GuiEquipSlotHeight
-	local halfSlotRateY = slotRateY / 2
+	local slotRatioX = finalSlotSize / GuiEquipSlotWidth
+	local halfSlotRatioX = slotRatioX / 2
+	local slotRatioY = finalSlotSize / GuiEquipSlotHeight
+	local halfSlotRatioY = slotRatioY / 2
 
-	local GuiEquipSlotOffsetRateX =  GuiEquipSlotOffsetX / GuiEquipSlotWidth
-	local GuiEquipSlotOffsetRateY =  GuiEquipSlotOffsetY / GuiEquipSlotHeight
+	local GuiEquipSlotOffsetRatioX =  GuiEquipSlotOffsetX / GuiEquipSlotWidth
+	local GuiEquipSlotOffsetRatioY =  GuiEquipSlotOffsetY / GuiEquipSlotHeight
 	
-	local slotSize = UDim2.new(slotRateX, 0, slotRateY, 0)
+	local slotSize = UDim2.new(slotRatioX, 0, slotRatioY, 0)
 	local slotAnchorPoint = Vector2.new(0.5, 0.5)
-	local FirstslotPosition = UDim2.new(GuiEquipSlotOffsetRateX + halfSlotRateX, 0, GuiEquipSlotOffsetRateY + halfSlotRateY, 0)
+	local FirstslotPosition = UDim2.new(GuiEquipSlotOffsetRatioX + halfSlotRatioX, 0, GuiEquipSlotOffsetRatioY + halfSlotRatioY, 0)
 
 	
 	for y = 0, (GuiEquipSlotCountPerColumn -1) do
@@ -11734,7 +11734,7 @@ function GuiEquipSlotsController:Initialize()
 
 			newGuiToolSlot.Size = slotSize
 			newGuiToolSlot.AnchorPoint = slotAnchorPoint
-			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiEquipSlotOffsetRateX + slotRateX) * x, 0, (GuiEquipSlotOffsetRateY + slotRateY) * y, 0)
+			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiEquipSlotOffsetRatioX + slotRatioX) * x, 0, (GuiEquipSlotOffsetRatioY + slotRatioY) * y, 0)
 			newGuiToolSlot.Parent = GuiEquipSlots
 			newGuiToolSlot.Name = tostring(equipType)
 
@@ -11824,17 +11824,17 @@ function GuiInventoryController:Initialize()
 	
 	local finalGuiInventoryHeight = finalSlotSize * GuiInventorySlotLineCount + GuiInventorySlotOffset * (GuiInventorySlotLineCount + 1)
 	
-	local slotRateX = finalSlotSize / GuiInventoryWidth
-	local halfSlotRateX = slotRateX / 2
-	local slotRateY = finalSlotSize / finalGuiInventoryHeight
-	local halfSlotRateY = slotRateY / 2
+	local slotRatioX = finalSlotSize / GuiInventoryWidth
+	local halfSlotRatioX = slotRatioX / 2
+	local slotRatioY = finalSlotSize / finalGuiInventoryHeight
+	local halfSlotRatioY = slotRatioY / 2
 	
-	local GuiInventoryOffsetRateX =  GuiInventorySlotOffset / GuiInventoryWidth
-	local GuiInventoryOffsetRateY =  GuiInventorySlotOffset / finalGuiInventoryHeight
+	local GuiInventoryOffsetRatioX =  GuiInventorySlotOffset / GuiInventoryWidth
+	local GuiInventoryOffsetRatioY =  GuiInventorySlotOffset / finalGuiInventoryHeight
 	
-	local slotSize = UDim2.new(slotRateX, 0, slotRateY, 0)
+	local slotSize = UDim2.new(slotRatioX, 0, slotRatioY, 0)
 	local slotAnchorPoint = Vector2.new(0.5, 0.5)
-	local FirstslotPosition = UDim2.new(GuiInventoryOffsetRateX + halfSlotRateX, 0, GuiInventoryOffsetRateY + halfSlotRateY, 0)
+	local FirstslotPosition = UDim2.new(GuiInventoryOffsetRatioX + halfSlotRatioX, 0, GuiInventoryOffsetRatioY + halfSlotRatioY, 0)
 
 	
 	GuiInventory.CanvasSize = UDim2.new(0, 0, finalGuiInventoryHeight / GuiInventorySize.Y, 0)
@@ -11847,7 +11847,7 @@ function GuiInventoryController:Initialize()
 			
 			newGuiToolSlot.Size = slotSize
 			newGuiToolSlot.AnchorPoint = slotAnchorPoint
-			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiInventoryOffsetRateX + slotRateX) * x, 0, (GuiInventoryOffsetRateY + slotRateY) * y, 0)
+			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiInventoryOffsetRatioX + slotRatioX) * x, 0, (GuiInventoryOffsetRatioY + slotRatioY) * y, 0)
 			newGuiToolSlot.Parent = GuiInventory
 			newGuiToolSlot.Name = tostring(slotIndex)
 

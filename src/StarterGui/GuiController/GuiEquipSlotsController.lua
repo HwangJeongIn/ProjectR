@@ -11,7 +11,7 @@ local EquipType = CommonEnum.EquipType
 local MaxEquipSlotCount = CommonConstant.MaxEquipSlotCount
 local GuiEquipSlotCountPerColumn = CommonConstant.GuiEquipSlotCountPerColumn
 local GuiEquipSlotCountPerRow = CommonConstant.GuiEquipSlotCountPerRow
-local GuiEquipSlotOffset = CommonConstant.GuiEquipSlotOffset
+local GuiEquipSlotOffsetRatio = CommonConstant.GuiEquipSlotOffsetRatio
 
 
 local player = game.Players.LocalPlayer
@@ -63,34 +63,36 @@ function GuiEquipSlotsController:Initialize()
 	local GuiEquipSlotsMetaData = {}
 	self:InitializeGuiEquipSlotsMetaData(GuiEquipSlotsMetaData)
 
-	local GuiEquipSlotWidth = GuiEquipSlots.AbsoluteSize.X
-	local GuiEquipSlotHeight = GuiEquipSlots.AbsoluteSize.Y
+	local GuiEquipSlotsWidth = GuiEquipSlots.AbsoluteSize.X
+	local GuiEquipSlotsHeight = GuiEquipSlots.AbsoluteSize.Y
 
 	local finalSlotSize = 0
 	local GuiEquipSlotOffsetX = 0
 	local GuiEquipSlotOffsetY = 0
 
-	if (GuiEquipSlotWidth / GuiEquipSlotCountPerRow) < (GuiEquipSlotHeight / GuiEquipSlotCountPerColumn) then
-		finalSlotSize = (GuiEquipSlotWidth - (GuiEquipSlotCountPerRow + 1) * GuiEquipSlotOffset) / GuiEquipSlotCountPerRow
+	if (GuiEquipSlotsWidth / GuiEquipSlotCountPerRow) < (GuiEquipSlotsHeight / GuiEquipSlotCountPerColumn) then
+		local GuiEquipSlotOffset = GuiEquipSlotsWidth * GuiEquipSlotOffsetRatio
+		finalSlotSize = (GuiEquipSlotsWidth - (GuiEquipSlotCountPerRow + 1) * GuiEquipSlotOffset) / GuiEquipSlotCountPerRow
 		GuiEquipSlotOffsetX = GuiEquipSlotOffset
-		GuiEquipSlotOffsetY = (GuiEquipSlotHeight - (finalSlotSize * GuiEquipSlotCountPerColumn)) / (GuiEquipSlotCountPerColumn + 1)
+		GuiEquipSlotOffsetY = (GuiEquipSlotsHeight - (finalSlotSize * GuiEquipSlotCountPerColumn)) / (GuiEquipSlotCountPerColumn + 1)
 	else
-		finalSlotSize = (GuiEquipSlotHeight - (GuiEquipSlotCountPerColumn + 1) * GuiEquipSlotOffset) / GuiEquipSlotCountPerColumn
-		GuiEquipSlotOffsetX = (GuiEquipSlotWidth - (finalSlotSize * GuiEquipSlotCountPerRow)) / (GuiEquipSlotCountPerRow + 1)
+		local GuiEquipSlotOffset = GuiEquipSlotsHeight * GuiEquipSlotOffsetRatio
+		finalSlotSize = (GuiEquipSlotsHeight - (GuiEquipSlotCountPerColumn + 1) * GuiEquipSlotOffset) / GuiEquipSlotCountPerColumn
+		GuiEquipSlotOffsetX = (GuiEquipSlotsWidth - (finalSlotSize * GuiEquipSlotCountPerRow)) / (GuiEquipSlotCountPerRow + 1)
 		GuiEquipSlotOffsetY = GuiEquipSlotOffset
 	end
 
-	local slotRateX = finalSlotSize / GuiEquipSlotWidth
-	local halfSlotRateX = slotRateX / 2
-	local slotRateY = finalSlotSize / GuiEquipSlotHeight
-	local halfSlotRateY = slotRateY / 2
+	local slotRatioX = finalSlotSize / GuiEquipSlotsWidth
+	local halfSlotRatioX = slotRatioX / 2
+	local slotRatioY = finalSlotSize / GuiEquipSlotsHeight
+	local halfSlotRatioY = slotRatioY / 2
 
-	local GuiEquipSlotOffsetRateX =  GuiEquipSlotOffsetX / GuiEquipSlotWidth
-	local GuiEquipSlotOffsetRateY =  GuiEquipSlotOffsetY / GuiEquipSlotHeight
+	local GuiEquipSlotOffsetRatioX =  GuiEquipSlotOffsetX / GuiEquipSlotsWidth
+	local GuiEquipSlotOffsetRatioY =  GuiEquipSlotOffsetY / GuiEquipSlotsHeight
 	
-	local slotSize = UDim2.new(slotRateX, 0, slotRateY, 0)
+	local slotSize = UDim2.new(slotRatioX, 0, slotRatioY, 0)
 	local slotAnchorPoint = Vector2.new(0.5, 0.5)
-	local FirstslotPosition = UDim2.new(GuiEquipSlotOffsetRateX + halfSlotRateX, 0, GuiEquipSlotOffsetRateY + halfSlotRateY, 0)
+	local FirstslotPosition = UDim2.new(GuiEquipSlotOffsetRatioX + halfSlotRatioX, 0, GuiEquipSlotOffsetRatioY + halfSlotRatioY, 0)
 
 	
 	for y = 0, (GuiEquipSlotCountPerColumn -1) do
@@ -106,7 +108,7 @@ function GuiEquipSlotsController:Initialize()
 
 			newGuiToolSlot.Size = slotSize
 			newGuiToolSlot.AnchorPoint = slotAnchorPoint
-			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiEquipSlotOffsetRateX + slotRateX) * x, 0, (GuiEquipSlotOffsetRateY + slotRateY) * y, 0)
+			newGuiToolSlot.Position = FirstslotPosition + UDim2.new((GuiEquipSlotOffsetRatioX + slotRatioX) * x, 0, (GuiEquipSlotOffsetRatioY + slotRatioY) * y, 0)
 			newGuiToolSlot.Parent = GuiEquipSlots
 			newGuiToolSlot.Name = tostring(equipType)
 
