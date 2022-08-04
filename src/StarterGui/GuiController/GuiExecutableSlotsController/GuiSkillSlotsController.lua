@@ -1,0 +1,5 @@
+local GuiSkillSlotsController = {}
+
+
+
+return GuiSkillSlotsController

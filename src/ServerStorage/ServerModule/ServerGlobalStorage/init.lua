@@ -92,7 +92,7 @@ function ServerGlobalStorage:SetArmorHandleEnabled(armor, enabled)
 	return true
 end
 
-function ServerGlobalStorage:FindArmorAllAttachments(armor, output)
+function ServerGlobalStorage:FindAllAttachmentsOfArmor(armor, output)
 	if not armor then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -122,7 +122,7 @@ function ServerGlobalStorage:FindArmorAllAttachments(armor, output)
 end
 
 --[[
-function ServerGlobalStorage:FindArmorAllAttachments(object, output)
+function ServerGlobalStorage:FindAllAttachmentsOfArmor(object, output)
 	if not object then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -136,7 +136,7 @@ function ServerGlobalStorage:FindArmorAllAttachments(object, output)
 	local children = object:GetChildren()
 	for _, child in children do
 		if child:IsA("Instance") then
-			if not self:FindArmorAllAttachments(child, output) then
+			if not self:FindAllAttachmentsOfArmor(child, output) then
 				return false
 			end
 		end
@@ -183,7 +183,7 @@ function ServerGlobalStorage:DetachArmorFromPlayer(player, armor)
 	end
 
 	local attachments = {}
-	if not self:FindArmorAllAttachments(armor, attachments) then
+	if not self:FindAllAttachmentsOfArmor(armor, attachments) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -253,7 +253,7 @@ function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
 	end
 
 	local attachments = {}
-	if not self:FindArmorAllAttachments(armor, attachments) then
+	if not self:FindAllAttachmentsOfArmor(armor, attachments) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
