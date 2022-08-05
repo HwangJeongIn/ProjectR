@@ -23,7 +23,7 @@ function GuiTooltipController:SetToolImage(image)
 		self.GuiToolImage.Image = image
 		self.GuiToolImage.ImageTransparency = 0
 	else
-		self.GuiToolImage.Image = ToolUtility.EmptyToolImage
+		self.GuiToolImage.Image = ToolUtility.DefaultToolImage
 		self.GuiToolImage.ImageTransparency = 0.9
 	end
 end
