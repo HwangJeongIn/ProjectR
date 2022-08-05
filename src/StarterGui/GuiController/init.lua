@@ -63,6 +63,30 @@ function GuiController:BindGuiKeys()
 	end)
 end
 
+function GuiController:InitializeTopbar()
+	local StarterGui = game:GetService("StarterGui")
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
+	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, true)
+
+	-- Create a "Fake" replacement topbar with a ScreenGui and Frame
+	local GuiTopbar = Instance.new("ScreenGui")
+	local GuiTopbarWindow = Instance.new("Frame")
+	 
+	-- Move (0, 0) to the actual top left corner of the screen, instead of under the topbar
+	GuiTopbar.IgnoreGuiInset = true
+
+	-- The topbar is 36 pixels tall, and spans the entire width of the screen
+	GuiTopbarWindow.Size = UDim2.new(1, 0, 0, 36) 
+
+	-- Style the topbar
+	GuiTopbarWindow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	GuiTopbarWindow.BackgroundTransparency = 0.2
+	GuiTopbarWindow.BorderSizePixel = 0
+	 
+	GuiTopbarWindow.Parent = GuiTopbar
+	GuiTopbar.Parent = PlayerGui
+end
+
 function GuiController:Initialize()
 	self.GuiInventoryController = require(script:WaitForChild("GuiInventoryController"))
 	self.GuiEquipSlotsController = require(script:WaitForChild("GuiEquipSlotsController"))
@@ -74,9 +98,9 @@ function GuiController:Initialize()
 	self.GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
 	
 	self.GuiBoard = GuiFacade.GuiBoard
-	self.GuiPlayersLeftCountText = GuiBoard:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
-	self.GuiKilledCountText = GuiBoard:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
-	self.GuiCurrentGameLengthText = GuiBoard:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
+	self.GuiPlayersLeftCountText = self.GuiBoard:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
+	self.GuiKilledCountText = self.GuiBoard:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
+	self.GuiCurrentGameLengthText = self.GuiBoard:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
 
 	self.GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
 	self.GuiCurrentGameLengthText.Text = CurrentGameLength.Value
@@ -104,6 +128,7 @@ function GuiController:Initialize()
 		[WinnerType.Ai] = "Winner is AI",
 	}
 
+	self:InitializeTopbar()
 	self:BindGuiKeys()
 	ClientGlobalStorage:Initialize(self)
 end
