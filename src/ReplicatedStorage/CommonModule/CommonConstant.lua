@@ -19,7 +19,7 @@ local CommonConstant = {
 
 	-- QuickSlots
 	MaxQuickSlotCount = 5,
-	GuiQuickSlotOffsetRatio = 0.025,
+	GuiQuickSlotOffsetRatio = 0.05,
 
 	-- SkillSlots
 	MaxSkillCount = 3,

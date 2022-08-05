@@ -2,14 +2,14 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="ScreenGui" referent="765">
+	<Item class="ScreenGui" referent="RBX8FD137D777E644869BAEF99FD0741D36">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<bool name="AutoLocalize">true</bool>
 			<int name="DisplayOrder">0</int>
 			<bool name="Enabled">false</bool>
 			<bool name="IgnoreGuiInset">false</bool>
-			<string name="Name">GuiTemplate</string>
+			<string name="Name">GuiTemplate1</string>
 			<bool name="ResetOnSpawn">true</bool>
 			<Ref name="RootLocalizationTable">null</Ref>
 			<token name="SelectionBehaviorDown">0</token>
@@ -21,7 +21,19 @@
 			<BinaryString name="Tags"></BinaryString>
 			<token name="ZIndexBehavior">1</token>
 		</Properties>
-		<Item class="ImageButton" referent="RBX74B861EE6E034729920BBE076CBC6765">
+		<Item class="UICorner" referent="RBXBD95288A98F940FC8451E494B7DCF58C">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<UDim name="CornerRadius">
+					<S>0</S>
+					<O>8</O>
+				</UDim>
+				<string name="Name">UICorner</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="ImageButton" referent="RBX3192B7965D664650ACB3064D94C45DAA">
 			<Properties>
 				<bool name="Active">true</bool>
 				<Vector2 name="AnchorPoint">
@@ -48,7 +60,7 @@
 				<bool name="ClipsDescendants">false</bool>
 				<bool name="Draggable">false</bool>
 				<Content name="HoverImage"><null></null></Content>
-				<Content name="Image"><url>http://www.roblox.com/asset/?id=6742779630</url></Content>
+				<Content name="Image"><url>http://www.roblox.com/asset/?id=2052879694</url></Content>
 				<Color3 name="ImageColor3">
 					<R>1</R>
 					<G>1</G>
@@ -71,9 +83,9 @@
 				<Ref name="NextSelectionRight">null</Ref>
 				<Ref name="NextSelectionUp">null</Ref>
 				<UDim2 name="Position">
-					<XS>0</XS>
+					<XS>0.435344815</XS>
 					<XO>0</XO>
-					<YS>0</YS>
+					<YS>0.372505546</YS>
 					<YO>0</YO>
 				</UDim2>
 				<Content name="PressedImage"><null></null></Content>
@@ -120,7 +132,7 @@
 				<bool name="Visible">true</bool>
 				<int name="ZIndex">1</int>
 			</Properties>
-			<Item class="ImageLabel" referent="RBXC337A8EFF3BD4603859CBECD552A0A50">
+			<Item class="ImageLabel" referent="RBX58ADF6FDE74B458485AE4779AFEF2A68">
 				<Properties>
 					<bool name="Active">false</bool>
 					<Vector2 name="AnchorPoint">
@@ -213,7 +225,7 @@
 					<bool name="Visible">true</bool>
 					<int name="ZIndex">1</int>
 				</Properties>
-				<Item class="TextLabel" referent="RBXAA48DFF3B7F44F21AE4E033B41786004">
+				<Item class="TextLabel" referent="RBXAE7AC3FCDEA4460FA5F6D9B0F9CAD1EC">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -302,7 +314,7 @@
 						<int name="ZIndex">1</int>
 					</Properties>
 				</Item>
-				<Item class="TextLabel" referent="RBXD9C5DD39F03B434497732ED333B0C07B">
+				<Item class="TextLabel" referent="RBXD28FCAB5E43640D890DB8DB242943F82">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -391,6 +403,74 @@
 						<int name="ZIndex">1</int>
 					</Properties>
 				</Item>
+			</Item>
+			<Item class="Decal" referent="RBXF598B6E33A67433BB0AE00A0D4EFD311">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Color3 name="Color3">
+						<R>1</R>
+						<G>1</G>
+						<B>1</B>
+					</Color3>
+					<token name="Face">5</token>
+					<string name="Name">Circle</string>
+					<int64 name="SourceAssetId">1989142078</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<Content name="Texture"><url>http://www.roblox.com/asset/?id=1989142067</url></Content>
+					<float name="Transparency">0</float>
+					<int name="ZIndex">1</int>
+				</Properties>
+			</Item>
+			<Item class="Decal" referent="RBXF7E989E5AB5347F3B2A3F400A3379827">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Color3 name="Color3">
+						<R>1</R>
+						<G>1</G>
+						<B>1</B>
+					</Color3>
+					<token name="Face">5</token>
+					<string name="Name">Images/Circle</string>
+					<int64 name="SourceAssetId">2052879717</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<Content name="Texture"><url>http://www.roblox.com/asset/?id=2052879694</url></Content>
+					<float name="Transparency">0</float>
+					<int name="ZIndex">1</int>
+				</Properties>
+			</Item>
+			<Item class="Decal" referent="RBX550F449C4B7647BF919CF6A057F34649">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Color3 name="Color3">
+						<R>1</R>
+						<G>1</G>
+						<B>1</B>
+					</Color3>
+					<token name="Face">5</token>
+					<string name="Name">Gray circle</string>
+					<int64 name="SourceAssetId">452313976</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<Content name="Texture"><url>http://www.roblox.com/asset/?id=452313975</url></Content>
+					<float name="Transparency">0</float>
+					<int name="ZIndex">1</int>
+				</Properties>
+			</Item>
+			<Item class="Decal" referent="RBX5CF5E228A9614A0DABC8425CEA609A2B">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Color3 name="Color3">
+						<R>1</R>
+						<G>1</G>
+						<B>1</B>
+					</Color3>
+					<token name="Face">5</token>
+					<string name="Name">slot</string>
+					<int64 name="SourceAssetId">6742779632</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<Content name="Texture"><url>http://www.roblox.com/asset/?id=6742779630</url></Content>
+					<float name="Transparency">0</float>
+					<int name="ZIndex">1</int>
+				</Properties>
 			</Item>
 		</Item>
 	</Item>

@@ -45,7 +45,8 @@ local CommonEnum = {
 	SlotType = {
 		InventorySlot = 1,
 		EquipSlot = 2,
-		QuickSlot = 3
+		QuickSlot = 3,
+		SkillSlot = 4
 	},
 	
 	StatusType = {

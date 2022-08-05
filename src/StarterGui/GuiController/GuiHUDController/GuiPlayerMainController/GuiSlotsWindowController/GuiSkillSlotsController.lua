@@ -29,12 +29,24 @@ local GuiSkillSlotsController = {
 }
 
 function GuiSkillSlotsController:Initialize()
+	local GuiSkillSlotsWidth = GuiSkillSlots.AbsoluteSize.X
 	local GuiSkillSlotsHeight = GuiSkillSlots.AbsoluteSize.Y
 
-    local GuiSlotsWindow = GuiSkillSlots.Parent
-    local GuiSlotsWindowWidth = GuiSlotsWindow.AbsoluteSize.X
-
-	local GuiSkillSlotOffset = GuiSkillSlotOffsetRatio * GuiSkillSlotsHeight
+    local GuiHUDBottomWindow = GuiSkillSlots.Parent
+    local prevSkillSlotsSize = GuiSkillSlots.Size
+    if GuiSkillSlotsWidth < GuiSkillSlotsHeight then
+        GuiSkillSlotsHeight = GuiSkillSlotsWidth
+        local GuiHUDBottomWindowHeight = GuiHUDBottomWindow.AbsoluteSize.Y
+        GuiSkillSlots.Size = UDim2.new(prevSkillSlotsSize.X.Scale, 0, GuiSkillSlotsHeight / GuiHUDBottomWindowHeight, 0)
+    else
+        GuiSkillSlotsWidth = GuiSkillSlotsHeight
+        local GuiHUDBottomWindowWidth = GuiHUDBottomWindow.AbsoluteSize.X
+        GuiSkillSlots.Size = UDim2.new(GuiSkillSlotsWidth / GuiHUDBottomWindowWidth, 0, prevSkillSlotsSize.Y.Scale, 0)
+    end
+    
+    --[[
+    local GuiSkillSlotsSize = GuiSkillSlotsWidth
+    local miniSlotRatio = 0.25 - GuiSkillSlotOffsetRatio * 2
 
 	local finalSlotSize = GuiSkillSlotsHeight - (GuiSkillSlotOffset * 2)
     local GuiSkillSlotsWidth = GuiSkillSlotOffset * (MaxSkillCount + 1) + finalSlotSize * MaxSkillCount
@@ -44,20 +56,16 @@ function GuiSkillSlotsController:Initialize()
     end
 
     
-    local prevSize = GuiSkillSlots.Size
-	GuiSkillSlots.Size = UDim2.new(GuiSkillSlotsWidth / GuiSlotsWindowWidth, 0, prevSize.Y.Scale, 0)
 
-	local slotRatioX = finalSlotSize / GuiSkillSlotsWidth
-	local halfSlotRatioX = slotRatioX / 2
-	local slotRatioY = finalSlotSize / GuiSkillSlotsHeight
-	local halfSlotRatioY = slotRatioY / 2
+
+
 
 	local GuiSkillSlotOffsetRatioX =  GuiSkillSlotOffset / GuiSkillSlotsWidth
 	local GuiSkillSlotOffsetRatioY =  GuiSkillSlotOffset / GuiSkillSlotsHeight
 	
-	local slotSize = UDim2.new(slotRatioX, 0, slotRatioY, 0)
+	local slotSize = UDim2.new(miniSlotRatio, 0, miniSlotRatio, 0)
 	local slotAnchorPoint = Vector2.new(0.5, 0.5)
-	local firstSlotPosition = UDim2.new(GuiSkillSlotOffsetRatioX + halfSlotRatioX, 0, GuiSkillSlotOffsetRatioY + halfSlotRatioY, 0)
+	local slotPosition = UDim2.new(GuiSkillSlotOffsetRatioX + halfSlotRatioX, 0, GuiSkillSlotOffsetRatioY + halfSlotRatioY, 0)
 	
     for slotIndex = 1, MaxSkillCount do
         local newGuiToolSlot = GuiToolSlotTemplate:Clone()
@@ -70,7 +78,7 @@ function GuiSkillSlotsController:Initialize()
 
         self.GuiSkillSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.SkillSlot, slotIndex, newGuiToolSlot))
     end
-
+--]]
 end
 
 GuiSkillSlotsController:Initialize()
