@@ -2,7 +2,7 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="ScreenGui" referent="RBX043D3C2787DD4D659963BF7831A6F806">
+	<Item class="ScreenGui" referent="766">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<bool name="AutoLocalize">true</bool>
@@ -21,7 +21,7 @@
 			<BinaryString name="Tags"></BinaryString>
 			<token name="ZIndexBehavior">1</token>
 		</Properties>
-		<Item class="Frame" referent="RBX310F25E270824F56BFF299D762BF5723">
+		<Item class="Frame" referent="767">
 			<Properties>
 				<bool name="Active">false</bool>
 				<Vector2 name="AnchorPoint">
@@ -69,10 +69,10 @@
 				<Ref name="SelectionImageObject">null</Ref>
 				<int name="SelectionOrder">0</int>
 				<UDim2 name="Size">
-					<XS>0</XS>
-					<XO>800</XO>
-					<YS>0</YS>
-					<YO>400</YO>
+					<XS>0.800000012</XS>
+					<XO>0</XO>
+					<YS>0.75</YS>
+					<YO>0</YO>
 				</UDim2>
 				<token name="SizeConstraint">0</token>
 				<int64 name="SourceAssetId">-1</int64>
@@ -81,7 +81,7 @@
 				<bool name="Visible">true</bool>
 				<int name="ZIndex">1</int>
 			</Properties>
-			<Item class="Frame" referent="RBXEBF82064353C47C9A30775FCA337F342">
+			<Item class="Frame" referent="768">
 				<Properties>
 					<bool name="Active">false</bool>
 					<Vector2 name="AnchorPoint">
@@ -142,7 +142,7 @@
 					<int name="ZIndex">1</int>
 				</Properties>
 			</Item>
-			<Item class="ScrollingFrame" referent="RBX3AEDE9FED45B4F94855370BF53EE8467">
+			<Item class="ScrollingFrame" referent="769">
 				<Properties>
 					<bool name="Active">true</bool>
 					<Vector2 name="AnchorPoint">
@@ -169,7 +169,7 @@
 					<Content name="BottomImage"><url>rbxasset://textures/ui/Scroll/scroll-bottom.png</url></Content>
 					<Vector2 name="CanvasPosition">
 						<X>0</X>
-						<Y>150</Y>
+						<Y>0</Y>
 					</Vector2>
 					<UDim2 name="CanvasSize">
 						<XS>0</XS>

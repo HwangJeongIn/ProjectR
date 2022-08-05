@@ -20,10 +20,15 @@ local GuiToolSlotController = {}
 
 function GuiToolSlotController:InitializeImage(slotType, slotIndex)
 	if slotType == SlotType.SkillSlot then
-		self.DefaultEmptyToolImage = ToolUtility.EmptySkillImage
+		self.DefaultToolImage = ToolUtility.DefaultSkillImage
+		self.EmptyToolImage = ToolUtility.EmptySkillImage
 		self.DefaultSlotImage = ToolUtility.DefaultCircularSlotImage
+		
+		--self.GuiToolSlot.ImageTransparency = 0.65
+
 	else
-		self.DefaultEmptyToolImage = ToolUtility.EmptyToolImage
+		self.DefaultToolImage = ToolUtility.DefaultToolImage
+		self.EmptyToolImage = ToolUtility.EmptyToolImage
 		self.DefaultSlotImage = ToolUtility.DefaultSlotImage
 	--elseif slotType == SlotType.InventorySlot then
 	--elseif slotType == SlotType.EquipSlot then
@@ -32,8 +37,7 @@ function GuiToolSlotController:InitializeImage(slotType, slotIndex)
 	--elseif slotType == SlotType.QuickSlot then
 	end
 
-	self.GuiToolSlot.Image = self.DefaultEmptyToolImage
-	self.GuiToolImage.Image = self.DefaultSlotImage
+	self.GuiToolSlot.Image = self.DefaultSlotImage
 end
 
 function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
@@ -103,18 +107,24 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 	return newGuiToolSlotController
 end
 
-function GuiToolSlotController:SetToolImage(image)
+function GuiToolSlotController:SetToolImage(image, isEmpty)
+	if isEmpty then
+		self.GuiToolImage.Image = self.EmptyToolImage
+		self.GuiToolImage.ImageTransparency = 0.9
+		return
+	end
+
 	if image then
 		self.GuiToolImage.Image = image
 		self.GuiToolImage.ImageTransparency = 0
 	else
-		self.GuiToolImage.Image = self.DefaultSlotImage
-		self.GuiToolImage.ImageTransparency = 0.9
+		self.GuiToolImage.Image = self.DefaultToolImage
+		self.GuiToolImage.ImageTransparency = 0
 	end
 end
 
 function GuiToolSlotController:ClearToolData()
-	self:SetToolImage(nil)
+	self:SetToolImage(nil, true)
 	self.GuiToolName.Text = ""
 	self.GuiToolCount.Text = ""
 
