@@ -28,6 +28,14 @@ local GuiSkillSlotsController = {
 	GuiSkillSlotsRaw = GuiSkillSlotsRaw
 }
 
+function GetPositionOnCircleByAngle(radius, angle, offsetX, offsetY)
+    local x = math.cos(angle) * radius
+    local y = math.sin(angle) * radius
+
+    -- y는 기준이 반대이기 때문에 -를 해준다.
+    return x + offsetX, -y + offsetY
+end
+
 function GuiSkillSlotsController:Initialize()
 	local GuiSkillSlotsWidth = GuiSkillSlots.AbsoluteSize.X
 	local GuiSkillSlotsHeight = GuiSkillSlots.AbsoluteSize.Y
@@ -44,41 +52,57 @@ function GuiSkillSlotsController:Initialize()
         GuiSkillSlots.Size = UDim2.new(GuiSkillSlotsWidth / GuiHUDBottomWindowWidth, 0, prevSkillSlotsSize.Y.Scale, 0)
     end
     
-    --[[
-    local GuiSkillSlotsSize = GuiSkillSlotsWidth
-    local miniSlotRatio = 0.25 - GuiSkillSlotOffsetRatio * 2
+    --local GuiSkillSlotsSize = GuiSkillSlotsWidth
 
-	local finalSlotSize = GuiSkillSlotsHeight - (GuiSkillSlotOffset * 2)
-    local GuiSkillSlotsWidth = GuiSkillSlotOffset * (MaxSkillCount + 1) + finalSlotSize * MaxSkillCount
-    if GuiSkillSlotsWidth > GuiSlotsWindowWidth then
-        Debug.Assert(false, "부모 객체의 사이즈가 너무 작습니다. Gui가 비정상입니다.")
-        return
-    end
-
-    
+    local mainToolSlotRatio = 0.5
+    local mainToolSlotPositionRatioX = 0.5 +  mainToolSlotRatio / 2
+    local mainToolSlotPositionRatioY = 0.5 +  mainToolSlotRatio / 2
+    local skillCircleHalfRatio = mainToolSlotPositionRatioX
 
 
-
-
-	local GuiSkillSlotOffsetRatioX =  GuiSkillSlotOffset / GuiSkillSlotsWidth
-	local GuiSkillSlotOffsetRatioY =  GuiSkillSlotOffset / GuiSkillSlotsHeight
-	
-	local slotSize = UDim2.new(miniSlotRatio, 0, miniSlotRatio, 0)
 	local slotAnchorPoint = Vector2.new(0.5, 0.5)
-	local slotPosition = UDim2.new(GuiSkillSlotOffsetRatioX + halfSlotRatioX, 0, GuiSkillSlotOffsetRatioY + halfSlotRatioY, 0)
-	
+    local mainToolSlotPosition = UDim2.new(mainToolSlotPositionRatioX, 0, mainToolSlotPositionRatioY, 0)
+    local mainToolSlotSize = UDim2.new(mainToolSlotRatio, 0, mainToolSlotRatio, 0)
+
+    local skillSlotRatio = 0.5 - GuiSkillSlotOffsetRatio * 2
+	local skillSlotSize = UDim2.new(skillSlotRatio, 0, skillSlotRatio, 0)
+
+    -- MainToolSlot
+    local newGuiMainToolSlot = GuiToolSlotTemplate:Clone()
+        
+    newGuiMainToolSlot.AnchorPoint = slotAnchorPoint
+    newGuiMainToolSlot.Size = mainToolSlotSize
+    newGuiMainToolSlot.Position = mainToolSlotPosition
+    newGuiMainToolSlot.Parent = GuiSkillSlots
+    newGuiMainToolSlot.Name = tostring("MainToolSlot")
+
+    self.GuiMainToolSlotController = GuiToolSlotController:new(SlotType.SkillSlot, 1, newGuiMainToolSlot)
+
+
+
+
+	--local startRadian = math.rad(math.pi  * (1 / 2))
+    --local endRadian = math.rad(math.pi * (1))
+
+	local startRadian = math.pi  * (1 / 2)
+    local endRadian = math.pi * (1)
+
+    local radianSize = endRadian - startRadian
+    local radianUnit = (radianSize / (MaxSkillCount - 1))
     for slotIndex = 1, MaxSkillCount do
         local newGuiToolSlot = GuiToolSlotTemplate:Clone()
         
-        newGuiToolSlot.Size = slotSize
+        local currentRadian = startRadian + radianUnit * (slotIndex - 1)
+        local finalXRatio, finalYRatio = GetPositionOnCircleByAngle(skillCircleHalfRatio, currentRadian, mainToolSlotPositionRatioX, mainToolSlotPositionRatioY)
+
         newGuiToolSlot.AnchorPoint = slotAnchorPoint
-        newGuiToolSlot.Position = firstSlotPosition + UDim2.new((GuiSkillSlotOffsetRatioX + slotRatioX) * (slotIndex - 1), 0, 0, 0)
+        newGuiToolSlot.Size = skillSlotSize
+        newGuiToolSlot.Position = UDim2.new(finalXRatio, 0, finalYRatio, 0)
         newGuiToolSlot.Parent = GuiSkillSlots
         newGuiToolSlot.Name = tostring(slotIndex)
 
         self.GuiSkillSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.SkillSlot, slotIndex, newGuiToolSlot))
     end
---]]
 end
 
 GuiSkillSlotsController:Initialize()

@@ -82,18 +82,18 @@
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>17.8807697</X>
-					<Y>22.3196182</Y>
-					<Z>-23.7044983</Z>
-					<R00>0.948850036</R00>
-					<R01>0.244323656</R01>
-					<R02>-0.199974105</R02>
-					<R10>1.4901163e-08</R10>
-					<R11>0.633376181</R11>
-					<R12>0.773844063</R12>
-					<R20>0.315727264</R20>
-					<R21>-0.73426199</R21>
-					<R22>0.600978971</R22>
+					<X>17.3812237</X>
+					<Y>22.4142513</Y>
+					<Z>-24.2038136</Z>
+					<R00>0.615598798</R00>
+					<R01>0.647122383</R01>
+					<R02>-0.449745238</R02>
+					<R10>-0</R10>
+					<R11>0.570699453</R11>
+					<R12>0.821159065</R12>
+					<R20>0.788059711</R20>
+					<R21>-0.505504549</R21>
+					<R22>0.351321906</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
@@ -10920,9 +10920,9 @@ function GuiController:Initialize()
 end
 
 function GuiController:ToggleInGameGui(isEnabled)
-	self.GuiPlayersLeftCountText.Parent.Enabled = isEnabled
-	self.GuiCurrentGameLengthText.Parent.Enabled = isEnabled
-	self.GuiKilledCountText.Parent.Enabled = isEnabled
+	self.GuiPlayersLeftCountText.Parent.Visible = isEnabled
+	self.GuiCurrentGameLengthText.Parent.Visible = isEnabled
+	self.GuiKilledCountText.Parent.Visible = isEnabled
 end
 
 function GuiController:SetGuiMainMessage(inputText)
@@ -10962,7 +10962,7 @@ function GuiController:ProcessWaiting(arguments)
 	print("GameStateType.Waiting in client")
 	self:SetGuiMainMessage("Waiting ... ")
 
-	self.GuiBoardWindow.Enabled = false
+	self:ToggleInGameGui(false)
 	
 end
 
@@ -10982,8 +10982,8 @@ function GuiController:ProcessPlaying(arguments)
 	
 	self:SetGuiMainMessage("Get ready to play")
 
-	self.GuiBoardWindow.Enabled = true
-	
+	self:ToggleInGameGui(true)
+
 	wait(2)
 	
 	self:SetGuiMainMessage("")
@@ -11483,49 +11483,81 @@ local GuiSkillSlotsController = {
 	GuiSkillSlotsRaw = GuiSkillSlotsRaw
 }
 
+function GetPositionOnCircleByAngle(radius, angle, offsetX, offsetY)
+    local x = math.cos(angle) * radius
+    local y = math.sin(angle) * radius
+
+    -- y는 기준이 반대이기 때문에 -를 해준다.
+    return x + offsetX, -y + offsetY
+end
+
 function GuiSkillSlotsController:Initialize()
+	local GuiSkillSlotsWidth = GuiSkillSlots.AbsoluteSize.X
 	local GuiSkillSlotsHeight = GuiSkillSlots.AbsoluteSize.Y
 
-    local GuiSlotsWindow = GuiSkillSlots.Parent
-    local GuiSlotsWindowWidth = GuiSlotsWindow.AbsoluteSize.X
-
-	local GuiSkillSlotOffset = GuiSkillSlotOffsetRatio * GuiSkillSlotsHeight
-
-	local finalSlotSize = GuiSkillSlotsHeight - (GuiSkillSlotOffset * 2)
-    local GuiSkillSlotsWidth = GuiSkillSlotOffset * (MaxSkillCount + 1) + finalSlotSize * MaxSkillCount
-    if GuiSkillSlotsWidth > GuiSlotsWindowWidth then
-        Debug.Assert(false, "부모 객체의 사이즈가 너무 작습니다. Gui가 비정상입니다.")
-        return
+    local GuiHUDBottomWindow = GuiSkillSlots.Parent
+    local prevSkillSlotsSize = GuiSkillSlots.Size
+    if GuiSkillSlotsWidth < GuiSkillSlotsHeight then
+        GuiSkillSlotsHeight = GuiSkillSlotsWidth
+        local GuiHUDBottomWindowHeight = GuiHUDBottomWindow.AbsoluteSize.Y
+        GuiSkillSlots.Size = UDim2.new(prevSkillSlotsSize.X.Scale, 0, GuiSkillSlotsHeight / GuiHUDBottomWindowHeight, 0)
+    else
+        GuiSkillSlotsWidth = GuiSkillSlotsHeight
+        local GuiHUDBottomWindowWidth = GuiHUDBottomWindow.AbsoluteSize.X
+        GuiSkillSlots.Size = UDim2.new(GuiSkillSlotsWidth / GuiHUDBottomWindowWidth, 0, prevSkillSlotsSize.Y.Scale, 0)
     end
-
     
-    local prevSize = GuiSkillSlots.Size
-	GuiSkillSlots.Size = UDim2.new(GuiSkillSlotsWidth / GuiSlotsWindowWidth, 0, prevSize.Y.Scale, 0)
+    --local GuiSkillSlotsSize = GuiSkillSlotsWidth
 
-	local slotRatioX = finalSlotSize / GuiSkillSlotsWidth
-	local halfSlotRatioX = slotRatioX / 2
-	local slotRatioY = finalSlotSize / GuiSkillSlotsHeight
-	local halfSlotRatioY = slotRatioY / 2
+    local mainToolSlotRatio = 0.5
+    local mainToolSlotPositionRatioX = 0.5 +  mainToolSlotRatio / 2
+    local mainToolSlotPositionRatioY = 0.5 +  mainToolSlotRatio / 2
+    local skillCircleHalfRatio = mainToolSlotPositionRatioX
 
-	local GuiSkillSlotOffsetRatioX =  GuiSkillSlotOffset / GuiSkillSlotsWidth
-	local GuiSkillSlotOffsetRatioY =  GuiSkillSlotOffset / GuiSkillSlotsHeight
-	
-	local slotSize = UDim2.new(slotRatioX, 0, slotRatioY, 0)
+
 	local slotAnchorPoint = Vector2.new(0.5, 0.5)
-	local firstSlotPosition = UDim2.new(GuiSkillSlotOffsetRatioX + halfSlotRatioX, 0, GuiSkillSlotOffsetRatioY + halfSlotRatioY, 0)
-	
+    local mainToolSlotPosition = UDim2.new(mainToolSlotPositionRatioX, 0, mainToolSlotPositionRatioY, 0)
+    local mainToolSlotSize = UDim2.new(mainToolSlotRatio, 0, mainToolSlotRatio, 0)
+
+    local skillSlotRatio = 0.5 - GuiSkillSlotOffsetRatio * 2
+	local skillSlotSize = UDim2.new(skillSlotRatio, 0, skillSlotRatio, 0)
+
+    -- MainToolSlot
+    local newGuiMainToolSlot = GuiToolSlotTemplate:Clone()
+        
+    newGuiMainToolSlot.AnchorPoint = slotAnchorPoint
+    newGuiMainToolSlot.Size = mainToolSlotSize
+    newGuiMainToolSlot.Position = mainToolSlotPosition
+    newGuiMainToolSlot.Parent = GuiSkillSlots
+    newGuiMainToolSlot.Name = tostring("MainToolSlot")
+
+    self.GuiMainToolSlotController = GuiToolSlotController:new(SlotType.SkillSlot, 1, newGuiMainToolSlot)
+
+
+
+
+	--local startRadian = math.rad(math.pi  * (1 / 2))
+    --local endRadian = math.rad(math.pi * (1))
+
+	local startRadian = math.pi  * (1 / 2)
+    local endRadian = math.pi * (1)
+
+    local radianSize = endRadian - startRadian
+    local radianUnit = (radianSize / (MaxSkillCount - 1))
     for slotIndex = 1, MaxSkillCount do
         local newGuiToolSlot = GuiToolSlotTemplate:Clone()
         
-        newGuiToolSlot.Size = slotSize
+        local currentRadian = startRadian + radianUnit * (slotIndex - 1)
+        local finalXRatio, finalYRatio = GetPositionOnCircleByAngle(skillCircleHalfRatio, currentRadian, mainToolSlotPositionRatioX, mainToolSlotPositionRatioY)
+
         newGuiToolSlot.AnchorPoint = slotAnchorPoint
-        newGuiToolSlot.Position = firstSlotPosition + UDim2.new((GuiSkillSlotOffsetRatioX + slotRatioX) * (slotIndex - 1), 0, 0, 0)
+        newGuiToolSlot.Size = skillSlotSize
+        newGuiToolSlot.Position = UDim2.new(finalXRatio, 0, finalYRatio, 0)
         newGuiToolSlot.Parent = GuiSkillSlots
         newGuiToolSlot.Name = tostring(slotIndex)
 
         self.GuiSkillSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.SkillSlot, slotIndex, newGuiToolSlot))
     end
-
 end
 
 GuiSkillSlotsController:Initialize()
@@ -11784,27 +11816,36 @@ function GuiFacade:Initialize()
     -- GuiHUD
     local GuiHUD = PlayerGui:WaitForChild("GuiHUD")
     
-    local GuiPlayerMain = GuiHUD:WaitForChild("GuiPlayerMain")
-    local GuiMinimap = GuiHUD:WaitForChild("GuiMinimap")
-    local GuiBoardWindow = GuiHUD:WaitForChild("GuiBoardWindow")
-    
-    local GuiBarsWindow = GuiPlayerMain:WaitForChild("GuiBarsWindow")
-    local GuiSlotsWindow = GuiPlayerMain:WaitForChild("GuiSlotsWindow")
-    
-    local GuiHpBar = GuiBarsWindow:WaitForChild("GuiHpBar")
-    
-    local GuiQuickSlots = GuiSlotsWindow:WaitForChild("GuiQuickSlots")
-    local GuiSkillSlots = GuiSlotsWindow:WaitForChild("GuiSkillSlots")
+    local GuiHUDTop = GuiHUD:WaitForChild("GuiHUDTop")
+    local GuiHUDTopWindow = GuiHUDTop:WaitForChild("GuiHUDTopWindow")
 
+    local GuiGameStateWindow = GuiHUDTopWindow:WaitForChild("GuiGameStateWindow")
+    local GuiBoardWindow = GuiGameStateWindow:WaitForChild("GuiBoardWindow")
+    local GuiBarsWindow = GuiGameStateWindow:WaitForChild("GuiBarsWindow")
+    local GuiHpBar = GuiBarsWindow:WaitForChild("GuiHpBar")
+
+    local GuiMinimap = GuiHUDTopWindow:WaitForChild("GuiMinimap")
+    
     self.GuiHUD = GuiHUD
-    self.GuiPlayerMain = GuiPlayerMain
-    self.GuiMinimap = GuiMinimap
+    self.GuiHUDTop = GuiHUDTop
+    --self.GuiHUDTopWindow = GuiHUDTopWindow
+    self.GuiGameStateWindow = GuiGameStateWindow
     self.GuiBoardWindow = GuiBoardWindow
     self.GuiBarsWindow = GuiBarsWindow
-    self.GuiSlotsWindow = GuiSlotsWindow
     self.GuiHpBar = GuiHpBar
+    self.GuiMinimap = GuiMinimap
+
+    local GuiHUDBottom = GuiHUD:WaitForChild("GuiHUDBottom")
+    local GuiHUDBottomWindow = GuiHUDBottom:WaitForChild("GuiHUDBottomWindow")
+    
+    local GuiQuickSlots = GuiHUDBottomWindow:WaitForChild("GuiQuickSlots")
+    local GuiSkillSlots = GuiHUDBottomWindow:WaitForChild("GuiSkillSlots")
+
+    self.GuiHUDBottom = GuiHUDBottom
+    --self.GuiHUDBottomWindow = GuiHUDBottomWindow
     self.GuiQuickSlots = GuiQuickSlots
     self.GuiSkillSlots = GuiSkillSlots
+
 
     -- GuiPlayerStatus
     local GuiPlayerStatus = PlayerGui:WaitForChild("GuiPlayerStatus")
@@ -12881,7 +12922,7 @@ return GuiTooltipController]]></ProtectedString>
 				<UniqueId name="UniqueId">49d8569eef00f7c002fd857600021c0b</UniqueId>
 				<token name="ZIndexBehavior">1</token>
 			</Properties>
-			<Item class="ImageButton" referent="766">
+			<Item class="ImageButton" referent="RBX74B861EE6E034729920BBE076CBC6765">
 				<Properties>
 					<bool name="Active">true</bool>
 					<Vector2 name="AnchorPoint">
@@ -12977,11 +13018,11 @@ return GuiTooltipController]]></ProtectedString>
 						<YS>1</YS>
 						<YO>0</YO>
 					</UDim2>
-					<UniqueId name="UniqueId">49d8569eef00f7c002fd857600021c0c</UniqueId>
+					<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0014f29b</UniqueId>
 					<bool name="Visible">true</bool>
 					<int name="ZIndex">1</int>
 				</Properties>
-				<Item class="ImageLabel" referent="767">
+				<Item class="ImageLabel" referent="RBXC337A8EFF3BD4603859CBECD552A0A50">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -13071,11 +13112,11 @@ return GuiTooltipController]]></ProtectedString>
 							<YS>1</YS>
 							<YO>0</YO>
 						</UDim2>
-						<UniqueId name="UniqueId">49d8569eef00f7c002fd857600021c0d</UniqueId>
+						<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0014f29c</UniqueId>
 						<bool name="Visible">true</bool>
 						<int name="ZIndex">1</int>
 					</Properties>
-					<Item class="TextLabel" referent="768">
+					<Item class="TextLabel" referent="RBXAA48DFF3B7F44F21AE4E033B41786004">
 						<Properties>
 							<bool name="Active">false</bool>
 							<Vector2 name="AnchorPoint">
@@ -13160,12 +13201,12 @@ return GuiTooltipController]]></ProtectedString>
 							<bool name="TextWrapped">true</bool>
 							<token name="TextXAlignment">2</token>
 							<token name="TextYAlignment">1</token>
-							<UniqueId name="UniqueId">49d8569eef00f7c002fd857600021c0e</UniqueId>
+							<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0014f29d</UniqueId>
 							<bool name="Visible">true</bool>
 							<int name="ZIndex">1</int>
 						</Properties>
 					</Item>
-					<Item class="TextLabel" referent="769">
+					<Item class="TextLabel" referent="RBXD9C5DD39F03B434497732ED333B0C07B">
 						<Properties>
 							<bool name="Active">false</bool>
 							<Vector2 name="AnchorPoint">
@@ -13250,7 +13291,7 @@ return GuiTooltipController]]></ProtectedString>
 							<bool name="TextWrapped">true</bool>
 							<token name="TextXAlignment">2</token>
 							<token name="TextYAlignment">1</token>
-							<UniqueId name="UniqueId">49d8569eef00f7c002fd857600021c0f</UniqueId>
+							<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0014f29e</UniqueId>
 							<bool name="Visible">true</bool>
 							<int name="ZIndex">1</int>
 						</Properties>
@@ -13291,6 +13332,22 @@ local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("Gui
 
 
 local GuiToolSlotController = {}
+
+function GuiToolSlotController:InitializeImage(slotType, slotIndex)
+	if slotType == SlotType.SkillSlot then
+		self.DefaultEmptyToolImage = ToolUtility.EmptySkillImage
+		self.DefaultSlotImage = ToolUtility.DefaultCircularSlotImage
+	else
+		self.DefaultEmptyToolImage = ToolUtility.EmptyToolImage
+		self.DefaultSlotImage = ToolUtility.DefaultSlotImage
+	--elseif slotType == SlotType.InventorySlot then
+	--elseif slotType == SlotType.EquipSlot then
+		--slotIndex
+	--end
+	--elseif slotType == SlotType.QuickSlot then
+	end
+
+end
 
 function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 	local newGuiToolSlotController = Utility:ShallowCopy(self)
@@ -13354,6 +13411,7 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 
 	end
 
+	newGuiToolSlotController:InitializeImage(slotType, slotIndex)
 	newGuiToolSlotController:ClearToolData()
 	return newGuiToolSlotController
 end
@@ -15506,7 +15564,7 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="ScreenGui" referent="RBX4D4959903C304B06BCCBF281BE7EB518">
+		<Item class="ScreenGui" referent="RBX24C71D7CC63A46CEBEF53AD4CAD02746">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<bool name="AutoLocalize">true</bool>
@@ -15523,10 +15581,217 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 				<bool name="SelectionGroup">false</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
-				<UniqueId name="UniqueId">643599910dc19ce202febc390002e998</UniqueId>
+				<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed3f</UniqueId>
 				<token name="ZIndexBehavior">1</token>
 			</Properties>
-			<Item class="ScreenGui" referent="RBXD9D17A3FCB644954A014B6F86E4AAA30">
+			<Item class="ScreenGui" referent="RBX8AA582BF57D54A938A243A08088840B1">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<bool name="AutoLocalize">true</bool>
+					<int name="DisplayOrder">0</int>
+					<bool name="Enabled">true</bool>
+					<bool name="IgnoreGuiInset">false</bool>
+					<string name="Name">GuiHUDBottom</string>
+					<bool name="ResetOnSpawn">true</bool>
+					<Ref name="RootLocalizationTable">null</Ref>
+					<token name="SelectionBehaviorDown">0</token>
+					<token name="SelectionBehaviorLeft">0</token>
+					<token name="SelectionBehaviorRight">0</token>
+					<token name="SelectionBehaviorUp">0</token>
+					<bool name="SelectionGroup">false</bool>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed40</UniqueId>
+					<token name="ZIndexBehavior">1</token>
+				</Properties>
+				<Item class="Frame" referent="RBXE1951837F5824FBE8E8E7EE4748BBEDE">
+					<Properties>
+						<bool name="Active">false</bool>
+						<Vector2 name="AnchorPoint">
+							<X>0.5</X>
+							<Y>1</Y>
+						</Vector2>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>0.0666666701</R>
+							<G>0</G>
+							<B>1</B>
+						</Color3>
+						<float name="BackgroundTransparency">0.800000012</float>
+						<Color3 name="BorderColor3">
+							<R>0.105882362</R>
+							<G>0.164705887</G>
+							<B>0.207843155</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">1</int>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<int name="LayoutOrder">0</int>
+						<string name="Name">GuiHUDBottomWindow</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<UDim2 name="Position">
+							<XS>0.5</XS>
+							<XO>0</XO>
+							<YS>0.975000024</YS>
+							<YO>0</YO>
+						</UDim2>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">false</bool>
+						<token name="SelectionBehaviorDown">0</token>
+						<token name="SelectionBehaviorLeft">0</token>
+						<token name="SelectionBehaviorRight">0</token>
+						<token name="SelectionBehaviorUp">0</token>
+						<bool name="SelectionGroup">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<int name="SelectionOrder">0</int>
+						<UDim2 name="Size">
+							<XS>1</XS>
+							<XO>0</XO>
+							<YS>0.400000006</YS>
+							<YO>0</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
+						<int64 name="SourceAssetId">-1</int64>
+						<token name="Style">0</token>
+						<BinaryString name="Tags"></BinaryString>
+						<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed41</UniqueId>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
+					</Properties>
+					<Item class="Frame" referent="RBXFDF8739BF09946E9B69D37ACB6B6F628">
+						<Properties>
+							<bool name="Active">false</bool>
+							<Vector2 name="AnchorPoint">
+								<X>1</X>
+								<Y>1</Y>
+							</Vector2>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<bool name="AutoLocalize">true</bool>
+							<token name="AutomaticSize">0</token>
+							<Color3 name="BackgroundColor3">
+								<R>0</R>
+								<G>0</G>
+								<B>0</B>
+							</Color3>
+							<float name="BackgroundTransparency">0.800000012</float>
+							<Color3 name="BorderColor3">
+								<R>0.105882362</R>
+								<G>0.164705887</G>
+								<B>0.207843155</B>
+							</Color3>
+							<token name="BorderMode">0</token>
+							<int name="BorderSizePixel">1</int>
+							<bool name="ClipsDescendants">false</bool>
+							<bool name="Draggable">false</bool>
+							<int name="LayoutOrder">0</int>
+							<string name="Name">GuiSkillSlots</string>
+							<Ref name="NextSelectionDown">null</Ref>
+							<Ref name="NextSelectionLeft">null</Ref>
+							<Ref name="NextSelectionRight">null</Ref>
+							<Ref name="NextSelectionUp">null</Ref>
+							<UDim2 name="Position">
+								<XS>1</XS>
+								<XO>0</XO>
+								<YS>1</YS>
+								<YO>0</YO>
+							</UDim2>
+							<Ref name="RootLocalizationTable">null</Ref>
+							<float name="Rotation">0</float>
+							<bool name="Selectable">false</bool>
+							<token name="SelectionBehaviorDown">0</token>
+							<token name="SelectionBehaviorLeft">0</token>
+							<token name="SelectionBehaviorRight">0</token>
+							<token name="SelectionBehaviorUp">0</token>
+							<bool name="SelectionGroup">false</bool>
+							<Ref name="SelectionImageObject">null</Ref>
+							<int name="SelectionOrder">0</int>
+							<UDim2 name="Size">
+								<XS>0.25</XS>
+								<XO>0</XO>
+								<YS>1</YS>
+								<YO>0</YO>
+							</UDim2>
+							<token name="SizeConstraint">0</token>
+							<int64 name="SourceAssetId">-1</int64>
+							<token name="Style">0</token>
+							<BinaryString name="Tags"></BinaryString>
+							<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed42</UniqueId>
+							<bool name="Visible">true</bool>
+							<int name="ZIndex">1</int>
+						</Properties>
+					</Item>
+					<Item class="Frame" referent="RBX4EF71C45279E44D5893283BECE195DE2">
+						<Properties>
+							<bool name="Active">false</bool>
+							<Vector2 name="AnchorPoint">
+								<X>0.5</X>
+								<Y>1</Y>
+							</Vector2>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<bool name="AutoLocalize">true</bool>
+							<token name="AutomaticSize">0</token>
+							<Color3 name="BackgroundColor3">
+								<R>0</R>
+								<G>0</G>
+								<B>0</B>
+							</Color3>
+							<float name="BackgroundTransparency">0.800000012</float>
+							<Color3 name="BorderColor3">
+								<R>0.105882362</R>
+								<G>0.164705887</G>
+								<B>0.207843155</B>
+							</Color3>
+							<token name="BorderMode">0</token>
+							<int name="BorderSizePixel">1</int>
+							<bool name="ClipsDescendants">false</bool>
+							<bool name="Draggable">false</bool>
+							<int name="LayoutOrder">0</int>
+							<string name="Name">GuiQuickSlots</string>
+							<Ref name="NextSelectionDown">null</Ref>
+							<Ref name="NextSelectionLeft">null</Ref>
+							<Ref name="NextSelectionRight">null</Ref>
+							<Ref name="NextSelectionUp">null</Ref>
+							<UDim2 name="Position">
+								<XS>0.5</XS>
+								<XO>0</XO>
+								<YS>1</YS>
+								<YO>0</YO>
+							</UDim2>
+							<Ref name="RootLocalizationTable">null</Ref>
+							<float name="Rotation">0</float>
+							<bool name="Selectable">false</bool>
+							<token name="SelectionBehaviorDown">0</token>
+							<token name="SelectionBehaviorLeft">0</token>
+							<token name="SelectionBehaviorRight">0</token>
+							<token name="SelectionBehaviorUp">0</token>
+							<bool name="SelectionGroup">false</bool>
+							<Ref name="SelectionImageObject">null</Ref>
+							<int name="SelectionOrder">0</int>
+							<UDim2 name="Size">
+								<XS>0.400000006</XS>
+								<XO>0</XO>
+								<YS>0.400000006</YS>
+								<YO>0</YO>
+							</UDim2>
+							<token name="SizeConstraint">0</token>
+							<int64 name="SourceAssetId">-1</int64>
+							<token name="Style">0</token>
+							<BinaryString name="Tags"></BinaryString>
+							<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed43</UniqueId>
+							<bool name="Visible">true</bool>
+							<int name="ZIndex">1</int>
+						</Properties>
+					</Item>
+				</Item>
+			</Item>
+			<Item class="ScreenGui" referent="RBX4F9A37AF73CD4B86BD3C5CF8C55CE4B4">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
@@ -15543,10 +15808,10 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 					<bool name="SelectionGroup">false</bool>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">643599910dc19ce202febc390002e99d</UniqueId>
+					<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed44</UniqueId>
 					<token name="ZIndexBehavior">1</token>
 				</Properties>
-				<Item class="Frame" referent="RBX8FB815EB79B74A65BCF7A7E51240D63E">
+				<Item class="Frame" referent="RBX15A32EB17AF74403B6139E15155336D8">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -15603,96 +15868,13 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 						<int64 name="SourceAssetId">-1</int64>
 						<token name="Style">0</token>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">643599910dc19ce202febc390002e99e</UniqueId>
+						<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed45</UniqueId>
 						<bool name="Visible">true</bool>
 						<int name="ZIndex">1</int>
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="ScreenGui" referent="RBXA41360C16FC5424688DA90066189E133">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<bool name="AutoLocalize">true</bool>
-					<int name="DisplayOrder">0</int>
-					<bool name="Enabled">false</bool>
-					<bool name="IgnoreGuiInset">false</bool>
-					<string name="Name">GuiHUDRight</string>
-					<bool name="ResetOnSpawn">true</bool>
-					<Ref name="RootLocalizationTable">null</Ref>
-					<token name="SelectionBehaviorDown">0</token>
-					<token name="SelectionBehaviorLeft">0</token>
-					<token name="SelectionBehaviorRight">0</token>
-					<token name="SelectionBehaviorUp">0</token>
-					<bool name="SelectionGroup">false</bool>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">643599910dc19ce202febc390002e9ad</UniqueId>
-					<token name="ZIndexBehavior">1</token>
-				</Properties>
-				<Item class="Frame" referent="RBX5FA3E13E11CB43A5BF8EB8388B1BE36D">
-					<Properties>
-						<bool name="Active">false</bool>
-						<Vector2 name="AnchorPoint">
-							<X>1</X>
-							<Y>0.5</Y>
-						</Vector2>
-						<BinaryString name="AttributesSerialize"></BinaryString>
-						<bool name="AutoLocalize">true</bool>
-						<token name="AutomaticSize">0</token>
-						<Color3 name="BackgroundColor3">
-							<R>0.0470588282</R>
-							<G>1</G>
-							<B>0</B>
-						</Color3>
-						<float name="BackgroundTransparency">0.800000012</float>
-						<Color3 name="BorderColor3">
-							<R>0.105882362</R>
-							<G>0.164705887</G>
-							<B>0.207843155</B>
-						</Color3>
-						<token name="BorderMode">0</token>
-						<int name="BorderSizePixel">1</int>
-						<bool name="ClipsDescendants">false</bool>
-						<bool name="Draggable">false</bool>
-						<int name="LayoutOrder">0</int>
-						<string name="Name">GuiHUDRightWindow</string>
-						<Ref name="NextSelectionDown">null</Ref>
-						<Ref name="NextSelectionLeft">null</Ref>
-						<Ref name="NextSelectionRight">null</Ref>
-						<Ref name="NextSelectionUp">null</Ref>
-						<UDim2 name="Position">
-							<XS>1</XS>
-							<XO>0</XO>
-							<YS>0.5</YS>
-							<YO>0</YO>
-						</UDim2>
-						<Ref name="RootLocalizationTable">null</Ref>
-						<float name="Rotation">0</float>
-						<bool name="Selectable">false</bool>
-						<token name="SelectionBehaviorDown">0</token>
-						<token name="SelectionBehaviorLeft">0</token>
-						<token name="SelectionBehaviorRight">0</token>
-						<token name="SelectionBehaviorUp">0</token>
-						<bool name="SelectionGroup">false</bool>
-						<Ref name="SelectionImageObject">null</Ref>
-						<int name="SelectionOrder">0</int>
-						<UDim2 name="Size">
-							<XS>0.25</XS>
-							<XO>0</XO>
-							<YS>1</YS>
-							<YO>0</YO>
-						</UDim2>
-						<token name="SizeConstraint">0</token>
-						<int64 name="SourceAssetId">-1</int64>
-						<token name="Style">0</token>
-						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">643599910dc19ce202febc390002e9ae</UniqueId>
-						<bool name="Visible">true</bool>
-						<int name="ZIndex">1</int>
-					</Properties>
-				</Item>
-			</Item>
-			<Item class="ScreenGui" referent="RBX76FCF0A0340649F69684C236BDC7CEC9">
+			<Item class="ScreenGui" referent="RBX006BCADE83164329BAC5D9F379B590A6">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
@@ -15709,10 +15891,10 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 					<bool name="SelectionGroup">false</bool>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">643599910dc19ce202febc390002e99f</UniqueId>
+					<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed46</UniqueId>
 					<token name="ZIndexBehavior">1</token>
 				</Properties>
-				<Item class="Frame" referent="RBXF5D571E1467541139C0F1B1A1A75E2C4">
+				<Item class="Frame" referent="RBXEB421344966D4945B6F268E78673A7DB">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -15769,11 +15951,11 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 						<int64 name="SourceAssetId">-1</int64>
 						<token name="Style">0</token>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">643599910dc19ce202febc390002e9a0</UniqueId>
+						<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed47</UniqueId>
 						<bool name="Visible">true</bool>
 						<int name="ZIndex">1</int>
 					</Properties>
-					<Item class="Frame" referent="RBXAB2E4B7F702241EE9F033E57984333C0">
+					<Item class="Frame" referent="RBXB22718A2414642B88691BD2D4418F359">
 						<Properties>
 							<bool name="Active">false</bool>
 							<Vector2 name="AnchorPoint">
@@ -15830,11 +16012,135 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 							<int64 name="SourceAssetId">-1</int64>
 							<token name="Style">0</token>
 							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">643599910dc19ce202febc390002e9a1</UniqueId>
+							<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed48</UniqueId>
 							<bool name="Visible">true</bool>
 							<int name="ZIndex">1</int>
 						</Properties>
-						<Item class="Frame" referent="RBX7DB5EB53935B4A6A80A20E8D585BF729">
+						<Item class="Frame" referent="RBX34FBCF1BCC49424E9F76A566190B5EA9">
+							<Properties>
+								<bool name="Active">false</bool>
+								<Vector2 name="AnchorPoint">
+									<X>0</X>
+									<Y>0</Y>
+								</Vector2>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<bool name="AutoLocalize">true</bool>
+								<token name="AutomaticSize">0</token>
+								<Color3 name="BackgroundColor3">
+									<R>0</R>
+									<G>0</G>
+									<B>0</B>
+								</Color3>
+								<float name="BackgroundTransparency">0.800000012</float>
+								<Color3 name="BorderColor3">
+									<R>0.105882362</R>
+									<G>0.164705887</G>
+									<B>0.207843155</B>
+								</Color3>
+								<token name="BorderMode">0</token>
+								<int name="BorderSizePixel">1</int>
+								<bool name="ClipsDescendants">false</bool>
+								<bool name="Draggable">false</bool>
+								<int name="LayoutOrder">0</int>
+								<string name="Name">GuiBarsWindow</string>
+								<Ref name="NextSelectionDown">null</Ref>
+								<Ref name="NextSelectionLeft">null</Ref>
+								<Ref name="NextSelectionRight">null</Ref>
+								<Ref name="NextSelectionUp">null</Ref>
+								<UDim2 name="Position">
+									<XS>0</XS>
+									<XO>0</XO>
+									<YS>0</YS>
+									<YO>0</YO>
+								</UDim2>
+								<Ref name="RootLocalizationTable">null</Ref>
+								<float name="Rotation">0</float>
+								<bool name="Selectable">false</bool>
+								<token name="SelectionBehaviorDown">0</token>
+								<token name="SelectionBehaviorLeft">0</token>
+								<token name="SelectionBehaviorRight">0</token>
+								<token name="SelectionBehaviorUp">0</token>
+								<bool name="SelectionGroup">false</bool>
+								<Ref name="SelectionImageObject">null</Ref>
+								<int name="SelectionOrder">0</int>
+								<UDim2 name="Size">
+									<XS>0.200000003</XS>
+									<XO>0</XO>
+									<YS>1</YS>
+									<YO>0</YO>
+								</UDim2>
+								<token name="SizeConstraint">0</token>
+								<int64 name="SourceAssetId">-1</int64>
+								<token name="Style">0</token>
+								<BinaryString name="Tags"></BinaryString>
+								<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed49</UniqueId>
+								<bool name="Visible">true</bool>
+								<int name="ZIndex">1</int>
+							</Properties>
+							<Item class="Frame" referent="RBXD849C64DB3A94BFA98AFFB365C4302F1">
+								<Properties>
+									<bool name="Active">false</bool>
+									<Vector2 name="AnchorPoint">
+										<X>0.5</X>
+										<Y>0.5</Y>
+									</Vector2>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<bool name="AutoLocalize">true</bool>
+									<token name="AutomaticSize">0</token>
+									<Color3 name="BackgroundColor3">
+										<R>1</R>
+										<G>0</G>
+										<B>0</B>
+									</Color3>
+									<float name="BackgroundTransparency">0</float>
+									<Color3 name="BorderColor3">
+										<R>0.105882362</R>
+										<G>0.164705887</G>
+										<B>0.207843155</B>
+									</Color3>
+									<token name="BorderMode">0</token>
+									<int name="BorderSizePixel">1</int>
+									<bool name="ClipsDescendants">false</bool>
+									<bool name="Draggable">false</bool>
+									<int name="LayoutOrder">0</int>
+									<string name="Name">GuiHpBar</string>
+									<Ref name="NextSelectionDown">null</Ref>
+									<Ref name="NextSelectionLeft">null</Ref>
+									<Ref name="NextSelectionRight">null</Ref>
+									<Ref name="NextSelectionUp">null</Ref>
+									<UDim2 name="Position">
+										<XS>0.5</XS>
+										<XO>0</XO>
+										<YS>0.5</YS>
+										<YO>0</YO>
+									</UDim2>
+									<Ref name="RootLocalizationTable">null</Ref>
+									<float name="Rotation">0</float>
+									<bool name="Selectable">false</bool>
+									<token name="SelectionBehaviorDown">0</token>
+									<token name="SelectionBehaviorLeft">0</token>
+									<token name="SelectionBehaviorRight">0</token>
+									<token name="SelectionBehaviorUp">0</token>
+									<bool name="SelectionGroup">false</bool>
+									<Ref name="SelectionImageObject">null</Ref>
+									<int name="SelectionOrder">0</int>
+									<UDim2 name="Size">
+										<XS>0.800000012</XS>
+										<XO>0</XO>
+										<YS>0.200000003</YS>
+										<YO>0</YO>
+									</UDim2>
+									<token name="SizeConstraint">0</token>
+									<int64 name="SourceAssetId">-1</int64>
+									<token name="Style">0</token>
+									<BinaryString name="Tags"></BinaryString>
+									<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed4a</UniqueId>
+									<bool name="Visible">true</bool>
+									<int name="ZIndex">1</int>
+								</Properties>
+							</Item>
+						</Item>
+						<Item class="Frame" referent="RBXCB6EB67031B241B092879393AB951F78">
 							<Properties>
 								<bool name="Active">false</bool>
 								<Vector2 name="AnchorPoint">
@@ -15891,11 +16197,11 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 								<int64 name="SourceAssetId">-1</int64>
 								<token name="Style">0</token>
 								<BinaryString name="Tags"></BinaryString>
-								<UniqueId name="UniqueId">643599910dc19ce202febc390002e9aa</UniqueId>
+								<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed4b</UniqueId>
 								<bool name="Visible">true</bool>
 								<int name="ZIndex">1</int>
 							</Properties>
-							<Item class="Frame" referent="RBX5AF00446A1834EE193F0A8341784091C">
+							<Item class="Frame" referent="RBXDA76F8F27F834706A4FD8463613D1D73">
 								<Properties>
 									<bool name="Active">false</bool>
 									<Vector2 name="AnchorPoint">
@@ -15952,11 +16258,11 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 									<int64 name="SourceAssetId">-1</int64>
 									<token name="Style">0</token>
 									<BinaryString name="Tags"></BinaryString>
-									<UniqueId name="UniqueId">643599910dc19ce202febc390002e9a2</UniqueId>
+									<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed4c</UniqueId>
 									<bool name="Visible">true</bool>
 									<int name="ZIndex">1</int>
 								</Properties>
-								<Item class="TextLabel" referent="RBXD620C8314B5644C2800249F47670F5CD">
+								<Item class="TextLabel" referent="RBXEAD6EEF829E34BA7AECAECFC906ED6F4">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -16041,12 +16347,12 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 										<bool name="TextWrapped">true</bool>
 										<token name="TextXAlignment">2</token>
 										<token name="TextYAlignment">1</token>
-										<UniqueId name="UniqueId">643599910dc19ce202febc390002e9a3</UniqueId>
+										<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed4d</UniqueId>
 										<bool name="Visible">true</bool>
 										<int name="ZIndex">1</int>
 									</Properties>
 								</Item>
-								<Item class="TextLabel" referent="RBX12839B017D9A4AF28D23604620A5049E">
+								<Item class="TextLabel" referent="RBX9B7DD07E809A436382C97D92148BBFA2">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -16131,13 +16437,13 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 										<bool name="TextWrapped">true</bool>
 										<token name="TextXAlignment">2</token>
 										<token name="TextYAlignment">1</token>
-										<UniqueId name="UniqueId">643599910dc19ce202febc390002e9a4</UniqueId>
+										<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed4e</UniqueId>
 										<bool name="Visible">true</bool>
 										<int name="ZIndex">1</int>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="Frame" referent="RBX13C3B6C5E0064F689D9464970489F7DA">
+							<Item class="Frame" referent="RBX9A85EDF1605D40308866F290E432990B">
 								<Properties>
 									<bool name="Active">false</bool>
 									<Vector2 name="AnchorPoint">
@@ -16194,11 +16500,11 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 									<int64 name="SourceAssetId">-1</int64>
 									<token name="Style">0</token>
 									<BinaryString name="Tags"></BinaryString>
-									<UniqueId name="UniqueId">643599910dc19ce202febc390002e9a5</UniqueId>
+									<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed4f</UniqueId>
 									<bool name="Visible">true</bool>
 									<int name="ZIndex">1</int>
 								</Properties>
-								<Item class="TextLabel" referent="RBX26470E5F663045928C0251557C49C474">
+								<Item class="TextLabel" referent="RBXB5345C851A1C4C7299C148CA06BF02B3">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -16283,12 +16589,12 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 										<bool name="TextWrapped">true</bool>
 										<token name="TextXAlignment">2</token>
 										<token name="TextYAlignment">1</token>
-										<UniqueId name="UniqueId">643599910dc19ce202febc390002e9a6</UniqueId>
+										<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed50</UniqueId>
 										<bool name="Visible">true</bool>
 										<int name="ZIndex">1</int>
 									</Properties>
 								</Item>
-								<Item class="TextLabel" referent="RBX2972A419D9F44368B7C15B23383E3CCD">
+								<Item class="TextLabel" referent="RBX52677962CB3548438D7BDAB7903F6265">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -16373,13 +16679,13 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 										<bool name="TextWrapped">true</bool>
 										<token name="TextXAlignment">2</token>
 										<token name="TextYAlignment">1</token>
-										<UniqueId name="UniqueId">643599910dc19ce202febc390002e9a7</UniqueId>
+										<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed51</UniqueId>
 										<bool name="Visible">true</bool>
 										<int name="ZIndex">1</int>
 									</Properties>
 								</Item>
 							</Item>
-							<Item class="Frame" referent="RBX2275D3C9673148F6AA4FFB84AF00BFC0">
+							<Item class="Frame" referent="RBX22DE31CCAF4F49E18BBDBAFF1CEA5844">
 								<Properties>
 									<bool name="Active">false</bool>
 									<Vector2 name="AnchorPoint">
@@ -16436,11 +16742,11 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 									<int64 name="SourceAssetId">-1</int64>
 									<token name="Style">0</token>
 									<BinaryString name="Tags"></BinaryString>
-									<UniqueId name="UniqueId">643599910dc19ce202febc390002e9a8</UniqueId>
+									<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed52</UniqueId>
 									<bool name="Visible">true</bool>
 									<int name="ZIndex">1</int>
 								</Properties>
-								<Item class="TextLabel" referent="RBXB40D331F19494AE7A18AAA86839FDFB5">
+								<Item class="TextLabel" referent="RBXC722281EC1E242939B0FF47C1C729143">
 									<Properties>
 										<bool name="Active">false</bool>
 										<Vector2 name="AnchorPoint">
@@ -16525,139 +16831,15 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 										<bool name="TextWrapped">true</bool>
 										<token name="TextXAlignment">2</token>
 										<token name="TextYAlignment">1</token>
-										<UniqueId name="UniqueId">643599910dc19ce202febc390002e9a9</UniqueId>
+										<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed53</UniqueId>
 										<bool name="Visible">true</bool>
 										<int name="ZIndex">1</int>
 									</Properties>
 								</Item>
 							</Item>
 						</Item>
-						<Item class="Frame" referent="RBXA2FD4145F122453794F3836F174CEBCB">
-							<Properties>
-								<bool name="Active">false</bool>
-								<Vector2 name="AnchorPoint">
-									<X>0</X>
-									<Y>0</Y>
-								</Vector2>
-								<BinaryString name="AttributesSerialize"></BinaryString>
-								<bool name="AutoLocalize">true</bool>
-								<token name="AutomaticSize">0</token>
-								<Color3 name="BackgroundColor3">
-									<R>0</R>
-									<G>0</G>
-									<B>0</B>
-								</Color3>
-								<float name="BackgroundTransparency">0.800000012</float>
-								<Color3 name="BorderColor3">
-									<R>0.105882362</R>
-									<G>0.164705887</G>
-									<B>0.207843155</B>
-								</Color3>
-								<token name="BorderMode">0</token>
-								<int name="BorderSizePixel">1</int>
-								<bool name="ClipsDescendants">false</bool>
-								<bool name="Draggable">false</bool>
-								<int name="LayoutOrder">0</int>
-								<string name="Name">GuiBarsWindow</string>
-								<Ref name="NextSelectionDown">null</Ref>
-								<Ref name="NextSelectionLeft">null</Ref>
-								<Ref name="NextSelectionRight">null</Ref>
-								<Ref name="NextSelectionUp">null</Ref>
-								<UDim2 name="Position">
-									<XS>0</XS>
-									<XO>0</XO>
-									<YS>0</YS>
-									<YO>0</YO>
-								</UDim2>
-								<Ref name="RootLocalizationTable">null</Ref>
-								<float name="Rotation">0</float>
-								<bool name="Selectable">false</bool>
-								<token name="SelectionBehaviorDown">0</token>
-								<token name="SelectionBehaviorLeft">0</token>
-								<token name="SelectionBehaviorRight">0</token>
-								<token name="SelectionBehaviorUp">0</token>
-								<bool name="SelectionGroup">false</bool>
-								<Ref name="SelectionImageObject">null</Ref>
-								<int name="SelectionOrder">0</int>
-								<UDim2 name="Size">
-									<XS>0.200000003</XS>
-									<XO>0</XO>
-									<YS>1</YS>
-									<YO>0</YO>
-								</UDim2>
-								<token name="SizeConstraint">0</token>
-								<int64 name="SourceAssetId">-1</int64>
-								<token name="Style">0</token>
-								<BinaryString name="Tags"></BinaryString>
-								<UniqueId name="UniqueId">643599910dc19ce202febc390002f473</UniqueId>
-								<bool name="Visible">true</bool>
-								<int name="ZIndex">1</int>
-							</Properties>
-							<Item class="Frame" referent="RBX597FD93552BC4374B55C4CA424308E38">
-								<Properties>
-									<bool name="Active">false</bool>
-									<Vector2 name="AnchorPoint">
-										<X>0.5</X>
-										<Y>0.5</Y>
-									</Vector2>
-									<BinaryString name="AttributesSerialize"></BinaryString>
-									<bool name="AutoLocalize">true</bool>
-									<token name="AutomaticSize">0</token>
-									<Color3 name="BackgroundColor3">
-										<R>1</R>
-										<G>0</G>
-										<B>0</B>
-									</Color3>
-									<float name="BackgroundTransparency">0</float>
-									<Color3 name="BorderColor3">
-										<R>0.105882362</R>
-										<G>0.164705887</G>
-										<B>0.207843155</B>
-									</Color3>
-									<token name="BorderMode">0</token>
-									<int name="BorderSizePixel">1</int>
-									<bool name="ClipsDescendants">false</bool>
-									<bool name="Draggable">false</bool>
-									<int name="LayoutOrder">0</int>
-									<string name="Name">GuiHpBar</string>
-									<Ref name="NextSelectionDown">null</Ref>
-									<Ref name="NextSelectionLeft">null</Ref>
-									<Ref name="NextSelectionRight">null</Ref>
-									<Ref name="NextSelectionUp">null</Ref>
-									<UDim2 name="Position">
-										<XS>0.5</XS>
-										<XO>0</XO>
-										<YS>0.5</YS>
-										<YO>0</YO>
-									</UDim2>
-									<Ref name="RootLocalizationTable">null</Ref>
-									<float name="Rotation">0</float>
-									<bool name="Selectable">false</bool>
-									<token name="SelectionBehaviorDown">0</token>
-									<token name="SelectionBehaviorLeft">0</token>
-									<token name="SelectionBehaviorRight">0</token>
-									<token name="SelectionBehaviorUp">0</token>
-									<bool name="SelectionGroup">false</bool>
-									<Ref name="SelectionImageObject">null</Ref>
-									<int name="SelectionOrder">0</int>
-									<UDim2 name="Size">
-										<XS>0.800000012</XS>
-										<XO>0</XO>
-										<YS>0.200000003</YS>
-										<YO>0</YO>
-									</UDim2>
-									<token name="SizeConstraint">0</token>
-									<int64 name="SourceAssetId">-1</int64>
-									<token name="Style">0</token>
-									<BinaryString name="Tags"></BinaryString>
-									<UniqueId name="UniqueId">643599910dc19ce202febc390002f474</UniqueId>
-									<bool name="Visible">true</bool>
-									<int name="ZIndex">1</int>
-								</Properties>
-							</Item>
-						</Item>
 					</Item>
-					<Item class="Frame" referent="RBX8C3FF9D23DD34397A2B25DF89E2E3458">
+					<Item class="Frame" referent="RBX3B3CE756AE8F48FB9B19FFBB6011A744">
 						<Properties>
 							<bool name="Active">false</bool>
 							<Vector2 name="AnchorPoint">
@@ -16714,21 +16896,21 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 							<int64 name="SourceAssetId">-1</int64>
 							<token name="Style">0</token>
 							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">643599910dc19ce202febc390002e9ac</UniqueId>
+							<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed54</UniqueId>
 							<bool name="Visible">true</bool>
 							<int name="ZIndex">1</int>
 						</Properties>
 					</Item>
 				</Item>
 			</Item>
-			<Item class="ScreenGui" referent="RBX12378C34CCB84FF89B21B529684282E0">
+			<Item class="ScreenGui" referent="RBX06CF2E0CC6B947198BFEC0F785AFC19A">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
 					<int name="DisplayOrder">0</int>
-					<bool name="Enabled">true</bool>
+					<bool name="Enabled">false</bool>
 					<bool name="IgnoreGuiInset">false</bool>
-					<string name="Name">GuiHUDBottom</string>
+					<string name="Name">GuiHUDRight</string>
 					<bool name="ResetOnSpawn">true</bool>
 					<Ref name="RootLocalizationTable">null</Ref>
 					<token name="SelectionBehaviorDown">0</token>
@@ -16738,23 +16920,23 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 					<bool name="SelectionGroup">false</bool>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">643599910dc19ce202febc390002e999</UniqueId>
+					<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed55</UniqueId>
 					<token name="ZIndexBehavior">1</token>
 				</Properties>
-				<Item class="Frame" referent="RBX47C58B9B09DE443D8F23FAB021DD9283">
+				<Item class="Frame" referent="RBXAA4630E5C1084CD685EEAB682DE6AE3E">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
-							<X>0.5</X>
-							<Y>1</Y>
+							<X>1</X>
+							<Y>0.5</Y>
 						</Vector2>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<bool name="AutoLocalize">true</bool>
 						<token name="AutomaticSize">0</token>
 						<Color3 name="BackgroundColor3">
-							<R>0.0666666701</R>
-							<G>0</G>
-							<B>1</B>
+							<R>0.0470588282</R>
+							<G>1</G>
+							<B>0</B>
 						</Color3>
 						<float name="BackgroundTransparency">0.800000012</float>
 						<Color3 name="BorderColor3">
@@ -16767,15 +16949,15 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 						<bool name="ClipsDescendants">false</bool>
 						<bool name="Draggable">false</bool>
 						<int name="LayoutOrder">0</int>
-						<string name="Name">GuiHUDBottomWindow</string>
+						<string name="Name">GuiHUDRightWindow</string>
 						<Ref name="NextSelectionDown">null</Ref>
 						<Ref name="NextSelectionLeft">null</Ref>
 						<Ref name="NextSelectionRight">null</Ref>
 						<Ref name="NextSelectionUp">null</Ref>
 						<UDim2 name="Position">
-							<XS>0.5</XS>
+							<XS>1</XS>
 							<XO>0</XO>
-							<YS>0.975000024</YS>
+							<YS>0.5</YS>
 							<YO>0</YO>
 						</UDim2>
 						<Ref name="RootLocalizationTable">null</Ref>
@@ -16789,35 +16971,252 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 						<Ref name="SelectionImageObject">null</Ref>
 						<int name="SelectionOrder">0</int>
 						<UDim2 name="Size">
-							<XS>1</XS>
+							<XS>0.25</XS>
 							<XO>0</XO>
-							<YS>0.375</YS>
+							<YS>1</YS>
 							<YO>0</YO>
 						</UDim2>
 						<token name="SizeConstraint">0</token>
 						<int64 name="SourceAssetId">-1</int64>
 						<token name="Style">0</token>
 						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">643599910dc19ce202febc390002e99a</UniqueId>
+						<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a0002ed56</UniqueId>
 						<bool name="Visible">true</bool>
 						<int name="ZIndex">1</int>
 					</Properties>
-					<Item class="Frame" referent="RBX5FCD025C40A54E8295ABFFE1F10A0FAE">
+				</Item>
+			</Item>
+		</Item>
+		<Item class="ScreenGui" referent="RBX8FD137D777E644869BAEF99FD0741D36">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="AutoLocalize">true</bool>
+				<int name="DisplayOrder">0</int>
+				<bool name="Enabled">false</bool>
+				<bool name="IgnoreGuiInset">false</bool>
+				<string name="Name">GuiTemplate1</string>
+				<bool name="ResetOnSpawn">true</bool>
+				<Ref name="RootLocalizationTable">null</Ref>
+				<token name="SelectionBehaviorDown">0</token>
+				<token name="SelectionBehaviorLeft">0</token>
+				<token name="SelectionBehaviorRight">0</token>
+				<token name="SelectionBehaviorUp">0</token>
+				<bool name="SelectionGroup">false</bool>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a001767f0</UniqueId>
+				<token name="ZIndexBehavior">1</token>
+			</Properties>
+			<Item class="ImageButton" referent="RBX3192B7965D664650ACB3064D94C45DAA">
+				<Properties>
+					<bool name="Active">true</bool>
+					<Vector2 name="AnchorPoint">
+						<X>0</X>
+						<Y>0</Y>
+					</Vector2>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<bool name="AutoButtonColor">true</bool>
+					<bool name="AutoLocalize">true</bool>
+					<token name="AutomaticSize">0</token>
+					<Color3 name="BackgroundColor3">
+						<R>1</R>
+						<G>1</G>
+						<B>1</B>
+					</Color3>
+					<float name="BackgroundTransparency">1</float>
+					<Color3 name="BorderColor3">
+						<R>0.105882362</R>
+						<G>0.164705887</G>
+						<B>0.207843155</B>
+					</Color3>
+					<token name="BorderMode">0</token>
+					<int name="BorderSizePixel">1</int>
+					<bool name="ClipsDescendants">false</bool>
+					<bool name="Draggable">false</bool>
+					<Content name="HoverImage"><null></null></Content>
+					<Content name="Image"><url>http://www.roblox.com/asset/?id=2052879694</url></Content>
+					<Color3 name="ImageColor3">
+						<R>1</R>
+						<G>1</G>
+						<B>1</B>
+					</Color3>
+					<Vector2 name="ImageRectOffset">
+						<X>0</X>
+						<Y>0</Y>
+					</Vector2>
+					<Vector2 name="ImageRectSize">
+						<X>0</X>
+						<Y>0</Y>
+					</Vector2>
+					<float name="ImageTransparency">0</float>
+					<int name="LayoutOrder">0</int>
+					<bool name="Modal">false</bool>
+					<string name="Name">GuiToolSlot</string>
+					<Ref name="NextSelectionDown">null</Ref>
+					<Ref name="NextSelectionLeft">null</Ref>
+					<Ref name="NextSelectionRight">null</Ref>
+					<Ref name="NextSelectionUp">null</Ref>
+					<UDim2 name="Position">
+						<XS>0.435344815</XS>
+						<XO>0</XO>
+						<YS>0.372505546</YS>
+						<YO>0</YO>
+					</UDim2>
+					<Content name="PressedImage"><null></null></Content>
+					<token name="ResampleMode">0</token>
+					<Ref name="RootLocalizationTable">null</Ref>
+					<float name="Rotation">0</float>
+					<token name="ScaleType">0</token>
+					<bool name="Selectable">true</bool>
+					<bool name="Selected">false</bool>
+					<token name="SelectionBehaviorDown">0</token>
+					<token name="SelectionBehaviorLeft">0</token>
+					<token name="SelectionBehaviorRight">0</token>
+					<token name="SelectionBehaviorUp">0</token>
+					<bool name="SelectionGroup">false</bool>
+					<Ref name="SelectionImageObject">null</Ref>
+					<int name="SelectionOrder">0</int>
+					<UDim2 name="Size">
+						<XS>0</XS>
+						<XO>100</XO>
+						<YS>0</YS>
+						<YO>100</YO>
+					</UDim2>
+					<token name="SizeConstraint">0</token>
+					<Rect2D name="SliceCenter">
+						<min>
+							<X>0</X>
+							<Y>0</Y>
+						</min>
+						<max>
+							<X>0</X>
+							<Y>0</Y>
+						</max>
+					</Rect2D>
+					<float name="SliceScale">1</float>
+					<int64 name="SourceAssetId">-1</int64>
+					<token name="Style">0</token>
+					<BinaryString name="Tags"></BinaryString>
+					<UDim2 name="TileSize">
+						<XS>1</XS>
+						<XO>0</XO>
+						<YS>1</YS>
+						<YO>0</YO>
+					</UDim2>
+					<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a001767f6</UniqueId>
+					<bool name="Visible">true</bool>
+					<int name="ZIndex">1</int>
+				</Properties>
+				<Item class="ImageLabel" referent="RBX58ADF6FDE74B458485AE4779AFEF2A68">
+					<Properties>
+						<bool name="Active">false</bool>
+						<Vector2 name="AnchorPoint">
+							<X>0</X>
+							<Y>0</Y>
+						</Vector2>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<float name="BackgroundTransparency">1</float>
+						<Color3 name="BorderColor3">
+							<R>0.105882362</R>
+							<G>0.164705887</G>
+							<B>0.207843155</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">1</int>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<Content name="Image"><url>http://www.roblox.com/asset/?id=10489717222</url></Content>
+						<Color3 name="ImageColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<Vector2 name="ImageRectOffset">
+							<X>0</X>
+							<Y>0</Y>
+						</Vector2>
+						<Vector2 name="ImageRectSize">
+							<X>0</X>
+							<Y>0</Y>
+						</Vector2>
+						<float name="ImageTransparency">0</float>
+						<int name="LayoutOrder">0</int>
+						<string name="Name">GuiToolImage</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<UDim2 name="Position">
+							<XS>0</XS>
+							<XO>0</XO>
+							<YS>0</YS>
+							<YO>0</YO>
+						</UDim2>
+						<token name="ResampleMode">0</token>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<token name="ScaleType">0</token>
+						<bool name="Selectable">false</bool>
+						<token name="SelectionBehaviorDown">0</token>
+						<token name="SelectionBehaviorLeft">0</token>
+						<token name="SelectionBehaviorRight">0</token>
+						<token name="SelectionBehaviorUp">0</token>
+						<bool name="SelectionGroup">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<int name="SelectionOrder">0</int>
+						<UDim2 name="Size">
+							<XS>1</XS>
+							<XO>0</XO>
+							<YS>1</YS>
+							<YO>0</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
+						<Rect2D name="SliceCenter">
+							<min>
+								<X>0</X>
+								<Y>0</Y>
+							</min>
+							<max>
+								<X>0</X>
+								<Y>0</Y>
+							</max>
+						</Rect2D>
+						<float name="SliceScale">1</float>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<UDim2 name="TileSize">
+							<XS>1</XS>
+							<XO>0</XO>
+							<YS>1</YS>
+							<YO>0</YO>
+						</UDim2>
+						<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a001767f7</UniqueId>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
+					</Properties>
+					<Item class="TextLabel" referent="RBXAE7AC3FCDEA4460FA5F6D9B0F9CAD1EC">
 						<Properties>
 							<bool name="Active">false</bool>
 							<Vector2 name="AnchorPoint">
-								<X>1</X>
-								<Y>1</Y>
+								<X>0</X>
+								<Y>0</Y>
 							</Vector2>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<bool name="AutoLocalize">true</bool>
 							<token name="AutomaticSize">0</token>
 							<Color3 name="BackgroundColor3">
-								<R>0</R>
-								<G>0</G>
-								<B>0</B>
+								<R>1</R>
+								<G>1</G>
+								<B>1</B>
 							</Color3>
-							<float name="BackgroundTransparency">0.800000012</float>
+							<float name="BackgroundTransparency">1</float>
 							<Color3 name="BorderColor3">
 								<R>0.105882362</R>
 								<G>0.164705887</G>
@@ -16827,18 +17226,28 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 							<int name="BorderSizePixel">1</int>
 							<bool name="ClipsDescendants">false</bool>
 							<bool name="Draggable">false</bool>
+							<token name="Font">3</token>
+							<Font name="FontFace">
+								<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
+								<Weight>400</Weight>
+								<Style>Normal</Style>
+								<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
+							</Font>
 							<int name="LayoutOrder">0</int>
-							<string name="Name">GuiSkillSlots</string>
+							<float name="LineHeight">1</float>
+							<int name="MaxVisibleGraphemes">-1</int>
+							<string name="Name">GuiToolName</string>
 							<Ref name="NextSelectionDown">null</Ref>
 							<Ref name="NextSelectionLeft">null</Ref>
 							<Ref name="NextSelectionRight">null</Ref>
 							<Ref name="NextSelectionUp">null</Ref>
 							<UDim2 name="Position">
-								<XS>1</XS>
+								<XS>0</XS>
 								<XO>0</XO>
-								<YS>1</YS>
+								<YS>0.75</YS>
 								<YO>0</YO>
 							</UDim2>
+							<bool name="RichText">false</bool>
 							<Ref name="RootLocalizationTable">null</Ref>
 							<float name="Rotation">0</float>
 							<bool name="Selectable">false</bool>
@@ -16850,36 +17259,54 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 							<Ref name="SelectionImageObject">null</Ref>
 							<int name="SelectionOrder">0</int>
 							<UDim2 name="Size">
-								<XS>0.25</XS>
+								<XS>1</XS>
 								<XO>0</XO>
-								<YS>1</YS>
+								<YS>0.200000003</YS>
 								<YO>0</YO>
 							</UDim2>
 							<token name="SizeConstraint">0</token>
 							<int64 name="SourceAssetId">-1</int64>
-							<token name="Style">0</token>
 							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">643599910dc19ce202febc390002e99b</UniqueId>
+							<string name="Text">Temp</string>
+							<Color3 name="TextColor3">
+								<R>0</R>
+								<G>0</G>
+								<B>0</B>
+							</Color3>
+							<bool name="TextScaled">true</bool>
+							<float name="TextSize">14</float>
+							<Color3 name="TextStrokeColor3">
+								<R>1</R>
+								<G>1</G>
+								<B>1</B>
+							</Color3>
+							<float name="TextStrokeTransparency">0</float>
+							<float name="TextTransparency">0</float>
+							<token name="TextTruncate">0</token>
+							<bool name="TextWrapped">true</bool>
+							<token name="TextXAlignment">2</token>
+							<token name="TextYAlignment">1</token>
+							<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a001767f8</UniqueId>
 							<bool name="Visible">true</bool>
 							<int name="ZIndex">1</int>
 						</Properties>
 					</Item>
-					<Item class="Frame" referent="RBX323418D6263A4164B75EB46766D39FA8">
+					<Item class="TextLabel" referent="RBXD28FCAB5E43640D890DB8DB242943F82">
 						<Properties>
 							<bool name="Active">false</bool>
 							<Vector2 name="AnchorPoint">
-								<X>0.5</X>
-								<Y>1</Y>
+								<X>0</X>
+								<Y>0</Y>
 							</Vector2>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<bool name="AutoLocalize">true</bool>
 							<token name="AutomaticSize">0</token>
 							<Color3 name="BackgroundColor3">
-								<R>0</R>
-								<G>0</G>
-								<B>0</B>
+								<R>1</R>
+								<G>1</G>
+								<B>1</B>
 							</Color3>
-							<float name="BackgroundTransparency">0.800000012</float>
+							<float name="BackgroundTransparency">1</float>
 							<Color3 name="BorderColor3">
 								<R>0.105882362</R>
 								<G>0.164705887</G>
@@ -16889,18 +17316,28 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 							<int name="BorderSizePixel">1</int>
 							<bool name="ClipsDescendants">false</bool>
 							<bool name="Draggable">false</bool>
+							<token name="Font">3</token>
+							<Font name="FontFace">
+								<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
+								<Weight>400</Weight>
+								<Style>Normal</Style>
+								<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
+							</Font>
 							<int name="LayoutOrder">0</int>
-							<string name="Name">GuiQuickSlots</string>
+							<float name="LineHeight">1</float>
+							<int name="MaxVisibleGraphemes">-1</int>
+							<string name="Name">GuiToolCount</string>
 							<Ref name="NextSelectionDown">null</Ref>
 							<Ref name="NextSelectionLeft">null</Ref>
 							<Ref name="NextSelectionRight">null</Ref>
 							<Ref name="NextSelectionUp">null</Ref>
 							<UDim2 name="Position">
-								<XS>0.5</XS>
+								<XS>0.800000012</XS>
 								<XO>0</XO>
-								<YS>1</YS>
+								<YS>0.75</YS>
 								<YO>0</YO>
 							</UDim2>
+							<bool name="RichText">false</bool>
 							<Ref name="RootLocalizationTable">null</Ref>
 							<float name="Rotation">0</float>
 							<bool name="Selectable">false</bool>
@@ -16912,16 +17349,34 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 							<Ref name="SelectionImageObject">null</Ref>
 							<int name="SelectionOrder">0</int>
 							<UDim2 name="Size">
-								<XS>0.400000006</XS>
+								<XS>0.200000003</XS>
 								<XO>0</XO>
-								<YS>0.5</YS>
+								<YS>0.200000003</YS>
 								<YO>0</YO>
 							</UDim2>
 							<token name="SizeConstraint">0</token>
 							<int64 name="SourceAssetId">-1</int64>
-							<token name="Style">0</token>
 							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">643599910dc19ce202febc390002e99c</UniqueId>
+							<string name="Text">Temp</string>
+							<Color3 name="TextColor3">
+								<R>0</R>
+								<G>0</G>
+								<B>0</B>
+							</Color3>
+							<bool name="TextScaled">true</bool>
+							<float name="TextSize">14</float>
+							<Color3 name="TextStrokeColor3">
+								<R>1</R>
+								<G>1</G>
+								<B>1</B>
+							</Color3>
+							<float name="TextStrokeTransparency">0</float>
+							<float name="TextTransparency">0</float>
+							<token name="TextTruncate">0</token>
+							<bool name="TextWrapped">true</bool>
+							<token name="TextXAlignment">2</token>
+							<token name="TextYAlignment">1</token>
+							<UniqueId name="UniqueId">709f2ab1f39ca7a102fec08a001767f9</UniqueId>
 							<bool name="Visible">true</bool>
 							<int name="ZIndex">1</int>
 						</Properties>
@@ -54179,11 +54634,11 @@ local CommonConstant = {
 
 	-- QuickSlots
 	MaxQuickSlotCount = 5,
-	GuiQuickSlotOffsetRatio = 0.025,
+	GuiQuickSlotOffsetRatio = 0.05,
 
 	-- SkillSlots
-	MaxSkillCount = 3,
-	GuiSkillSlotOffsetRatio = 0.025,
+	MaxSkillCount = 4,
+	GuiSkillSlotOffsetRatio = 0.05,
 	
 	UndefinedElementValue = false
 }
@@ -54251,7 +54706,8 @@ local CommonEnum = {
 	SlotType = {
 		InventorySlot = 1,
 		EquipSlot = 2,
-		QuickSlot = 3
+		QuickSlot = 3,
+		SkillSlot = 4
 	},
 	
 	StatusType = {
@@ -55250,7 +55706,10 @@ local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 
 local ToolUtility = {
-	EmptyToolImage = "http://www.roblox.com/asset/?id=35924240"
+	EmptyToolImage = "",
+	EmptySkillImage = "http://www.roblox.com/asset/?id=10489717222",
+	DefaultSlotImage = "http://www.roblox.com/asset/?id=10489757489",
+	DefaultCircularSlotImage = "http://www.roblox.com/asset/?id=10489755989"
 }
 
 function ToolUtility:GetToolGameData(tool)

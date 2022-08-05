@@ -19,9 +19,8 @@ local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("Gui
 local GuiToolSlotController = {}
 
 function GuiToolSlotController:InitializeImage(slotType, slotIndex)
-
 	if slotType == SlotType.SkillSlot then
-		self.DefaultEmptyToolImage = ToolUtility.EmptyToolImage
+		self.DefaultEmptyToolImage = ToolUtility.EmptySkillImage
 		self.DefaultSlotImage = ToolUtility.DefaultCircularSlotImage
 	else
 		self.DefaultEmptyToolImage = ToolUtility.EmptyToolImage
@@ -33,7 +32,8 @@ function GuiToolSlotController:InitializeImage(slotType, slotIndex)
 	--elseif slotType == SlotType.QuickSlot then
 	end
 
-	self.GuiToolSlot.Image = self.DefaultSlotImage
+	self.GuiToolSlot.Image = self.DefaultEmptyToolImage
+	self.GuiToolImage.Image = self.DefaultSlotImage
 end
 
 function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
@@ -108,7 +108,7 @@ function GuiToolSlotController:SetToolImage(image)
 		self.GuiToolImage.Image = image
 		self.GuiToolImage.ImageTransparency = 0
 	else
-		self.GuiToolImage.Image = ToolUtility.EmptyToolImage
+		self.GuiToolImage.Image = self.DefaultSlotImage
 		self.GuiToolImage.ImageTransparency = 0.9
 	end
 end

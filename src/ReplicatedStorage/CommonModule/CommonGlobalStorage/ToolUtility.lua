@@ -12,9 +12,10 @@ local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 
 local ToolUtility = {
-	EmptyToolImage = "http://www.roblox.com/asset/?id=35924240",
-	DefaultSlotImage = "http://www.roblox.com/asset/?id=6742779630",
-	DefaultCircularSlotImage = "http://www.roblox.com/asset/?id=1989142067"
+	EmptyToolImage = "",
+	EmptySkillImage = "http://www.roblox.com/asset/?id=10489717222",
+	DefaultSlotImage = "http://www.roblox.com/asset/?id=10489757489",
+	DefaultCircularSlotImage = "http://www.roblox.com/asset/?id=10489755989"
 }
 
 function ToolUtility:GetToolGameData(tool)

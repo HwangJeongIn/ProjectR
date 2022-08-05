@@ -21,18 +21,6 @@
 			<BinaryString name="Tags"></BinaryString>
 			<token name="ZIndexBehavior">1</token>
 		</Properties>
-		<Item class="UICorner" referent="RBXBD95288A98F940FC8451E494B7DCF58C">
-			<Properties>
-				<BinaryString name="AttributesSerialize"></BinaryString>
-				<UDim name="CornerRadius">
-					<S>0</S>
-					<O>8</O>
-				</UDim>
-				<string name="Name">UICorner</string>
-				<int64 name="SourceAssetId">-1</int64>
-				<BinaryString name="Tags"></BinaryString>
-			</Properties>
-		</Item>
 		<Item class="ImageButton" referent="RBX3192B7965D664650ACB3064D94C45DAA">
 			<Properties>
 				<bool name="Active">true</bool>
