@@ -97,10 +97,10 @@ function GuiController:Initialize()
 	self.GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
 	self.GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
 	
-	self.GuiBoard = GuiFacade.GuiBoard
-	self.GuiPlayersLeftCountText = self.GuiBoard:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
-	self.GuiKilledCountText = self.GuiBoard:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
-	self.GuiCurrentGameLengthText = self.GuiBoard:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
+	self.GuiBoardWindow = GuiFacade.GuiBoardWindow
+	self.GuiPlayersLeftCountText = self.GuiBoardWindow:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
+	self.GuiKilledCountText = self.GuiBoardWindow:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
+	self.GuiCurrentGameLengthText = self.GuiBoardWindow:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
 
 	self.GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
 	self.GuiCurrentGameLengthText.Text = CurrentGameLength.Value
@@ -134,9 +134,9 @@ function GuiController:Initialize()
 end
 
 function GuiController:ToggleInGameGui(isEnabled)
-	self.GuiPlayersLeftCountText.Parent.Enabled = isEnabled
-	self.GuiCurrentGameLengthText.Parent.Enabled = isEnabled
-	self.GuiKilledCountText.Parent.Enabled = isEnabled
+	self.GuiPlayersLeftCountText.Parent.Visible = isEnabled
+	self.GuiCurrentGameLengthText.Parent.Visible = isEnabled
+	self.GuiKilledCountText.Parent.Visible = isEnabled
 end
 
 function GuiController:SetGuiMainMessage(inputText)
@@ -176,7 +176,7 @@ function GuiController:ProcessWaiting(arguments)
 	print("GameStateType.Waiting in client")
 	self:SetGuiMainMessage("Waiting ... ")
 
-	self.GuiBoard.Enabled = false
+	self:ToggleInGameGui(false)
 	
 end
 
@@ -196,8 +196,8 @@ function GuiController:ProcessPlaying(arguments)
 	
 	self:SetGuiMainMessage("Get ready to play")
 
-	self.GuiBoard.Enabled = true
-	
+	self:ToggleInGameGui(true)
+
 	wait(2)
 	
 	self:SetGuiMainMessage("")

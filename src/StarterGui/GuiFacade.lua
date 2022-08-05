@@ -11,27 +11,36 @@ function GuiFacade:Initialize()
     -- GuiHUD
     local GuiHUD = PlayerGui:WaitForChild("GuiHUD")
     
-    local GuiPlayerMain = GuiHUD:WaitForChild("GuiPlayerMain")
-    local GuiMinimap = GuiHUD:WaitForChild("GuiMinimap")
-    local GuiBoard = GuiHUD:WaitForChild("GuiBoard")
-    
-    local GuiBarsWindow = GuiPlayerMain:WaitForChild("GuiBarsWindow")
-    local GuiSlotsWindow = GuiPlayerMain:WaitForChild("GuiSlotsWindow")
-    
-    local GuiHpBar = GuiBarsWindow:WaitForChild("GuiHpBar")
-    
-    local GuiQuickSlots = GuiSlotsWindow:WaitForChild("GuiQuickSlots")
-    local GuiSkillSlots = GuiSlotsWindow:WaitForChild("GuiSkillSlots")
+    local GuiHUDTop = GuiHUD:WaitForChild("GuiHUDTop")
+    local GuiHUDTopWindow = GuiHUDTop:WaitForChild("GuiHUDTopWindow")
 
+    local GuiGameStateWindow = GuiHUDTopWindow:WaitForChild("GuiGameStateWindow")
+    local GuiBoardWindow = GuiGameStateWindow:WaitForChild("GuiBoardWindow")
+    local GuiBarsWindow = GuiGameStateWindow:WaitForChild("GuiBarsWindow")
+    local GuiHpBar = GuiBarsWindow:WaitForChild("GuiHpBar")
+
+    local GuiMinimap = GuiHUDTopWindow:WaitForChild("GuiMinimap")
+    
     self.GuiHUD = GuiHUD
-    self.GuiPlayerMain = GuiPlayerMain
-    self.GuiMinimap = GuiMinimap
-    self.GuiBoard = GuiBoard
+    self.GuiHUDTop = GuiHUDTop
+    --self.GuiHUDTopWindow = GuiHUDTopWindow
+    self.GuiGameStateWindow = GuiGameStateWindow
+    self.GuiBoardWindow = GuiBoardWindow
     self.GuiBarsWindow = GuiBarsWindow
-    self.GuiSlotsWindow = GuiSlotsWindow
     self.GuiHpBar = GuiHpBar
+    self.GuiMinimap = GuiMinimap
+
+    local GuiHUDBottom = GuiHUD:WaitForChild("GuiHUDBottom")
+    local GuiHUDBottomWindow = GuiHUDBottom:WaitForChild("GuiHUDBottomWindow")
+    
+    local GuiQuickSlots = GuiHUDBottomWindow:WaitForChild("GuiQuickSlots")
+    local GuiSkillSlots = GuiHUDBottomWindow:WaitForChild("GuiSkillSlots")
+
+    self.GuiHUDBottom = GuiHUDBottom
+    --self.GuiHUDBottomWindow = GuiHUDBottomWindow
     self.GuiQuickSlots = GuiQuickSlots
     self.GuiSkillSlots = GuiSkillSlots
+
 
     -- GuiPlayerStatus
     local GuiPlayerStatus = PlayerGui:WaitForChild("GuiPlayerStatus")

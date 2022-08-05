@@ -38411,10 +38411,10 @@ function GuiController:Initialize()
 	self.GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
 	self.GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
 	
-	self.GuiBoard = GuiFacade.GuiBoard
-	self.GuiPlayersLeftCountText = GuiBoard:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
-	self.GuiKilledCountText = GuiBoard:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
-	self.GuiCurrentGameLengthText = GuiBoard:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
+	self.GuiBoardWindow = GuiFacade.GuiBoardWindow
+	self.GuiPlayersLeftCountText = GuiBoardWindow:WaitForChild("GuiPlayersLeftCount"):WaitForChild("GuiPlayersLeftCountText")
+	self.GuiKilledCountText = GuiBoardWindow:WaitForChild("GuiKilledCount"):WaitForChild("GuiKilledCountText")
+	self.GuiCurrentGameLengthText = GuiBoardWindow:WaitForChild("GuiCurrentGameLength"):WaitForChild("GuiCurrentGameLengthText")
 
 	self.GuiPlayersLeftCountText.Text = PlayersLeftCount.Value
 	self.GuiCurrentGameLengthText.Text = CurrentGameLength.Value
@@ -38489,7 +38489,7 @@ function GuiController:ProcessWaiting(arguments)
 	print("GameStateType.Waiting in client")
 	self:SetGuiMainMessage("Waiting ... ")
 
-	self.GuiBoard.Enabled = false
+	self.GuiBoardWindow.Enabled = false
 	
 end
 
@@ -38509,7 +38509,7 @@ function GuiController:ProcessPlaying(arguments)
 	
 	self:SetGuiMainMessage("Get ready to play")
 
-	self.GuiBoard.Enabled = true
+	self.GuiBoardWindow.Enabled = true
 	
 	wait(2)
 	
@@ -39239,7 +39239,7 @@ function GuiFacade:Initialize()
     
     local GuiPlayerMain = GuiHUD:WaitForChild("GuiPlayerMain")
     local GuiMinimap = GuiHUD:WaitForChild("GuiMinimap")
-    local GuiBoard = GuiHUD:WaitForChild("GuiBoard")
+    local GuiBoardWindow = GuiHUD:WaitForChild("GuiBoardWindow")
     
     local GuiBarsWindow = GuiPlayerMain:WaitForChild("GuiBarsWindow")
     local GuiSlotsWindow = GuiPlayerMain:WaitForChild("GuiSlotsWindow")
@@ -39252,7 +39252,7 @@ function GuiFacade:Initialize()
     self.GuiHUD = GuiHUD
     self.GuiPlayerMain = GuiPlayerMain
     self.GuiMinimap = GuiMinimap
-    self.GuiBoard = GuiBoard
+    self.GuiBoardWindow = GuiBoardWindow
     self.GuiBarsWindow = GuiBarsWindow
     self.GuiSlotsWindow = GuiSlotsWindow
     self.GuiHpBar = GuiHpBar
@@ -39746,7 +39746,7 @@ return GuiFacade</string>
       </Item>
       <Item class="ScreenGui" referent="745">
         <Properties>
-          <string name="Name">GuiBoard</string>
+          <string name="Name">GuiBoardWindow</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
           <bool name="AutoLocalize">true</bool>
           <int name="DisplayOrder">0</int>
