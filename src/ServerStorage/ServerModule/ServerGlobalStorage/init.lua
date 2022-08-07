@@ -282,13 +282,67 @@ function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
 	return true
 end
 
+function ServerGlobalStorage:CanEquipTool(playerId, tool)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local player = game.Players:GetPlayerByUserId(playerId)
+	return player.Backpack == tool.Parent
+end
+
+function ServerGlobalStorage:CanUnequipTool(playerId, equipType, equippedTool)
+	local player = game.Players:GetPlayerByUserId(playerId)
+	local character = player.Character
+	if not character then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if equipType == EquipType.Weapon then
+		return (character == equippedTool.Parent)
+	elseif equipType == EquipType.Armor then
+		local characterArmorsFolder = character:FindFirstChild("Armors")
+		if not characterArmorsFolder then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+		return (characterArmorsFolder == equippedTool.Parent)
+	end
+	
+	return true
+end
+
+function ServerGlobalStorage:CanUnequipToolByEquipType(playerId, equipType)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	local equippedTool = self:GetEquipSlot(playerId, equipType)
+	if not equippedTool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return self:CanUnequipTool(playerId, equipType, equippedTool)
+end
+
+
+
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
 function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
 	local equipType = ToolUtility:GetEquipType(tool)
 	if not equipType or equipType ~= EquipType.Weapon then
 		return false
 	end
-	
+
+	if not self:CanEquipTool(playerId, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
 	local prevTool, currentTool = self:EquipTool(playerId, equipType, tool)
 	if not currentTool then
 		Debug.Assert(false, "비정상입니다.")
@@ -300,20 +354,25 @@ function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
 	return true
 end
 
-function ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId, tool)
-	local equipType = ToolUtility:GetEquipType(tool)
-	if not equipType or equipType ~= EquipType.Weapon then
+function ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId)
+	local equippedWeapon = self:GetEquipSlot(playerId, EquipType.Weapon)
+	if not equippedWeapon then
 		return false
 	end
-	
-	local prevTool = self:UnequipTool(playerId, equipType) 
+
+	if not self:CanUnequipTool(playerId, EquipType.Weapon, equippedWeapon) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local prevTool = self:UnequipTool(playerId, EquipType.Weapon) 
 	if not prevTool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
 	local player = game.Players:GetPlayerByUserId(playerId)
-	UnequipToolSTC:FireClient(player, equipType)
+	UnequipToolSTC:FireClient(player, EquipType.Weapon)
 	return true
 end
 

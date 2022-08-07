@@ -272,6 +272,22 @@ function CommonGlobalStorage:SwapInventorySlot(playerId, slotIndex1, slotIndex2)
 	return true
 end
 
+function CommonGlobalStorage:GetEquipSlot(playerId, equipType)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
+	local tool = equipSlots:GetSlot(equipType)
+	if nil == tool then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return tool
+end
+
 --[[
 function CommonGlobalStorage:CheckAndGetArmorData(armor)
 	if not armor then

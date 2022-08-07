@@ -146,20 +146,22 @@ function ClientGlobalStorage:SwapQuickSlot(slotIndex1, slotIndex2)
 	local tool2 = ClientGlobalStorage:GetQuickSlot(slotIndex2)
 	if nil == tool2 then
 		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
-		return
+		return false
 	end
 
 
 	--Gui 갱신
 	if not self.GuiController:SetQuickToolSlot(slotIndex1, tool1) then
 		Debug.Assert(false, "비정상입니다.")
-		return
+		return false
 	end
 
 	if not self.GuiController:SetQuickToolSlot(slotIndex2, tool2) then
 		Debug.Assert(false, "비정상입니다.")
-		return
+		return false
 	end
+
+	return true
 end
 
 

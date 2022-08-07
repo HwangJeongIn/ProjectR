@@ -18,6 +18,16 @@ local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
 local EquipSlots = {}
 EquipSlots.EquipSlotsRaw = EquipSlotsRaw
 
+function EquipSlots:GetSlot(slotIndex)
+	local targetTool = self.EquipSlotsRaw:Get(slotIndex)
+	if nil == targetTool then
+		Debug.Assert(false, "슬롯 인덱스가 비정상입니다.")
+		return nil
+	end
+
+	return targetTool
+end
+
 function EquipSlots:UnequipTool(equipType)
     if not equipType then
         Debug.Assert(false, "타입이 비정상입니다.")

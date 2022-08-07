@@ -50,6 +50,11 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
         end
         
         local playerId = player.UserId
+        if not ServerGlobalStorage:CanUnequipToolByEquipType(player, equipType) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
+        
         local prevTool = nil
         if equipType == EquipType.Weapon then
             local humanoid = character:FindFirstChild("Humanoid")
@@ -93,18 +98,18 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
             return
         end
     
-        if player.Backpack ~= tool.Parent then
-            Debug.Assert(false, "해당 플레이어가 소유한 도구가 아닙니다.")
-            return
-        end
-    
         local character = player.Character
         if not character then
             Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 장착할 수 없습니다.")
             return
         end
-    
+
         local playerId = player.UserId
+        if not ServerGlobalStorage:CanEquipTool(playerId, tool) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
+    
         local prevTool = nil
         local currentTool = nil
     
@@ -159,7 +164,8 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
             return
         end
         
-        if player.Backpack ~= tool.Parent then
+        local playerId = player.UserId
+        if not ServerGlobalStorage:CanEquipTool(playerId, tool) then
             Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
             return
         end
@@ -175,7 +181,8 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
             Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
             return
         end
-    
+
+        ServerGlobalStorage:CheckAndUnequipIfWeapon(player.UserId)
         ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
         humanoid:EquipTool(tool)
     end)
