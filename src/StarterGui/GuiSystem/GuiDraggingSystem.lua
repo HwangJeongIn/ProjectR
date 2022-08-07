@@ -94,6 +94,14 @@ function OnInputEnded(input)
             elseif currentSlotType == SlotType.QuickSlot then
 
             end 
+        elseif prevSlotType == SlotType.QuickSlot then
+            if currentSlotType == SlotType.QuickSlot then
+                if prevSlotIndex ~= currentSlotIndex then
+                    if not ClientGlobalStorage:SendSwapInventorySlot(prevSlotIndex, currentSlotIndex) then
+                        Debug.Assert(false, "비정상입니다.")
+                    end
+                end
+            end
         elseif prevSlotType == SlotType.SkillSlot then
 
         end

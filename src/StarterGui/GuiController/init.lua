@@ -264,6 +264,22 @@ function GuiController:SetEquipToolSlot(equipType, tool)
 
 	return true
 end
+
+function GuiController:SetQuickSlot(slotIndex, tool)
+	if not slotIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self.GuiInventoryController:SetToolSlot(slotIndex, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+
 GuiController:Initialize()
 return GuiController
 

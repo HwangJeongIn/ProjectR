@@ -26,6 +26,7 @@ local SwapInventorySlotSTC = RemoteEvents:WaitForChild("SwapInventorySlotSTC")
 
 
 function ClientRemoteEventImpl:InitializeRemoteEvents(ClientGlobalStorage, GuiController)
+	ClientGlobalStorage.GuiController = GuiController
 	-- STC
 	SwapInventorySlotSTC.OnClientEvent:Connect(function(slotIndex1, slotIndex2)
 		Debug.Assert(slotIndex1, "장착 슬롯 비정상")

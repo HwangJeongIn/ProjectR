@@ -28,9 +28,10 @@ local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
 
 
+local QuickSlots = require(script:WaitForChild("QuickSlots"))
 local ClientGlobalStorage = CommonGlobalStorage
+ClientGlobalStorage.QuickSlots = QuickSlots
 
--- 초기화 코드
 
 function ClientGlobalStorage:Initialize(guiController)
 	self:SetClientMode()
@@ -89,63 +90,74 @@ function ClientGlobalStorage:SendUnequipToolCTS(equipType)
 	return true
 end
 
-
 function ClientGlobalStorage:GetData()
 	return self.PlayerTable[PlayerId]
 end
 
-function ClientGlobalStorage:CheckQuickSlotIndex(quickSlotIndex)
-	if MaxQuickSlotCount < quickSlotIndex or quickSlotIndex < 1 then
-		Debug.Assert(false, "슬롯인덱스가 비정상입니다. [QuickSlot] => " .. tostring(quickSlotIndex))
-		return false
-	end
-	
-	return true
-end
-
-
-function ClientGlobalStorage:GetQuickSlot(quickSlotIndex)
-	if self:CheckQuickSlotIndex(quickSlotIndex) == false then
+function ClientGlobalStorage:GetQuickSlot(slotIndex)
+	local targetTool = self.QuickSlots:GetSlot(slotIndex)
+	if nil == targetTool then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
 	end
 	
-	local data = self:GetData()
-	return data[StatusType.QuickSlot][quickSlotIndex]
+	return targetTool
 end
 
-function ClientGlobalStorage:SetQuickSlot(quickSlotIndex, tool)
-	
-	if self:CheckQuickSlotIndex(quickSlotIndex) == false then
+function ClientGlobalStorage:SetQuickSlot(slotIndex, tool)
+	if not self.QuickSlots:SetSlot(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 	
-	if not tool then
+	-- Gui 갱신
+	--[[
+	if not GuiController:SetInventoryToolSlot(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
-		return false
+		return
 	end
-	
-	local data = self:GetData()
-	data[StatusType.QuickSlot][quickSlotIndex] = tool
-end
-
-function ClientGlobalStorage:SwapQuickSlot(quickSlotIndex1, quickSlotIndex2)
-	if self:CheckQuickSlotIndex(quickSlotIndex1) == false or self:CheckQuickSlotIndex(quickSlotIndex2) == false then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	local tool1 = self:GetQuickSlot(quickSlotIndex1)
-	local tool2 = self:GetQuickSlot(quickSlotIndex2)
-	
-	if self:SetQuickSlot(quickSlotIndex1, tool2) == false or self:SetQuickSlot(quickSlotIndex2, tool1) == false then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
+	--]]
 	return true
 end
+
+function ClientGlobalStorage:SwapQuickSlot(slotIndex1, slotIndex2)
+	if not self.QuickSlots:SwapSlot(slotIndex1, slotIndex2) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local tool1 = ClientGlobalStorage:GetQuickSlot(slotIndex1)
+	if nil == tool1 then
+		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+		return
+	end
+
+	local tool2 = ClientGlobalStorage:GetInventorySlot(slotIndex2)
+	if nil == tool2 then
+		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+		return
+	end
+
+	if not self.GuiController:SetInventoryToolSlot(slotIndex1, tool1) then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+	--Gui 갱신
+	--[[
+	if not GuiController:SetInventoryToolSlot(slotIndex1, tool1) then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+
+	if not GuiController:SetInventoryToolSlot(slotIndex2, tool2) then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+	--]]
+end
+
+
+
 
 ClientGlobalStorage.__index = Utility.Inheritable__index
 ClientGlobalStorage.__newindex = Utility.Inheritable__newindex

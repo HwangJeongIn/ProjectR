@@ -62,16 +62,8 @@ function CommonGlobalStorage:CreateEmptyData()
 		[StatusType.EquipSlots] = Utility:DeepCopy(EquipSlots),
 		[StatusType.Inventory] = Utility:DeepCopy(Inventory)
 	}
-
-	if self.IsClient then
-		playerData[StatusType.QuickSlots] = {}
-	end
 	
 	return playerData
-end
-
-function CommonGlobalStorage:SetClientMode()
-	self.IsClient = true
 end
 
 function CommonGlobalStorage:CheckPlayer(playerId)
