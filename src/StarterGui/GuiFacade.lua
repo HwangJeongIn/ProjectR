@@ -6,7 +6,10 @@ function GuiFacade:Initialize()
     
     -- GUiTemplate
     local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
-    local GuiToolSlotTemplate = GuiTemplate:WaitForChild("GuiToolSlot")
+    local GuiSlotTemplate = GuiTemplate:WaitForChild("GuiSlot")
+    self.GuiTemplate = {
+        GuiSlot = GuiSlotTemplate
+    }
 
     -- GuiHUD
     local GuiHUD = PlayerGui:WaitForChild("GuiHUD")
@@ -52,9 +55,7 @@ function GuiFacade:Initialize()
     self.GuiPlayerStatusWindow = GuiPlayerStatusWindow
     self.GuiEquipSlots = GuiEquipSlots
     self.GuiInventory = GuiInventory
-    self.GuiTemplate = {
-        GuiToolSlot = GuiToolSlotTemplate
-    }
+
     
     -- GuiTooltip
     local GuiTooltip = PlayerGui:WaitForChild("GuiTooltip")
@@ -66,8 +67,10 @@ function GuiFacade:Initialize()
     -- GuiTemplateControllers
     local GuiTemplateControllers = PlayerGui:WaitForChild("GuiTemplateControllers")
     local GuiToolSlotController = require(GuiTemplateControllers:WaitForChild("GuiToolSlotController"))
+    local GuiSkillSlotController = require(GuiTemplateControllers:WaitForChild("GuiSkillSlotController"))
     self.GuiTemplateController = {
-        GuiToolSlotController = GuiToolSlotController
+        GuiToolSlotController = GuiToolSlotController,
+        GuiSkillSlotController = GuiSkillSlotController
     }
 
     -- GuiPopupWindowControllers

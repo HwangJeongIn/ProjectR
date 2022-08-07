@@ -18,8 +18,8 @@ local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
 local GuiSkillSlots = GuiFacade.GuiSkillSlots
-local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiToolSlot
-local GuiToolSlotController = GuiFacade.GuiTemplateController.GuiToolSlotController
+local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiSlot
+local GuiSkillSlotController = GuiFacade.GuiTemplateController.GuiSkillSlotController
 
 
 local GuiSkillSlotsRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
@@ -76,7 +76,7 @@ function GuiSkillSlotsController:Initialize()
     newGuiMainToolSlot.Parent = GuiSkillSlots
     newGuiMainToolSlot.Name = tostring("MainToolSlot")
 
-    self.GuiMainToolSlotController = GuiToolSlotController:new(SlotType.SkillSlot, 1, newGuiMainToolSlot)
+    self.GuiMainToolSlotController = GuiSkillSlotController:new(SlotType.SkillSlot, 1, newGuiMainToolSlot)
 
 
 
@@ -101,7 +101,7 @@ function GuiSkillSlotsController:Initialize()
         newGuiToolSlot.Parent = GuiSkillSlots
         newGuiToolSlot.Name = tostring(slotIndex)
 
-        self.GuiSkillSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.SkillSlot, slotIndex, newGuiToolSlot))
+        self.GuiSkillSlotsRaw:Set(slotIndex, GuiSkillSlotController:new(SlotType.SkillSlot, slotIndex, newGuiToolSlot))
     end
 end
 

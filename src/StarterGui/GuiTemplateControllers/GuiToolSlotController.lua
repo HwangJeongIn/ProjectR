@@ -10,62 +10,33 @@ local SlotType = CommonEnum.SlotType
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
-local GuiToolSlot = GuiTemplate:WaitForChild("GuiToolSlot")
+local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
 
 local GuiPopupWindowControllers = PlayerGui:WaitForChild("GuiPopupWindowControllers")
 local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("GuiTooltipController"))
 
 
-local GuiToolSlotController = {}
+local GuiSlotController = Utility:DeepCopy(require(script.Parent:WaitForChild("GuiSlotController")))
 
-function GuiToolSlotController:InitializeImage(slotType, slotIndex)
-	if slotType == SlotType.SkillSlot then
-		self.DefaultToolImage = ToolUtility.DefaultSkillImage
-		self.EmptyToolImage = ToolUtility.EmptySkillImage
-		self.DefaultSlotImage = ToolUtility.DefaultCircularSlotImage
-		
-		--self.GuiToolSlot.ImageTransparency = 0.65
+local GuiToolSlotController = GuiSlotController
 
-	else
-		self.DefaultToolImage = ToolUtility.DefaultToolImage
-		self.EmptyToolImage = ToolUtility.EmptyToolImage
-		self.DefaultSlotImage = ToolUtility.DefaultSlotImage
-	--elseif slotType == SlotType.InventorySlot then
-	--elseif slotType == SlotType.EquipSlot then
-		--slotIndex
-	--end
-	--elseif slotType == SlotType.QuickSlot then
+function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
+
+	if not slotType == SlotType.InventorySlot 
+	and not slotType == SlotType.EquipSlot 
+	and not slotType == slotType.QuickSlot then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
 	end
 
-	self.GuiToolSlot.Image = self.DefaultSlotImage
-end
-
-function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
-	local newGuiToolSlotController = Utility:ShallowCopy(self)
-
-	if not newGuiToolSlot then
-		newGuiToolSlot = GuiToolSlot:Clone()
-	end
-
-	local newGuiToolImage = newGuiToolSlot:WaitForChild("GuiToolImage")
-	local newGuiToolName = newGuiToolImage:WaitForChild("GuiToolName")
-	local newGuiToolCount = newGuiToolImage:WaitForChild("GuiToolCount")
-
-	newGuiToolSlotController.GuiToolSlot = newGuiToolSlot
-	newGuiToolSlotController.GuiToolImage = newGuiToolImage
-	newGuiToolSlotController.GuiToolName = newGuiToolName
-	newGuiToolSlotController.GuiToolCount = newGuiToolCount
-	newGuiToolSlotController.SlotIndex = slotIndex
-	newGuiToolSlotController.SlotType = slotType
+	local newGuiToolSlotController = self:newRaw(slotType, slotIndex, newGuiSlot)
 	
-	newGuiToolSlotController.Tool = nil
-
-	newGuiToolSlotController.GuiToolSlot.MouseEnter:connect(function(x,y)
-		newGuiToolSlotController.GuiToolSlot.ImageTransparency = 0.5
+	newGuiToolSlotController.GuiSlot.MouseEnter:connect(function(x,y)
+		newGuiToolSlotController.GuiSlot.ImageTransparency = 0.5
 	end)
 	
-	newGuiToolSlotController.GuiToolSlot.MouseLeave:connect(function()
-		newGuiToolSlotController.GuiToolSlot.ImageTransparency = 0
+	newGuiToolSlotController.GuiSlot.MouseLeave:connect(function()
+		newGuiToolSlotController.GuiSlot.ImageTransparency = 0
 	end)
 
 	--[[
@@ -82,7 +53,7 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 	--]]
 
 	if newGuiToolSlotController.SlotType == SlotType.InventorySlot then
-		newGuiToolSlotController.GuiToolSlot.Activated:connect(function(inputObject)
+		newGuiToolSlotController.GuiSlot.Activated:connect(function(inputObject)
 			local targetTool = newGuiToolSlotController.Tool
 			if not targetTool then
 				return
@@ -90,7 +61,7 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 			GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
 		end)
 	elseif newGuiToolSlotController.SlotType == SlotType.EquipSlot then
-		newGuiToolSlotController.GuiToolSlot.Activated:connect(function(inputObject)
+		newGuiToolSlotController.GuiSlot.Activated:connect(function(inputObject)
 			local targetTool = newGuiToolSlotController.Tool
 			if not targetTool then
 				return
@@ -102,37 +73,13 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 
 	end
 
-	newGuiToolSlotController:InitializeImage(slotType, slotIndex)
 	newGuiToolSlotController:ClearToolData()
 	return newGuiToolSlotController
 end
 
-function GuiToolSlotController:SetToolImage(image, isEmpty)
-	if isEmpty then
-		self.GuiToolImage.Image = self.EmptyToolImage
-		self.GuiToolImage.ImageTransparency = 0.9
-		return
-	end
-
-	if image then
-		self.GuiToolImage.Image = image
-		self.GuiToolImage.ImageTransparency = 0
-	else
-		self.GuiToolImage.Image = self.DefaultToolImage
-		self.GuiToolImage.ImageTransparency = 0
-	end
-end
-
 function GuiToolSlotController:ClearToolData()
-	self:SetToolImage(nil, true)
-	self.GuiToolName.Text = ""
-	self.GuiToolCount.Text = ""
-
+	self:ClearData()
 	self.Tool = nil
-end
-
-function GuiToolSlotController:GetSlotIndex()
-	return self.SlotIndex
 end
 
 function GuiToolSlotController:GetTool()
@@ -152,16 +99,16 @@ function GuiToolSlotController:SetTool(tool)
 		return false
 	end
 
-	self:SetToolImage(toolGameData.Image)
-	self.GuiToolName.Text = tool.Name
+	self:SetImage(toolGameData.Image)
+	self:SetName(tool.Name)
 	self.Tool = tool
 
 	-- 여러개 소유할 수 있다면 변경될 수 있다.
-	if not self.SlotType == SlotType.EquipSlot then
-		self.GuiToolCount.Text = "1"
+	if self.SlotType ~= SlotType.EquipSlot then
+		self:SetNumber("1")
 	end
 
 	return true
 end
 
-return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
+return GuiToolSlotController

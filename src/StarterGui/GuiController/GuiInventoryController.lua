@@ -18,7 +18,7 @@ local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 local GuiInventory = GuiFacade.GuiInventory
 
-local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiToolSlot
+local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiSlot
 local GuiToolSlotController = GuiFacade.GuiTemplateController.GuiToolSlotController
 
 local GuiInventoryRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
