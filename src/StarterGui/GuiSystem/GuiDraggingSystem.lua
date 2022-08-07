@@ -8,6 +8,7 @@ local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModu
 
 local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
 local Debug = ClientModuleFacade.Debug
+local ToolUtility = ClientModuleFacade.ToolUtility
 local KeyBinder = ClientModuleFacade.KeyBinder
 
 
@@ -67,22 +68,28 @@ function OnInputEnded(input)
             return
         end
 
-        if not GuiDraggingSystem.SlotControllerCandidate then
-            GuiDraggingSystem:ClearSlotController()
-            Debug.Print("마지막 위치에 슬롯이 없습니다.")
-            return
-        end
+
 
 
         local prevSlotType = GuiDraggingSystem.SlotController.SlotType
         local prevSlotIndex = GuiDraggingSystem.SlotController.SlotIndex
+        local prevTool = GuiDraggingSystem.SlotController.Tool
 
-        local currentSlotType = GuiDraggingSystem.SlotControllerCandidate.SlotType
-        local currentSlotIndex = GuiDraggingSystem.SlotControllerCandidate.SlotIndex
+        local currentSlotType = nil
+        local currentSlotIndex = nil
+
+        if GuiDraggingSystem.SlotControllerCandidate then
+            currentSlotType = GuiDraggingSystem.SlotControllerCandidate.SlotType
+            currentSlotIndex = GuiDraggingSystem.SlotControllerCandidate.SlotIndex
+        end
 
         print("Swap Slot => ")
         print("From => ".. SlotTypeConverter[prevSlotType] .. " : " .. tostring(prevSlotIndex))
-        print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
+        if currentSlotType then
+            print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
+        else
+            print("To => ".. "nil : nil")
+        end
     
         if prevSlotType == SlotType.InventorySlot then
             if currentSlotType == SlotType.InventorySlot then
@@ -95,6 +102,15 @@ function OnInputEnded(input)
 				if not ClientGlobalStorage:SetQuickSlotByInventorySlot(currentSlotIndex, prevSlotIndex) then
                     Debug.Assert(false, "비정상입니다.")
                 end
+            elseif currentSlotType == SlotType.EquipSlot then
+                if prevTool then
+                    local prevToolEquipType = ToolUtility:GetEquipType(prevTool)
+                    if prevToolEquipType then
+                        if not ClientGlobalStorage:SendEquipToolCTS(prevToolEquipType, prevTool) then
+                            Debug.Assert(false, "비정상입니다.")
+                        end
+                    end
+                end
             end 
         elseif prevSlotType == SlotType.QuickSlot then
             if currentSlotType == SlotType.QuickSlot then
@@ -102,6 +118,12 @@ function OnInputEnded(input)
                     if not ClientGlobalStorage:SwapQuickSlot(prevSlotIndex, currentSlotIndex) then
                         Debug.Assert(false, "비정상입니다.")
                     end
+                end
+            end
+        elseif prevSlotType == SlotType.EquipSlot then
+            if currentSlotType == SlotType.InventorySlot or not currentSlotType then
+                if not ClientGlobalStorage:SendUnequipToolCTS(prevSlotIndex) then
+                    Debug.Assert(false, "비정상입니다.")
                 end
             end
         elseif prevSlotType == SlotType.SkillSlot then

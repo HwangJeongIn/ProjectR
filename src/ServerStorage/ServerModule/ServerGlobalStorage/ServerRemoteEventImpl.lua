@@ -50,7 +50,7 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
         end
         
         local playerId = player.UserId
-        if not ServerGlobalStorage:CanUnequipToolByEquipType(player, equipType) then
+        if not ServerGlobalStorage:CanUnequipToolByEquipType(playerId, equipType) then
             Debug.Assert(false, "비정상입니다.")
             return
         end
