@@ -34,7 +34,6 @@ ClientGlobalStorage.QuickSlots = QuickSlots
 
 
 function ClientGlobalStorage:Initialize(guiController)
-	self:SetClientMode()
 	self:AddPlayer(LocalPlayer) -- 본인거는 서버도 통보안해준다.
 
 	Debug.Assert(guiController, "비정상입니다.")
@@ -104,6 +103,20 @@ function ClientGlobalStorage:GetQuickSlot(slotIndex)
 	return targetTool
 end
 
+function ClientGlobalStorage:SetQuickSlotByInventorySlot(quickSlotIndex, inventorySlotIndex)
+	local targetTool = ClientGlobalStorage:GetInventorySlot(PlayerId, inventorySlotIndex)
+	if nil == targetTool then
+		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+		return false
+	end
+
+	if not self:SetQuickSlot(quickSlotIndex, targetTool) then
+		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+		return false
+	end
+	return true
+end
+
 function ClientGlobalStorage:SetQuickSlot(slotIndex, tool)
 	if not self.QuickSlots:SetSlot(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
@@ -111,12 +124,10 @@ function ClientGlobalStorage:SetQuickSlot(slotIndex, tool)
 	end
 	
 	-- Gui 갱신
-	--[[
-	if not GuiController:SetInventoryToolSlot(slotIndex, tool) then
+	if not self.GuiController:SetQuickToolSlot(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return
 	end
-	--]]
 	return true
 end
 
@@ -132,28 +143,23 @@ function ClientGlobalStorage:SwapQuickSlot(slotIndex1, slotIndex2)
 		return
 	end
 
-	local tool2 = ClientGlobalStorage:GetInventorySlot(slotIndex2)
+	local tool2 = ClientGlobalStorage:GetQuickSlot(slotIndex2)
 	if nil == tool2 then
 		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
 		return
 	end
 
-	if not self.GuiController:SetInventoryToolSlot(slotIndex1, tool1) then
-		Debug.Assert(false, "비정상입니다.")
-		return
-	end
+
 	--Gui 갱신
-	--[[
-	if not GuiController:SetInventoryToolSlot(slotIndex1, tool1) then
+	if not self.GuiController:SetQuickToolSlot(slotIndex1, tool1) then
 		Debug.Assert(false, "비정상입니다.")
 		return
 	end
 
-	if not GuiController:SetInventoryToolSlot(slotIndex2, tool2) then
+	if not self.GuiController:SetQuickToolSlot(slotIndex2, tool2) then
 		Debug.Assert(false, "비정상입니다.")
 		return
 	end
-	--]]
 end
 
 

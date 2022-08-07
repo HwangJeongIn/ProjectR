@@ -73,5 +73,25 @@ function GuiQuickSlotsController:Initialize()
 
 end
 
+function GuiQuickSlotsController:SetToolSlot(slotIndex, tool)
+	if not slotIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local targetGuiToolSlotController = self.GuiQuickSlotsRaw:Get(slotIndex)
+	if not targetGuiToolSlotController then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not targetGuiToolSlotController:SetTool(tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
 GuiQuickSlotsController:Initialize()
 return GuiQuickSlotsController

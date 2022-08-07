@@ -1,0 +1,3 @@
+local GuiHpBarController = {}
+
+return GuiHpBarController

@@ -14,7 +14,7 @@ local Container = CommonModule:WaitForChild("Container")
 local QuickSlotsRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
 QuickSlotsRaw:Initialize(MaxQuickSlotCount)
 
-local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
+--local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
 local QuickSlots = {}
 QuickSlots.QuickSlotsRaw = QuickSlotsRaw
 

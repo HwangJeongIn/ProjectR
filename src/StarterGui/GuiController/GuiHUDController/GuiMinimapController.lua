@@ -1,3 +1,3 @@
-local module = {}
+local GuiMinimapController = {}
 
-return module
+return GuiMinimapController

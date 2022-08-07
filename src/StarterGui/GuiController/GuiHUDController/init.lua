@@ -9,14 +9,15 @@ local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
 local GuiHUD = GuiFacade.GuiHUD
-local GuiPlayerMain = GuiFacade.GuiPlayerMain
-local GuiMinimap = GuiFacade.GuiPlayerMain
 
 local GuiHUDController = {}
 
 function GuiHUDController:Initialize()
 	self.GuiMinimapController = require(script:WaitForChild("GuiMinimapController"))
-	self.GuiPlayerMainController = require(script:WaitForChild("GuiPlayerMainController"))
+	self.GuiQuickSlotsController = require(script:WaitForChild("GuiQuickSlotsController"))
+	self.GuiSkillSlotsController = require(script:WaitForChild("GuiSkillSlotsController"))
+	self.GuiBarsWindowController = require(script:WaitForChild("GuiSkillSlotsController"))
+	self.GuiHpBarController = self.GuiBarsWindowController.GuiHpBarController
 end
 
 GuiHUDController:Initialize()
