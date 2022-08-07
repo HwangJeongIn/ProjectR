@@ -73,6 +73,13 @@ CommonEnum.EquipType.Converter = {
 	[CommonEnum.EquipType.Boots] = "Boots"
 }
 
+CommonEnum.SlotType.Converter = {
+	[CommonEnum.SlotType.InventorySlot] = "InventorySlot",
+	[CommonEnum.SlotType.EquipSlot] = "EquipSlot",
+	[CommonEnum.SlotType.QuickSlot] = "QuickSlot",
+	[CommonEnum.SlotType.SkillSlot] = "SkillSlot"
+}
+
 
 CommonEnum.__index = Utility.Inheritable__index
 CommonEnum.__newindex = Utility.Inheritable__newindex

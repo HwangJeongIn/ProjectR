@@ -22,10 +22,43 @@ local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
 local EquipToolSTC = RemoteEvents:WaitForChild("EquipToolSTC")
 local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
+local SwapInventorySlotSTC = RemoteEvents:WaitForChild("SwapInventorySlotSTC")
 
 
 function ClientRemoteEventImpl:InitializeRemoteEvents(ClientGlobalStorage, GuiController)
 	-- STC
+	SwapInventorySlotSTC.OnClientEvent:Connect(function(slotIndex1, slotIndex2)
+		Debug.Assert(slotIndex1, "장착 슬롯 비정상")
+		Debug.Assert(slotIndex2, "도구 비정상")
+		
+		if not ClientGlobalStorage:SwapInventorySlot(PlayerId, slotIndex1, slotIndex2) then
+			Debug.Assert(false, "인벤토리 슬롯을 스왑하지 못했습니다.")
+			return
+		end
+
+		local tool1 = ClientGlobalStorage:GetInventorySlot(PlayerId, slotIndex1)
+		if nil == tool1 then
+			Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+			return
+		end
+
+		local tool2 = ClientGlobalStorage:GetInventorySlot(PlayerId, slotIndex2)
+		if nil == tool2 then
+			Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+			return
+		end
+
+		if not GuiController:SetInventoryToolSlot(slotIndex1, tool1) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+
+		if not GuiController:SetInventoryToolSlot(slotIndex2, tool2) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+	end)
+
 	EquipToolSTC.OnClientEvent:Connect(function(equipType, tool)
 		Debug.Assert(equipType, "장착 슬롯 비정상")
 		Debug.Assert(tool, "도구 비정상")

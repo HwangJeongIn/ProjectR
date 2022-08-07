@@ -25,6 +25,7 @@ local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
 local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
 local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
+local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
 
 
 local ClientGlobalStorage = CommonGlobalStorage
@@ -41,6 +42,22 @@ function ClientGlobalStorage:Initialize(guiController)
 	local ClientRemoteEventImpl = require(script:WaitForChild("ClientRemoteEventImpl"))
 	ClientRemoteEventImpl:InitializeRemoteEvents(self, guiController)
 end
+
+function ClientGlobalStorage:SendSwapInventorySlot(slotIndex1, slotIndex2)
+	local data = ClientGlobalStorage:GetData()
+	local inventory = data[StatusType.Inventory]
+
+	-- 서버로 올리기 전에 검증
+	if nil == inventory:GetSlot(slotIndex1) 
+	or nil == inventory:GetSlot(slotIndex2) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	SwapInventorySlotCTS:FireServer(slotIndex1, slotIndex2)
+	return true
+end
+
 
 function ClientGlobalStorage:SendSelectToolCTS(slotIndex, tool)
 	if not slotIndex or not tool then

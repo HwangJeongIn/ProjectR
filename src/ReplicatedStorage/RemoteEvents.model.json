@@ -3,6 +3,14 @@
   "Children": [
 
     {
+      "Name": "SwapInventorySlotSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "SwapInventorySlotCTS",
+      "ClassName": "RemoteEvent"
+    },
+    {
       "Name": "EquipToolSTC",
       "ClassName": "RemoteEvent"
     },

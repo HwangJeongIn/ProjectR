@@ -27,6 +27,17 @@ Inventory[ToolType.Armor] = Utility:DeepCopy(InventoryRaw)
 Inventory[ToolType.Weapon] = Utility:DeepCopy(InventoryRaw)
 Inventory[ToolType.Consumable] = Utility:DeepCopy(InventoryRaw)
 
+
+function Inventory:GetSlot(slotIndex)
+	local targetTool = self.InventoryRaw:Get(slotIndex)
+	if nil == targetTool then
+		Debug.Assert(false, "슬롯 인덱스가 비정상입니다.")
+		return nil
+	end
+
+	return targetTool
+end
+
 function Inventory:GetSlots(toolType)
 	if toolType == ToolType.All then
 		return self.InventoryRaw.GetValue()
@@ -141,6 +152,21 @@ function Inventory:RemoveTool(tool)
 		return false
 	end
 	
+	return true
+end
+
+function Inventory:SwapSlot(slotIndex1, slotIndex2)
+	local tool1 = self.InventoryRaw:Get(slotIndex1)
+	local tool2 = self.InventoryRaw:Get(slotIndex2)
+
+	-- 그냥 비어있는 슬롯이라면 UndefinedElementValue 값을 가진다.
+	if nil == tool1 or nil == tool2 then
+		Debug.Assert(false, "슬롯 인덱스가 비정상입니다.")
+		return false
+	end
+
+	self.InventoryRaw:SetRaw(slotIndex1, tool2)
+	self.InventoryRaw:SetRaw(slotIndex2, tool1)
 	return true
 end
 

@@ -28,7 +28,7 @@ local KeyToActionMappingTable = {
 	[Enum.KeyCode.R] = {}
 }
 
-function KeyBinder:BindCustomAction(keyCode, userInputState, customActionName, customAction)
+function KeyBinder:BindCustomAction(keyCodeOrUserInputType, userInputState, customActionName, customAction)
 	ContextActionService:BindAction(
 		customActionName,
 		function(actionName, inputState, inputObject)
@@ -37,7 +37,7 @@ function KeyBinder:BindCustomAction(keyCode, userInputState, customActionName, c
 			end
 		end,
 		true,
-		keyCode)
+		keyCodeOrUserInputType)
 end
 
 function KeyBinder:Initialize()

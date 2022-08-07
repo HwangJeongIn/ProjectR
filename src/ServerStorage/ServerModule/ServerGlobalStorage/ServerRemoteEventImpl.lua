@@ -15,14 +15,28 @@ local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 --local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
 local EquipToolSTC = RemoteEvents:WaitForChild("EquipToolSTC")
 local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
+local SwapInventorySlotSTC = RemoteEvents:WaitForChild("SwapInventorySlotSTC")
 
 -- CTS
 local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
 local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
 local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
+local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
 
 
 function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
+
+    SwapInventorySlotCTS.OnServerEvent:Connect(function(player, slotIndex1, slotIndex2)
+        
+        local playerId = player.UserId
+        if not ServerGlobalStorage:SwapInventorySlot(playerId, slotIndex1, slotIndex2) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
+
+        SwapInventorySlotSTC:FireClient(player, slotIndex1, slotIndex2)
+    end)
+
     UnequipToolCTS.OnServerEvent:Connect(function(player, equipType)
         if not equipType then
             Debug.Assert(false, "비정상입니다.")

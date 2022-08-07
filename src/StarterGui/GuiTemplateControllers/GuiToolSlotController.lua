@@ -30,14 +30,7 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
 	end
 
 	local newGuiToolSlotController = self:newRaw(slotType, slotIndex, newGuiSlot)
-	
-	newGuiToolSlotController.GuiSlot.MouseEnter:connect(function(x,y)
-		newGuiToolSlotController.GuiSlot.ImageTransparency = 0.5
-	end)
-	
-	newGuiToolSlotController.GuiSlot.MouseLeave:connect(function()
-		newGuiToolSlotController.GuiSlot.ImageTransparency = 0
-	end)
+
 
 	--[[
 	newGuiToolSlotController.GuiToolSlot.MouseButton1Down:connect(function(x,y)

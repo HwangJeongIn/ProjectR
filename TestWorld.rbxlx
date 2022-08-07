@@ -82,27 +82,27 @@
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>0</X>
-					<Y>20</Y>
-					<Z>20</Z>
-					<R00>1</R00>
-					<R01>0</R01>
-					<R02>-0</R02>
+					<X>16.7813168</X>
+					<Y>13.9051619</Y>
+					<Z>-19.2493362</Z>
+					<R00>0.939690113</R00>
+					<R01>-0.0603307746</R01>
+					<R02>0.336664349</R02>
 					<R10>-0</R10>
-					<R11>0.780868828</R11>
-					<R12>0.624695063</R12>
-					<R20>0</R20>
-					<R21>-0.624695063</R21>
-					<R22>0.780868828</R22>
+					<R11>0.984320223</R11>
+					<R12>0.176391691</R12>
+					<R20>-0.342027307</R20>
+					<R21>-0.165753528</R21>
+					<R22>0.924955785</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
 				<float name="FieldOfView">70</float>
 				<token name="FieldOfViewMode">0</token>
 				<CoordinateFrame name="Focus">
-					<X>0</X>
-					<Y>0</Y>
-					<Z>-5</Z>
+					<X>16.1079884</X>
+					<Y>13.5523787</Y>
+					<Z>-21.099247</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -10071,6 +10071,7 @@ local ChangeGameDataCTS = RemoteEvents:WaitForChild("ChangeGameDataCTS")
 local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
 local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
 local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
+local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
 
 
 local ClientGlobalStorage = CommonGlobalStorage
@@ -10087,6 +10088,22 @@ function ClientGlobalStorage:Initialize(guiController)
 	local ClientRemoteEventImpl = require(script:WaitForChild("ClientRemoteEventImpl"))
 	ClientRemoteEventImpl:InitializeRemoteEvents(self, guiController)
 end
+
+function ClientGlobalStorage:SendSwapInventorySlot(slotIndex1, slotIndex2)
+	local data = ClientGlobalStorage:GetData()
+	local inventory = data[StatusType.Inventory]
+
+	-- 서버로 올리기 전에 검증
+	if nil == inventory:GetSlot(slotIndex1) 
+	or nil == inventory:GetSlot(slotIndex2) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	SwapInventorySlotCTS:FireServer(slotIndex1, slotIndex2)
+	return true
+end
+
 
 function ClientGlobalStorage:SendSelectToolCTS(slotIndex, tool)
 	if not slotIndex or not tool then
@@ -10217,10 +10234,43 @@ local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
 local EquipToolSTC = RemoteEvents:WaitForChild("EquipToolSTC")
 local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
+local SwapInventorySlotSTC = RemoteEvents:WaitForChild("SwapInventorySlotSTC")
 
 
 function ClientRemoteEventImpl:InitializeRemoteEvents(ClientGlobalStorage, GuiController)
 	-- STC
+	SwapInventorySlotSTC.OnClientEvent:Connect(function(slotIndex1, slotIndex2)
+		Debug.Assert(slotIndex1, "장착 슬롯 비정상")
+		Debug.Assert(slotIndex2, "도구 비정상")
+		
+		if not ClientGlobalStorage:SwapInventorySlot(PlayerId, slotIndex1, slotIndex2) then
+			Debug.Assert(false, "인벤토리 슬롯을 스왑하지 못했습니다.")
+			return
+		end
+
+		local tool1 = ClientGlobalStorage:GetInventorySlot(PlayerId, slotIndex1)
+		if nil == tool1 then
+			Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+			return
+		end
+
+		local tool2 = ClientGlobalStorage:GetInventorySlot(PlayerId, slotIndex2)
+		if nil == tool2 then
+			Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+			return
+		end
+
+		if not GuiController:SetInventoryToolSlot(slotIndex1, tool1) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+
+		if not GuiController:SetInventoryToolSlot(slotIndex2, tool2) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+	end)
+
 	EquipToolSTC.OnClientEvent:Connect(function(equipType, tool)
 		Debug.Assert(equipType, "장착 슬롯 비정상")
 		Debug.Assert(tool, "도구 비정상")
@@ -10356,7 +10406,7 @@ local KeyToActionMappingTable = {
 	[Enum.KeyCode.R] = {}
 }
 
-function KeyBinder:BindCustomAction(keyCode, userInputState, customActionName, customAction)
+function KeyBinder:BindCustomAction(keyCodeOrUserInputType, userInputState, customActionName, customAction)
 	ContextActionService:BindAction(
 		customActionName,
 		function(actionName, inputState, inputObject)
@@ -10365,7 +10415,7 @@ function KeyBinder:BindCustomAction(keyCode, userInputState, customActionName, c
 			end
 		end,
 		true,
-		keyCode)
+		keyCodeOrUserInputType)
 end
 
 function KeyBinder:Initialize()
@@ -10860,10 +10910,10 @@ function GuiController:InitializeTopbar()
 	 
 	-- Move (0, 0) to the actual top left corner of the screen, instead of under the topbar
 	GuiTopbar.IgnoreGuiInset = true
-
+	GuiTopbar.Name = "GuiTopbar"
 	-- The topbar is 36 pixels tall, and spans the entire width of the screen
 	GuiTopbarWindow.Size = UDim2.new(1, 0, 0, 36) 
-
+	GuiTopbarWindow.Name = "GuiTopbarWindow"
 	-- Style the topbar
 	GuiTopbarWindow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	GuiTopbarWindow.BackgroundTransparency = 0.2
@@ -11474,7 +11524,7 @@ local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
 local GuiSkillSlots = GuiFacade.GuiSkillSlots
 local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiSlot
-local GuiToolSlotController = GuiFacade.GuiTemplateController.GuiToolSlotController
+local GuiSkillSlotController = GuiFacade.GuiTemplateController.GuiSkillSlotController
 
 
 local GuiSkillSlotsRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
@@ -11531,7 +11581,7 @@ function GuiSkillSlotsController:Initialize()
     newGuiMainToolSlot.Parent = GuiSkillSlots
     newGuiMainToolSlot.Name = tostring("MainToolSlot")
 
-    self.GuiMainToolSlotController = GuiToolSlotController:new(SlotType.SkillSlot, 1, newGuiMainToolSlot)
+    self.GuiMainToolSlotController = GuiSkillSlotController:new(SlotType.SkillSlot, 1, newGuiMainToolSlot)
 
 
 
@@ -11556,7 +11606,7 @@ function GuiSkillSlotsController:Initialize()
         newGuiToolSlot.Parent = GuiSkillSlots
         newGuiToolSlot.Name = tostring(slotIndex)
 
-        self.GuiSkillSlotsRaw:Set(slotIndex, GuiToolSlotController:new(SlotType.SkillSlot, slotIndex, newGuiToolSlot))
+        self.GuiSkillSlotsRaw:Set(slotIndex, GuiSkillSlotController:new(SlotType.SkillSlot, slotIndex, newGuiToolSlot))
     end
 end
 
@@ -11811,7 +11861,10 @@ function GuiFacade:Initialize()
     
     -- GUiTemplate
     local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
-    local GuiToolSlotTemplate = GuiTemplate:WaitForChild("GuiToolSlot")
+    local GuiSlotTemplate = GuiTemplate:WaitForChild("GuiSlot")
+    self.GuiTemplate = {
+        GuiSlot = GuiSlotTemplate
+    }
 
     -- GuiHUD
     local GuiHUD = PlayerGui:WaitForChild("GuiHUD")
@@ -11857,9 +11910,7 @@ function GuiFacade:Initialize()
     self.GuiPlayerStatusWindow = GuiPlayerStatusWindow
     self.GuiEquipSlots = GuiEquipSlots
     self.GuiInventory = GuiInventory
-    self.GuiTemplate = {
-        GuiToolSlot = GuiToolSlotTemplate
-    }
+
     
     -- GuiTooltip
     local GuiTooltip = PlayerGui:WaitForChild("GuiTooltip")
@@ -11871,8 +11922,10 @@ function GuiFacade:Initialize()
     -- GuiTemplateControllers
     local GuiTemplateControllers = PlayerGui:WaitForChild("GuiTemplateControllers")
     local GuiToolSlotController = require(GuiTemplateControllers:WaitForChild("GuiToolSlotController"))
+    local GuiSkillSlotController = require(GuiTemplateControllers:WaitForChild("GuiSkillSlotController"))
     self.GuiTemplateController = {
-        GuiToolSlotController = GuiToolSlotController
+        GuiToolSlotController = GuiToolSlotController,
+        GuiSkillSlotController = GuiSkillSlotController
     }
 
     -- GuiPopupWindowControllers
@@ -14389,7 +14442,7 @@ return GuiTooltipController]]></ProtectedString>
 					<float name="ImageTransparency">0</float>
 					<int name="LayoutOrder">0</int>
 					<bool name="Modal">false</bool>
-					<string name="Name">GuiToolSlot</string>
+					<string name="Name">GuiSlot</string>
 					<Ref name="NextSelectionDown">null</Ref>
 					<Ref name="NextSelectionLeft">null</Ref>
 					<Ref name="NextSelectionRight">null</Ref>
@@ -14486,7 +14539,7 @@ return GuiTooltipController]]></ProtectedString>
 						</Vector2>
 						<float name="ImageTransparency">0</float>
 						<int name="LayoutOrder">0</int>
-						<string name="Name">GuiToolImage</string>
+						<string name="Name">GuiImage</string>
 						<Ref name="NextSelectionDown">null</Ref>
 						<Ref name="NextSelectionLeft">null</Ref>
 						<Ref name="NextSelectionRight">null</Ref>
@@ -14574,7 +14627,7 @@ return GuiTooltipController]]></ProtectedString>
 							<int name="LayoutOrder">0</int>
 							<float name="LineHeight">1</float>
 							<int name="MaxVisibleGraphemes">-1</int>
-							<string name="Name">GuiToolName</string>
+							<string name="Name">GuiName</string>
 							<Ref name="NextSelectionDown">null</Ref>
 							<Ref name="NextSelectionLeft">null</Ref>
 							<Ref name="NextSelectionRight">null</Ref>
@@ -14664,7 +14717,7 @@ return GuiTooltipController]]></ProtectedString>
 							<int name="LayoutOrder">0</int>
 							<float name="LineHeight">1</float>
 							<int name="MaxVisibleGraphemes">-1</int>
-							<string name="Name">GuiToolCount</string>
+							<string name="Name">GuiNumber</string>
 							<Ref name="NextSelectionDown">null</Ref>
 							<Ref name="NextSelectionLeft">null</Ref>
 							<Ref name="NextSelectionRight">null</Ref>
@@ -15217,63 +15270,27 @@ local SlotType = CommonEnum.SlotType
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
-local GuiToolSlot = GuiTemplate:WaitForChild("GuiToolSlot")
+local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
 
 local GuiPopupWindowControllers = PlayerGui:WaitForChild("GuiPopupWindowControllers")
 local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("GuiTooltipController"))
 
 
-local GuiToolSlotController = {}
+local GuiSlotController = Utility:DeepCopy(require(script.Parent:WaitForChild("GuiSlotController")))
 
-function GuiToolSlotController:InitializeImage(slotType, slotIndex)
-	if slotType == SlotType.SkillSlot then
-		self.DefaultToolImage = ToolUtility.DefaultSkillImage
-		self.EmptyToolImage = ToolUtility.EmptySkillImage
-		self.DefaultSlotImage = ToolUtility.DefaultCircularSlotImage
-		
-		--self.GuiToolSlot.ImageTransparency = 0.65
+local GuiToolSlotController = GuiSlotController
 
-	else
-		self.DefaultToolImage = ToolUtility.DefaultToolImage
-		self.EmptyToolImage = ToolUtility.EmptyToolImage
-		self.DefaultSlotImage = ToolUtility.DefaultSlotImage
-	--elseif slotType == SlotType.InventorySlot then
-	--elseif slotType == SlotType.EquipSlot then
-		--slotIndex
-	--end
-	--elseif slotType == SlotType.QuickSlot then
+function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
+
+	if not slotType == SlotType.InventorySlot 
+	and not slotType == SlotType.EquipSlot 
+	and not slotType == slotType.QuickSlot then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
 	end
 
-	self.GuiToolSlot.Image = self.DefaultSlotImage
-end
+	local newGuiToolSlotController = self:newRaw(slotType, slotIndex, newGuiSlot)
 
-function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
-	local newGuiToolSlotController = Utility:ShallowCopy(self)
-
-	if not newGuiToolSlot then
-		newGuiToolSlot = GuiToolSlot:Clone()
-	end
-
-	local newGuiToolImage = newGuiToolSlot:WaitForChild("GuiToolImage")
-	local newGuiToolName = newGuiToolImage:WaitForChild("GuiToolName")
-	local newGuiToolCount = newGuiToolImage:WaitForChild("GuiToolCount")
-
-	newGuiToolSlotController.GuiToolSlot = newGuiToolSlot
-	newGuiToolSlotController.GuiToolImage = newGuiToolImage
-	newGuiToolSlotController.GuiToolName = newGuiToolName
-	newGuiToolSlotController.GuiToolCount = newGuiToolCount
-	newGuiToolSlotController.SlotIndex = slotIndex
-	newGuiToolSlotController.SlotType = slotType
-	
-	newGuiToolSlotController.Tool = nil
-
-	newGuiToolSlotController.GuiToolSlot.MouseEnter:connect(function(x,y)
-		newGuiToolSlotController.GuiToolSlot.ImageTransparency = 0.5
-	end)
-	
-	newGuiToolSlotController.GuiToolSlot.MouseLeave:connect(function()
-		newGuiToolSlotController.GuiToolSlot.ImageTransparency = 0
-	end)
 
 	--[[
 	newGuiToolSlotController.GuiToolSlot.MouseButton1Down:connect(function(x,y)
@@ -15289,7 +15306,7 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 	--]]
 
 	if newGuiToolSlotController.SlotType == SlotType.InventorySlot then
-		newGuiToolSlotController.GuiToolSlot.Activated:connect(function(inputObject)
+		newGuiToolSlotController.GuiSlot.Activated:connect(function(inputObject)
 			local targetTool = newGuiToolSlotController.Tool
 			if not targetTool then
 				return
@@ -15297,7 +15314,7 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 			GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
 		end)
 	elseif newGuiToolSlotController.SlotType == SlotType.EquipSlot then
-		newGuiToolSlotController.GuiToolSlot.Activated:connect(function(inputObject)
+		newGuiToolSlotController.GuiSlot.Activated:connect(function(inputObject)
 			local targetTool = newGuiToolSlotController.Tool
 			if not targetTool then
 				return
@@ -15309,37 +15326,13 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiToolSlot)
 
 	end
 
-	newGuiToolSlotController:InitializeImage(slotType, slotIndex)
 	newGuiToolSlotController:ClearToolData()
 	return newGuiToolSlotController
 end
 
-function GuiToolSlotController:SetToolImage(image, isEmpty)
-	if isEmpty then
-		self.GuiToolImage.Image = self.EmptyToolImage
-		self.GuiToolImage.ImageTransparency = 0.9
-		return
-	end
-
-	if image then
-		self.GuiToolImage.Image = image
-		self.GuiToolImage.ImageTransparency = 0
-	else
-		self.GuiToolImage.Image = self.DefaultToolImage
-		self.GuiToolImage.ImageTransparency = 0
-	end
-end
-
 function GuiToolSlotController:ClearToolData()
-	self:SetToolImage(nil, true)
-	self.GuiToolName.Text = ""
-	self.GuiToolCount.Text = ""
-
+	self:ClearData()
 	self.Tool = nil
-end
-
-function GuiToolSlotController:GetSlotIndex()
-	return self.SlotIndex
 end
 
 function GuiToolSlotController:GetTool()
@@ -15359,23 +15352,264 @@ function GuiToolSlotController:SetTool(tool)
 		return false
 	end
 
-	self:SetToolImage(toolGameData.Image)
-	self.GuiToolName.Text = tool.Name
+	self:SetImage(toolGameData.Image)
+	self:SetName(tool.Name)
 	self.Tool = tool
 
 	-- 여러개 소유할 수 있다면 변경될 수 있다.
-	if not self.SlotType == SlotType.EquipSlot then
-		self.GuiToolCount.Text = "1"
+	if self.SlotType ~= SlotType.EquipSlot then
+		self:SetNumber("1")
 	end
 
 	return true
 end
 
-return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
+return GuiToolSlotController
 ]]></ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021c21</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX807ECC066D19448B8D54AF0B376F2C43">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">GuiSkillSlotController</string>
+					<string name="ScriptGuid">{54C1F3B6-8194-4DBD-8148-80E9595349A8}</string>
+					<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
+local Debug = CommonMoudleFacade.Debug
+local Utility = CommonMoudleFacade.Utility
+local ToolUtility = CommonMoudleFacade.ToolUtility
+
+local CommonEnum = CommonMoudleFacade.CommonEnum
+local SlotType = CommonEnum.SlotType
+
+local player = game.Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
+local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
+
+local GuiPopupWindowControllers = PlayerGui:WaitForChild("GuiPopupWindowControllers")
+local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("GuiTooltipController"))
+
+
+local GuiSlotController = Utility:DeepCopy(require(script.Parent:WaitForChild("GuiSlotController")))
+
+local GuiSkillSlotController = GuiSlotController
+
+function GuiSkillSlotController:new(slotType, slotIndex, newGuiSlot)
+
+	if not slotType == SlotType.SkillSlot then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local newGuiSkillSlotController = self:newRaw(slotType, slotIndex, newGuiSlot)
+	
+	newGuiSkillSlotController.GuiSlot.MouseEnter:connect(function(x,y)
+		newGuiSkillSlotController.GuiSlot.ImageTransparency = 0.5
+	end)
+	
+	newGuiSkillSlotController.GuiSlot.MouseLeave:connect(function()
+		newGuiSkillSlotController.GuiSlot.ImageTransparency = 0
+	end)
+
+	if newGuiSkillSlotController.SlotType == SlotType.SkillSlot then
+		--[[
+		newGuiSkillSlotController.GuiSlot.Activated:connect(function(inputObject)
+			local targetTool = newGuiSkillSlotController.Tool
+			if not targetTool then
+				return
+			end
+			GuiTooltipController:InitializeByToolSlot(newGuiSkillSlotController)
+		end)
+		--]]
+	end
+
+	newGuiSkillSlotController:ClearSkillData()
+	return newGuiSkillSlotController
+end
+
+function GuiSkillSlotController:ClearSkillData()
+	self:ClearData()
+	self.Skill = nil
+end
+
+function GuiSkillSlotController:ExecuteSkill(args)
+	if not self.Skill(args) then
+		Debug.Assert(false, "스킬 사용에 실패했습니다.")
+	end
+end
+
+function GuiSkillSlotController:InitializeSkill(skillKey)
+	if not skillKey then
+		return false
+	end
+
+	-- ...
+	return true
+end
+
+return GuiSkillSlotController
+]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">0a5cfb4ea37065340300d71d0002ea04</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX30B80C78759946AF805EDD5D5DD659DC">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">GuiSlotController</string>
+					<string name="ScriptGuid">{19BD4DC1-5152-4432-8551-B70A66CA25A1}</string>
+					<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
+
+local Debug = ClientModuleFacade.Debug
+local Utility = ClientModuleFacade.Utility
+local ToolUtility = ClientModuleFacade.ToolUtility
+local CommonEnum = ClientModuleFacade.CommonEnum
+local SlotType = CommonEnum.SlotType
+
+local KeyBinder = ClientModuleFacade.KeyBinder
+
+local player = game.Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
+local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
+
+local GuiSystem = PlayerGui:WaitForChild("GuiSystem")
+local GuiDraggingSystem = require(GuiSystem:WaitForChild("GuiDraggingSystem"))
+
+local GuiSlotController = {}
+
+function GuiSlotController:InitializeImage(slotType, slotIndex)
+
+	if slotType == SlotType.SkillSlot then
+		self.DefaultImage = ToolUtility.DefaultSkillImage
+		self.EmptyImage = ToolUtility.EmptySkillImage
+		self.DefaultSlotImage = ToolUtility.DefaultCircularSlotImage
+		
+		--self.GuiToolSlot.ImageTransparency = 0.65
+
+	else
+		self.DefaultImage = ToolUtility.DefaultToolImage
+		self.EmptyImage = ToolUtility.EmptyToolImage
+		self.DefaultSlotImage = ToolUtility.DefaultSlotImage
+	--elseif slotType == SlotType.InventorySlot then
+	--elseif slotType == SlotType.EquipSlot then
+		--slotIndex
+	--end
+	--elseif slotType == SlotType.QuickSlot then
+	end
+
+	self.GuiSlot.Image = self.DefaultSlotImage
+end
+
+function GuiSlotController:newRaw(slotType, slotIndex, newGuiSlot)
+	local newGuiSlotController = Utility:ShallowCopy(self)
+
+	if not newGuiSlot then
+		newGuiSlot = GuiSlot:Clone()
+	end
+
+	local newGuiImage = newGuiSlot:WaitForChild("GuiImage")
+	local newGuiName = newGuiImage:WaitForChild("GuiName")
+	local newGuiNumber = newGuiImage:WaitForChild("GuiNumber")
+
+	newGuiSlotController.GuiSlot = newGuiSlot
+	newGuiSlotController.GuiImage = newGuiImage
+	newGuiSlotController.GuiName = newGuiName
+	newGuiSlotController.GuiNumber = newGuiNumber
+	newGuiSlotController.SlotIndex = slotIndex
+	newGuiSlotController.SlotType = slotType
+	
+	--[[
+	-- Touch
+	KeyBinder:BindCustomAction(Enum.UserInputType.MouseButton1, Enum.UserInputState.Begin, "1", 
+	function(actionName, inputState, inputObject)
+		print("Enum.UserInputType.MouseButton1, Enum.UserInputState.Begin => " .. tostring(newGuiSlotController.SlotIndex))
+	end)
+
+	KeyBinder:BindCustomAction(Enum.UserInputType.MouseButton1, Enum.UserInputState.End, "2", 
+	function(actionName, inputState, inputObject)
+		print("Enum.UserInputType.MouseButton1, Enum.UserInputState.End => " .. tostring(newGuiSlotController.SlotIndex))
+	end)
+
+	
+	newGuiSlotController.GuiSlot.InputBegan:Connect(function(inputObject) 
+		print("newGuiSlotController.GuiSlot.InputBegan => " .. tostring(newGuiSlotController.SlotIndex))
+	end)
+	newGuiSlotController.GuiSlot.InputChanged:Connect(function(inputObject) 
+		--print(newGuiSlotController.SlotIndex)
+	end)
+	newGuiSlotController.GuiSlot.InputEnded:Connect(function(inputObject) 
+		print("newGuiSlotController.GuiSlot.InputEnded => " .. tostring(newGuiSlotController.SlotIndex))
+	end)
+
+--]]
+
+	newGuiSlotController.GuiSlot.MouseEnter:Connect(function(x,y)
+		newGuiSlotController.GuiSlot.ImageTransparency = 0.5
+		Debug.Print("SetSlotControllerCandidate => " .. tostring(newGuiSlotController.SlotIndex))
+		GuiDraggingSystem:SetSlotControllerCandidate(newGuiSlotController)
+	end)
+
+	newGuiSlotController.GuiSlot.MouseLeave:Connect(function()
+		newGuiSlotController.GuiSlot.ImageTransparency = 0
+		--Debug.Print("SetSlotControllerCandidate => nil")
+		--GuiDraggingSystem:SetSlotControllerCandidate(nil)
+	end)
+	newGuiSlotController:InitializeImage(slotType, slotIndex)
+	return newGuiSlotController
+end
+
+function GuiSlotController:GetImage()
+	return self.GuiImage
+end
+
+function GuiSlotController:SetImage(image, isEmpty)
+	if isEmpty then
+		self.GuiImage.Image = self.EmptyImage
+		self.GuiImage.ImageTransparency = 0.9
+	else
+		if image then
+			self.GuiImage.Image = image
+			self.GuiImage.ImageTransparency = 0
+		else
+			self.GuiImage.Image = self.DefaultImage
+			self.GuiImage.ImageTransparency = 0
+		end
+	end
+end
+
+function GuiSlotController:SetName(name)
+	self.GuiName.Text = name
+end
+
+function GuiSlotController:SetNumber(number)
+	self.GuiNumber.Text = number
+end
+
+function GuiSlotController:ClearData()
+	self:SetImage(nil, true)
+	self:SetName("")
+	self:SetNumber("")
+end
+
+function GuiSlotController:GetSlotIndex()
+	return self.SlotIndex
+end
+
+return GuiSlotController
+]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">0a5cfb4ea37065340300d71d0002ea06</UniqueId>
 				</Properties>
 			</Item>
 		</Item>
@@ -17465,6 +17699,215 @@ return GuiToolSlotController:new(SlotType.EquipSlot, -1, GuiToolSlot)
 					<float name="Transparency">0</float>
 					<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021c3e</UniqueId>
 					<int name="ZIndex">1</int>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="Folder" referent="RBXF6EC65C4A9EE40CCBD09B1498C7B419B">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">GuiSystem</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<UniqueId name="UniqueId">0a5cfb4ea37065340300d71d0002ea01</UniqueId>
+			</Properties>
+			<Item class="ModuleScript" referent="RBX13A382F72779470196C2AC179BAF8DD4">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">GuiDraggingSystem</string>
+					<string name="ScriptGuid">{763CAE08-92A1-494D-951E-FAE00435AAD2}</string>
+					<ProtectedString name="Source"><![CDATA[
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
+
+local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
+local Debug = ClientModuleFacade.Debug
+local KeyBinder = ClientModuleFacade.KeyBinder
+
+
+local CommonEnum = ClientModuleFacade.CommonEnum
+local SlotType = CommonEnum.SlotType
+local SlotTypeConverter = SlotType.Converter
+
+local LocalPlayer = game.Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local Mouse = LocalPlayer:GetMouse()
+
+local GuiDraggingSystem = {
+    SlotControllerCandidate = nil,
+    SlotController = nil,
+    ShadowImage = nil
+}
+
+-- 더 정리할 필요있음
+function OnInputBegan(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+        if not GuiDraggingSystem.SlotControllerCandidate then 
+            Debug.Print("후보가 없습니다.")
+            return
+        end
+        
+        if not GuiDraggingSystem:SetSlotController(GuiDraggingSystem.SlotControllerCandidate) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
+
+        GuiDraggingSystem.UpdatingMousePosition = RunService.RenderStepped:Connect(function(deltaTime)
+            if not GuiDraggingSystem.SlotController then
+                Debug.Assert(false, "비정상입니다.")
+                return
+            end
+    
+            GuiDraggingSystem:UpdatePosition(Mouse.X, Mouse.Y)
+        end)
+        
+        -- 같은 슬롯을 클릭하고 다른 곳으로 드래그하면 문제가 발생해서 주석 처리
+        --GuiDraggingSystem:SetSlotControllerCandidate(nil)
+	end
+end
+
+function OnInputEnded(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+        if GuiDraggingSystem.UpdatingMousePosition then
+            GuiDraggingSystem.UpdatingMousePosition:Disconnect()
+            GuiDraggingSystem.UpdatingMousePosition = nil
+        end
+
+        if not GuiDraggingSystem.SlotController then
+            GuiDraggingSystem:ClearSlotController()
+            Debug.Print("처음에 선택한 위치에 슬롯이 없습니다.")
+            return
+        end
+
+        if not GuiDraggingSystem.SlotControllerCandidate then
+            GuiDraggingSystem:ClearSlotController()
+            Debug.Print("마지막 위치에 슬롯이 없습니다.")
+            return
+        end
+
+
+        local prevSlotType = GuiDraggingSystem.SlotController.SlotType
+        local prevSlotIndex = GuiDraggingSystem.SlotController.SlotIndex
+
+        local currentSlotType = GuiDraggingSystem.SlotControllerCandidate.SlotType
+        local currentSlotIndex = GuiDraggingSystem.SlotControllerCandidate.SlotIndex
+
+        print("Swap Slot => ")
+        print("From => ".. SlotTypeConverter[prevSlotType] .. " : " .. tostring(prevSlotIndex))
+        print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
+    
+        if prevSlotType == SlotType.InventorySlot then
+            if currentSlotType == SlotType.InventorySlot then
+                if prevSlotIndex ~= currentSlotIndex then
+                    if not ClientGlobalStorage:SendSwapInventorySlot(prevSlotIndex, currentSlotIndex) then
+                        Debug.Assert(false, "비정상입니다.")
+                    end
+                end
+            elseif currentSlotType == SlotType.QuickSlot then
+
+            end 
+        elseif prevSlotType == SlotType.SkillSlot then
+
+        end
+        
+
+
+
+
+
+        GuiDraggingSystem:ClearSlotController()
+	end
+end
+
+UserInputService.InputBegan:Connect(OnInputBegan)
+UserInputService.InputEnded:Connect(OnInputEnded)
+
+
+function GuiDraggingSystem:Initialize()
+    self.Shadow = Instance.new("ScreenGui")
+    self.Shadow.Name = "Shadow"
+
+    self.ShadowImage = Instance.new("ImageLabel")
+    self.ShadowImage.Name = "ShadowImage"
+
+    self.ShadowImage.BackgroundTransparency = 1
+	self.ShadowImage.AnchorPoint = Vector2.new(0.5, 0.5)
+    self.ShadowImage.ImageTransparency = 0.75
+	self.ShadowImage.Size = UDim2.new(0, 100, 0, 100)
+    self.ShadowImage.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+    self.ShadowImage.Image = ""
+    
+    self.Shadow.Parent = PlayerGui
+    self.ShadowImage.Parent = self.Shadow
+    self:ClearSlotController()
+end
+
+function GuiDraggingSystem:Clear()
+    self:SetSlotControllerCandidate(nil)
+end
+
+function GuiDraggingSystem:SetSlotControllerCandidate(slotControllerCandidate)
+    self.SlotControllerCandidate = slotControllerCandidate
+end
+
+function GuiDraggingSystem:ClearSlotController()
+    self.SlotController = nil
+    self.ShadowImage.Image = ""
+    self.Shadow.Enabled = false
+end
+
+function GuiDraggingSystem:SetShadowImage(targetImage)
+    if not targetImage then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+    
+    if targetImage.Image then    
+        local targetImageSize = UDim2.new(0, targetImage.AbsoluteSize.X, 0, targetImage.AbsoluteSize.Y)
+        self.ShadowImage.Size = targetImageSize
+        self.ShadowImage.Image = targetImage.Image
+
+        local targetImagePosition = UDim2.new(0, targetImage.AbsolutePosition.X, 0, targetImage.AbsolutePosition.Y)
+        self.ShadowImage.Position = targetImagePosition
+        self.Shadow.Enabled = true
+    end
+    return true
+end
+
+function GuiDraggingSystem:SetSlotController(slotController)
+    if not slotController then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    self.SlotController = slotController
+    if not self:SetShadowImage(slotController:GetImage()) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+    
+    return true
+end
+
+function GuiDraggingSystem:UpdatePosition(x, y)
+    if self.Shadow.Enabled then
+        --print(tostring(x) .. " , " .. tostring(y))
+        self.ShadowImage.Position = UDim2.new(0, x, 0, y)
+    end
+end
+
+GuiDraggingSystem:Initialize()
+return GuiDraggingSystem]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">0a5cfb4ea37065340300d71d0002ea02</UniqueId>
 				</Properties>
 			</Item>
 		</Item>
@@ -52855,14 +53298,28 @@ local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 --local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
 local EquipToolSTC = RemoteEvents:WaitForChild("EquipToolSTC")
 local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
+local SwapInventorySlotSTC = RemoteEvents:WaitForChild("SwapInventorySlotSTC")
 
 -- CTS
 local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
 local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
 local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
+local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
 
 
 function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
+
+    SwapInventorySlotCTS.OnServerEvent:Connect(function(player, slotIndex1, slotIndex2)
+        
+        local playerId = player.UserId
+        if not ServerGlobalStorage:SwapInventorySlot(playerId, slotIndex1, slotIndex2) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
+
+        SwapInventorySlotSTC:FireClient(player, slotIndex1, slotIndex2)
+    end)
+
     UnequipToolCTS.OnServerEvent:Connect(function(player, equipType)
         if not equipType then
             Debug.Assert(false, "비정상입니다.")
@@ -54819,6 +55276,13 @@ CommonEnum.EquipType.Converter = {
 	[CommonEnum.EquipType.Boots] = "Boots"
 }
 
+CommonEnum.SlotType.Converter = {
+	[CommonEnum.SlotType.InventorySlot] = "InventorySlot",
+	[CommonEnum.SlotType.EquipSlot] = "EquipSlot",
+	[CommonEnum.SlotType.QuickSlot] = "QuickSlot",
+	[CommonEnum.SlotType.SkillSlot] = "SkillSlot"
+}
+
 
 CommonEnum.__index = Utility.Inheritable__index
 CommonEnum.__newindex = Utility.Inheritable__newindex
@@ -55280,6 +55744,37 @@ function CommonGlobalStorage:UnequipToolByTool(playerId, tool)
 	return prevTool
 end
 
+function CommonGlobalStorage:GetInventorySlot(playerId, slotIndex)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local inventory = self.PlayerTable[playerId][StatusType.Inventory]
+	local tool = inventory:GetSlot(slotIndex)
+	if nil == tool then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return tool
+end
+
+function CommonGlobalStorage:SwapInventorySlot(playerId, slotIndex1, slotIndex2)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local inventory = self.PlayerTable[playerId][StatusType.Inventory]
+	if not inventory:SwapSlot(slotIndex1, slotIndex2) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
 --[[
 function CommonGlobalStorage:CheckAndGetArmorData(armor)
 	if not armor then
@@ -55554,6 +56049,17 @@ Inventory[ToolType.Armor] = Utility:DeepCopy(InventoryRaw)
 Inventory[ToolType.Weapon] = Utility:DeepCopy(InventoryRaw)
 Inventory[ToolType.Consumable] = Utility:DeepCopy(InventoryRaw)
 
+
+function Inventory:GetSlot(slotIndex)
+	local targetTool = self.InventoryRaw:Get(slotIndex)
+	if nil == targetTool then
+		Debug.Assert(false, "슬롯 인덱스가 비정상입니다.")
+		return nil
+	end
+
+	return targetTool
+end
+
 function Inventory:GetSlots(toolType)
 	if toolType == ToolType.All then
 		return self.InventoryRaw.GetValue()
@@ -55668,6 +56174,21 @@ function Inventory:RemoveTool(tool)
 		return false
 	end
 	
+	return true
+end
+
+function Inventory:SwapSlot(slotIndex1, slotIndex2)
+	local tool1 = self.InventoryRaw:Get(slotIndex1)
+	local tool2 = self.InventoryRaw:Get(slotIndex2)
+
+	-- 그냥 비어있는 슬롯이라면 UndefinedElementValue 값을 가진다.
+	if nil == tool1 or nil == tool2 then
+		Debug.Assert(false, "슬롯 인덱스가 비정상입니다.")
+		return false
+	end
+
+	self.InventoryRaw:SetRaw(slotIndex1, tool2)
+	self.InventoryRaw:SetRaw(slotIndex2, tool1)
 	return true
 end
 
@@ -56587,6 +57108,24 @@ return CommonModuleFacade
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021930</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="RemoteEvent" referent="RBX1A63D28DCF3B47BC91C6A19FC732578E">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">SwapInventorySlotCTS</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">599f54a62dde5496030116520014f400</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="RemoteEvent" referent="RBX19027C509963490AB3F741C592608482">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">SwapInventorySlotSTC</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">599f54a62dde5496030116520014f401</UniqueId>
 				</Properties>
 			</Item>
 		</Item>

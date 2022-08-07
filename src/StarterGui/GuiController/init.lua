@@ -74,10 +74,10 @@ function GuiController:InitializeTopbar()
 	 
 	-- Move (0, 0) to the actual top left corner of the screen, instead of under the topbar
 	GuiTopbar.IgnoreGuiInset = true
-
+	GuiTopbar.Name = "GuiTopbar"
 	-- The topbar is 36 pixels tall, and spans the entire width of the screen
 	GuiTopbarWindow.Size = UDim2.new(1, 0, 0, 36) 
-
+	GuiTopbarWindow.Name = "GuiTopbarWindow"
 	-- Style the topbar
 	GuiTopbarWindow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	GuiTopbarWindow.BackgroundTransparency = 0.2
