@@ -29,13 +29,13 @@ local GuiObjectName = GuiObjectTooltipWindow:WaitForChild("GuiObjectName")
 
 local Mouse = LocalPlayer:GetMouse()
 
-local WorldInteractionSystem = {
+local GuiWorldInteractionSystem = {
     SlotControllerCandidate = nil,
     SlotController = nil,
     ShadowImage = nil
 }
 
-function WorldInteractionSystem:GetToolFromTrigger(targetPart)
+function GuiWorldInteractionSystem:GetToolFromTrigger(targetPart)
 	if not targetPart then
 		return nil
 	end
@@ -60,7 +60,7 @@ function OnInputChanged(input)
 		return
 	end
 
-	local tool = WorldInteractionSystem:GetToolFromTrigger(Mouse.Target)
+	local tool = GuiWorldInteractionSystem:GetToolFromTrigger(Mouse.Target)
 	if not tool then
 		GuiObjectTooltip.Adornee = nil
 		GuiObjectTooltip.Enabled = false
@@ -82,35 +82,33 @@ function OnInputChanged(input)
 	--if mouse.Target:FindFirstChild("")
 end
 
-function OnInputEnded(input)
-	if input.KeyCode == Enum.KeyCode.F then
-		if not Mouse.Target then
-			return
-		end
+function OnInputBegan(input)
+	if not Mouse.Target then
+		return
+	end
+
+	local tool = GuiWorldInteractionSystem:GetToolFromTrigger(Mouse.Target)
+	if not tool then
+		GuiObjectTooltip.Adornee = nil
+		GuiObjectTooltip.Enabled = false
+		return
+	end
 	
-		local tool = WorldInteractionSystem:GetToolFromTrigger(Mouse.Target)
-		if not tool then
-			GuiObjectTooltip.Adornee = nil
-			GuiObjectTooltip.Enabled = false
-			return
-		end
-		
-		local distance = LocalPlayer:DistanceFromCharacter(Mouse.Target.Position)
-		if distance < MaxPickupDistance then
-			if not ClientGlobalStorage:SendPickupTool(tool) then
-				Debug.Assert(false, "비정상입니다.")
-			end
+	local distance = LocalPlayer:DistanceFromCharacter(Mouse.Target.Position)
+	if distance < MaxPickupDistance then
+		if not ClientGlobalStorage:SendPickupTool(tool) then
+			Debug.Assert(false, "비정상입니다.")
 		end
 	end
 end
 
 --UserInputService.InputBegan:Connect(OnInputBegan)
 
-KeyBinder:BindAction(Enum.UserInputState.Change, nil, "GuiDraggingSystem", OnInputChanged)
-KeyBinder:BindAction(Enum.UserInputState.End, Enum.KeyCode.F, "GuiDraggingSystem", OnInputEnded)
+KeyBinder:BindAction(Enum.UserInputState.Change, nil, "GuiWorldInteractionSystem", OnInputChanged)
+KeyBinder:BindAction(Enum.UserInputState.Begin, Enum.KeyCode.F, "GuiWorldInteractionSystem", OnInputBegan)
 --UserInputService.InputChanged:Connect(OnInputChanged)
 --UserInputService.InputEnded:Connect(OnInputEnded)
 
 
---WorldInteractionSystem:Initialize()
-return WorldInteractionSystem
+--GuiWorldInteractionSystem:Initialize()
+return GuiWorldInteractionSystem

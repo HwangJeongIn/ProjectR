@@ -18,7 +18,7 @@ KeyBinder.__newindex = Utility.Inheritable__newindex
 
 local InputToActionMappingTable = {
 	[Enum.UserInputState.Begin] = {
-		Always = {}
+		Always = {},
 		[Enum.KeyCode.One] = {},
 		[Enum.KeyCode.Two] = {},
 		[Enum.KeyCode.Three] = {},
@@ -47,10 +47,10 @@ function OnInput(input)
 		action(input)
 	end
 
-	if input.KeyCode then
-		targetInputTypeActions = targetInputStateActions[input.KeyCode]
-	else
+	if input.KeyCode == Enum.KeyCode.Unknown then
 		targetInputTypeActions = targetInputStateActions[input.UserInputType]
+	else
+		targetInputTypeActions = targetInputStateActions[input.KeyCode]
 	end
 	
 	if not targetInputTypeActions then
@@ -101,12 +101,20 @@ function KeyBinder:BindAction(userInputState, keyCodeOrUserInputType, actionName
 	end
 
 	if not keyCodeOrUserInputType then
-		targetInputStateActions.Always.actionName = action
+		if targetInputStateActions.Always[actionName] then
+			Debug.Assert(false, "이미 존재하는 이름입니다. => " .. actionName)
+			return false
+		end
+		targetInputStateActions.Always[actionName] = action
 	else
 		if not targetInputStateActions[keyCodeOrUserInputType] then
-			targetInputStateActions[keyCodeOrUserInputType] = { actionName = action }
+			targetInputStateActions[keyCodeOrUserInputType] = { [actionName] = action }
 		else
-			targetInputStateActions[keyCodeOrUserInputType].actionName = action
+			if targetInputStateActions[keyCodeOrUserInputType][actionName] then
+				Debug.Assert(false, "이미 존재하는 이름입니다. => " .. actionName)
+				return false
+			end
+			targetInputStateActions[keyCodeOrUserInputType][actionName] = action
 		end
 	end
 

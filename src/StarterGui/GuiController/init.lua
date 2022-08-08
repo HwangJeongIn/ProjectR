@@ -51,16 +51,16 @@ function GuiController:BindGuiKeys()
 	--local tween = TweenService:Create(GuiPlayerStatusWindow, GuiPlayerStatusGuiTweenInfo, { Position = UDim2.new(0,0,.5,0)})
 	local GuiPlayerStatusGuiTween = TweenService:Create(GuiPlayerStatusWindow, GuiPlayerStatusGuiTweenInfo, { Position = UDim2.new(.5,0,.5,0)})
 	
-	KeyBinder:BindCustomAction(Enum.KeyCode.Backquote, Enum.UserInputState.Begin, "GuiPlayerStatusToggleKey", 
-	function(inputObject)
-		if GuiPlayerStatus.Enabled then
-			GuiPlayerStatusWindow.Position = UDim2.new(0.3,0,.5,0)
-			GuiTooltipController:ClearToolData()
-		else
-			GuiPlayerStatusGuiTween:Play()
-		end
-		GuiPlayerStatus.Enabled = not GuiPlayerStatus.Enabled
-	end)
+	KeyBinder:BindAction(Enum.UserInputState.Begin, Enum.KeyCode.Backquote, "GuiPlayerStatusToggleKey", 
+		function(inputObject)
+			if GuiPlayerStatus.Enabled then
+				GuiPlayerStatusWindow.Position = UDim2.new(0.3,0,.5,0)
+				GuiTooltipController:ClearToolData()
+			else
+				GuiPlayerStatusGuiTween:Play()
+			end
+			GuiPlayerStatus.Enabled = not GuiPlayerStatus.Enabled
+		end)
 end
 
 function GuiController:InitializeTopbar()

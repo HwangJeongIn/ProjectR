@@ -17,7 +17,7 @@ local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
 
 local GuiSystem = PlayerGui:WaitForChild("GuiSystem")
 local GuiDraggingSystem = require(GuiSystem:WaitForChild("GuiDraggingSystem"))
-local WorldInteractionSystem = require(GuiSystem:WaitForChild("WorldInteractionSystem"))
+local GuiWorldInteractionSystem = require(GuiSystem:WaitForChild("GuiWorldInteractionSystem"))
 
 local GuiSlotController = {}
 

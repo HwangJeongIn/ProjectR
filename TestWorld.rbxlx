@@ -15810,7 +15810,7 @@ local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
 
 local GuiSystem = PlayerGui:WaitForChild("GuiSystem")
 local GuiDraggingSystem = require(GuiSystem:WaitForChild("GuiDraggingSystem"))
-local WorldInteractionSystem = require(GuiSystem:WaitForChild("WorldInteractionSystem"))
+local GuiWorldInteractionSystem = require(GuiSystem:WaitForChild("GuiWorldInteractionSystem"))
 
 local GuiSlotController = {}
 
@@ -18275,7 +18275,7 @@ return GuiDraggingSystem]]></ProtectedString>
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Content name="LinkedSource"><null></null></Content>
-					<string name="Name">WorldInteractionSystem</string>
+					<string name="Name">GuiWorldInteractionSystem</string>
 					<string name="ScriptGuid">{12D23857-5378-4434-B548-C003D197C54E}</string>
 					<ProtectedString name="Source"><![CDATA[
 local UserInputService = game:GetService("UserInputService")
@@ -18308,13 +18308,13 @@ local GuiObjectName = GuiObjectTooltipWindow:WaitForChild("GuiObjectName")
 
 local Mouse = LocalPlayer:GetMouse()
 
-local WorldInteractionSystem = {
+local GuiWorldInteractionSystem = {
     SlotControllerCandidate = nil,
     SlotController = nil,
     ShadowImage = nil
 }
 
-function WorldInteractionSystem:GetToolFromTrigger(targetPart)
+function GuiWorldInteractionSystem:GetToolFromTrigger(targetPart)
 	if not targetPart then
 		return nil
 	end
@@ -18339,7 +18339,7 @@ function OnInputChanged(input)
 		return
 	end
 
-	local tool = WorldInteractionSystem:GetToolFromTrigger(Mouse.Target)
+	local tool = GuiWorldInteractionSystem:GetToolFromTrigger(Mouse.Target)
 	if not tool then
 		GuiObjectTooltip.Adornee = nil
 		GuiObjectTooltip.Enabled = false
@@ -18367,7 +18367,7 @@ function OnInputEnded(input)
 			return
 		end
 	
-		local tool = WorldInteractionSystem:GetToolFromTrigger(Mouse.Target)
+		local tool = GuiWorldInteractionSystem:GetToolFromTrigger(Mouse.Target)
 		if not tool then
 			GuiObjectTooltip.Adornee = nil
 			GuiObjectTooltip.Enabled = false
@@ -18389,8 +18389,8 @@ end
 --UserInputService.InputEnded:Connect(OnInputEnded)
 
 
---WorldInteractionSystem:Initialize()
-return WorldInteractionSystem]]></ProtectedString>
+--GuiWorldInteractionSystem:Initialize()
+return GuiWorldInteractionSystem]]></ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">3146cb74d60615d70301f70b0010e552</UniqueId>
