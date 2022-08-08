@@ -35,7 +35,7 @@ local WorldInteractionSystem = {
     ShadowImage = nil
 }
 
-function GetToolFromPart(targetPart)
+function WorldInteractionSystem:GetToolFromTrigger(targetPart)
 	if not targetPart then
 		return nil
 	end
@@ -55,15 +55,12 @@ function GetToolFromPart(targetPart)
 	return targetTool
 end
 
--- 더 정리할 필요있음
 function OnInputChanged(input)
-
 	if not Mouse.Target then
 		return
 	end
 
-	local tool = GetToolFromPart(Mouse.Target)
-	
+	local tool = WorldInteractionSystem:GetToolFromTrigger(Mouse.Target)
 	if not tool then
 		GuiObjectTooltip.Adornee = nil
 		GuiObjectTooltip.Enabled = false
@@ -91,7 +88,7 @@ function OnInputEnded(input)
 			return
 		end
 	
-		local tool = GetToolFromPart(Mouse.Target)
+		local tool = WorldInteractionSystem:GetToolFromTrigger(Mouse.Target)
 		if not tool then
 			GuiObjectTooltip.Adornee = nil
 			GuiObjectTooltip.Enabled = false
@@ -108,8 +105,11 @@ function OnInputEnded(input)
 end
 
 --UserInputService.InputBegan:Connect(OnInputBegan)
-UserInputService.InputChanged:Connect(OnInputChanged)
-UserInputService.InputEnded:Connect(OnInputEnded)
+
+KeyBinder:BindAction(Enum.UserInputState.Change, nil, "GuiDraggingSystem", OnInputChanged)
+KeyBinder:BindAction(Enum.UserInputState.End, Enum.KeyCode.F, "GuiDraggingSystem", OnInputEnded)
+--UserInputService.InputChanged:Connect(OnInputChanged)
+--UserInputService.InputEnded:Connect(OnInputEnded)
 
 
 --WorldInteractionSystem:Initialize()

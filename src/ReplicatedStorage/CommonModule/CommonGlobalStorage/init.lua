@@ -169,7 +169,7 @@ function CommonGlobalStorage:IsInBackpack(playerId, tool)
 	return player.Backpack == tool.Parent
 end
 
-function CommonGlobalStorage:IsInCharacter(playerId, equipType, equippedTool)
+function CommonGlobalStorage:IsInCharacter(playerId, equipType, equippedTool, findAll)
 	local player = game.Players:GetPlayerByUserId(playerId)
 	local character = player.Character
 	if not character then
@@ -177,9 +177,14 @@ function CommonGlobalStorage:IsInCharacter(playerId, equipType, equippedTool)
 		return false
 	end
 
-	if equipType == EquipType.Weapon then
+	if equipType == EquipType.Weapon or not equipType then
 		return (character == equippedTool.Parent)
 	elseif equipType == EquipType.Armor then
+
+		if findAll and (character == equippedTool.Parent) then
+			return true
+		end
+
 		local characterArmorsFolder = character:FindFirstChild("Armors")
 		if not characterArmorsFolder then
 			Debug.Assert(false, "비정상입니다.")

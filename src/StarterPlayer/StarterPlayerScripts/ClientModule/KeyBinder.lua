@@ -16,92 +16,74 @@ local KeyBinder = {}
 KeyBinder.__index = Utility.Inheritable__index
 KeyBinder.__newindex = Utility.Inheritable__newindex
 
-local KeyToActionMappingTable = {
-	[Enum.KeyCode.One] = {},
-	[Enum.KeyCode.Two] = {},
-	[Enum.KeyCode.Three] = {},
-	[Enum.KeyCode.Four] = {},
-	[Enum.KeyCode.Five] = {},
-	--[Enum.KeyCode.Backquote] = {},
-	[Enum.KeyCode.Q] = {},
-	[Enum.KeyCode.E] = {},
-	[Enum.KeyCode.R] = {}
+local InputToActionMappingTable = {
+	[Enum.UserInputState.Begin] = {
+		Always = {}
+		[Enum.KeyCode.One] = {},
+		[Enum.KeyCode.Two] = {},
+		[Enum.KeyCode.Three] = {},
+		[Enum.KeyCode.Four] = {},
+		[Enum.KeyCode.Five] = {},
+		--[Enum.KeyCode.Backquote] = {},
+		[Enum.KeyCode.Q] = {},
+		[Enum.KeyCode.E] = {},
+		[Enum.KeyCode.R] = {}
+	},
+
+	[Enum.UserInputState.Change] = {
+		Always = {}
+	},
+
+	[Enum.UserInputState.End] = {
+		Always = {}
+	}
 }
 
+function OnInput(input)
+	local targetInputStateActions = InputToActionMappingTable[input.UserInputState]
+	local targetInputTypeActions = nil
+
+	for _, action in pairs(targetInputStateActions.Always) do
+		action(input)
+	end
+
+	if input.KeyCode then
+		targetInputTypeActions = targetInputStateActions[input.KeyCode]
+	else
+		targetInputTypeActions = targetInputStateActions[input.UserInputType]
+	end
+	
+	if not targetInputTypeActions then
+		return
+	end
+
+	for _, action in pairs(targetInputTypeActions) do
+		action(input)
+	end
+end
+
+UserInputService.InputBegan:Connect(OnInput)
+UserInputService.InputChanged:Connect(OnInput)
+UserInputService.InputEnded:Connect(OnInput)
+
+-- 무시되는 경우가 있어서 일단 보류
+--[[
 function KeyBinder:BindCustomAction(keyCodeOrUserInputType, userInputState, customActionName, customAction)
 	ContextActionService:BindAction(
 		customActionName,
 		function(actionName, inputState, inputObject)
 			if (inputState == userInputState) then
-				customAction(actionName, inputState, inputObject)
+				customAction(inputObject)
 			end
 		end,
 		true,
 		keyCodeOrUserInputType)
 end
+--]]
 
-function KeyBinder:Initialize()
-	
-	for keyCode, actionTable in pairs(KeyToActionMappingTable) do
-		
-		local actionName = tostring(keyCode)
-		
-		ContextActionService:BindAction(
-			actionName,
-			function(actionName, inputState, inputObject)
-				if (inputState == Enum.UserInputState.Begin) then
-					for _, action in pairs(actionTable) do
-						action(actionName, inputState, inputObject)
-					end
-				end
-			end,
-			true, keyCode)
-		--[[
-		ContextActionService:BindActionAtPriority(
-			actionName,
-			function(keyCode, action, actionName) 
-				for actionName, action in pairs(actionTable) do
-					action(keyCode, action, actionName)
-				end
-			end,
-			true, 1, keyCode) -- 1은 우선순위
-		--]]
-	end
-end
 
-function KeyBinder:CheckKey(keyCode)
-	if not KeyToActionMappingTable[keyCode] then
-		Debug.Assert(false, "해당 키는 사용할 수 없습니다. => " .. tostring(keyCode))
-		return false
-	end
-	
-	return true
-end
-
-function KeyBinder:UnbindActions(keyCode)
-	if self:CheckKey(keyCode) == false then
-		Debug.Assert(false, "비정상입니다.")
-		return
-	end
-	
-	local targetTable = KeyToActionMappingTable[keyCode]
-	for key, _ in pairs(targetTable)  do
-		targetTable[key] = nil
-	end
-end
-
-function KeyBinder:BindAction(keyCode, action, actionName)
-	if self:CheckKey(keyCode) == false then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	if not actionName then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	if not action then
+function KeyBinder:BindAction(userInputState, keyCodeOrUserInputType, actionName, action)
+	if not userInputState or not action then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -112,42 +94,54 @@ function KeyBinder:BindAction(keyCode, action, actionName)
 		return false
 	end
 	
-	local targetTable = KeyToActionMappingTable[keyCode]
-	targetTable[actionName] = action
-	
-end
-
-function KeyBinder:BindSingleAction(keyCode, action, actionName)
-	if self:CheckKey(keyCode) == false then
+	local targetInputStateActions = InputToActionMappingTable[userInputState]
+	if not targetInputStateActions then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
-	
-	self:UnbindActions(keyCode)
-	
-	if not actionName then
-		actionName = 1
-	end
-	
-	if action then
-		if self:BindAction(keyCode, action, actionName) == false then
-			Debug.Assert(false, "비정상입니다.")
-			return false
+
+	if not keyCodeOrUserInputType then
+		targetInputStateActions.Always.actionName = action
+	else
+		if not targetInputStateActions[keyCodeOrUserInputType] then
+			targetInputStateActions[keyCodeOrUserInputType] = { actionName = action }
+		else
+			targetInputStateActions[keyCodeOrUserInputType].actionName = action
 		end
 	end
-	
-	return true
+
 end
 
+function KeyBinder:Initialize()
+	for keyCode, actionTable in pairs(InputToActionMappingTable) do
+		
+		local actionName = tostring(keyCode)
+		ContextActionService:BindAction(
+			actionName,
+			function(actionName, inputState, inputObject)
+				if (inputState == Enum.UserInputState.Begin) then
+					for _, action in pairs(actionTable) do
+						action(actionName, inputState, inputObject)
+					end
+				end
+			end,
+			true, keyCode)
 
-KeyBinder:Initialize()
+		--[[
+		ContextActionService:BindActionAtPriority(
+			actionName,
+			function(keyCode, action, actionName) 
+				for actionName, action in pairs(actionTable) do
+					action(keyCode, action, actionName)
+				end
+			end,
+			true, 1, keyCode) -- 1은 우선순위
+		--]]
 
---[[
-KeyBinder:BindSingleAction(Enum.KeyCode.One, function() 
-	print("test!!!@@#!")
-	KeyBinder:BindSingleAction(Enum.KeyCode.Two, function() print("i'm two!!") end)
-end)
---]]
+	end
+end
+
+--KeyBinder:Initialize()
 return KeyBinder
 
 --[[

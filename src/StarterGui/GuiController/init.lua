@@ -52,7 +52,7 @@ function GuiController:BindGuiKeys()
 	local GuiPlayerStatusGuiTween = TweenService:Create(GuiPlayerStatusWindow, GuiPlayerStatusGuiTweenInfo, { Position = UDim2.new(.5,0,.5,0)})
 	
 	KeyBinder:BindCustomAction(Enum.KeyCode.Backquote, Enum.UserInputState.Begin, "GuiPlayerStatusToggleKey", 
-	function(actionName, inputState, inputObject)
+	function(inputObject)
 		if GuiPlayerStatus.Enabled then
 			GuiPlayerStatusWindow.Position = UDim2.new(0.3,0,.5,0)
 			GuiTooltipController:ClearToolData()

@@ -18,6 +18,15 @@ QuickSlotsRaw:Initialize(MaxQuickSlotCount)
 local QuickSlots = {}
 QuickSlots.QuickSlotsRaw = QuickSlotsRaw
 
+function QuickSlots:GetSlotIndex(tool)
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+	
+	return self.QuickSlotsRaw:GetIndex(tool)
+end
+
 function QuickSlots:GetSlot(slotIndex)
     local targetTool = self.QuickSlotsRaw:Get(slotIndex)
     if nil == targetTool then
@@ -29,7 +38,7 @@ function QuickSlots:GetSlot(slotIndex)
 end
 
 function QuickSlots:SetSlot(slotIndex, tool)
-	if not slotIndex or not tool then
+	if not slotIndex then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end

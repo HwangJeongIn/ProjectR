@@ -1,21 +1,22 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
-local Debug = require(CommonModule:WaitForChild("Debug"))
-local Utility = require(CommonModule:WaitForChild("Utility"))
+local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
+local Debug = CommonModuleFacade.Debug
+local Utility = CommonModuleFacade.Utility
+local ToolUtility = CommonModuleFacade.ToolUtility
 
-local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
+
+local CommonConstant = CommonModuleFacade.CommonConstant
 local MaxPickupDistance = CommonConstant.MaxPickupDistance
 
-local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
+local CommonEnum = CommonModuleFacade.CommonEnum
 local GameDataType = CommonEnum.GameDataType
 local StatusType = CommonEnum.StatusType
 local ToolType = CommonEnum.ToolType
 local EquipType = CommonEnum.EquipType
 
-local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
-local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
+local CommonGameDataManager = CommonModuleFacade.CommonGameDataManager
+local CommonGlobalStorage = CommonModuleFacade.CommonGlobalStorage
 
-local CommonGlobalStorage = require(CommonModule:WaitForChild("CommonGlobalStorage"))
 local LocalPlayer = game.Players.LocalPlayer
 local PlayerId = LocalPlayer.UserId
 
@@ -43,6 +44,18 @@ function ClientGlobalStorage:Initialize(guiController)
 
 	local ClientRemoteEventImpl = require(script:WaitForChild("ClientRemoteEventImpl"))
 	ClientRemoteEventImpl:InitializeRemoteEvents(self, guiController)
+end
+
+function ClientGlobalStorage:SendDropTool(tool)
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	-- 인벤토리 검증
+	local data = ClientGlobalStorage:GetData()
+	local inventory = data[StatusType.Inventory]
+	--inventory:Get
 end
 
 function ClientGlobalStorage:SendPickupTool(tool)
@@ -133,6 +146,25 @@ function ClientGlobalStorage:SetQuickSlotByInventorySlot(quickSlotIndex, invento
 		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
 		return false
 	end
+	return true
+end
+
+function ClientGlobalStorage:ClearQuickSlotIfExist(tool)
+	if nil == tool then
+		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+		return false
+	end
+
+	local slotIndex = self.QuickSlots:GetSlotIndex(tool)
+	if not slotIndex then
+		return true
+	end
+
+	if not self:SetQuickSlot(slotIndex, nil) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
 	return true
 end
 

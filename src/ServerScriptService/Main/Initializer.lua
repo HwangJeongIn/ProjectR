@@ -30,7 +30,31 @@ function InitializeTools()
 
 	local toolCount = #toolList
 	for i = 1, toolCount do
-		toolList[i].CanBeDropped = false
+		--toolList[i].CanBeDropped = false
+
+		local handle = toolList[i]:FindFirstChild("Handle")
+		if not handle then
+			Debug.Assert(false, "도구에 핸들이 없습니다. => " .. toolList[i].Name)
+			return false
+		end
+
+		local trigger = handle:FindFirstChild("Trigger")
+		if not trigger then
+			Debug.Assert(false, "도구에 트리거가 없습니다. => " .. toolList[i].Name)
+			return false
+		end
+
+		if handle.CanTouch then
+			Debug.Print("CanTouch가 켜져있습니다. 자동으로 꺼집니다." .. toolList[i].Name)
+			handle.CanTouch = false
+		end
+
+		if trigger.CanCollide then
+			Debug.Print("CanCollide가 켜져있습니다. 자동으로 꺼집니다." .. toolList[i].Name)
+			trigger.CanCollide = false
+			trigger.CanQuery = true
+		end
+
 		if toolList[i].Damager then
 			local clonedDamagerScript = DamagerScript:Clone()
 			clonedDamagerScript.Parent = toolList[i]
@@ -40,9 +64,11 @@ function InitializeTools()
 			clonedInteractorScript.Parent = toolList[i]
 
 		else
-			ServerModuleFacade.Assert(false, "도구 용도에 맞게 태그를 지정하세요")
+			Debug.Assert(false, "도구 용도에 맞게 태그를 지정하세요")
+			return false
 		end
 	end
+	return true
 end
 
 function ClearPlayer(player)

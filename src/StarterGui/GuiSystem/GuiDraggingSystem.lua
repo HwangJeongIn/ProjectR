@@ -26,6 +26,8 @@ local GuiDraggingSystem = {
     ShadowImage = nil
 }
 
+
+
 -- 더 정리할 필요있음
 function OnInputBegan(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -67,8 +69,6 @@ function OnInputEnded(input)
             Debug.Print("처음에 선택한 위치에 슬롯이 없습니다.")
             return
         end
-
-
 
 
         local prevSlotType = GuiDraggingSystem.SlotController.SlotType
@@ -130,19 +130,16 @@ function OnInputEnded(input)
 
         end
         
-
-
-
-
-
         GuiDraggingSystem:ClearSlotController()
 	end
 end
 
-UserInputService.InputBegan:Connect(OnInputBegan)
-UserInputService.InputEnded:Connect(OnInputEnded)
+--UserInputService.InputBegan:Connect(OnInputBegan)
+--UserInputService.InputEnded:Connect(OnInputEnded)
+KeyBinder:BindAction(Enum.UserInputState.Begin, Enum.UserInputType.MouseButton1, "GuiDraggingSystem", OnInputBegan)
+KeyBinder:BindAction(Enum.UserInputState.End, Enum.UserInputType.MouseButton1, "GuiDraggingSystem", OnInputEnded)
 
-
+    
 function GuiDraggingSystem:Initialize()
     self.Shadow = Instance.new("ScreenGui")
     self.Shadow.Name = "Shadow"
@@ -165,6 +162,13 @@ end
 
 function GuiDraggingSystem:Clear()
     self:SetSlotControllerCandidate(nil)
+end
+
+function GuiDraggingSystem:CheckAndClearSlotControllerCandidate(slotControllerCandidate)
+    if self.SlotControllerCandidate == slotControllerCandidate then
+        print("self.SlotControllerCandidate = nil")
+        self.SlotControllerCandidate = nil
+    end
 end
 
 function GuiDraggingSystem:SetSlotControllerCandidate(slotControllerCandidate)

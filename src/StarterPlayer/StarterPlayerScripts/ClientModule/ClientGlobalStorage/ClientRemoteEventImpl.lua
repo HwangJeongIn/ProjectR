@@ -1,10 +1,11 @@
 local ClientRemoteEventImpl = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
-local Debug = require(CommonModule:WaitForChild("Debug"))
+local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
+local Debug = CommonModuleFacade.Debug
+local ToolUtility = CommonModuleFacade.ToolUtility
 
-local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
+local CommonEnum = CommonModuleFacade.CommonEnum
 --local GameDataType = CommonEnum.GameDataType
 local StatusType = CommonEnum.StatusType
 --local ToolType = CommonEnum.ToolType
@@ -127,6 +128,17 @@ function ClientRemoteEventImpl:InitializeRemoteEvents(ClientGlobalStorage, GuiCo
 			Debug.Assert(false, "비정상입니다.")
 			return
 		end
+
+		local equipType = ToolUtility:GetEquipType(tool)
+		-- 플레이어가 장착중일 때는 퀵슬롯에서 빼지 않는다.
+		if not ClientGlobalStorage:IsInCharacter(PlayerId, equipType, tool, true) then
+			if not ClientGlobalStorage:ClearQuickSlotIfExist(tool) then
+				Debug.Assert(false, "비정상입니다.")
+				return
+			end
+		end
+
+
 	end)
 
 	NotifyWinnerSTC.OnClientEvent:Connect(function(winnerType, winnerName, winnerReward)

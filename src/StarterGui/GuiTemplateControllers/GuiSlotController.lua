@@ -95,7 +95,7 @@ function GuiSlotController:newRaw(slotType, slotIndex, newGuiSlot)
 	newGuiSlotController.GuiSlot.MouseLeave:Connect(function()
 		newGuiSlotController.GuiSlot.ImageTransparency = 0
 		--Debug.Print("SetSlotControllerCandidate => nil")
-		--GuiDraggingSystem:SetSlotControllerCandidate(nil)
+		GuiDraggingSystem:CheckAndClearSlotControllerCandidate(newGuiSlotController)
 	end)
 	newGuiSlotController:InitializeImage(slotType, slotIndex)
 	return newGuiSlotController
