@@ -30,7 +30,9 @@ local CommonConstant = {
 
 	--
 	MaxDistanceToIdentifyObject = 30,
-	MaxPickupDistance = 15
+	MaxPickupDistance = 15,
+
+	MaxDropDistance = 3
 }
 
 CommonConstant.__index = Utility.Inheritable__index

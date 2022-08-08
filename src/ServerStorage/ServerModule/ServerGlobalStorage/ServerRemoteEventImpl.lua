@@ -193,7 +193,7 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
             return
         end
 
-        if not ServerGlobalStorage:SelectTool(player, tool, true) then
+        if not ServerGlobalStorage:SelectTool(player, tool, false) then
             Debug.Assert(false, "비정상입니다.")
             return
         end

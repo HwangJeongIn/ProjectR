@@ -12,6 +12,7 @@ local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
 
 local MaxPickupDistance = ServerConstant.MaxPickupDistance
+local MaxDropDistance = ServerConstant.MaxDropDistance
 
 local EquipTypeToBoneMappingTable = ServerConstant.EquipTypeToBoneMappingTable
 
@@ -71,8 +72,8 @@ function ServerGlobalStorage:DropToolRaw(character, tool)
 
 	local targetCFrame = characterCFrame + characterCFrame.LookVector * 3
 	
-	tool.Handle.CFrame = targetCFrame
 	tool.Parent = game.workspace
+	tool.Handle.CFrame = targetCFrame
 	return true
 end
 
@@ -139,14 +140,14 @@ end
 
 
 
-function ServerGlobalStorage:SelectTool(player, tool, isInBackpack)
+function ServerGlobalStorage:SelectTool(player, tool, fromWorkspace)
 	if not tool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 	
 	local playerId = player.UserId
-	if isInBackpack then
+	if not fromWorkspace then
 		if not ServerGlobalStorage:IsInBackpack(playerId, tool) then
 			Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
 			return false
@@ -165,8 +166,8 @@ function ServerGlobalStorage:SelectTool(player, tool, isInBackpack)
 		return false
 	end
 
-	ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId)
-	ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
+	self:CheckAndUnequipIfWeapon(playerId)
+	self:CheckAndEquipIfWeapon(playerId, tool, fromWorkspace)
 	humanoid:EquipTool(tool)
 
 	return true
@@ -179,7 +180,7 @@ function ServerGlobalStorage:SelectWorkspaceTool(player, tool)
 		return false
 	end
 
-	if not self:SelectTool(player, tool, false) then
+	if not self:SelectTool(player, tool, true) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -449,16 +450,19 @@ function ServerGlobalStorage:IsInCharacterByEquipType(playerId, equipType)
 end
 
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
-function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
+function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool, fromWorkspace)
 	local equipType = ToolUtility:GetEquipType(tool)
 	if not equipType or equipType ~= EquipType.Weapon then
 		return false
 	end
 
-	if not self:IsInBackpack(playerId, tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
+	if not fromWorkspace then
+		if not self:IsInBackpack(playerId, tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
 	end
+
 
 	local prevTool, currentTool = self:EquipTool(playerId, equipType, tool)
 	if not currentTool then
