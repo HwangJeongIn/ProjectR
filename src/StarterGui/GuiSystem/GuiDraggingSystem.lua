@@ -23,6 +23,7 @@ local Mouse = LocalPlayer:GetMouse()
 local GuiDraggingSystem = {
     SlotControllerCandidate = nil,
     SlotController = nil,
+    SlotWindowType = nil,
     ShadowImage = nil
 }
 
@@ -89,9 +90,24 @@ function OnInputEnded(input)
     if prevSlotType == SlotType.InventorySlot then
         if not currentSlotType then
             -- Inventory -> Workspace
-            if not ClientGlobalStorage:SendDropTool(prevTool) then
-                Debug.Assert(false, "비정상입니다.")
+
+            -- 만약 EquipSlotWindow이면 바로 착용
+            if GuiDraggingSystem.SlotWindowType == SlotType.EquipSlot then
+                if prevTool then
+                    local prevToolEquipType = ToolUtility:GetEquipType(prevTool)
+                    if prevToolEquipType then
+                        if not ClientGlobalStorage:SendEquipToolCTS(prevToolEquipType, prevTool) then
+                            Debug.Assert(false, "비정상입니다.")
+                        end
+                    end
+                end
+            else
+                if not ClientGlobalStorage:SendDropTool(prevTool) then
+                    Debug.Assert(false, "비정상입니다.")
+                end
             end
+
+
         elseif currentSlotType == SlotType.InventorySlot then
             -- Inventory -> Inventory
             if prevSlotIndex ~= currentSlotIndex then
@@ -171,6 +187,16 @@ end
 
 function GuiDraggingSystem:Clear()
     self:SetSlotControllerCandidate(nil)
+end
+
+function GuiDraggingSystem:SetSlotWindowType(slotWindowType)
+    self.SlotWindowType = slotWindowType
+end
+
+function GuiDraggingSystem:CheckAndClearSetSlotWindowType(slotWindowType)
+    if self.SlotWindowType == slotWindowType then
+        self.SlotWindowType = nil
+    end
 end
 
 function GuiDraggingSystem:CheckAndClearSlotControllerCandidate(slotControllerCandidate)

@@ -78,6 +78,14 @@ function GuiFacade:Initialize()
     local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("GuiTooltipController"))
     self.GuiTooltipController = GuiTooltipController
 
+    -- GuiSystem
+    local GuiSystem = PlayerGui:WaitForChild("GuiSystem")
+    local GuiDraggingSystem = require(GuiSystem:WaitForChild("GuiDraggingSystem"))
+    local GuiWorldInteractionSystem = require(GuiSystem:WaitForChild("GuiWorldInteractionSystem"))
+    self.GuiSystem = {
+        GuiDraggingSystem = GuiDraggingSystem,
+        GuiWorldInteractionSystem = GuiWorldInteractionSystem
+    }
 end
 
 GuiFacade:Initialize()

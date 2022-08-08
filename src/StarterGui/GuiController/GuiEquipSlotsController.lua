@@ -22,6 +22,7 @@ local GuiEquipSlots = GuiFacade.GuiEquipSlots
 local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiSlot
 
 local GuiToolSlotController = GuiFacade.GuiTemplateController.GuiToolSlotController
+local GuiDraggingSystem = GuiFacade.GuiSystem.GuiDraggingSystem
 
 local GuiEquipSlotsRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
 GuiEquipSlotsRaw:Initialize(MaxEquipSlotCount)
@@ -115,6 +116,15 @@ function GuiEquipSlotsController:Initialize()
 			self.GuiEquipSlotsRaw:Set(equipType, GuiToolSlotController:new(SlotType.EquipSlot, equipType, newGuiToolSlot))
 		end
 	end
+
+	GuiEquipSlots.MouseEnter:Connect(function(x,y)
+		GuiDraggingSystem:SetSlotWindowType(SlotType.EquipSlot)
+	end)
+
+	GuiEquipSlots.MouseLeave:Connect(function()
+		GuiDraggingSystem:CheckAndClearSetSlotWindowType(SlotType.EquipSlot)
+	end)
+
 end
 
 function GuiEquipSlotsController:SetToolSlot(equipType, tool)
