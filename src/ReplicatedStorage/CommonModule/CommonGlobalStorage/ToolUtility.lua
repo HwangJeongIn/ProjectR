@@ -17,7 +17,15 @@ local ToolUtility = {
 	DefaultSkillImage = "http://www.roblox.com/asset/?id=10489717222",
 	EmptySkillImage = "http://www.roblox.com/asset/?id=10489717222",
 	DefaultSlotImage = "http://www.roblox.com/asset/?id=10489757489",
-	DefaultCircularSlotImage = "http://www.roblox.com/asset/?id=10489755989"
+	DefaultCircularSlotImage = "http://www.roblox.com/asset/?id=10489755989",
+
+	QuickSlotIndexToKeyCodeTable = {
+		[1] = Enum.KeyCode.One,
+		[2] = Enum.KeyCode.Two,
+		[3] = Enum.KeyCode.Three,
+		[4] = Enum.KeyCode.Four,
+		[5] = Enum.KeyCode.Five
+	}
 }
 
 function ToolUtility:GetToolGameData(tool)

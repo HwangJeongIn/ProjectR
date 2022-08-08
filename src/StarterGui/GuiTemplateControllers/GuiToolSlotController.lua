@@ -10,6 +10,8 @@ local ToolUtility = ClientModuleFacade.ToolUtility
 local CommonEnum = ClientModuleFacade.CommonEnum
 local SlotType = CommonEnum.SlotType
 
+local KeyBinder = ClientModuleFacade.KeyBinder
+
 local Player = game.Players.LocalPlayer
 local PlayerId = Player.UserId
 local PlayerGui = Player:WaitForChild("PlayerGui")
@@ -23,6 +25,23 @@ local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("Gui
 local GuiSlotController = Utility:DeepCopy(require(script.Parent:WaitForChild("GuiSlotController")))
 
 local GuiToolSlotController = GuiSlotController
+
+function SelectToolActionForQuickSlot(tool)
+	if not tool then
+		return true
+	end
+	if not ClientGlobalStorage:IsInBackpack(PlayerId, tool) then
+		Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
+		return false
+	end
+
+	if not ClientGlobalStorage:SendSelectToolCTS(tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
 
 function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
 
@@ -67,18 +86,25 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
 		end)
 
 	elseif newGuiToolSlotController.SlotType == SlotType.QuickSlot then
-		newGuiToolSlotController.GuiSlot.Activated:connect(function(inputObject)
-			local targetTool = newGuiToolSlotController.Tool
-			if not targetTool then
-				return
-			end
-			if not ClientGlobalStorage:IsInBackpack(PlayerId, targetTool) then
-				Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
-				return
-			end
+		local targetSlotIndexEnum = ToolUtility.QuickSlotIndexToKeyCodeTable[newGuiToolSlotController.SlotIndex]
+		if not targetSlotIndexEnum then
+			Debug.Assert(false, "비정상입니다. 슬롯이 늘어났는지 확인해보세요")
+			return
+		end
 
-			ClientGlobalStorage:Send
-			GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
+		local quickSlotActionName = tostring(targetSlotIndexEnum)
+		KeyBinder:BindAction(Enum.UserInputState.Begin, targetSlotIndexEnum, quickSlotActionName, function(inputObject)
+			if not SelectToolActionForQuickSlot(newGuiToolSlotController.Tool) then
+				Debug.Assert(false, "비정상입니다.")
+				return
+			end
+		end)
+
+		newGuiToolSlotController.GuiSlot.Activated:connect(function(inputObject)
+			if not SelectToolActionForQuickSlot(newGuiToolSlotController.Tool) then
+				Debug.Assert(false, "비정상입니다.")
+				return
+			end
 		end)
 	end
 
