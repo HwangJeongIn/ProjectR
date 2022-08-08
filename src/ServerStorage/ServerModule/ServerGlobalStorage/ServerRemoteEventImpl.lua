@@ -4,6 +4,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonModuleFacade.Debug
 local ToolUtility = CommonModuleFacade.ToolUtility
+
+local CommonConstant = CommonModuleFacade.CommonConstant
+local MaxPickupDistance = CommonConstant.MaxPickupDistance
+
 local CommonEnum = CommonModuleFacade.CommonEnum
 
 local EquipType = CommonEnum.EquipType
@@ -22,9 +26,19 @@ local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
 local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
 local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
+local PickupToolCTS = RemoteEvents:WaitForChild("PickupToolCTS")
+local DropToolCTS = RemoteEvents:WaitForChild("DropToolCTS")
 
 
 function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
+
+
+    PickupToolCTS.OnServerEvent:Connect(function(player, tool)
+        if not ServerGlobalStorage:SelectToolFromWorkspace(player, tool) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
+    end)
 
     SwapInventorySlotCTS.OnServerEvent:Connect(function(player, slotIndex1, slotIndex2)
         
@@ -50,7 +64,7 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
         end
         
         local playerId = player.UserId
-        if not ServerGlobalStorage:CanUnequipToolByEquipType(playerId, equipType) then
+        if not ServerGlobalStorage:IsInCharacterByEquipType(playerId, equipType) then
             Debug.Assert(false, "비정상입니다.")
             return
         end
@@ -105,7 +119,7 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
         end
 
         local playerId = player.UserId
-        if not ServerGlobalStorage:CanEquipTool(playerId, tool) then
+        if not ServerGlobalStorage:IsInBackpack(playerId, tool) then
             Debug.Assert(false, "비정상입니다.")
             return
         end
@@ -163,28 +177,11 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
             Debug.Assert(false, "비정상입니다.")
             return
         end
-        
-        local playerId = player.UserId
-        if not ServerGlobalStorage:CanEquipTool(playerId, tool) then
-            Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
-            return
-        end
-    
-        local character = player.Character
-        if not character then
-            Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 있을 수 있는 상황입니다.")
-            return
-        end
-    
-        local humanoid = character:FindFirstChild("Humanoid")
-        if not humanoid then
-            Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
-            return
-        end
 
-        ServerGlobalStorage:CheckAndUnequipIfWeapon(player.UserId)
-        ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
-        humanoid:EquipTool(tool)
+        if not ServerGlobalStorage:SelectTool(player, tool, true) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
     end)
 end
 

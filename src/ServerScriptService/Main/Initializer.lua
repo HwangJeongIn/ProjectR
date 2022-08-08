@@ -30,6 +30,7 @@ function InitializeTools()
 
 	local toolCount = #toolList
 	for i = 1, toolCount do
+		toolList[i].CanBeDropped = false
 		if toolList[i].Damager then
 			local clonedDamagerScript = DamagerScript:Clone()
 			clonedDamagerScript.Parent = toolList[i]

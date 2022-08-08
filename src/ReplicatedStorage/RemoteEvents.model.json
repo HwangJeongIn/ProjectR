@@ -43,6 +43,15 @@
       "ClassName": "RemoteEvent"
     },
 
+    
+    {
+      "Name": "DropToolCTS",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "PickupToolCTS",
+      "ClassName": "RemoteEvent"
+    },
     {
       "Name": "EquipToolCTS",
       "ClassName": "RemoteEvent"

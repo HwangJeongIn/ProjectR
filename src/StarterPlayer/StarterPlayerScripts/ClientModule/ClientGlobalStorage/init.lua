@@ -4,7 +4,7 @@ local Debug = require(CommonModule:WaitForChild("Debug"))
 local Utility = require(CommonModule:WaitForChild("Utility"))
 
 local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
-local MaxQuickSlotCount = CommonConstant.MaxQuickSlotCount
+local MaxPickupDistance = CommonConstant.MaxPickupDistance
 
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
@@ -27,6 +27,8 @@ local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
 local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
 
+local DropToolCTS = RemoteEvents:WaitForChild("DropToolCTS")
+local PickupToolCTS = RemoteEvents:WaitForChild("PickupToolCTS")
 
 local QuickSlots = require(script:WaitForChild("QuickSlots"))
 local ClientGlobalStorage = CommonGlobalStorage
@@ -42,6 +44,23 @@ function ClientGlobalStorage:Initialize(guiController)
 	local ClientRemoteEventImpl = require(script:WaitForChild("ClientRemoteEventImpl"))
 	ClientRemoteEventImpl:InitializeRemoteEvents(self, guiController)
 end
+
+function ClientGlobalStorage:SendPickupTool(tool)
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local distance = LocalPlayer:DistanceFromCharacter(tool.Handle.Position)
+	if distance > MaxPickupDistance then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	PickupToolCTS:FireServer(tool)
+	return true
+end
+
 
 function ClientGlobalStorage:SendSwapInventorySlot(slotIndex1, slotIndex2)
 	local data = ClientGlobalStorage:GetData()

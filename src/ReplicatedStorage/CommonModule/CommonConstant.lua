@@ -26,7 +26,11 @@ local CommonConstant = {
 	-- 0.25보다 클수 없음
 	GuiSkillSlotOffsetRatio = 0.075,
 	
-	UndefinedElementValue = false
+	UndefinedElementValue = false,
+
+	--
+	MaxDistanceToIdentifyObject = 30,
+	MaxPickupDistance = 15
 }
 
 CommonConstant.__index = Utility.Inheritable__index

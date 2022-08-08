@@ -159,6 +159,38 @@ function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
 	return true
 end
 
+function CommonGlobalStorage:IsInBackpack(playerId, tool)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local player = game.Players:GetPlayerByUserId(playerId)
+	return player.Backpack == tool.Parent
+end
+
+function CommonGlobalStorage:IsInCharacter(playerId, equipType, equippedTool)
+	local player = game.Players:GetPlayerByUserId(playerId)
+	local character = player.Character
+	if not character then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if equipType == EquipType.Weapon then
+		return (character == equippedTool.Parent)
+	elseif equipType == EquipType.Armor then
+		local characterArmorsFolder = character:FindFirstChild("Armors")
+		if not characterArmorsFolder then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+		return (characterArmorsFolder == equippedTool.Parent)
+	end
+	
+	return true
+end
+
 function CommonGlobalStorage:EquipTool(playerId, equipType, tool)
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")

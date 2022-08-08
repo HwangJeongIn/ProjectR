@@ -11,6 +11,8 @@ local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
 
+local MaxPickupDistance = ServerConstant.MaxPickupDistance
+
 local EquipTypeToBoneMappingTable = ServerConstant.EquipTypeToBoneMappingTable
 
 local GameDataType = ServerEnum.GameDataType
@@ -34,6 +36,54 @@ local ServerGlobalStorage = CommonGlobalStorage
 function ServerGlobalStorage:Initialize()
 	local ServerRemoteEventImpl = require(script:WaitForChild("ServerRemoteEventImpl"))
 	ServerRemoteEventImpl:InitializeRemoteEvents(self)
+end
+
+function ServerGlobalStorage:SelectTool(player, tool, isInBackpack)
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	local playerId = player.UserId
+	if isInBackpack then
+		if not ServerGlobalStorage:IsInBackpack(playerId, tool) then
+			Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
+			return false
+		end
+	end
+
+	local character = player.Character
+	if not character then
+		Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+		return false
+	end
+
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid then
+		Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+		return false
+	end
+
+	ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId)
+	ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
+	humanoid:EquipTool(tool)
+
+	return true
+end
+
+function ServerGlobalStorage:SelectToolFromWorkspace(player, tool)
+	local distance = player:DistanceFromCharacter(tool.Handle.Position)
+	if distance > MaxPickupDistance then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self:SelectTool(player, tool, false) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
 end
 
 function ServerGlobalStorage:GetBonesByEquipType(character, equipType)
@@ -282,39 +332,7 @@ function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
 	return true
 end
 
-function ServerGlobalStorage:CanEquipTool(playerId, tool)
-	if not self:CheckPlayer(playerId) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	local player = game.Players:GetPlayerByUserId(playerId)
-	return player.Backpack == tool.Parent
-end
-
-function ServerGlobalStorage:CanUnequipTool(playerId, equipType, equippedTool)
-	local player = game.Players:GetPlayerByUserId(playerId)
-	local character = player.Character
-	if not character then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	if equipType == EquipType.Weapon then
-		return (character == equippedTool.Parent)
-	elseif equipType == EquipType.Armor then
-		local characterArmorsFolder = character:FindFirstChild("Armors")
-		if not characterArmorsFolder then
-			Debug.Assert(false, "비정상입니다.")
-			return false
-		end
-		return (characterArmorsFolder == equippedTool.Parent)
-	end
-	
-	return true
-end
-
-function ServerGlobalStorage:CanUnequipToolByEquipType(playerId, equipType)
+function ServerGlobalStorage:IsInCharacterByEquipType(playerId, equipType)
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -326,10 +344,8 @@ function ServerGlobalStorage:CanUnequipToolByEquipType(playerId, equipType)
 		return false
 	end
 
-	return self:CanUnequipTool(playerId, equipType, equippedTool)
+	return self:IsInCharacter(playerId, equipType, equippedTool)
 end
-
-
 
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
 function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
@@ -338,7 +354,7 @@ function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
 		return false
 	end
 
-	if not self:CanEquipTool(playerId, tool) then
+	if not self:IsInBackpack(playerId, tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -360,7 +376,7 @@ function ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId)
 		return false
 	end
 
-	if not self:CanUnequipTool(playerId, EquipType.Weapon, equippedWeapon) then
+	if not self:IsInCharacter(playerId, EquipType.Weapon, equippedWeapon) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end

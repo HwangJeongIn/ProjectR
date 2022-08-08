@@ -82,18 +82,18 @@
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<CoordinateFrame name="CFrame">
-					<X>16.7813168</X>
-					<Y>13.9051619</Y>
-					<Z>-19.2493362</Z>
-					<R00>0.939690113</R00>
-					<R01>-0.0603307746</R01>
-					<R02>0.336664349</R02>
+					<X>17.843298</X>
+					<Y>13.8327875</Y>
+					<Z>-20.1452713</Z>
+					<R00>0.481746405</R00>
+					<R01>-0.122862674</R01>
+					<R02>0.867654979</R02>
 					<R10>-0</R10>
-					<R11>0.984320223</R11>
-					<R12>0.176391691</R12>
-					<R20>-0.342027307</R20>
-					<R21>-0.165753528</R21>
-					<R22>0.924955785</R22>
+					<R11>0.990122616</R11>
+					<R12>0.140204459</R12>
+					<R20>-0.876310766</R20>
+					<R21>-0.0675429925</R21>
+					<R22>0.476987958</R22>
 				</CoordinateFrame>
 				<Ref name="CameraSubject">null</Ref>
 				<token name="CameraType">0</token>
@@ -10050,7 +10050,7 @@ local Debug = require(CommonModule:WaitForChild("Debug"))
 local Utility = require(CommonModule:WaitForChild("Utility"))
 
 local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
-local MaxQuickSlotCount = CommonConstant.MaxQuickSlotCount
+local MaxPickupDistance = CommonConstant.MaxPickupDistance
 
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
@@ -10073,13 +10073,15 @@ local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
 local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
 
+local DropToolCTS = RemoteEvents:WaitForChild("DropToolCTS")
+local PickupToolCTS = RemoteEvents:WaitForChild("PickupToolCTS")
 
+local QuickSlots = require(script:WaitForChild("QuickSlots"))
 local ClientGlobalStorage = CommonGlobalStorage
+ClientGlobalStorage.QuickSlots = QuickSlots
 
--- 초기화 코드
 
 function ClientGlobalStorage:Initialize(guiController)
-	self:SetClientMode()
 	self:AddPlayer(LocalPlayer) -- 본인거는 서버도 통보안해준다.
 
 	Debug.Assert(guiController, "비정상입니다.")
@@ -10088,6 +10090,23 @@ function ClientGlobalStorage:Initialize(guiController)
 	local ClientRemoteEventImpl = require(script:WaitForChild("ClientRemoteEventImpl"))
 	ClientRemoteEventImpl:InitializeRemoteEvents(self, guiController)
 end
+
+function ClientGlobalStorage:SendPickupTool(tool)
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local distance = LocalPlayer:DistanceFromCharacter(tool.Handle.Position)
+	if distance > MaxPickupDistance then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	PickupToolCTS:FireServer(tool)
+	return true
+end
+
 
 function ClientGlobalStorage:SendSwapInventorySlot(slotIndex1, slotIndex2)
 	local data = ClientGlobalStorage:GetData()
@@ -10135,63 +10154,83 @@ function ClientGlobalStorage:SendUnequipToolCTS(equipType)
 	return true
 end
 
-
 function ClientGlobalStorage:GetData()
 	return self.PlayerTable[PlayerId]
 end
 
-function ClientGlobalStorage:CheckQuickSlotIndex(quickSlotIndex)
-	if MaxQuickSlotCount < quickSlotIndex or quickSlotIndex < 1 then
-		Debug.Assert(false, "슬롯인덱스가 비정상입니다. [QuickSlot] => " .. tostring(quickSlotIndex))
-		return false
-	end
-	
-	return true
-end
-
-
-function ClientGlobalStorage:GetQuickSlot(quickSlotIndex)
-	if self:CheckQuickSlotIndex(quickSlotIndex) == false then
+function ClientGlobalStorage:GetQuickSlot(slotIndex)
+	local targetTool = self.QuickSlots:GetSlot(slotIndex)
+	if nil == targetTool then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
 	end
 	
-	local data = self:GetData()
-	return data[StatusType.QuickSlot][quickSlotIndex]
+	return targetTool
 end
 
-function ClientGlobalStorage:SetQuickSlot(quickSlotIndex, tool)
-	
-	if self:CheckQuickSlotIndex(quickSlotIndex) == false then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	if not tool then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	local data = self:GetData()
-	data[StatusType.QuickSlot][quickSlotIndex] = tool
-end
-
-function ClientGlobalStorage:SwapQuickSlot(quickSlotIndex1, quickSlotIndex2)
-	if self:CheckQuickSlotIndex(quickSlotIndex1) == false or self:CheckQuickSlotIndex(quickSlotIndex2) == false then
-		Debug.Assert(false, "비정상입니다.")
+function ClientGlobalStorage:SetQuickSlotByInventorySlot(quickSlotIndex, inventorySlotIndex)
+	local targetTool = ClientGlobalStorage:GetInventorySlot(PlayerId, inventorySlotIndex)
+	if nil == targetTool then
+		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
 		return false
 	end
 
-	local tool1 = self:GetQuickSlot(quickSlotIndex1)
-	local tool2 = self:GetQuickSlot(quickSlotIndex2)
-	
-	if self:SetQuickSlot(quickSlotIndex1, tool2) == false or self:SetQuickSlot(quickSlotIndex2, tool1) == false then
-		Debug.Assert(false, "비정상입니다.")
+	if not self:SetQuickSlot(quickSlotIndex, targetTool) then
+		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
 		return false
 	end
-	
 	return true
 end
+
+function ClientGlobalStorage:SetQuickSlot(slotIndex, tool)
+	if not self.QuickSlots:SetSlot(slotIndex, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	-- Gui 갱신
+	if not self.GuiController:SetQuickToolSlot(slotIndex, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return
+	end
+	return true
+end
+
+function ClientGlobalStorage:SwapQuickSlot(slotIndex1, slotIndex2)
+	if not self.QuickSlots:SwapSlot(slotIndex1, slotIndex2) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local tool1 = ClientGlobalStorage:GetQuickSlot(slotIndex1)
+	if nil == tool1 then
+		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+		return
+	end
+
+	local tool2 = ClientGlobalStorage:GetQuickSlot(slotIndex2)
+	if nil == tool2 then
+		Debug.Assert(false, "슬롯인덱스가 비정상입니다.")
+		return false
+	end
+
+
+	--Gui 갱신
+	if not self.GuiController:SetQuickToolSlot(slotIndex1, tool1) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self.GuiController:SetQuickToolSlot(slotIndex2, tool2) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+
+
 
 ClientGlobalStorage.__index = Utility.Inheritable__index
 ClientGlobalStorage.__newindex = Utility.Inheritable__newindex
@@ -10238,6 +10277,7 @@ local SwapInventorySlotSTC = RemoteEvents:WaitForChild("SwapInventorySlotSTC")
 
 
 function ClientRemoteEventImpl:InitializeRemoteEvents(ClientGlobalStorage, GuiController)
+	ClientGlobalStorage.GuiController = GuiController
 	-- STC
 	SwapInventorySlotSTC.OnClientEvent:Connect(function(slotIndex1, slotIndex2)
 		Debug.Assert(slotIndex1, "장착 슬롯 비정상")
@@ -10363,7 +10403,68 @@ return ClientRemoteEventImpl]]></ProtectedString>
 							<Content name="LinkedSource"><null></null></Content>
 							<string name="Name">QuickSlots</string>
 							<string name="ScriptGuid">{741E700D-620B-4072-99B7-179141E48D53}</string>
-							<ProtectedString name="Source"></ProtectedString>
+							<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
+
+local Debug = require(CommonModule:WaitForChild("Debug"))
+local Utility = require(CommonModule:WaitForChild("Utility"))
+
+local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
+local MaxQuickSlotCount = CommonConstant.MaxQuickSlotCount
+
+local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
+local ToolType = CommonEnum.ToolType
+
+local Container = CommonModule:WaitForChild("Container")
+local QuickSlotsRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
+QuickSlotsRaw:Initialize(MaxQuickSlotCount)
+
+--local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
+local QuickSlots = {}
+QuickSlots.QuickSlotsRaw = QuickSlotsRaw
+
+function QuickSlots:GetSlot(slotIndex)
+    local targetTool = self.QuickSlotsRaw:Get(slotIndex)
+    if nil == targetTool then
+        Debug.Assert(false, "슬롯 인덱스가 비정상입니다.")
+        return nil
+    end
+
+    return targetTool
+end
+
+function QuickSlots:SetSlot(slotIndex, tool)
+	if not slotIndex or not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self.QuickSlotsRaw:Set(slotIndex, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+function QuickSlots:SwapSlot(slotIndex1, slotIndex2)
+	local tool1 = self.QuickSlotsRaw:Get(slotIndex1)
+	local tool2 = self.QuickSlotsRaw:Get(slotIndex2)
+
+	-- 그냥 비어있는 슬롯이라면 UndefinedElementValue 값을 가진다.
+	if nil == tool1 or nil == tool2 then
+		Debug.Assert(false, "슬롯 인덱스가 비정상입니다.")
+		return false
+	end
+
+	self.QuickSlotsRaw:SetRaw(slotIndex1, tool2)
+	self.QuickSlotsRaw:SetRaw(slotIndex2, tool1)
+	return true
+end
+
+
+return QuickSlots
+]]></ProtectedString>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 							<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021c43</UniqueId>
@@ -10743,7 +10844,7 @@ UserInputService.InputEnded:Connect(onInputEnded)
 					<string name="Name">PickupManager</string>
 					<token name="RunContext">0</token>
 					<string name="ScriptGuid">{E5770965-2327-4FC8-993B-5815125F0D2E}</string>
-					<ProtectedString name="Source"><![CDATA[local UIS = game:GetService("UserInputService")
+					<ProtectedString name="Source"><![CDATA[local UserInputService = game:GetService("UserInputService")
 local pickupKey = "F"
 
 local player = game.Players.LocalPlayer
@@ -10752,45 +10853,7 @@ local mouse = player:GetMouse()
 local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiObjectTooltip = PlayerGui:WaitForChild("GuiObjectTooltip")
 --local SlotTooltip = PlayerGui:WaitForChild("SlotTooltip")
-
-
--- 인벤토리 초기화
-
-
-UIS.InputChanged:Connect(function(input)
-	
-	if mouse.Target then
-		local target = mouse.Target.Parent
-		if target.ClassName == "Tool" then
-
-			GuiObjectTooltip.Adornee = mouse.Target
-			GuiObjectTooltip.GuiObjectName.Text = target.Name
-
-			GuiObjectTooltip.Enabled = true
-			-- targetParent.Name
-		else
-			GuiObjectTooltip.Adornee = nil
-			GuiObjectTooltip.Enabled = false
-		end
-		--if mouse.Target:FindFirstChild("")
-	end
-		
-end)
-
-UIS.InputEnded:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode[pickupKey] then
-		if mouse.Target then
-			local target = mouse.Target.Parent
-			if target.ClassName == "Tool" then
-				local distanceFromItem = player:DistanceFromCharacter(mouse.Target.Position)
-	
-				if distanceFromItem < 30 then
-					print("pick up!")
-				end
-			end
-		end
-	end
-end)]]></ProtectedString>
+]]></ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021c48</UniqueId>
@@ -11100,6 +11163,22 @@ function GuiController:SetEquipToolSlot(equipType, tool)
 
 	return true
 end
+
+function GuiController:SetQuickToolSlot(slotIndex, tool)
+	if not slotIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self.GuiQuickSlotsController:SetToolSlot(slotIndex, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+
 GuiController:Initialize()
 return GuiController
 
@@ -11279,14 +11358,15 @@ local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
 local GuiHUD = GuiFacade.GuiHUD
-local GuiPlayerMain = GuiFacade.GuiPlayerMain
-local GuiMinimap = GuiFacade.GuiPlayerMain
 
 local GuiHUDController = {}
 
 function GuiHUDController:Initialize()
 	self.GuiMinimapController = require(script:WaitForChild("GuiMinimapController"))
-	self.GuiPlayerMainController = require(script:WaitForChild("GuiPlayerMainController"))
+	self.GuiQuickSlotsController = require(script:WaitForChild("GuiQuickSlotsController"))
+	self.GuiSkillSlotsController = require(script:WaitForChild("GuiSkillSlotsController"))
+	self.GuiBarsWindowController = require(script:WaitForChild("GuiSkillSlotsController"))
+	self.GuiHpBarController = self.GuiBarsWindowController.GuiHpBarController
 end
 
 GuiHUDController:Initialize()
@@ -11302,50 +11382,21 @@ return GuiHUDController
 						<Content name="LinkedSource"><null></null></Content>
 						<string name="Name">GuiMinimapController</string>
 						<string name="ScriptGuid">{52D6DEDE-9EC5-4FB4-BA12-87114A4D5E2B}</string>
-						<ProtectedString name="Source"><![CDATA[local module = {}
+						<ProtectedString name="Source"><![CDATA[local GuiMinimapController = {}
 
-return module]]></ProtectedString>
+return GuiMinimapController]]></ProtectedString>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 						<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021be4</UniqueId>
 					</Properties>
 				</Item>
-				<Item class="ModuleScript" referent="727">
+				<Item class="ModuleScript" referent="RBX1C877FA9510F40278B84EE2C11361605">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<Content name="LinkedSource"><null></null></Content>
-						<string name="Name">GuiPlayerMainController</string>
-						<string name="ScriptGuid">{7D9DDA8F-FE72-4BBF-A1B7-6BB807555CA7}</string>
+						<string name="Name">GuiBarsWindowController</string>
+						<string name="ScriptGuid">{CD97228E-9864-44C8-961A-3AC287A7FF40}</string>
 						<ProtectedString name="Source"><![CDATA[local player = game.Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
-local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
-
-local GuiPlayerMain = GuiFacade.GuiPlayerMain
-
-local GuiBarsWindow = GuiFacade.GuiBarsWindow
-local GuiSlotsWindow = GuiFacade.GuiSlotsWindow
-
-local GuiPlayerMainController = {}
-
-function GuiPlayerMainController:Initialize()
-	self.GuiBarsWindowController = require(script:WaitForChild("GuiBarsWindowController"))
-	self.GuiSlotsWindowController = require(script:WaitForChild("GuiSlotsWindowController"))
-end
-
-GuiPlayerMainController:Initialize()
-return GuiPlayerMainController
-]]></ProtectedString>
-						<int64 name="SourceAssetId">-1</int64>
-						<BinaryString name="Tags"></BinaryString>
-						<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021be5</UniqueId>
-					</Properties>
-					<Item class="ModuleScript" referent="728">
-						<Properties>
-							<BinaryString name="AttributesSerialize"></BinaryString>
-							<Content name="LinkedSource"><null></null></Content>
-							<string name="Name">GuiBarsWindowController</string>
-							<string name="ScriptGuid">{D4A47997-774A-48C3-866E-3AB91A62C02B}</string>
-							<ProtectedString name="Source"><![CDATA[local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
@@ -11361,60 +11412,33 @@ end
 GuiBarsWindowController:Initialize()
 return GuiBarsWindowController
 ]]></ProtectedString>
-							<int64 name="SourceAssetId">-1</int64>
-							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021be6</UniqueId>
-						</Properties>
-						<Item class="ModuleScript" referent="729">
-							<Properties>
-								<BinaryString name="AttributesSerialize"></BinaryString>
-								<Content name="LinkedSource"><null></null></Content>
-								<string name="Name">GuiHpBarController</string>
-								<string name="ScriptGuid">{DB52ECAA-39AB-4582-8655-C4CA2B62DB38}</string>
-								<ProtectedString name="Source"><![CDATA[local GuiPlayerMain = {}
-
-return GuiPlayerMain
-]]></ProtectedString>
-								<int64 name="SourceAssetId">-1</int64>
-								<BinaryString name="Tags"></BinaryString>
-								<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021be7</UniqueId>
-							</Properties>
-						</Item>
-					</Item>
-					<Item class="ModuleScript" referent="730">
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<UniqueId name="UniqueId">3e36fccb15b542100301276c00075ea2</UniqueId>
+					</Properties>
+					<Item class="ModuleScript" referent="RBXB09D06D5210E4CD5A7642C9181AD303B">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<Content name="LinkedSource"><null></null></Content>
-							<string name="Name">GuiSlotsWindowController</string>
-							<string name="ScriptGuid">{69149946-62C3-43CC-9D63-CEE2CCE55AE8}</string>
-							<ProtectedString name="Source"><![CDATA[local player = game.Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
-local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
+							<string name="Name">GuiHpBarController</string>
+							<string name="ScriptGuid">{836DE4CA-080A-43A7-AF4E-AD0A8F3C5D2B}</string>
+							<ProtectedString name="Source"><![CDATA[local GuiHpBarController = {}
 
-local GuiQuickSlots = GuiFacade.GuiQuickSlots
-local GuiSkillSlots = GuiFacade.GuiSkillSlots
-
-local GuiSlotsWindowController = {}
-
-function GuiSlotsWindowController:Initialize()
-	self.GuiQuickSlotsController = require(script:WaitForChild("GuiQuickSlotsController"))
-	self.GuiSkillSlotsController = require(script:WaitForChild("GuiSkillSlotsController"))
-end
-
-GuiSlotsWindowController:Initialize()
-return GuiSlotsWindowController
+return GuiHpBarController
 ]]></ProtectedString>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
-							<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021be8</UniqueId>
+							<UniqueId name="UniqueId">3e36fccb15b542100301276c00075ea3</UniqueId>
 						</Properties>
-						<Item class="ModuleScript" referent="731">
-							<Properties>
-								<BinaryString name="AttributesSerialize"></BinaryString>
-								<Content name="LinkedSource"><null></null></Content>
-								<string name="Name">GuiQuickSlotsController</string>
-								<string name="ScriptGuid">{A4D49286-F0DC-42EC-BB97-096F458E7713}</string>
-								<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+					</Item>
+				</Item>
+				<Item class="ModuleScript" referent="RBXC0E7A2098C8E40808F8E21DA8AD5FFB2">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">GuiQuickSlotsController</string>
+						<string name="ScriptGuid">{A1ADAD13-0785-457D-B91B-E144BFCE5CF6}</string>
+						<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonMoudleFacade.Debug
 local Utility = CommonMoudleFacade.Utility
@@ -11489,21 +11513,41 @@ function GuiQuickSlotsController:Initialize()
 
 end
 
+function GuiQuickSlotsController:SetToolSlot(slotIndex, tool)
+	if not slotIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local targetGuiToolSlotController = self.GuiQuickSlotsRaw:Get(slotIndex)
+	if not targetGuiToolSlotController then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not targetGuiToolSlotController:SetTool(tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
 GuiQuickSlotsController:Initialize()
 return GuiQuickSlotsController
 ]]></ProtectedString>
-								<int64 name="SourceAssetId">-1</int64>
-								<BinaryString name="Tags"></BinaryString>
-								<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021be9</UniqueId>
-							</Properties>
-						</Item>
-						<Item class="ModuleScript" referent="732">
-							<Properties>
-								<BinaryString name="AttributesSerialize"></BinaryString>
-								<Content name="LinkedSource"><null></null></Content>
-								<string name="Name">GuiSkillSlotsController</string>
-								<string name="ScriptGuid">{FC41296A-5404-46F0-9BF4-F8E2A270F0BD}</string>
-								<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<UniqueId name="UniqueId">3e36fccb15b542100301276c00075ea6</UniqueId>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX0AA0D2F1AA9D4C7F9915CB91BEDFAA8C">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">GuiSkillSlotsController</string>
+						<string name="ScriptGuid">{B42569E6-2BF1-49F1-88B4-50FDE412BE20}</string>
+						<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonMoudleFacade.Debug
 local Utility = CommonMoudleFacade.Utility
@@ -11613,12 +11657,10 @@ end
 GuiSkillSlotsController:Initialize()
 return GuiSkillSlotsController
 ]]></ProtectedString>
-								<int64 name="SourceAssetId">-1</int64>
-								<BinaryString name="Tags"></BinaryString>
-								<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021bea</UniqueId>
-							</Properties>
-						</Item>
-					</Item>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<UniqueId name="UniqueId">3e36fccb15b542100301276c00075ea8</UniqueId>
+					</Properties>
 				</Item>
 			</Item>
 			<Item class="ModuleScript" referent="733">
@@ -13488,7 +13530,7 @@ return GuiFacade]]></ProtectedString>
 				<float name="DistanceLowerLimit">0</float>
 				<float name="DistanceStep">0</float>
 				<float name="DistanceUpperLimit">-1</float>
-				<bool name="Enabled">false</bool>
+				<bool name="Enabled">true</bool>
 				<Vector3 name="ExtentsOffset">
 					<X>0</X>
 					<Y>0</Y>
@@ -13535,12 +13577,12 @@ return GuiFacade]]></ProtectedString>
 				<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021c09</UniqueId>
 				<token name="ZIndexBehavior">1</token>
 			</Properties>
-			<Item class="TextLabel" referent="764">
+			<Item class="Frame" referent="RBXD287DDF6095142B5ACABCA9D51FD87F0">
 				<Properties>
 					<bool name="Active">false</bool>
 					<Vector2 name="AnchorPoint">
-						<X>0</X>
-						<Y>0</Y>
+						<X>0.5</X>
+						<Y>0.5</Y>
 					</Vector2>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<bool name="AutoLocalize">true</bool>
@@ -13550,7 +13592,7 @@ return GuiFacade]]></ProtectedString>
 						<G>1</G>
 						<B>1</B>
 					</Color3>
-					<float name="BackgroundTransparency">1</float>
+					<float name="BackgroundTransparency">0</float>
 					<Color3 name="BorderColor3">
 						<R>0.105882362</R>
 						<G>0.164705887</G>
@@ -13560,118 +13602,18 @@ return GuiFacade]]></ProtectedString>
 					<int name="BorderSizePixel">1</int>
 					<bool name="ClipsDescendants">false</bool>
 					<bool name="Draggable">false</bool>
-					<token name="Font">3</token>
-					<Font name="FontFace">
-						<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
-						<Weight>400</Weight>
-						<Style>Normal</Style>
-						<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
-					</Font>
 					<int name="LayoutOrder">0</int>
-					<float name="LineHeight">1</float>
-					<int name="MaxVisibleGraphemes">-1</int>
-					<string name="Name">GuiObjectName</string>
+					<string name="Name">GuiObjectTooltip</string>
 					<Ref name="NextSelectionDown">null</Ref>
 					<Ref name="NextSelectionLeft">null</Ref>
 					<Ref name="NextSelectionRight">null</Ref>
 					<Ref name="NextSelectionUp">null</Ref>
 					<UDim2 name="Position">
-						<XS>0</XS>
+						<XS>0.5</XS>
 						<XO>0</XO>
-						<YS>0</YS>
-						<YO>50</YO>
-					</UDim2>
-					<bool name="RichText">false</bool>
-					<Ref name="RootLocalizationTable">null</Ref>
-					<float name="Rotation">0</float>
-					<bool name="Selectable">false</bool>
-					<token name="SelectionBehaviorDown">0</token>
-					<token name="SelectionBehaviorLeft">0</token>
-					<token name="SelectionBehaviorRight">0</token>
-					<token name="SelectionBehaviorUp">0</token>
-					<bool name="SelectionGroup">false</bool>
-					<Ref name="SelectionImageObject">null</Ref>
-					<int name="SelectionOrder">0</int>
-					<UDim2 name="Size">
-						<XS>0</XS>
-						<XO>200</XO>
-						<YS>0</YS>
-						<YO>50</YO>
-					</UDim2>
-					<token name="SizeConstraint">0</token>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<string name="Text">Name</string>
-					<Color3 name="TextColor3">
-						<R>1</R>
-						<G>1</G>
-						<B>1</B>
-					</Color3>
-					<bool name="TextScaled">true</bool>
-					<float name="TextSize">14</float>
-					<Color3 name="TextStrokeColor3">
-						<R>0</R>
-						<G>0</G>
-						<B>0</B>
-					</Color3>
-					<float name="TextStrokeTransparency">0</float>
-					<float name="TextTransparency">0</float>
-					<token name="TextTruncate">0</token>
-					<bool name="TextWrapped">true</bool>
-					<token name="TextXAlignment">2</token>
-					<token name="TextYAlignment">1</token>
-					<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021c0a</UniqueId>
-					<bool name="Visible">true</bool>
-					<int name="ZIndex">1</int>
-				</Properties>
-			</Item>
-			<Item class="TextLabel" referent="765">
-				<Properties>
-					<bool name="Active">false</bool>
-					<Vector2 name="AnchorPoint">
-						<X>0</X>
-						<Y>0</Y>
-					</Vector2>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<bool name="AutoLocalize">true</bool>
-					<token name="AutomaticSize">0</token>
-					<Color3 name="BackgroundColor3">
-						<R>1</R>
-						<G>1</G>
-						<B>1</B>
-					</Color3>
-					<float name="BackgroundTransparency">1</float>
-					<Color3 name="BorderColor3">
-						<R>0.105882362</R>
-						<G>0.164705887</G>
-						<B>0.207843155</B>
-					</Color3>
-					<token name="BorderMode">0</token>
-					<int name="BorderSizePixel">1</int>
-					<bool name="ClipsDescendants">false</bool>
-					<bool name="Draggable">false</bool>
-					<token name="Font">3</token>
-					<Font name="FontFace">
-						<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
-						<Weight>400</Weight>
-						<Style>Normal</Style>
-						<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
-					</Font>
-					<int name="LayoutOrder">0</int>
-					<float name="LineHeight">1</float>
-					<int name="MaxVisibleGraphemes">-1</int>
-					<string name="Name">GuiInteraction</string>
-					<Ref name="NextSelectionDown">null</Ref>
-					<Ref name="NextSelectionLeft">null</Ref>
-					<Ref name="NextSelectionRight">null</Ref>
-					<Ref name="NextSelectionUp">null</Ref>
-					<UDim2 name="Position">
-						<XS>0</XS>
-						<XO>0</XO>
-						<YS>0</YS>
+						<YS>0.5</YS>
 						<YO>0</YO>
 					</UDim2>
-					<bool name="RichText">false</bool>
 					<Ref name="RootLocalizationTable">null</Ref>
 					<float name="Rotation">0</float>
 					<bool name="Selectable">false</bool>
@@ -13683,37 +13625,199 @@ return GuiFacade]]></ProtectedString>
 					<Ref name="SelectionImageObject">null</Ref>
 					<int name="SelectionOrder">0</int>
 					<UDim2 name="Size">
-						<XS>0</XS>
-						<XO>200</XO>
-						<YS>0</YS>
-						<YO>50</YO>
+						<XS>0.5</XS>
+						<XO>0</XO>
+						<YS>0.5</YS>
+						<YO>0</YO>
 					</UDim2>
 					<token name="SizeConstraint">0</token>
 					<int64 name="SourceAssetId">-1</int64>
+					<token name="Style">0</token>
 					<BinaryString name="Tags"></BinaryString>
-					<string name="Text">InteractionText</string>
-					<Color3 name="TextColor3">
-						<R>1</R>
-						<G>1</G>
-						<B>1</B>
-					</Color3>
-					<bool name="TextScaled">true</bool>
-					<float name="TextSize">14</float>
-					<Color3 name="TextStrokeColor3">
-						<R>0</R>
-						<G>0</G>
-						<B>0</B>
-					</Color3>
-					<float name="TextStrokeTransparency">0</float>
-					<float name="TextTransparency">0</float>
-					<token name="TextTruncate">0</token>
-					<bool name="TextWrapped">true</bool>
-					<token name="TextXAlignment">2</token>
-					<token name="TextYAlignment">1</token>
-					<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021c0b</UniqueId>
+					<UniqueId name="UniqueId">5c213253169b1b360302130a0002ea1a</UniqueId>
 					<bool name="Visible">true</bool>
 					<int name="ZIndex">1</int>
 				</Properties>
+				<Item class="TextLabel" referent="764">
+					<Properties>
+						<bool name="Active">false</bool>
+						<Vector2 name="AnchorPoint">
+							<X>0.5</X>
+							<Y>0.5</Y>
+						</Vector2>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<float name="BackgroundTransparency">1</float>
+						<Color3 name="BorderColor3">
+							<R>0.105882362</R>
+							<G>0.164705887</G>
+							<B>0.207843155</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">1</int>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<token name="Font">3</token>
+						<Font name="FontFace">
+							<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
+							<Weight>400</Weight>
+							<Style>Normal</Style>
+							<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
+						</Font>
+						<int name="LayoutOrder">0</int>
+						<float name="LineHeight">1</float>
+						<int name="MaxVisibleGraphemes">-1</int>
+						<string name="Name">GuiObjectName</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<UDim2 name="Position">
+							<XS>0.5</XS>
+							<XO>0</XO>
+							<YS>0.5</YS>
+							<YO>0</YO>
+						</UDim2>
+						<bool name="RichText">false</bool>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">false</bool>
+						<token name="SelectionBehaviorDown">0</token>
+						<token name="SelectionBehaviorLeft">0</token>
+						<token name="SelectionBehaviorRight">0</token>
+						<token name="SelectionBehaviorUp">0</token>
+						<bool name="SelectionGroup">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<int name="SelectionOrder">0</int>
+						<UDim2 name="Size">
+							<XS>0.5</XS>
+							<XO>0</XO>
+							<YS>0.5</YS>
+							<YO>0</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<string name="Text">Name</string>
+						<Color3 name="TextColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<bool name="TextScaled">true</bool>
+						<float name="TextSize">14</float>
+						<Color3 name="TextStrokeColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<float name="TextStrokeTransparency">0</float>
+						<float name="TextTransparency">0</float>
+						<token name="TextTruncate">0</token>
+						<bool name="TextWrapped">true</bool>
+						<token name="TextXAlignment">2</token>
+						<token name="TextYAlignment">1</token>
+						<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021c0a</UniqueId>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
+					</Properties>
+				</Item>
+				<Item class="TextLabel" referent="765">
+					<Properties>
+						<bool name="Active">false</bool>
+						<Vector2 name="AnchorPoint">
+							<X>0.5</X>
+							<Y>0.5</Y>
+						</Vector2>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<bool name="AutoLocalize">true</bool>
+						<token name="AutomaticSize">0</token>
+						<Color3 name="BackgroundColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<float name="BackgroundTransparency">1</float>
+						<Color3 name="BorderColor3">
+							<R>0.105882362</R>
+							<G>0.164705887</G>
+							<B>0.207843155</B>
+						</Color3>
+						<token name="BorderMode">0</token>
+						<int name="BorderSizePixel">1</int>
+						<bool name="ClipsDescendants">false</bool>
+						<bool name="Draggable">false</bool>
+						<token name="Font">3</token>
+						<Font name="FontFace">
+							<Family><url>rbxasset://fonts/families/SourceSansPro.json</url></Family>
+							<Weight>400</Weight>
+							<Style>Normal</Style>
+							<CachedFaceId><url>rbxasset://fonts/SourceSansPro-Regular.ttf</url></CachedFaceId>
+						</Font>
+						<int name="LayoutOrder">0</int>
+						<float name="LineHeight">1</float>
+						<int name="MaxVisibleGraphemes">-1</int>
+						<string name="Name">GuiInteraction</string>
+						<Ref name="NextSelectionDown">null</Ref>
+						<Ref name="NextSelectionLeft">null</Ref>
+						<Ref name="NextSelectionRight">null</Ref>
+						<Ref name="NextSelectionUp">null</Ref>
+						<UDim2 name="Position">
+							<XS>0.5</XS>
+							<XO>0</XO>
+							<YS>0.5</YS>
+							<YO>0</YO>
+						</UDim2>
+						<bool name="RichText">false</bool>
+						<Ref name="RootLocalizationTable">null</Ref>
+						<float name="Rotation">0</float>
+						<bool name="Selectable">false</bool>
+						<token name="SelectionBehaviorDown">0</token>
+						<token name="SelectionBehaviorLeft">0</token>
+						<token name="SelectionBehaviorRight">0</token>
+						<token name="SelectionBehaviorUp">0</token>
+						<bool name="SelectionGroup">false</bool>
+						<Ref name="SelectionImageObject">null</Ref>
+						<int name="SelectionOrder">0</int>
+						<UDim2 name="Size">
+							<XS>0.5</XS>
+							<XO>0</XO>
+							<YS>0.5</YS>
+							<YO>0</YO>
+						</UDim2>
+						<token name="SizeConstraint">0</token>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<string name="Text">InteractionText</string>
+						<Color3 name="TextColor3">
+							<R>1</R>
+							<G>1</G>
+							<B>1</B>
+						</Color3>
+						<bool name="TextScaled">true</bool>
+						<float name="TextSize">14</float>
+						<Color3 name="TextStrokeColor3">
+							<R>0</R>
+							<G>0</G>
+							<B>0</B>
+						</Color3>
+						<float name="TextStrokeTransparency">0</float>
+						<float name="TextTransparency">0</float>
+						<token name="TextTruncate">0</token>
+						<bool name="TextWrapped">true</bool>
+						<token name="TextXAlignment">2</token>
+						<token name="TextYAlignment">1</token>
+						<UniqueId name="UniqueId">315f978ae2a96f7002ff0fd200021c0b</UniqueId>
+						<bool name="Visible">true</bool>
+						<int name="ZIndex">1</int>
+					</Properties>
+				</Item>
 			</Item>
 		</Item>
 		<Item class="ScreenGui" referent="766">
@@ -15484,6 +15588,7 @@ local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
 
 local GuiSystem = PlayerGui:WaitForChild("GuiSystem")
 local GuiDraggingSystem = require(GuiSystem:WaitForChild("GuiDraggingSystem"))
+local WorldInteractionSystem = require(GuiSystem:WaitForChild("WorldInteractionSystem"))
 
 local GuiSlotController = {}
 
@@ -15550,7 +15655,6 @@ function GuiSlotController:newRaw(slotType, slotIndex, newGuiSlot)
 	newGuiSlotController.GuiSlot.InputEnded:Connect(function(inputObject) 
 		print("newGuiSlotController.GuiSlot.InputEnded => " .. tostring(newGuiSlotController.SlotIndex))
 	end)
-
 --]]
 
 	newGuiSlotController.GuiSlot.MouseEnter:Connect(function(x,y)
@@ -17726,6 +17830,7 @@ local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModu
 
 local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
 local Debug = ClientModuleFacade.Debug
+local ToolUtility = ClientModuleFacade.ToolUtility
 local KeyBinder = ClientModuleFacade.KeyBinder
 
 
@@ -17785,22 +17890,28 @@ function OnInputEnded(input)
             return
         end
 
-        if not GuiDraggingSystem.SlotControllerCandidate then
-            GuiDraggingSystem:ClearSlotController()
-            Debug.Print("마지막 위치에 슬롯이 없습니다.")
-            return
-        end
+
 
 
         local prevSlotType = GuiDraggingSystem.SlotController.SlotType
         local prevSlotIndex = GuiDraggingSystem.SlotController.SlotIndex
+        local prevTool = GuiDraggingSystem.SlotController.Tool
 
-        local currentSlotType = GuiDraggingSystem.SlotControllerCandidate.SlotType
-        local currentSlotIndex = GuiDraggingSystem.SlotControllerCandidate.SlotIndex
+        local currentSlotType = nil
+        local currentSlotIndex = nil
+
+        if GuiDraggingSystem.SlotControllerCandidate then
+            currentSlotType = GuiDraggingSystem.SlotControllerCandidate.SlotType
+            currentSlotIndex = GuiDraggingSystem.SlotControllerCandidate.SlotIndex
+        end
 
         print("Swap Slot => ")
         print("From => ".. SlotTypeConverter[prevSlotType] .. " : " .. tostring(prevSlotIndex))
-        print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
+        if currentSlotType then
+            print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
+        else
+            print("To => ".. "nil : nil")
+        end
     
         if prevSlotType == SlotType.InventorySlot then
             if currentSlotType == SlotType.InventorySlot then
@@ -17810,8 +17921,33 @@ function OnInputEnded(input)
                     end
                 end
             elseif currentSlotType == SlotType.QuickSlot then
-
+				if not ClientGlobalStorage:SetQuickSlotByInventorySlot(currentSlotIndex, prevSlotIndex) then
+                    Debug.Assert(false, "비정상입니다.")
+                end
+            elseif currentSlotType == SlotType.EquipSlot then
+                if prevTool then
+                    local prevToolEquipType = ToolUtility:GetEquipType(prevTool)
+                    if prevToolEquipType then
+                        if not ClientGlobalStorage:SendEquipToolCTS(prevToolEquipType, prevTool) then
+                            Debug.Assert(false, "비정상입니다.")
+                        end
+                    end
+                end
             end 
+        elseif prevSlotType == SlotType.QuickSlot then
+            if currentSlotType == SlotType.QuickSlot then
+                if prevSlotIndex ~= currentSlotIndex then
+                    if not ClientGlobalStorage:SwapQuickSlot(prevSlotIndex, currentSlotIndex) then
+                        Debug.Assert(false, "비정상입니다.")
+                    end
+                end
+            end
+        elseif prevSlotType == SlotType.EquipSlot then
+            if currentSlotType == SlotType.InventorySlot or not currentSlotType then
+                if not ClientGlobalStorage:SendUnequipToolCTS(prevSlotIndex) then
+                    Debug.Assert(false, "비정상입니다.")
+                end
+            end
         elseif prevSlotType == SlotType.SkillSlot then
 
         end
@@ -17908,6 +18044,133 @@ return GuiDraggingSystem]]></ProtectedString>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">0a5cfb4ea37065340300d71d0002ea02</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX25DD331B1A8445789FFB48DAAA905845">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">WorldInteractionSystem</string>
+					<string name="ScriptGuid">{12D23857-5378-4434-B548-C003D197C54E}</string>
+					<ProtectedString name="Source"><![CDATA[
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
+
+local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
+local Debug = ClientModuleFacade.Debug
+local ToolUtility = ClientModuleFacade.ToolUtility
+local KeyBinder = ClientModuleFacade.KeyBinder
+
+local CommonConstant = ClientModuleFacade.CommonConstant
+
+local MaxDistanceToIdentifyObject = CommonConstant.MaxDistanceToIdentifyObject
+local MaxPickupDistance = CommonConstant.MaxPickupDistance
+
+local CommonEnum = ClientModuleFacade.CommonEnum
+local SlotType = CommonEnum.SlotType
+local SlotTypeConverter = SlotType.Converter
+
+local LocalPlayer = game.Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local GuiObjectTooltip = PlayerGui:WaitForChild("GuiObjectTooltip")
+local GuiObjectTooltipWindow = GuiObjectTooltip:WaitForChild("GuiObjectTooltipWindow")
+local GuiObjectName = GuiObjectTooltipWindow:WaitForChild("GuiObjectName")
+
+
+local Mouse = LocalPlayer:GetMouse()
+
+local WorldInteractionSystem = {
+    SlotControllerCandidate = nil,
+    SlotController = nil,
+    ShadowImage = nil
+}
+
+function GetToolFromPart(targetPart)
+	if not targetPart then
+		return nil
+	end
+
+	local targetTool = targetPart
+	for count = 1, 4 do
+		targetTool = targetTool.Parent
+		if not targetTool then
+			return nil
+		end
+	end
+
+	if targetTool.ClassName ~= "Tool" then
+		return nil
+	end
+
+	return targetTool
+end
+
+-- 더 정리할 필요있음
+function OnInputChanged(input)
+
+	if not Mouse.Target then
+		return
+	end
+
+	local tool = GetToolFromPart(Mouse.Target)
+	
+	if not tool then
+		GuiObjectTooltip.Adornee = nil
+		GuiObjectTooltip.Enabled = false
+		return
+	end
+
+	local distance = LocalPlayer:DistanceFromCharacter(Mouse.Target.Position)
+	if distance > MaxDistanceToIdentifyObject then
+		GuiObjectTooltip.Adornee = nil
+		GuiObjectTooltip.Enabled = false
+		return
+	end
+
+	GuiObjectTooltip.Adornee = Mouse.Target
+	GuiObjectName.Text = tool.Name
+
+	GuiObjectTooltip.Enabled = true
+	-- targetParent.Name
+	--if mouse.Target:FindFirstChild("")
+end
+
+function OnInputEnded(input)
+	if input.KeyCode == Enum.KeyCode.F then
+		if not Mouse.Target then
+			return
+		end
+	
+		local tool = GetToolFromPart(Mouse.Target)
+		if not tool then
+			GuiObjectTooltip.Adornee = nil
+			GuiObjectTooltip.Enabled = false
+			return
+		end
+		
+		local distance = LocalPlayer:DistanceFromCharacter(Mouse.Target.Position)
+		if distance < MaxPickupDistance then
+			if not ClientGlobalStorage:SendPickupTool(tool) then
+				Debug.Assert(false, "비정상입니다.")
+			end
+		end
+	end
+end
+
+--UserInputService.InputBegan:Connect(OnInputBegan)
+UserInputService.InputChanged:Connect(OnInputChanged)
+UserInputService.InputEnded:Connect(OnInputEnded)
+
+
+--WorldInteractionSystem:Initialize()
+return WorldInteractionSystem]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">3146cb74d60615d70301f70b0010e552</UniqueId>
 				</Properties>
 			</Item>
 		</Item>
@@ -18375,6 +18638,7 @@ function InitializeTools()
 
 	local toolCount = #toolList
 	for i = 1, toolCount do
+		toolList[i].CanBeDropped = false
 		if toolList[i].Damager then
 			local clonedDamagerScript = DamagerScript:Clone()
 			clonedDamagerScript.Parent = toolList[i]
@@ -52872,6 +53136,8 @@ local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
 
+local MaxPickupDistance = ServerConstant.MaxPickupDistance
+
 local EquipTypeToBoneMappingTable = ServerConstant.EquipTypeToBoneMappingTable
 
 local GameDataType = ServerEnum.GameDataType
@@ -52895,6 +53161,54 @@ local ServerGlobalStorage = CommonGlobalStorage
 function ServerGlobalStorage:Initialize()
 	local ServerRemoteEventImpl = require(script:WaitForChild("ServerRemoteEventImpl"))
 	ServerRemoteEventImpl:InitializeRemoteEvents(self)
+end
+
+function ServerGlobalStorage:SelectTool(player, tool, isInBackpack)
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	local playerId = player.UserId
+	if isInBackpack then
+		if not ServerGlobalStorage:IsInBackpack(playerId, tool) then
+			Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
+			return false
+		end
+	end
+
+	local character = player.Character
+	if not character then
+		Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+		return false
+	end
+
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid then
+		Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+		return false
+	end
+
+	ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId)
+	ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
+	humanoid:EquipTool(tool)
+
+	return true
+end
+
+function ServerGlobalStorage:SelectToolFromWorkspace(player, tool)
+	local distance = player:DistanceFromCharacter(tool.Handle.Position)
+	if distance > MaxPickupDistance then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self:SelectTool(player, tool, false) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
 end
 
 function ServerGlobalStorage:GetBonesByEquipType(character, equipType)
@@ -53143,13 +53457,33 @@ function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
 	return true
 end
 
+function ServerGlobalStorage:IsInCharacterByEquipType(playerId, equipType)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	local equippedTool = self:GetEquipSlot(playerId, equipType)
+	if not equippedTool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return self:IsInCharacter(playerId, equipType, equippedTool)
+end
+
 -- Weapon은 명시적으로 장착하는 것이 없다. 그냥 들고 있으면 알아서 EquipSlot에 집어넣어야한다.
 function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
 	local equipType = ToolUtility:GetEquipType(tool)
 	if not equipType or equipType ~= EquipType.Weapon then
 		return false
 	end
-	
+
+	if not self:IsInBackpack(playerId, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
 	local prevTool, currentTool = self:EquipTool(playerId, equipType, tool)
 	if not currentTool then
 		Debug.Assert(false, "비정상입니다.")
@@ -53161,20 +53495,25 @@ function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
 	return true
 end
 
-function ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId, tool)
-	local equipType = ToolUtility:GetEquipType(tool)
-	if not equipType or equipType ~= EquipType.Weapon then
+function ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId)
+	local equippedWeapon = self:GetEquipSlot(playerId, EquipType.Weapon)
+	if not equippedWeapon then
 		return false
 	end
-	
-	local prevTool = self:UnequipTool(playerId, equipType) 
+
+	if not self:IsInCharacter(playerId, EquipType.Weapon, equippedWeapon) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local prevTool = self:UnequipTool(playerId, EquipType.Weapon) 
 	if not prevTool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
 	local player = game.Players:GetPlayerByUserId(playerId)
-	UnequipToolSTC:FireClient(player, equipType)
+	UnequipToolSTC:FireClient(player, EquipType.Weapon)
 	return true
 end
 
@@ -53287,6 +53626,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonModuleFacade.Debug
 local ToolUtility = CommonModuleFacade.ToolUtility
+
+local CommonConstant = CommonModuleFacade.CommonConstant
+local MaxPickupDistance = CommonConstant.MaxPickupDistance
+
 local CommonEnum = CommonModuleFacade.CommonEnum
 
 local EquipType = CommonEnum.EquipType
@@ -53305,9 +53648,19 @@ local SelectToolCTS = RemoteEvents:WaitForChild("SelectToolCTS")
 local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
 local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
+local PickupToolCTS = RemoteEvents:WaitForChild("PickupToolCTS")
+local DropToolCTS = RemoteEvents:WaitForChild("DropToolCTS")
 
 
 function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
+
+
+    PickupToolCTS.OnServerEvent:Connect(function(player, tool)
+        if not ServerGlobalStorage:SelectToolFromWorkspace(player, tool) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
+    end)
 
     SwapInventorySlotCTS.OnServerEvent:Connect(function(player, slotIndex1, slotIndex2)
         
@@ -53333,6 +53686,11 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
         end
         
         local playerId = player.UserId
+        if not ServerGlobalStorage:IsInCharacterByEquipType(playerId, equipType) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
+        
         local prevTool = nil
         if equipType == EquipType.Weapon then
             local humanoid = character:FindFirstChild("Humanoid")
@@ -53376,18 +53734,18 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
             return
         end
     
-        if player.Backpack ~= tool.Parent then
-            Debug.Assert(false, "해당 플레이어가 소유한 도구가 아닙니다.")
-            return
-        end
-    
         local character = player.Character
         if not character then
             Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 장착할 수 없습니다.")
             return
         end
-    
+
         local playerId = player.UserId
+        if not ServerGlobalStorage:IsInBackpack(playerId, tool) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
+    
         local prevTool = nil
         local currentTool = nil
     
@@ -53441,26 +53799,11 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
             Debug.Assert(false, "비정상입니다.")
             return
         end
-        
-        if player.Backpack ~= tool.Parent then
-            Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
+
+        if not ServerGlobalStorage:SelectTool(player, tool, true) then
+            Debug.Assert(false, "비정상입니다.")
             return
         end
-    
-        local character = player.Character
-        if not character then
-            Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 있을 수 있는 상황입니다.")
-            return
-        end
-    
-        local humanoid = character:FindFirstChild("Humanoid")
-        if not humanoid then
-            Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
-            return
-        end
-    
-        ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
-        humanoid:EquipTool(tool)
     end)
 end
 
@@ -55182,7 +55525,11 @@ local CommonConstant = {
 	-- 0.25보다 클수 없음
 	GuiSkillSlotOffsetRatio = 0.075,
 	
-	UndefinedElementValue = false
+	UndefinedElementValue = false,
+
+	--
+	MaxDistanceToIdentifyObject = 30,
+	MaxPickupDistance = 15
 }
 
 CommonConstant.__index = Utility.Inheritable__index
@@ -55557,16 +55904,8 @@ function CommonGlobalStorage:CreateEmptyData()
 		[StatusType.EquipSlots] = Utility:DeepCopy(EquipSlots),
 		[StatusType.Inventory] = Utility:DeepCopy(Inventory)
 	}
-
-	if self.IsClient then
-		playerData[StatusType.QuickSlots] = {}
-	end
 	
 	return playerData
-end
-
-function CommonGlobalStorage:SetClientMode()
-	self.IsClient = true
 end
 
 function CommonGlobalStorage:CheckPlayer(playerId)
@@ -55659,6 +55998,38 @@ function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
 		return false
 	end
 
+	return true
+end
+
+function CommonGlobalStorage:IsInBackpack(playerId, tool)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local player = game.Players:GetPlayerByUserId(playerId)
+	return player.Backpack == tool.Parent
+end
+
+function CommonGlobalStorage:IsInCharacter(playerId, equipType, equippedTool)
+	local player = game.Players:GetPlayerByUserId(playerId)
+	local character = player.Character
+	if not character then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if equipType == EquipType.Weapon then
+		return (character == equippedTool.Parent)
+	elseif equipType == EquipType.Armor then
+		local characterArmorsFolder = character:FindFirstChild("Armors")
+		if not characterArmorsFolder then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+		return (characterArmorsFolder == equippedTool.Parent)
+	end
+	
 	return true
 end
 
@@ -55773,6 +56144,22 @@ function CommonGlobalStorage:SwapInventorySlot(playerId, slotIndex1, slotIndex2)
 	end
 
 	return true
+end
+
+function CommonGlobalStorage:GetEquipSlot(playerId, equipType)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local equipSlots = self.PlayerTable[playerId][StatusType.EquipSlots]
+	local tool = equipSlots:GetSlot(equipType)
+	if nil == tool then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return tool
 end
 
 --[[
@@ -55915,6 +56302,16 @@ EquipSlotsRaw:Initialize(MaxEquipSlotCount)
 local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
 local EquipSlots = {}
 EquipSlots.EquipSlotsRaw = EquipSlotsRaw
+
+function EquipSlots:GetSlot(slotIndex)
+	local targetTool = self.EquipSlotsRaw:Get(slotIndex)
+	if nil == targetTool then
+		Debug.Assert(false, "슬롯 인덱스가 비정상입니다.")
+		return nil
+	end
+
+	return targetTool
+end
 
 function EquipSlots:UnequipTool(equipType)
     if not equipType then
@@ -57126,6 +57523,24 @@ return CommonModuleFacade
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<UniqueId name="UniqueId">599f54a62dde5496030116520014f401</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="RemoteEvent" referent="RBXECCD793574404C0B95027E367FB73AA7">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">PickupToolCTS</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">3146cb74d60615d70301f70b0010e554</UniqueId>
+				</Properties>
+			</Item>
+			<Item class="RemoteEvent" referent="RBX321C2D9F283B4B07806EA883814E1011">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">DropToolCTS</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">3146cb74d60615d70301f70b0010e556</UniqueId>
 				</Properties>
 			</Item>
 		</Item>
