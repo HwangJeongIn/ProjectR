@@ -7,10 +7,6 @@
       "ClassName": "RemoteEvent"
     },
     {
-      "Name": "SwapInventorySlotCTS",
-      "ClassName": "RemoteEvent"
-    },
-    {
       "Name": "EquipToolSTC",
       "ClassName": "RemoteEvent"
     },
@@ -46,6 +42,14 @@
     
     {
       "Name": "DropToolCTS",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "DropSelectedToolCTS",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "SwapInventorySlotCTS",
       "ClassName": "RemoteEvent"
     },
     {

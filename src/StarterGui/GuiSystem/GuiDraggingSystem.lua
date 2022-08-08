@@ -87,17 +87,25 @@ function OnInputEnded(input)
     end
 
     if prevSlotType == SlotType.InventorySlot then
-        if currentSlotType == SlotType.InventorySlot then
+        if not currentSlotType then
+            -- Inventory -> Workspace
+            if not ClientGlobalStorage:SendDropTool(prevTool) then
+                Debug.Assert(false, "비정상입니다.")
+            end
+        elseif currentSlotType == SlotType.InventorySlot then
+            -- Inventory -> Inventory
             if prevSlotIndex ~= currentSlotIndex then
                 if not ClientGlobalStorage:SendSwapInventorySlot(prevSlotIndex, currentSlotIndex) then
                     Debug.Assert(false, "비정상입니다.")
                 end
             end
         elseif currentSlotType == SlotType.QuickSlot then
+            -- Inventory -> QuickSlot
             if not ClientGlobalStorage:SetQuickSlotByInventorySlot(currentSlotIndex, prevSlotIndex) then
                 Debug.Assert(false, "비정상입니다.")
             end
         elseif currentSlotType == SlotType.EquipSlot then
+            -- Inventory -> EquipSlot
             if prevTool then
                 local prevToolEquipType = ToolUtility:GetEquipType(prevTool)
                 if prevToolEquipType then
@@ -108,7 +116,10 @@ function OnInputEnded(input)
             end
         end 
     elseif prevSlotType == SlotType.QuickSlot then
-        if currentSlotType == SlotType.QuickSlot then
+        if not currentSlotType then
+            -- QuickSlot -> Workspace
+        elseif currentSlotType == SlotType.QuickSlot then
+            -- QuickSlot -> QuickSlot
             if prevSlotIndex ~= currentSlotIndex then
                 if not ClientGlobalStorage:SwapQuickSlot(prevSlotIndex, currentSlotIndex) then
                     Debug.Assert(false, "비정상입니다.")
@@ -117,6 +128,7 @@ function OnInputEnded(input)
         end
     elseif prevSlotType == SlotType.EquipSlot then
         if currentSlotType == SlotType.InventorySlot or not currentSlotType then
+            -- EquipSlot -> Inventory
             if not ClientGlobalStorage:SendUnequipToolCTS(prevSlotIndex) then
                 Debug.Assert(false, "비정상입니다.")
             end

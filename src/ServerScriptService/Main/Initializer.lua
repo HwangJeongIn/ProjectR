@@ -20,52 +20,56 @@ local DamagerScript = ToolModule:WaitForChild("Damager")
 local InteractorScript = ToolModule:WaitForChild("Interactor")
 
 local Tools = ServerStorage:WaitForChild("Tools")
+local ArmorTools = Tools:WaitForChild("Armors")
+local WeaponTools = Tools:WaitForChild("Weapons")
 local MapController = require(script.Parent:WaitForChild("MapController"))
 
 local Initializer = {}
 
 
 function InitializeTools()
-	local toolList = Tools:GetChildren()
+	local toolFolders = Tools:GetChildren()
 
-	local toolCount = #toolList
-	for i = 1, toolCount do
-		--toolList[i].CanBeDropped = false
+	for _, toolFolder in pairs(toolFolders) do
+		local tools = toolFolder:GetChildren()
+		for _, tool in pairs(tools) do
 
-		local handle = toolList[i]:FindFirstChild("Handle")
-		if not handle then
-			Debug.Assert(false, "도구에 핸들이 없습니다. => " .. toolList[i].Name)
-			return false
-		end
+			tool.CanBeDropped = false
+			local handle = tool:FindFirstChild("Handle")
+			if not handle then
+				Debug.Assert(false, "도구에 핸들이 없습니다. => " .. tool.Name)
+				return false
+			end
 
-		local trigger = handle:FindFirstChild("Trigger")
-		if not trigger then
-			Debug.Assert(false, "도구에 트리거가 없습니다. => " .. toolList[i].Name)
-			return false
-		end
+			local trigger = handle:FindFirstChild("Trigger")
+			if not trigger then
+				Debug.Assert(false, "도구에 트리거가 없습니다. => " .. tool.Name)
+				return false
+			end
 
-		if handle.CanTouch then
-			Debug.Print("CanTouch가 켜져있습니다. 자동으로 꺼집니다." .. toolList[i].Name)
-			handle.CanTouch = false
-		end
+			if handle.CanTouch then
+				Debug.Print("CanTouch가 켜져있습니다. 자동으로 꺼집니다." .. tool.Name)
+				handle.CanTouch = false
+			end
 
-		if trigger.CanCollide then
-			Debug.Print("CanCollide가 켜져있습니다. 자동으로 꺼집니다." .. toolList[i].Name)
-			trigger.CanCollide = false
-			trigger.CanQuery = true
-		end
+			if trigger.CanCollide then
+				Debug.Print("CanCollide가 켜져있습니다. 자동으로 꺼집니다." .. tool.Name)
+				trigger.CanCollide = false
+				trigger.CanQuery = true
+			end
 
-		if toolList[i].Damager then
-			local clonedDamagerScript = DamagerScript:Clone()
-			clonedDamagerScript.Parent = toolList[i]
+			if tool:FindFirstChild("Damager") then
+				local clonedDamagerScript = DamagerScript:Clone()
+				clonedDamagerScript.Parent = tool
 
-		elseif toolList[i].Interactor then
-			local clonedInteractorScript = InteractorScript:Clone()
-			clonedInteractorScript.Parent = toolList[i]
+			elseif tool:FindFirstChild("Interactor") then
+				local clonedInteractorScript = InteractorScript:Clone()
+				clonedInteractorScript.Parent = tool
 
-		else
-			Debug.Assert(false, "도구 용도에 맞게 태그를 지정하세요")
-			return false
+			else
+				Debug.Print("도구 용도 없음")
+				--return false
+			end
 		end
 	end
 	return true
@@ -188,6 +192,28 @@ function Initializer:ClearPlayers(players)
 	end
 end
 
+function Initializer:PushDefaulArmorTools(player)
+	local Boots = ArmorTools.Boots:Clone()
+	Boots.Parent = player.Backpack
+
+	local Chestplate = ArmorTools.Chestplate:Clone()
+	Chestplate.Parent = player.Backpack
+
+	local Helmet = ArmorTools.Helmet:Clone()
+	Helmet.Parent = player.Backpack
+
+	local Leggings = ArmorTools.Leggings:Clone()
+	Leggings.Parent = player.Backpack
+end
+
+function Initializer:PushDefaulWeaponTools(player)
+	local Sword = WeaponTools.Sword:Clone()
+	Sword.Parent = player.Backpack
+
+	local Axe = WeaponTools.Axe:Clone()
+	Axe.Parent = player.Backpack
+end
+
 function Initializer:StartGame(playersInGame)
 	for i, player in pairs (playersInGame) do
 
@@ -204,39 +230,8 @@ function Initializer:StartGame(playersInGame)
 			continue
 		end
 		
-
-		-- 기본 도구
-		local sword = ServerStorage.Tools.Sword:Clone()
-		--sword:WaitForChild("Key")
-		sword.Parent = player.Backpack
-
-		local axe = ServerStorage.Tools.Axe:Clone()
-		--axe:WaitForChild("Key")
-		axe.Parent = player.Backpack
-
-		if false then
-			local sword = ServerStorage.Tools.Sword:Clone()
-			--sword:WaitForChild("Key")
-			sword.Parent = player.Backpack
-	
-			local axe = ServerStorage.Tools.Axe:Clone()
-			--axe:WaitForChild("Key")
-			axe.Parent = player.Backpack
-	
-			
-			local sword = ServerStorage.Tools.Sword:Clone()
-			--sword:WaitForChild("Key")
-			sword.Parent = player.Backpack
-	
-			local axe = ServerStorage.Tools.Axe:Clone()
-			--axe:WaitForChild("Key")
-			axe.Parent = player.Backpack
-	
-			
-			local sword = ServerStorage.Tools.Sword:Clone()
-			--sword:WaitForChild("Key")
-			sword.Parent = player.Backpack
-		end
+		self:PushDefaulWeaponTools(player)
+		self:PushDefaulArmorTools(player)
 
 		--[[
 		local boolValue = Instance.new("BoolValue")

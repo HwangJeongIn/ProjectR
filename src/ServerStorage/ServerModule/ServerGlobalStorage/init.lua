@@ -32,11 +32,112 @@ local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
 local ServerGlobalStorage = CommonGlobalStorage
 
 
-
 function ServerGlobalStorage:Initialize()
 	local ServerRemoteEventImpl = require(script:WaitForChild("ServerRemoteEventImpl"))
 	ServerRemoteEventImpl:InitializeRemoteEvents(self)
 end
+
+
+
+function ServerGlobalStorage:DropToolRaw(character, tool)
+	
+
+	--[[
+	local rayLength = 100
+	local rayDirection = Vector3.new(0, -rayLength, 0)
+
+	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+
+	local rayOrigin = Vector3.new(spawnPoint.X, spawnPoint.Y + rayLength, spawnPoint.Z)
+
+	local raycastParams = RaycastParams.new()
+	--raycastParams.FilterDescendantsInstances = {character.Parent}
+	--raycastParams.FilterType = CommonEnum.RaycastFilterType.Blacklist
+	local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+
+	local finalPosition = rayOrigin
+	if raycastResult then
+		finalPosition = raycastResult.Position
+	end
+
+	humanoidRootPart.CFrame = CFrame.lookAt(finalPosition, mapCenterPosition)
+	--]]
+
+
+	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+	Debug.Assert(humanoidRootPart, "비정상입니다.")
+
+	local characterCFrame = humanoidRootPart.CFrame
+
+	local targetCFrame = characterCFrame + characterCFrame.LookVector * 3
+	
+	tool.Handle.CFrame = targetCFrame
+	tool.Parent = game.workspace
+	return true
+end
+
+
+function ServerGlobalStorage:DropTool(player, tool)
+	local playerId = player.UserId
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local character = player.Character
+	if not character then
+		Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+		return false
+	end
+
+	if not self:IsInBackpack(playerId, tool) then
+		Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
+		return false
+	end
+
+	if not self:DropToolRaw(character, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+function ServerGlobalStorage:DropSelectedTool(player, tool)
+	local playerId = player.UserId
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	if not self:IsInCharacterRaw(playerId, tool) then
+		Debug.Assert(false, "캐릭터가 해당 도구를 들고 있지 않습니다.")
+		return false
+	end
+
+	local character = player.Character
+	if not character then
+		Debug.Print("플레이어 캐릭터가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+		return false
+	end
+
+	local humanoid = character:FindFirstChild("Humanoid")
+	if not humanoid then
+		Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
+		return false
+	end
+
+	ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId)
+	humanoid:UnequipTools()
+
+	if not self:DropToolRaw(character, tool) then
+		Debug.Assert(false, "캐릭터가 해당 도구를 들고 있지 않습니다.")
+		return false
+	end
+	return true
+end
+
+
 
 function ServerGlobalStorage:SelectTool(player, tool, isInBackpack)
 	if not tool then
@@ -71,7 +172,7 @@ function ServerGlobalStorage:SelectTool(player, tool, isInBackpack)
 	return true
 end
 
-function ServerGlobalStorage:SelectToolFromWorkspace(player, tool)
+function ServerGlobalStorage:SelectWorkspaceTool(player, tool)
 	local distance = player:DistanceFromCharacter(tool.Handle.Position)
 	if distance > MaxPickupDistance then
 		Debug.Assert(false, "비정상입니다.")

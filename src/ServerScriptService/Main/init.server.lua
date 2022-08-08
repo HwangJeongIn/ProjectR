@@ -65,6 +65,25 @@ end
 
 Initializer:InitializeGame()
 
+function Temp()
+	local players = game.Players:GetPlayers()
+	for i, player in pairs(players) do
+		Initializer:PushDefaulWeaponTools(player)
+		Initializer:PushDefaulArmorTools(player)
+	end
+
+	while true do
+		wait(5)
+	end
+end
+
+while #game.Players:GetPlayers() < 1 do
+	wait(1)
+end
+
+wait(3)
+Temp()
+
 while false  do
 	
 	

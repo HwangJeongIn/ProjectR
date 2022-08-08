@@ -169,6 +169,16 @@ function CommonGlobalStorage:IsInBackpack(playerId, tool)
 	return player.Backpack == tool.Parent
 end
 
+function CommonGlobalStorage:IsInCharacterRaw(playerId, tool)
+	local player = game.Players:GetPlayerByUserId(playerId)
+	local character = player.Character
+	if not character then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	return (character == tool.Parent)
+end
+
 function CommonGlobalStorage:IsInCharacter(playerId, equipType, equippedTool, findAll)
 	local player = game.Players:GetPlayerByUserId(playerId)
 	local character = player.Character

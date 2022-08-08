@@ -28,6 +28,7 @@ local EquipToolCTS = RemoteEvents:WaitForChild("EquipToolCTS")
 local UnequipToolCTS = RemoteEvents:WaitForChild("UnequipToolCTS")
 local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
 
+local DropSelectedToolCTS = RemoteEvents:WaitForChild("DropSelectedToolCTS")
 local DropToolCTS = RemoteEvents:WaitForChild("DropToolCTS")
 local PickupToolCTS = RemoteEvents:WaitForChild("PickupToolCTS")
 
@@ -52,10 +53,30 @@ function ClientGlobalStorage:SendDropTool(tool)
 		return false
 	end
 
-	-- 인벤토리 검증
-	local data = ClientGlobalStorage:GetData()
-	local inventory = data[StatusType.Inventory]
-	--inventory:Get
+	-- Backpack에 존재하는 지 검증
+	if not self:IsInBackpack(PlayerId, tool) then
+		Debug.Assert(false, "캐릭터가 해당 도구를 가지고 있지 않습니다.")
+		return false
+	end
+
+	DropToolCTS:FireServer(tool)
+	return true
+end
+
+function ClientGlobalStorage:SendDropSelectedTool(tool)
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	-- 지금 선택된 상태인지 검증
+	if not self:IsInCharacterRaw(PlayerId, tool) then
+		Debug.Assert(false, "캐릭터가 해당 도구를 들고 있지 않습니다.")
+		return false
+	end
+
+	DropSelectedToolCTS:FireServer(tool)
+	return true
 end
 
 function ClientGlobalStorage:SendPickupTool(tool)
