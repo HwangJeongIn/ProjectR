@@ -1,14 +1,18 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
-local Debug = CommonMoudleFacade.Debug
-local Utility = CommonMoudleFacade.Utility
-local ToolUtility = CommonMoudleFacade.ToolUtility
+local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
 
-local CommonEnum = CommonMoudleFacade.CommonEnum
+local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
+local Debug = ClientModuleFacade.Debug
+local Utility = ClientModuleFacade.Utility
+local ToolUtility = ClientModuleFacade.ToolUtility
+
+local CommonEnum = ClientModuleFacade.CommonEnum
 local SlotType = CommonEnum.SlotType
 
-local player = game.Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
+local Player = game.Players.LocalPlayer
+local PlayerId = Player.UserId
+local PlayerGui = Player:WaitForChild("PlayerGui")
 local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
 local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
 
@@ -63,7 +67,19 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
 		end)
 
 	elseif newGuiToolSlotController.SlotType == SlotType.QuickSlot then
+		newGuiToolSlotController.GuiSlot.Activated:connect(function(inputObject)
+			local targetTool = newGuiToolSlotController.Tool
+			if not targetTool then
+				return
+			end
+			if not ClientGlobalStorage:IsInBackpack(PlayerId, targetTool) then
+				Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
+				return
+			end
 
+			ClientGlobalStorage:Send
+			GuiTooltipController:InitializeByToolSlot(newGuiToolSlotController)
+		end)
 	end
 
 	newGuiToolSlotController:ClearToolData()

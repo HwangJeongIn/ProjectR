@@ -208,7 +208,7 @@ function SelectToolAction(tooltip, inputObject)
 		return false
 	end
 	
-	if not ClientGlobalStorage:SendSelectToolCTS(tooltip.ToolSlot:GetSlotIndex(), tool) then
+	if not ClientGlobalStorage:SendSelectToolCTS(--[[tooltip.ToolSlot:GetSlotIndex(),--]] tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end

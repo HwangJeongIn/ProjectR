@@ -187,12 +187,13 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
         EquipToolSTC:FireClient(player, equipType, tool)
     end)
     
-    SelectToolCTS.OnServerEvent:Connect(function(player, inventorySlotIndex, tool)
+    SelectToolCTS.OnServerEvent:Connect(function(player, --[[inventorySlotIndex,--]] tool)
+        --[[
         if not inventorySlotIndex or not tool then
             Debug.Assert(false, "비정상입니다.")
             return
         end
-
+        --]]
         if not ServerGlobalStorage:SelectTool(player, tool, false) then
             Debug.Assert(false, "비정상입니다.")
             return

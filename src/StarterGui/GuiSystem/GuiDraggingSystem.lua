@@ -118,6 +118,9 @@ function OnInputEnded(input)
     elseif prevSlotType == SlotType.QuickSlot then
         if not currentSlotType then
             -- QuickSlot -> Workspace
+            if not ClientGlobalStorage:SetQuickSlot(prevSlotIndex, nil) then
+                Debug.Assert(false, "비정상입니다.")
+            end
         elseif currentSlotType == SlotType.QuickSlot then
             -- QuickSlot -> QuickSlot
             if prevSlotIndex ~= currentSlotIndex then

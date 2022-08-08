@@ -138,8 +138,6 @@ function ServerGlobalStorage:DropSelectedTool(player, tool)
 	return true
 end
 
-
-
 function ServerGlobalStorage:SelectTool(player, tool, fromWorkspace)
 	if not tool then
 		Debug.Assert(false, "비정상입니다.")

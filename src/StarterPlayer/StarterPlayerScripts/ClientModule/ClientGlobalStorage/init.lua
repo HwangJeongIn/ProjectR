@@ -112,13 +112,13 @@ function ClientGlobalStorage:SendSwapInventorySlot(slotIndex1, slotIndex2)
 end
 
 
-function ClientGlobalStorage:SendSelectToolCTS(slotIndex, tool)
-	if not slotIndex or not tool then
+function ClientGlobalStorage:SendSelectToolCTS(--[[slotIndex,--]] tool)
+	if --[[not slotIndex or--]] not tool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-	SelectToolCTS:FireServer(slotIndex, tool)
+	SelectToolCTS:FireServer(--[[slotIndex,--]] tool)
 	return true
 end
 
