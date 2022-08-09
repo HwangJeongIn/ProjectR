@@ -15,7 +15,7 @@ local StatType = ServerEnum.StatType
 local Debris = game:GetService("Debris")
 
 local DamagerTool = script.Parent
-
+ 
 local DamagerController = {}
 
 function DamagerController:InitializeDamagerController(gameDataType, damagerTool)
