@@ -15,12 +15,13 @@ local ServerGlobalStorage = require(ServerModule:WaitForChild("ServerGlobalStora
 local ServerGameDataModule = ServerModule:WaitForChild("ServerGameDataModule")
 local ServerGameDataManager = require(ServerGameDataModule:WaitForChild("ServerGameDataManager"))
 
--- 종속성 때문에 주석처리
--- 오브젝트 모듈
---local ObjectModule = ServerModule:WaitForChild("ObjectModule")
---local ToolModule = ObjectModule:WaitForChild("ToolModule")
---local VehicleModule = ObjectModule:WaitForChild("VehicleModule")
---local WorldInteractorModule = ObjectModule:WaitForChild("WorldInteractorModule")
+-- 오브젝트 모듈 
+-- require 호출을 하지 않기 때문에 ObjectModule 내부에 있는 스크립트에서 ServerModuleFacade를 사용할 수 있다.
+-- System 종류는 ServerGlobalStorage에서도 사용해야할 것 같으니 함수를 통해 ServerGlobalStorage 내부 변수로 초기화하면 된다.
+local ObjectModule = ServerModule:WaitForChild("ObjectModule")
+local ToolModule = ObjectModule:WaitForChild("ToolModule")
+local VehicleModule = ObjectModule:WaitForChild("VehicleModule")
+local WorldInteractorModule = ObjectModule:WaitForChild("WorldInteractorModule")
 
 
 local ServerModuleFacade = {
@@ -30,11 +31,10 @@ local ServerModuleFacade = {
 	ServerGlobalStorage = ServerGlobalStorage,
 	ServerGameDataManager = ServerGameDataManager,
 	
-	-- 종속성 때문에 주석처리
-	--ObjectModule = ObjectModule,
-	--ToolModule = ToolModule,
-	--VehicleModule = VehicleModule,
-	--WorldInteractorModule = WorldInteractorModule
+	ObjectModule = ObjectModule,
+	ToolModule = ToolModule,
+	VehicleModule = VehicleModule,
+	WorldInteractorModule = WorldInteractorModule
 }
 
 setmetatable(ServerModuleFacade, CommonModuleFacade)
