@@ -54,6 +54,21 @@ local CommonEnum = {
 		EquipSlots = 2,
 		Inventory = 3,
 		QuickSlots = 4, -- 클라이언트 전용
+	},
+	
+	StatType = {
+		STR = 1,
+		DEF = 2,
+		Move = 3,
+		AttackSpeed = 4,
+		
+		HP = 5,
+		MP = 6,
+		HIT = 7,
+		Dodge = 8,
+		Block = 9,
+		Critical = 10,
+		Sight = 11
 	}
 }
 
@@ -78,6 +93,20 @@ CommonEnum.SlotType.Converter = {
 	[CommonEnum.SlotType.EquipSlot] = "EquipSlot",
 	[CommonEnum.SlotType.QuickSlot] = "QuickSlot",
 	[CommonEnum.SlotType.SkillSlot] = "SkillSlot"
+}
+
+CommonEnum.StatType.Converter = {
+	[CommonEnum.StatType.STR] = "STR",
+	[CommonEnum.StatType.DEF] = "DEF",
+	[CommonEnum.StatType.Move] = "Move",
+	[CommonEnum.StatType.AttackSpeed] = "AttackSpeed",
+	[CommonEnum.StatType.HP] = "HP",
+	[CommonEnum.StatType.MP] = "MP",
+	[CommonEnum.StatType.HIT] = "HIT",
+	[CommonEnum.StatType.Dodge] = "Dodge",
+	[CommonEnum.StatType.Block] = "Block",
+	[CommonEnum.StatType.Critical] = "Critical",
+	[CommonEnum.StatType.Sight] = "Sight"
 }
 
 

@@ -16,7 +16,7 @@ local Debug = CommonModuleFacade.Debug
 
 local ObjectBase = {
 	
-	actions = {},
+	Actions = {},
 	Root = Utility.EmptyFunction,
 	GetGameDataType = Utility.EmptyFunction,
 	GetGameDataKey = Utility.EmptyFunction,
@@ -26,72 +26,24 @@ local ObjectBase = {
 ObjectBase.__index = Utility.Inheritable__index
 ObjectBase.__newindex = Utility.Inheritable__newindex
 
---[[
-local root = nil
-local gameDataType = nil
-local gameDataKey = nil
-local gameData = nil
---]]
 
--- local actions = {}
-
-
--- 함수 정의 ------------------------------------------------------------------------------------------------------
-
---[[
-function ObjectBase:Initialize(objectGameDataType, objectRoot)
-
+function ObjectBase:InitializeObject(objectGameDataType, objectRoot)
 	if not objectRoot then
 		Debug.Assert(false, "입력이 비정상입니다. GameDataType => " .. tostring(objectGameDataType))
-		return	
+		return false
 	end
 
 	local typSTring  = type(objectGameDataType)
 	if not objectGameDataType or type(objectGameDataType) ~= "number" then
 		Debug.Assert(false, "입력이 비정상입니다.")
-		return	
+		return false
 	end
 
 
 	local objectGameDataKey = objectRoot:FindFirstChild("Key")
 	if not objectGameDataKey then
 		Debug.Assert(false, "객체에 키 태그가 존재하지 않습니다.")
-		return
-	end
-
-	objectGameDataKey = objectGameDataKey.Value
-
-	local objectGameData = GameDataManager[objectGameDataType]:Get(objectGameDataKey)
-	if not objectGameData then
-		Debug.Assert(false, "데이터가 존재하지 않습니다.")
-		return
-	end
-
-	self.root = objectRoot
-	self.gameDataType = objectGameDataType
-	self.gameDataKey = objectGameDataKey
-	self.gameData = objectGameData
-end
---]]
-
-function ObjectBase:Initialize(objectGameDataType, objectRoot)
-	
-	if not objectRoot then
-		Debug.Assert(false, "입력이 비정상입니다. GameDataType => " .. tostring(objectGameDataType))
-		return	
-	end
-
-	local typSTring  = type(objectGameDataType)
-	if not objectGameDataType or type(objectGameDataType) ~= "number" then
-		Debug.Assert(false, "입력이 비정상입니다.")
-		return	
-	end
-
-
-	local objectGameDataKey = objectRoot:FindFirstChild("Key")
-	if not objectGameDataKey then
-		Debug.Assert(false, "객체에 키 태그가 존재하지 않습니다.")
-		return
+		return false
 	end
 
 	objectGameDataKey = objectGameDataKey.Value
@@ -99,7 +51,7 @@ function ObjectBase:Initialize(objectGameDataType, objectRoot)
 	local objectGameData = ServerGameDataManager[objectGameDataType]:Get(objectGameDataKey)
 	if not objectGameData then
 		Debug.Assert(false, "데이터가 존재하지 않습니다.")
-		return
+		return false
 	end
 	
 	local interalData = {
@@ -133,104 +85,9 @@ function ObjectBase:Initialize(objectGameDataType, objectRoot)
 		Debug.Assert(interalData.gameData, "GameData가 존재하지 않습니다. 초기화 해주세요.")
 		return interalData.gameData
 	end
-end
 
---[[
-function ObjectBase:Initialize__(objectGameDataType, objectRoot)
-	
-	-- Clone하면 두 번 호출될 수 있음
-	if root then
-		Debug.Log("재초기화 GameDataType => " .. tostring(gameDataType))
-		--return	
-	end
-	
-	if not objectRoot then
-		Debug.Assert(false, "입력이 비정상입니다. GameDataType => " .. tostring(gameDataType))
-		return	
-	end
-	
-	local typSTring  = type(objectGameDataType)
-	if not objectGameDataType or type(objectGameDataType) ~= "number" then
-		Debug.Assert(false, "입력이 비정상입니다.")
-		return	
-	end
-	
-	
-	local objectGameDataKey = objectRoot:FindFirstChild("Key")
-	if not objectGameDataKey then
-		Debug.Assert(false, "객체에 키 태그가 존재하지 않습니다.")
-		return
-	end
-	
-	objectGameDataKey = objectGameDataKey.Value
-	
-	local objectGameData = GameDataManager[objectGameDataType]:Get(objectGameDataKey)
-	if not objectGameData then
-		Debug.Assert(false, "데이터가 존재하지 않습니다.")
-		return
-	end
-	
-	root = objectRoot
-	gameDataType = objectGameDataType
-	gameDataKey = objectGameDataKey
-	gameData = objectGameData
-	
-	
+	return true
 end
-
-function ObjectBase:Root()
-	Debug.Assert(self.root, "ObjectRoot가 존재하지 않습니다. 초기화 해주세요.")
-	return self.root
-end
-
-function ObjectBase:GetGameDataType()
-	Debug.Assert(self.root, "ObjectRoot가 존재하지 않습니다. 초기화 해주세요.")
-	Debug.Assert(self.gameDataType, "GameDataType이 존재하지 않습니다. 초기화 해주세요.")
-	return self.gameDataType
-end
-
-function ObjectBase:GetGameDataKey()
-
-	Debug.Assert(self.root, "ObjectRoot가 존재하지 않습니다. 초기화 해주세요.")
-	Debug.Assert(self.gameDataType, "GameDataType이 존재하지 않습니다. 초기화 해주세요.")
-	Debug.Assert(self.gameDataKey, "GameDataKey가 존재하지 않습니다. 초기화 해주세요.")
-	return self.gameDataKey
-end
-
-function ObjectBase:GetGameData()
-	Debug.Assert(self.root, "ObjectRoot가 존재하지 않습니다. 초기화 해주세요.")
-	Debug.Assert(self.gameDataType, "GameDataType이 존재하지 않습니다. 초기화 해주세요.")
-	Debug.Assert(self.gameData, "GameData가 존재하지 않습니다. 초기화 해주세요.")
-	return self.gameData
-end
---]]
---[[
-function ObjectBase.Root()
-	Debug.Assert(root, "ObjectRoot가 존재하지 않습니다. 초기화 해주세요.")
-	return root
-end
-
-function ObjectBase.GetGameDataType()
-	Debug.Assert(root, "ObjectRoot가 존재하지 않습니다. 초기화 해주세요.")
-	Debug.Assert(gameDataType, "GameDataType이 존재하지 않습니다. 초기화 해주세요.")
-	return gameDataType
-end
-
-function ObjectBase.GetGameDataKey()
-
-	Debug.Assert(root, "ObjectRoot가 존재하지 않습니다. 초기화 해주세요.")
-	Debug.Assert(gameDataType, "GameDataType이 존재하지 않습니다. 초기화 해주세요.")
-	Debug.Assert(gameDataKey, "GameDataKey가 존재하지 않습니다. 초기화 해주세요.")
-	return gameDataKey
-end
-
-function ObjectBase.GetGameData()
-	Debug.Assert(root, "ObjectRoot가 존재하지 않습니다. 초기화 해주세요.")
-	Debug.Assert(gameDataType, "GameDataType이 존재하지 않습니다. 초기화 해주세요.")
-	Debug.Assert(gameData, "GameData가 존재하지 않습니다. 초기화 해주세요.")
-	return gameData
-end
---]]
 
 function ObjectBase:BindAction(action)
 	
@@ -243,12 +100,12 @@ function ObjectBase:BindAction(action)
 	
 	local actionName = tostring(action)
 	
-	self.actions[actionName] = action
+	self.Actions[actionName] = action
 end
 
 function ObjectBase:UnbindActions()
 	
-	self.actions = {}
+	self.Actions = {}
 	
 end
 
@@ -262,30 +119,16 @@ function ObjectBase:UnbindAction(action)
 	end
 	
 	local actionName = tostring(action)
-	self.actions[actionName] = nil
+	self.Actions[actionName] = nil
 	
 end
 
 function ObjectBase:ExecuteActions(...)
 	
-	for --[[actionName--]] _, action in pairs(self.actions) do
+	for --[[actionName--]] _, action in pairs(self.Actions) do
 		action(...)
 	end
 	
 end
-
---[[
-function ObjectBase.ExecuteAction(action, ...)
-	
-	local actionName = tostring(action)
-	
-	if actions[actionName]  then
-		actions[actionName](...)
-	end
-	
-end
---]]
-
--- 반환 코드 ------------------------------------------------------------------------------------------------------
 
 return ObjectBase

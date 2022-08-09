@@ -5654,13 +5654,13 @@ function ClientGlobalStorage:SendSwapInventorySlot(slotIndex1, slotIndex2)
 end
 
 
-function ClientGlobalStorage:SendSelectToolCTS(slotIndex, tool)
-	if not slotIndex or not tool then
+function ClientGlobalStorage:SendSelectToolCTS(--[[slotIndex,--]] tool)
+	if --[[not slotIndex or--]] not tool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-	SelectToolCTS:FireServer(slotIndex, tool)
+	SelectToolCTS:FireServer(--[[slotIndex,--]] tool)
 	return true
 end
 
@@ -6790,6 +6790,7 @@ local GuiEquipSlots = GuiFacade.GuiEquipSlots
 local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiSlot
 
 local GuiToolSlotController = GuiFacade.GuiTemplateController.GuiToolSlotController
+local GuiDraggingSystem = GuiFacade.GuiSystem.GuiDraggingSystem
 
 local GuiEquipSlotsRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
 GuiEquipSlotsRaw:Initialize(MaxEquipSlotCount)
@@ -6883,6 +6884,15 @@ function GuiEquipSlotsController:Initialize()
 			self.GuiEquipSlotsRaw:Set(equipType, GuiToolSlotController:new(SlotType.EquipSlot, equipType, newGuiToolSlot))
 		end
 	end
+
+	GuiEquipSlots.MouseEnter:Connect(function(x,y)
+		GuiDraggingSystem:SetSlotWindowType(SlotType.EquipSlot)
+	end)
+
+	GuiEquipSlots.MouseLeave:Connect(function()
+		GuiDraggingSystem:CheckAndClearSetSlotWindowType(SlotType.EquipSlot)
+	end)
+
 end
 
 function GuiEquipSlotsController:SetToolSlot(equipType, tool)
@@ -7547,6 +7557,14 @@ function GuiFacade:Initialize()
     local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("GuiTooltipController"))
     self.GuiTooltipController = GuiTooltipController
 
+    -- GuiSystem
+    local GuiSystem = PlayerGui:WaitForChild("GuiSystem")
+    local GuiDraggingSystem = require(GuiSystem:WaitForChild("GuiDraggingSystem"))
+    local GuiWorldInteractionSystem = require(GuiSystem:WaitForChild("GuiWorldInteractionSystem"))
+    self.GuiSystem = {
+        GuiDraggingSystem = GuiDraggingSystem,
+        GuiWorldInteractionSystem = GuiWorldInteractionSystem
+    }
 end
 
 GuiFacade:Initialize()
@@ -9547,7 +9565,7 @@ function SelectToolAction(tooltip, inputObject)
 		return false
 	end
 	
-	if not ClientGlobalStorage:SendSelectToolCTS(tooltip.ToolSlot:GetSlotIndex(), tool) then
+	if not ClientGlobalStorage:SendSelectToolCTS(--[[tooltip.ToolSlot:GetSlotIndex(),--]] tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -10632,17 +10650,23 @@ return GuiTooltipController]]></ProtectedString>
 					<Content name="LinkedSource"><null></null></Content>
 					<string name="Name">GuiToolSlotController</string>
 					<string name="ScriptGuid">{5D0D7382-55A1-4C9C-BAB6-2F2D9FF529BC}</string>
-					<ProtectedString name="Source"><![CDATA[local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
-local Debug = CommonMoudleFacade.Debug
-local Utility = CommonMoudleFacade.Utility
-local ToolUtility = CommonMoudleFacade.ToolUtility
+					<ProtectedString name="Source"><![CDATA[local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
 
-local CommonEnum = CommonMoudleFacade.CommonEnum
+local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
+local Debug = ClientModuleFacade.Debug
+local Utility = ClientModuleFacade.Utility
+local ToolUtility = ClientModuleFacade.ToolUtility
+
+local CommonEnum = ClientModuleFacade.CommonEnum
 local SlotType = CommonEnum.SlotType
 
-local player = game.Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
+local KeyBinder = ClientModuleFacade.KeyBinder
+
+local Player = game.Players.LocalPlayer
+local PlayerId = Player.UserId
+local PlayerGui = Player:WaitForChild("PlayerGui")
 local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
 local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
 
@@ -10653,6 +10677,23 @@ local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("Gui
 local GuiSlotController = Utility:DeepCopy(require(script.Parent:WaitForChild("GuiSlotController")))
 
 local GuiToolSlotController = GuiSlotController
+
+function SelectToolActionForQuickSlot(tool)
+	if not tool then
+		return true
+	end
+	if not ClientGlobalStorage:IsInBackpack(PlayerId, tool) then
+		Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
+		return false
+	end
+
+	if not ClientGlobalStorage:SendSelectToolCTS(tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
 
 function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
 
@@ -10697,7 +10738,26 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
 		end)
 
 	elseif newGuiToolSlotController.SlotType == SlotType.QuickSlot then
+		local targetSlotIndexEnum = ToolUtility.QuickSlotIndexToKeyCodeTable[newGuiToolSlotController.SlotIndex]
+		if not targetSlotIndexEnum then
+			Debug.Assert(false, "비정상입니다. 슬롯이 늘어났는지 확인해보세요")
+			return
+		end
 
+		local quickSlotActionName = tostring(targetSlotIndexEnum)
+		KeyBinder:BindAction(Enum.UserInputState.Begin, targetSlotIndexEnum, quickSlotActionName, function(inputObject)
+			if not SelectToolActionForQuickSlot(newGuiToolSlotController.Tool) then
+				Debug.Assert(false, "비정상입니다.")
+				return
+			end
+		end)
+
+		newGuiToolSlotController.GuiSlot.Activated:connect(function(inputObject)
+			if not SelectToolActionForQuickSlot(newGuiToolSlotController.Tool) then
+				Debug.Assert(false, "비정상입니다.")
+				return
+			end
+		end)
 	end
 
 	newGuiToolSlotController:ClearToolData()
@@ -10858,7 +10918,6 @@ local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
 
 local GuiSystem = PlayerGui:WaitForChild("GuiSystem")
 local GuiDraggingSystem = require(GuiSystem:WaitForChild("GuiDraggingSystem"))
-local GuiWorldInteractionSystem = require(GuiSystem:WaitForChild("GuiWorldInteractionSystem"))
 
 local GuiSlotController = {}
 
@@ -13115,6 +13174,7 @@ local Mouse = LocalPlayer:GetMouse()
 local GuiDraggingSystem = {
     SlotControllerCandidate = nil,
     SlotController = nil,
+    SlotWindowType = nil,
     ShadowImage = nil
 }
 
@@ -13181,9 +13241,24 @@ function OnInputEnded(input)
     if prevSlotType == SlotType.InventorySlot then
         if not currentSlotType then
             -- Inventory -> Workspace
-            if not ClientGlobalStorage:SendDropTool(prevTool) then
-                Debug.Assert(false, "비정상입니다.")
+
+            -- 만약 EquipSlotWindow이면 바로 착용
+            if GuiDraggingSystem.SlotWindowType == SlotType.EquipSlot then
+                if prevTool then
+                    local prevToolEquipType = ToolUtility:GetEquipType(prevTool)
+                    if prevToolEquipType then
+                        if not ClientGlobalStorage:SendEquipToolCTS(prevToolEquipType, prevTool) then
+                            Debug.Assert(false, "비정상입니다.")
+                        end
+                    end
+                end
+            else
+                if not ClientGlobalStorage:SendDropTool(prevTool) then
+                    Debug.Assert(false, "비정상입니다.")
+                end
             end
+
+
         elseif currentSlotType == SlotType.InventorySlot then
             -- Inventory -> Inventory
             if prevSlotIndex ~= currentSlotIndex then
@@ -13210,6 +13285,9 @@ function OnInputEnded(input)
     elseif prevSlotType == SlotType.QuickSlot then
         if not currentSlotType then
             -- QuickSlot -> Workspace
+            if not ClientGlobalStorage:SetQuickSlot(prevSlotIndex, nil) then
+                Debug.Assert(false, "비정상입니다.")
+            end
         elseif currentSlotType == SlotType.QuickSlot then
             -- QuickSlot -> QuickSlot
             if prevSlotIndex ~= currentSlotIndex then
@@ -13260,6 +13338,16 @@ end
 
 function GuiDraggingSystem:Clear()
     self:SetSlotControllerCandidate(nil)
+end
+
+function GuiDraggingSystem:SetSlotWindowType(slotWindowType)
+    self.SlotWindowType = slotWindowType
+end
+
+function GuiDraggingSystem:CheckAndClearSetSlotWindowType(slotWindowType)
+    if self.SlotWindowType == slotWindowType then
+        self.SlotWindowType = nil
+    end
 end
 
 function GuiDraggingSystem:CheckAndClearSlotControllerCandidate(slotControllerCandidate)
@@ -48883,16 +48971,14 @@ function ServerGlobalStorage:DropSelectedTool(player, tool)
 	return true
 end
 
-
-
-function ServerGlobalStorage:SelectTool(player, tool, isInBackpack)
+function ServerGlobalStorage:SelectTool(player, tool, fromWorkspace)
 	if not tool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 	
 	local playerId = player.UserId
-	if isInBackpack then
+	if not fromWorkspace then
 		if not ServerGlobalStorage:IsInBackpack(playerId, tool) then
 			Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
 			return false
@@ -48911,8 +48997,8 @@ function ServerGlobalStorage:SelectTool(player, tool, isInBackpack)
 		return false
 	end
 
-	ServerGlobalStorage:CheckAndUnequipIfWeapon(playerId)
-	ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool)
+	self:CheckAndUnequipIfWeapon(playerId)
+	self:CheckAndEquipIfWeapon(playerId, tool, fromWorkspace)
 	humanoid:EquipTool(tool)
 
 	return true
@@ -48925,7 +49011,7 @@ function ServerGlobalStorage:SelectWorkspaceTool(player, tool)
 		return false
 	end
 
-	if not self:SelectTool(player, tool, false) then
+	if not self:SelectTool(player, tool, true) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -49200,13 +49286,14 @@ function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool, fromWorkspace
 	if not equipType or equipType ~= EquipType.Weapon then
 		return false
 	end
-	
+
 	if not fromWorkspace then
 		if not self:IsInBackpack(playerId, tool) then
 			Debug.Assert(false, "비정상입니다.")
 			return false
 		end
 	end
+
 
 	local prevTool, currentTool = self:EquipTool(playerId, equipType, tool)
 	if not currentTool then
@@ -49533,13 +49620,14 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
         EquipToolSTC:FireClient(player, equipType, tool)
     end)
     
-    SelectToolCTS.OnServerEvent:Connect(function(player, inventorySlotIndex, tool)
+    SelectToolCTS.OnServerEvent:Connect(function(player, --[[inventorySlotIndex,--]] tool)
+        --[[
         if not inventorySlotIndex or not tool then
             Debug.Assert(false, "비정상입니다.")
             return
         end
-
-        if not ServerGlobalStorage:SelectTool(player, tool, true) then
+        --]]
+        if not ServerGlobalStorage:SelectTool(player, tool, false) then
             Debug.Assert(false, "비정상입니다.")
             return
         end
@@ -56341,7 +56429,15 @@ local ToolUtility = {
 	DefaultSkillImage = "http://www.roblox.com/asset/?id=10489717222",
 	EmptySkillImage = "http://www.roblox.com/asset/?id=10489717222",
 	DefaultSlotImage = "http://www.roblox.com/asset/?id=10489757489",
-	DefaultCircularSlotImage = "http://www.roblox.com/asset/?id=10489755989"
+	DefaultCircularSlotImage = "http://www.roblox.com/asset/?id=10489755989",
+
+	QuickSlotIndexToKeyCodeTable = {
+		[1] = Enum.KeyCode.One,
+		[2] = Enum.KeyCode.Two,
+		[3] = Enum.KeyCode.Three,
+		[4] = Enum.KeyCode.Four,
+		[5] = Enum.KeyCode.Five
+	}
 }
 
 function ToolUtility:GetToolGameData(tool)

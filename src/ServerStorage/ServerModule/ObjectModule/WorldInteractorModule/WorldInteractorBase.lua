@@ -11,14 +11,27 @@ local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 local GameDataManager = ServerModuleFacade.GameDataManager
 local Debug = ServerModuleFacade.Debug
 
+local ObjectModule = ServerModuleFacade.ObjectModule
+
 
 local WorldInteractorBase = {}
 WorldInteractorBase.__index = Utility.Inheritable__index
 WorldInteractorBase.__newindex = Utility.Inheritable__newindex
+setmetatable(WorldInteractorBase, Utility:DeepCopy(require(ObjectModule:WaitForChild("ObjectBase"))))
 
 
--- 함수 정의 ------------------------------------------------------------------------------------------------------
+function OnDestroying(worldInteractorBase)
+	local worldInteractor = worldInteractorBase.Root()
+	local worldInteractorData = worldInteractorBase.GetGameData()
+end
 
+function WorldInteractorBase:InitializeWorldInteractor(gameDataType, worldInteractor)
+	self:InitializeObject(gameDataType, worldInteractor)
+	worldInteractor.Destroying:Connect(function() OnDestroying(self) end)
+end
+
+
+--[[
 -- Tool에 붙은 데이터들을 플레이어에게 적용하기
 
 function onEquipped(toolBase)
@@ -47,21 +60,6 @@ function onUnequipped(toolBase)
 	ServerGlobalStorage:RemoveGameData(character, toolBase.GetGameDataType())
 
 end
+--]]
 
-function onDestroying(worldInteractorBase)
-	
-	local worldInteractor = worldInteractorBase.Root()
-	local worldInteractorData = worldInteractorBase.GetGameData()
-	
-end
-
-function WorldInteractorBase:InitializeAll(gameDataType, worldInteractor)
-	self:Initialize(gameDataType, worldInteractor)
-	worldInteractor.Destroying:Connect(function() onDestroying(self) end)
-end
-
-
--- 반환 코드 ------------------------------------------------------------------------------------------------------
-
-setmetatable(WorldInteractorBase, Utility:DeepCopy(require(ServerModuleFacade.ObjectModule:WaitForChild("ObjectBase"))))
 return WorldInteractorBase

@@ -2,6 +2,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 
 local Debug = require(CommonModule:WaitForChild("Debug"))
+local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
+local StatType = CommonEnum.StatType
+local StatTypeConverter = StatType.Converter
 
 --[[
 local Utility = require(CommonModule:WaitForChild("Utility"))
@@ -9,8 +12,7 @@ local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
 local MaxInventorySlotCount = CommonConstant.MaxInventorySlotCount
 
-local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
-local GameDataType = CommonEnum.GameDataType
+
 local ToolType = CommonEnum.ToolType
 
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
@@ -23,7 +25,6 @@ local PlayerStatistic = {
 
 function PlayerStatistic:CreateEmptyStatistic()
 	return {
-		DirtyFlag = false,
 		STR = 0,
 		DEF = 0,
 		Move = 0,
@@ -41,6 +42,22 @@ end
 
 function PlayerStatistic:ClearData()
     self.Value = self:CreateEmptyStatistic()
+end
+
+function PlayerStatistic:GetStat(statType)
+	local targetStatName = StatTypeConverter[statType]
+	if nil == targetStatName then
+        Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local targetStatType = self.Value[targetStatName]
+	if nil == targetStatType then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return targetStatType
 end
 
 function PlayerStatistic:UpdateRemovedToolGameData(toolGameData)

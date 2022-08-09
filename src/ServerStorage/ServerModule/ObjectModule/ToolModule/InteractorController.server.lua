@@ -1,5 +1,5 @@
-local Interactor = {}
+local InteractorController = {}
 
 local ObjectBase = require(script.Parent:WaitForChild("ObjectBase"))
 
-return Interactor
+return InteractorController

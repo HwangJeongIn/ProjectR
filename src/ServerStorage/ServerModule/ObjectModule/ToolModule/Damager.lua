@@ -7,21 +7,36 @@ local Debug = ServerModuleFacade.Debug
 local ServerConstant = ServerModuleFacade.ServerConstant
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
-local GameDataType = ServerModuleFacade.ServerEnum.GameDataType
+local ServerEnum = ServerModuleFacade.ServerEnum
+local GameDataType = ServerEnum.GameDataType
+local StatType = ServerEnum.StatType
 
-local ToolBase = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("ToolBase")))
+local ToolModule = ServerModuleFacade.ToolModule
 local Debris = game:GetService("Debris")
 
 local Tool = script.Parent
 local Anim1 = Tool.anim1
 local isAttacking = false
 
-ToolBase:InitializeAll(GameDataType.Tool, Tool)
+
+local Damager = {}
+Damager.__index = Utility.Inheritable__index
+Damager.__newindex = Utility.Inheritable__newindex
+setmetatable(Damager, Utility:DeepCopy(require(ToolModule:WaitForChild("ToolBase"))))
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
-function CanAttack(otherPart)
-	
+
+function Damager:InitializeDamager(gameDataType, damager)
+    if not self:InitializeTool(GameDataType.Tool, Tool) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    return true
+end
+
+function Damager:CanAttack(otherPart)
 	if not otherPart then
 		Debug.Assert(false, "대상이 존재하지 않습니다.")
 		return false
@@ -56,12 +71,16 @@ function CanAttack(otherPart)
 	
 end
 
-function CalcDamage(attackerCharacter, attackeeCharacter)
+function Damager:CalcDamage(attackerCharacter, attackeeCharacter)
 	
 	local attackerSTR = 0
 	local attackeeDEF = 0
 	
 	-- ==== 캐릭터 계산 ====
+
+
+
+
 	local attackerCharacterGameData = ServerGlobalStorage:GetGameData(attackerCharacter, GameDataType.Character)
 	local attackeeCharacterGameData = ServerGlobalStorage:GetGameData(attackeeCharacter, GameDataType.Character)
 	
@@ -98,10 +117,9 @@ function CalcDamage(attackerCharacter, attackeeCharacter)
 	finalDamage = math.clamp(finalDamage, 0, 100)
 	
 	return finalDamage
-	
 end
 
-function AttackCharacter(attackerCharacter, attackeeCharacter)
+function Damager:AttackCharacter(attackerCharacter, attackeeCharacter)
 
 	local damage = CalcDamage(attackerCharacter, attackeeCharacter)
 	Debug.Log("Damage : ".. tostring(damage))
@@ -116,12 +134,9 @@ function AttackCharacter(attackerCharacter, attackeeCharacter)
 	end
 
 	attackeeCharacterHumanoid:TakeDamage(damage)
-	
 end
 
-function Attack(attackeePart)
-	
-	
+function Damager:Attack(attackeePart)
 	if CanAttack(attackeePart) == false then
 		--Debug.Assert(false, "공격할 수 없습니다.")
 		return
@@ -140,8 +155,6 @@ function Attack(attackeePart)
 		local attackeeCharacter = attackeePart.Parent
 		AttackCharacter(attackerCharacter, attackeeCharacter)
 	end
-	
-	
 --[[
 	local attackerTag = Instance.new("ObjectValue")
 	attackerTag.Name = "AttackerTag"
@@ -151,44 +164,4 @@ function Attack(attackeePart)
 	--]]
 end
 
-
-function onTouched(otherPart)
-
-	if isAttacking == false then return end
-	isAttacking = false
-	
-	Attack(otherPart)
-	
-	--[[
-	target = otherPart.Parent:FindFirstChild("Humanoid")
-	if target ~= nil then 
-		if target.Parent == tool.Parent then return end
-	else
-		if not otherPart.Parent.ObjectModule then return end
-
-		target = require(otherPart.Parent.ObjectModule)
-		if target == nil then return end
-	end
-
-	target:TakeDamage(damage)
-	--]]
-end
-
-
-function onActivated()
-
-	--Debug.Assert(false, ToolBase:GetGameDataKey())
-	isAttacking = true
-	local humanoid = Tool.Parent:FindFirstChild("Humanoid")
-	local anim1Track = humanoid:LoadAnimation(Anim1)
-	anim1Track:Play()
-
-	anim1Track.Stopped:Connect(function() isAttacking = false end)
-
-	--humanoid:TakeDamage(50)
-end
-
-
--- 이벤트 바인드
-Tool.Activated:Connect(onActivated)
-Tool.Attacker.Touched:Connect(onTouched)
+return Damager

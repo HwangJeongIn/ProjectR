@@ -7,20 +7,30 @@ local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
-
 local GameDataManager = ServerModuleFacade.GameDataManager
 local Debug = ServerModuleFacade.Debug
 
+local ObjectModule = ServerModuleFacade.ObjectModule
 
 local ToolBase = {}
 ToolBase.__index = Utility.Inheritable__index
 ToolBase.__newindex = Utility.Inheritable__newindex
+setmetatable(ToolBase, Utility:DeepCopy(require(ObjectModule:WaitForChild("ObjectBase"))))
 
+function ToolBase:InitializeTool(gameDataType, tool)
+	if not self:InitializeObject(gameDataType, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	--tool.Equipped:Connect(function() OnEquipped(self) end)
+	--tool.Unequipped:Connect(function() OnUnequipped(self) end)
+	--tool.Equipped:Connect(function() Debug.Print("OnEquipped : " .. tostring(tool)) end)
+	--tool.Unequipped:Connect(function() Debug.Print("OnUnequipped : ".. tostring(tool)) end)
+	return true
+end
 
--- 함수 정의 ------------------------------------------------------------------------------------------------------
-
--- Tool에 붙은 데이터들을 플레이어에게 적용하기
-
+--[[
 function OnEquipped(toolBase)
 
 	local tool = toolBase.Root()
@@ -47,20 +57,8 @@ function OnUnequipped(toolBase)
 	local player = tool.Parent.Parent
 	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
 end
-
-function ToolBase:InitializeAll(gameDataType, tool)
-	
-	self:Initialize(gameDataType, tool)
-	
-	--tool.Equipped:Connect(function() OnEquipped(self) end)
-	--tool.Unequipped:Connect(function() OnUnequipped(self) end)
-	tool.Equipped:Connect(function() Debug.Print("OnEquipped : " .. tostring(tool)) end)
-	tool.Unequipped:Connect(function() Debug.Print("OnUnequipped : ".. tostring(tool)) end)
-
-end
-
+--]]
 
 -- 반환 코드 ------------------------------------------------------------------------------------------------------
 
-setmetatable(ToolBase, Utility:DeepCopy(require(ServerModuleFacade.ObjectModule:WaitForChild("ObjectBase"))))
 return ToolBase

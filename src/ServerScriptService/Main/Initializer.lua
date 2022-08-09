@@ -16,8 +16,8 @@ local GameStateType = ServerModuleFacade.CommonEnum.GameStateType
 local GameDataType = ServerModuleFacade.ServerEnum.GameDataType
 
 local ToolModule = ServerModuleFacade.ToolModule
-local DamagerScript = ToolModule:WaitForChild("Damager")
-local InteractorScript = ToolModule:WaitForChild("Interactor")
+local DamagerControllerScript = ToolModule:WaitForChild("DamagerController")
+local InteractorControllerScript = ToolModule:WaitForChild("InteractorController")
 
 local Tools = ServerStorage:WaitForChild("Tools")
 local ArmorTools = Tools:WaitForChild("Armors")
@@ -58,13 +58,13 @@ function InitializeTools()
 				trigger.CanQuery = true
 			end
 
-			if tool:FindFirstChild("Damager") then
-				local clonedDamagerScript = DamagerScript:Clone()
-				clonedDamagerScript.Parent = tool
+			if tool:FindFirstChild("DamagerController") then
+				local clonedDamagerControllerScript = DamagerControllerScript:Clone()
+				clonedDamagerControllerScript.Parent = tool
 
 			elseif tool:FindFirstChild("Interactor") then
-				local clonedInteractorScript = InteractorScript:Clone()
-				clonedInteractorScript.Parent = tool
+				local clonedInteractorControllerScript = InteractorControllerScript:Clone()
+				clonedInteractorControllerScript.Parent = tool
 
 			else
 				Debug.Print("도구 용도 없음")

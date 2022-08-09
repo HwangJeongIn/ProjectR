@@ -46,19 +46,7 @@ end
 
 function CommonGlobalStorage:CreateEmptyData()
 	local playerData = {
-		[StatusType.Statistic] =  Utility:DeepCopy(PlayerStatistic),
-		--[[
-		[StatusType.ArmorSlot] = {
-			-- 그냥 명시적으로 표현
-			[EquipType.Helmet] = {Value = nil, ToolGameData = nil},
-			[EquipType.Chestplate] = {Value = nil, ToolGameData = nil},
-			[EquipType.Leggings] = {Value = nil, ToolGameData = nil},
-			[EquipType.Boots] = {Value = nil, ToolGameData = nil}
-		},
-
-		-- 그냥 명시적으로 표현
-		[StatusType.WeaponSlot] = {Value = nil, ToolGameData = nil},
-		--]]
+		[StatusType.Statistic] = Utility:DeepCopy(PlayerStatistic),
 		[StatusType.EquipSlots] = Utility:DeepCopy(EquipSlots),
 		[StatusType.Inventory] = Utility:DeepCopy(Inventory)
 	}
@@ -119,7 +107,6 @@ function CommonGlobalStorage:ClearPlayer(player)
 end
 
 function CommonGlobalStorage:GetPlayerStatistic(playerId)
-
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
 		return nil
@@ -127,6 +114,28 @@ function CommonGlobalStorage:GetPlayerStatistic(playerId)
 
 	--self:CheckAndCalculateStatistic(playerId)
 	return self.PlayerTable[playerId][StatusType.Statistic]:Get()
+end
+
+-- 각 합산된 능력치
+function CommonGlobalStorage:GetStat(playerId, statType)
+	if not statType then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+	
+	local targetPlayerStatistic = self:GetPlayerStatistic(playerId)
+	if not targetPlayerStatistic then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local targetStat = targetPlayerStatistic:GetStat(statType)
+	if nil == targetStat then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return targetStat
 end
 
 function CommonGlobalStorage:UpdateRemovedToolGameData(playerId, toolGameData)
