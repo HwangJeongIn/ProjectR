@@ -58,7 +58,7 @@ function InitializeTools()
 				trigger.CanQuery = true
 			end
 
-			if tool:FindFirstChild("DamagerController") then
+			if tool:FindFirstChild("Damager") then
 				local clonedDamagerControllerScript = DamagerControllerScript:Clone()
 				clonedDamagerControllerScript.Parent = tool
 

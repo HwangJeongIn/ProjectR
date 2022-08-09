@@ -29,20 +29,21 @@ local ToolUtility = {
 }
 
 function ToolUtility:GetToolGameData(tool)
-	
 	if not tool then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
 	end
 
 	-- FindFirstChild를 쓰면 가끔 못찾는 경우가 있다. 확인해봐야한다.
+	--[[
 	local key = tool:WaitForChild("Key")
 	if not key then
 		Debug.Assert(false, "Key 객체가 존재하지 않습니다. => " .. tostring(tool))
 		return nil
 	end
+	--]]
 
-	key = key.Value
+	local key = tool.Key.Value
 	local toolGameData = CommonGameDataManager[GameDataType.Tool]:Get(key)
 	if not toolGameData then
 		Debug.Assert(false, "ToolGameData가 존재하지 않습니다. [key] => " .. tostring(key))

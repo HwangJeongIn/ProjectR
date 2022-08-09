@@ -28,6 +28,15 @@ local Utility = {
 Utility.__index = Inheritable__index
 Utility.__newindex = Immutable__newindex
 
+
+function Utility:AddClonedObjectModuleScriptToObject(object, objectModuleSript)
+	local clonedObjectModuleScript = objectModuleSript:Clone()
+	clonedObjectModuleScript.Parent = object
+	clonedObjectModuleScript.Name = "RawObjectData"
+
+	return require(clonedObjectModuleScript)
+end
+
 function Utility:ShallowCopy(original)
 	local originalType = type(original)
 	local copy = {}

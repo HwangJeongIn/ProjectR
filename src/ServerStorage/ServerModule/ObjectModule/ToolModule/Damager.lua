@@ -4,8 +4,12 @@ local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 local Utility = ServerModuleFacade.Utility
 local Debug = ServerModuleFacade.Debug
-local ServerConstant = ServerModuleFacade.ServerConstant
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
+
+
+local ServerConstant = ServerModuleFacade.ServerConstant
+local DefaultAttackPoint = ServerConstant.DefaultAttackPoint
+local DefaultSTRFactor = ServerConstant.DefaultSTRFactor
 
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
@@ -14,11 +18,6 @@ local StatType = ServerEnum.StatType
 local ToolModule = ServerModuleFacade.ToolModule
 local Debris = game:GetService("Debris")
 
-local Tool = script.Parent
-local Anim1 = Tool.anim1
-local isAttacking = false
-
-
 local Damager = {}
 Damager.__index = Utility.Inheritable__index
 Damager.__newindex = Utility.Inheritable__newindex
@@ -26,9 +25,8 @@ setmetatable(Damager, Utility:DeepCopy(require(ToolModule:WaitForChild("ToolBase
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
-
-function Damager:InitializeDamager(gameDataType, damager)
-    if not self:InitializeTool(GameDataType.Tool, Tool) then
+function Damager:InitializeDamager(gameDataType, damagerTool)
+    if not self:InitializeTool(gameDataType, damagerTool) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -48,36 +46,43 @@ function Damager:CanAttack(otherPart)
 		return false
 	end
 	
-	if not Tool then
+    local damagerTool = self:Root()
+	if not damagerTool then
 		Debug.Assert(false, "도구가 없습니다.")
 		return false
 	end
 	
-	local toolParent = Tool.Parent
-	local toolParentClassName = toolParent.ClassName
-	if not toolParentClassName 
-		or toolParentClassName == "Workspace" 		-- 필드에 존재
-		or toolParentClassName == "Backpack" then	-- 가방에 존재
+	local damagerToolParent = damagerTool.Parent
+	local damagerToolClassName = damagerToolParent.ClassName
+	if not damagerToolClassName 
+		or damagerToolClassName == "Workspace" 		-- 필드에 존재
+		or damagerToolClassName == "Backpack" then	-- 가방에 존재
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 	
 	-- 자기자신인 경우
-	if toolParent == otherModel then
+	if damagerToolParent == otherModel then
 		return false
 	end
 	
 	return true
-	
 end
 
-function Damager:CalcDamage(attackerCharacter, attackeeCharacter)
+function Damager:CalcDamage(damagedActor, damageCauser)
 	
+    --[[
+    local playerOfDamagedActor = game.Players:GetPlayerByUserId(damagedActor)
+    local playerOfDamageCauser = game.Players:GetPlayerByUserId(damageCauser)
+
+	local damagedPlayer = game.Players:GetPlayerByUserId(damagedActor)
+    local damageCauserPlayer = 
+
 	local attackerSTR = 0
 	local attackeeDEF = 0
 	
 	-- ==== 캐릭터 계산 ====
-
+    ServerGlobalStorage:GetStat(StatType.STR)
 
 
 
@@ -112,11 +117,12 @@ function Damager:CalcDamage(attackerCharacter, attackeeCharacter)
 	end
 	
 	
-	local finalDamage = ServerConstant.DefaultAttackPoint + (attackerSTR * ServerConstant.DefaultSTRFactor) - attackeeDEF
+	local finalDamage = DefaultAttackPoint + (attackerSTR * DefaultSTRFactor) - attackeeDEF
 	
 	finalDamage = math.clamp(finalDamage, 0, 100)
 	
 	return finalDamage
+    --]]
 end
 
 function Damager:AttackCharacter(attackerCharacter, attackeeCharacter)
@@ -137,7 +143,7 @@ function Damager:AttackCharacter(attackerCharacter, attackeeCharacter)
 end
 
 function Damager:Attack(attackeePart)
-	if CanAttack(attackeePart) == false then
+	if self:CanAttack(attackeePart) == false then
 		--Debug.Assert(false, "공격할 수 없습니다.")
 		return
 	end
@@ -153,7 +159,7 @@ function Damager:Attack(attackeePart)
 	else
 		local attackerCharacter = Tool.Parent
 		local attackeeCharacter = attackeePart.Parent
-		AttackCharacter(attackerCharacter, attackeeCharacter)
+		self:AttackCharacter(attackerCharacter, attackeeCharacter)
 	end
 --[[
 	local attackerTag = Instance.new("ObjectValue")
