@@ -15,11 +15,12 @@ local ServerGlobalStorage = require(ServerModule:WaitForChild("ServerGlobalStora
 local ServerGameDataModule = ServerModule:WaitForChild("ServerGameDataModule")
 local ServerGameDataManager = require(ServerGameDataModule:WaitForChild("ServerGameDataManager"))
 
+-- 종속성 때문에 주석처리
 -- 오브젝트 모듈
-local ObjectModule = ServerModule:WaitForChild("ObjectModule")
-local ToolModule = ObjectModule:WaitForChild("ToolModule")
-local VehicleModule = ObjectModule:WaitForChild("VehicleModule")
-local WorldInteractorModule = ObjectModule:WaitForChild("WorldInteractorModule")
+--local ObjectModule = ServerModule:WaitForChild("ObjectModule")
+--local ToolModule = ObjectModule:WaitForChild("ToolModule")
+--local VehicleModule = ObjectModule:WaitForChild("VehicleModule")
+--local WorldInteractorModule = ObjectModule:WaitForChild("WorldInteractorModule")
 
 
 local ServerModuleFacade = {
@@ -28,10 +29,12 @@ local ServerModuleFacade = {
 	ServerEnum = ServerEnum,
 	ServerGlobalStorage = ServerGlobalStorage,
 	ServerGameDataManager = ServerGameDataManager,
-	ObjectModule = ObjectModule,
-	ToolModule = ToolModule,
-	VehicleModule = VehicleModule,
-	WorldInteractorModule = WorldInteractorModule
+	
+	-- 종속성 때문에 주석처리
+	--ObjectModule = ObjectModule,
+	--ToolModule = ToolModule,
+	--VehicleModule = VehicleModule,
+	--WorldInteractorModule = WorldInteractorModule
 }
 
 setmetatable(ServerModuleFacade, CommonModuleFacade)
