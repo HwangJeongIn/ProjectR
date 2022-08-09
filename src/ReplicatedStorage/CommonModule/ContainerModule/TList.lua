@@ -6,8 +6,8 @@ local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
 local UndefinedElementValue = CommonConstant.UndefinedElementValue
 
-local Container = CommonModule:WaitForChild("Container")
-local TContainerBase = Utility:DeepCopy(require(Container:WaitForChild("TContainerBase")))
+local ContainerModule = CommonModule:WaitForChild("ContainerModule")
+local TContainerBase = Utility:DeepCopy(require(ContainerModule:WaitForChild("TContainerBase")))
 
 local TList = TContainerBase
 

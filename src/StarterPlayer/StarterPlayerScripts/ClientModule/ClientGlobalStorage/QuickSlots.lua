@@ -10,8 +10,8 @@ local MaxQuickSlotCount = CommonConstant.MaxQuickSlotCount
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local ToolType = CommonEnum.ToolType
 
-local Container = CommonModule:WaitForChild("Container")
-local QuickSlotsRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
+local ContainerModule = CommonModule:WaitForChild("ContainerModule")
+local QuickSlotsRaw = Utility:DeepCopy(require(ContainerModule:WaitForChild("TArray")))
 QuickSlotsRaw:Initialize(MaxQuickSlotCount)
 
 --local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))

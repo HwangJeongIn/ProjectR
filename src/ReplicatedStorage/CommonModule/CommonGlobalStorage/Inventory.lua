@@ -11,8 +11,8 @@ local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
 local ToolType = CommonEnum.ToolType
 
-local Container = CommonModule:WaitForChild("Container")
-local InventoryRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
+local ContainerModule = CommonModule:WaitForChild("ContainerModule")
+local InventoryRaw = Utility:DeepCopy(require(ContainerModule:WaitForChild("TArray")))
 
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))

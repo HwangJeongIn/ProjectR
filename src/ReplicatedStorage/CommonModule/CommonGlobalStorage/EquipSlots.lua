@@ -10,8 +10,8 @@ local MaxEquipSlotCount = CommonConstant.MaxEquipSlotCount
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local ToolType = CommonEnum.ToolType
 
-local Container = CommonModule:WaitForChild("Container")
-local EquipSlotsRaw = Utility:DeepCopy(require(Container:WaitForChild("TArray")))
+local ContainerModule = CommonModule:WaitForChild("ContainerModule")
+local EquipSlotsRaw = Utility:DeepCopy(require(ContainerModule:WaitForChild("TArray")))
 EquipSlotsRaw:Initialize(MaxEquipSlotCount)
 
 local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))

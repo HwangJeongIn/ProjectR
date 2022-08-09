@@ -5,9 +5,9 @@ local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local Debug = require(CommonModule:WaitForChild("Debug"))
 local Utility = require(CommonModule:WaitForChild("Utility"))
 
-local Container = CommonModule:WaitForChild("Container")
-local TArray = require(Container:WaitForChild("TArray"))
-local TList = require(Container:WaitForChild("TList"))
+local ContainerModule = CommonModule:WaitForChild("ContainerModule")
+local TArray = require(ContainerModule:WaitForChild("TArray"))
+local TList = require(ContainerModule:WaitForChild("TList"))
 
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
