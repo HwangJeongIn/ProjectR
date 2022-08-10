@@ -9,69 +9,28 @@ local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Debug = ServerModuleFacade.Debug
-local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
-local ServerGameDataManager = ServerModuleFacade.ServerGameDataManager
-
 local GameStateType = ServerModuleFacade.CommonEnum.GameStateType
-local GameDataType = ServerModuleFacade.ServerEnum.GameDataType
 
-local ToolModule = ServerModuleFacade.ToolModule
-local DamagerControllerScript = ToolModule:WaitForChild("DamagerController")
-local InteractorControllerScript = ToolModule:WaitForChild("InteractorController")
+local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
-local Tools = ServerStorage:WaitForChild("Tools")
-local ArmorTools = Tools:WaitForChild("Armors")
-local WeaponTools = Tools:WaitForChild("Weapons")
 local MapController = require(script.Parent:WaitForChild("MapController"))
 
 local Initializer = {}
 
+function Initializer:InitializeGame()
 
-function InitializeTools()
-	local toolFolders = Tools:GetChildren()
+	local ServerModule = ServerModuleFacade.ServerModule
+	local WorldSystemModule = ServerModule:WaitForChild("WorldSystemModule")
+	local toolSystem = require(WorldSystemModule:WaitForChild("ToolSystem"))
+	local worldInteractorSystem = require(WorldSystemModule:WaitForChild("WorldInteractorSystem"))
+	local monsterSystem = require(WorldSystemModule:WaitForChild("MonsterSystem"))
 
-	for _, toolFolder in pairs(toolFolders) do
-		local tools = toolFolder:GetChildren()
-		for _, tool in pairs(tools) do
-
-			tool.CanBeDropped = false
-			local handle = tool:FindFirstChild("Handle")
-			if not handle then
-				Debug.Assert(false, "도구에 핸들이 없습니다. => " .. tool.Name)
-				return false
-			end
-
-			local trigger = handle:FindFirstChild("Trigger")
-			if not trigger then
-				Debug.Assert(false, "도구에 트리거가 없습니다. => " .. tool.Name)
-				return false
-			end
-
-			if handle.CanTouch then
-				Debug.Print("CanTouch가 켜져있습니다. 자동으로 꺼집니다." .. tool.Name)
-				handle.CanTouch = false
-			end
-
-			if trigger.CanCollide then
-				Debug.Print("CanCollide가 켜져있습니다. 자동으로 꺼집니다." .. tool.Name)
-				trigger.CanCollide = false
-				trigger.CanQuery = true
-			end
-
-			if tool:FindFirstChild("Damager") then
-				local clonedDamagerControllerScript = DamagerControllerScript:Clone()
-				clonedDamagerControllerScript.Parent = tool
-
-			elseif tool:FindFirstChild("Interactor") then
-				local clonedInteractorControllerScript = InteractorControllerScript:Clone()
-				clonedInteractorControllerScript.Parent = tool
-
-			else
-				Debug.Print("도구 용도 없음")
-				--return false
-			end
-		end
+	if not ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, monsterSystem) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
 	end
+	self:RegisterPlayerEvent()
+
 	return true
 end
 
@@ -173,14 +132,9 @@ function OnPlayerRemoving(player)
 	ServerGlobalStorage:RemovePlayer(player)
 end
 
-function RegisterPlayerEvent()
+function Initializer:RegisterPlayerEvent()
 	game.Players.PlayerAdded:Connect(OnPlayerAdded)
 	game.Players.PlayerRemoving:Connect(OnPlayerRemoving)
-end
-
-function Initializer:InitializeGame()
-	InitializeTools()
-	RegisterPlayerEvent()
 end
 
 function Initializer:ClearPlayers(players)
@@ -258,7 +212,6 @@ function Initializer:EnterGame(map, playersInGame)
 	MapController:EnterMap(map, playersInGame)
 	self:StartGame(playersInGame)
 end
-
 
 return Initializer
 

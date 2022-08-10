@@ -130,7 +130,12 @@ function GuiController:Initialize()
 
 	self:InitializeTopbar()
 	self:BindGuiKeys()
-	ClientGlobalStorage:Initialize(self)
+	if not ClientGlobalStorage:Initialize(self) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
 end
 
 function GuiController:ToggleInGameGui(isEnabled)

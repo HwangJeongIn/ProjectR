@@ -1,0 +1,3 @@
+local MonsterSystem = {}
+
+return MonsterSystem

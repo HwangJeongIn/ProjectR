@@ -74,10 +74,10 @@ local CommonEnum = {
 
 -- 필요하면 추가
 CommonEnum.ToolType.Converter = {
-	[CommonEnum.ToolType.All] = "All",
 	[CommonEnum.ToolType.Weapon] = "Weapon",
 	[CommonEnum.ToolType.Armor] = "Armor",
 	[CommonEnum.ToolType.Consumable] = "Consumable",
+	[CommonEnum.ToolType.All] = "All",
 }
 
 CommonEnum.EquipType.Converter = {

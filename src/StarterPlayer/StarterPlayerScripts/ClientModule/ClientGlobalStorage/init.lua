@@ -36,15 +36,26 @@ local QuickSlots = require(script:WaitForChild("QuickSlots"))
 local ClientGlobalStorage = CommonGlobalStorage
 ClientGlobalStorage.QuickSlots = QuickSlots
 
+ClientGlobalStorage.__index = Utility.Inheritable__index
+ClientGlobalStorage.__newindex = Utility.Inheritable__newindex
+--setmetatable(ClientGlobalStorage, CommonGlobalStorage)
+
 
 function ClientGlobalStorage:Initialize(guiController)
-	self:AddPlayer(LocalPlayer) -- 본인거는 서버도 통보안해준다.
-
-	Debug.Assert(guiController, "비정상입니다.")
+	if not guiController then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	-- 본인거는 서버도 통보안해준다.
+	if not self:AddPlayer(LocalPlayer) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
 	--self.GuiController = guiController
-
 	local ClientRemoteEventImpl = require(script:WaitForChild("ClientRemoteEventImpl"))
 	ClientRemoteEventImpl:InitializeRemoteEvents(self, guiController)
+	return true
 end
 
 function ClientGlobalStorage:SendDropTool(tool)
@@ -236,12 +247,4 @@ function ClientGlobalStorage:SwapQuickSlot(slotIndex1, slotIndex2)
 	return true
 end
 
-
-
-
-ClientGlobalStorage.__index = Utility.Inheritable__index
-ClientGlobalStorage.__newindex = Utility.Inheritable__newindex
---setmetatable(ClientGlobalStorage, CommonGlobalStorage)
-
---ClientGlobalStorage:Initialize()
 return ClientGlobalStorage

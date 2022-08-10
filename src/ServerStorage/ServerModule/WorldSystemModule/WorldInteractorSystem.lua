@@ -1,0 +1,3 @@
+local WorldInteractorSystem = {}
+
+return WorldInteractorSystem

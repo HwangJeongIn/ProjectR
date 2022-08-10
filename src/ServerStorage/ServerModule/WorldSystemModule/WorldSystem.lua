@@ -23,14 +23,6 @@ local ToolType = ServerEnum.ToolType
 local EquipType = ServerEnum.EquipType
 
 local WorldSystem = {
-    Objects = {}
 }
-
-
-
-
-function SpawnObject(parent, position, )
-
-end
 
 return WorldSystem
