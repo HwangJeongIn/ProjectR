@@ -9,7 +9,9 @@ local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Debug = ServerModuleFacade.Debug
-local GameStateType = ServerModuleFacade.CommonEnum.GameStateType
+local CommonEnum = ServerModuleFacade.CommonEnum
+local GameStateType = CommonEnum.GameStateType
+local ToolType = CommonEnum.ToolType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
@@ -147,25 +149,15 @@ function Initializer:ClearPlayers(players)
 end
 
 function Initializer:PushDefaulArmorTools(player)
-	local Boots = ArmorTools.Boots:Clone()
-	Boots.Parent = player.Backpack
-
-	local Chestplate = ArmorTools.Chestplate:Clone()
-	Chestplate.Parent = player.Backpack
-
-	local Helmet = ArmorTools.Helmet:Clone()
-	Helmet.Parent = player.Backpack
-
-	local Leggings = ArmorTools.Leggings:Clone()
-	Leggings.Parent = player.Backpack
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Boots", player)
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Chestplate", player)
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Helmet", player)
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Leggings", player)
 end
 
 function Initializer:PushDefaulWeaponTools(player)
-	local Sword = WeaponTools.Sword:Clone()
-	Sword.Parent = player.Backpack
-
-	local Axe = WeaponTools.Axe:Clone()
-	Axe.Parent = player.Backpack
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Weapon, "Sword", player)
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Weapon, "Axe", player)
 end
 
 function Initializer:StartGame(playersInGame)

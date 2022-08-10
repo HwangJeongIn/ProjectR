@@ -6,7 +6,7 @@ local Debug = CommonModuleFacade.Debug
 local Utility = CommonModuleFacade.Utility
 
 local ServerStorage = game:GetService("ServerStorage")
-local ServerModuleFacade = ServerStorage:WaitForChild("ServerModuleFacade")
+local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 local ServerEnum = ServerModuleFacade.ServerEnum
@@ -19,8 +19,8 @@ local ToolModule = ServerModuleFacade.ToolModule
 local DamagerController = ToolModule:WaitForChild("DamagerController")
 
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
-local SystemModule = ServerModule:WaitForChild("SystemModule")
-local ObjectSystemBase = SystemModule:WaitForChild("ObjectSystemBase")
+local SystemModule = ServerModule:WaitForChild("WorldSystemModule")
+local ObjectSystemBase = require(SystemModule:WaitForChild("ObjectSystemBase"))
 
 --[[
 local ServerConstant = ServerModuleFacade.ServerConstant
@@ -32,12 +32,11 @@ local GameDataType = ServerEnum.GameDataType
 local StatusType = ServerEnum.StatusType
 local EquipType = ServerEnum.EquipType
 --]]
-local ToolSystem = {
-}
+local ToolSystem = Utility.DeepCopy(ObjectSystemBase)
 
 ToolSystem.__index = Utility.Inheritable__index
 ToolSystem.__newindex = Utility.Inheritable__newindex
-setmetatable(ToolSystem, Utility.DeepCopy(ObjectSystemBase))
+--setmetatable(ToolSystem, Utility.DeepCopy(ObjectSystemBase))
 
 function ToolSystem:InitializeToolTemplate(tool)
     if not tool then
@@ -146,7 +145,7 @@ function ToolSystem:GetClonedToolScript(toolType, tool)
 end
 
 function ToolSystem:CreateTool(toolType, toolName)
-    if not toolType or toolName then
+    if not toolType or not toolName then
         Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolType) .. " : " .. toolName)
         return nil
     end
