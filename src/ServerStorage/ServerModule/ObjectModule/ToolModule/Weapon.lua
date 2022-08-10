@@ -18,15 +18,15 @@ local StatType = ServerEnum.StatType
 local ToolModule = ServerModuleFacade.ToolModule
 local Debris = game:GetService("Debris")
 
-local Damager = {}
-Damager.__index = Utility.Inheritable__index
-Damager.__newindex = Utility.Inheritable__newindex
-setmetatable(Damager, Utility:DeepCopy(require(ToolModule:WaitForChild("ToolBase"))))
+local Weapon = {}
+Weapon.__index = Utility.Inheritable__index
+Weapon.__newindex = Utility.Inheritable__newindex
+setmetatable(Weapon, Utility:DeepCopy(require(ToolModule:WaitForChild("ToolBase"))))
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
-function Damager:InitializeDamager(gameDataType, damagerTool)
-    if not self:InitializeTool(gameDataType, damagerTool) then
+function Weapon:InitializeWeapon(gameDataType, weaponTool)
+    if not self:InitializeTool(gameDataType, weaponTool) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -34,7 +34,7 @@ function Damager:InitializeDamager(gameDataType, damagerTool)
     return true
 end
 
-function Damager:CanAttack(otherPart)
+function Weapon:CanAttack(otherPart)
 	if not otherPart then
 		Debug.Assert(false, "대상이 존재하지 않습니다.")
 		return false
@@ -46,30 +46,30 @@ function Damager:CanAttack(otherPart)
 		return false
 	end
 	
-    local damagerTool = self:Root()
-	if not damagerTool then
+    local weaponTool = self:Root()
+	if not weaponTool then
 		Debug.Assert(false, "도구가 없습니다.")
 		return false
 	end
 	
-	local damagerToolParent = damagerTool.Parent
-	local damagerToolClassName = damagerToolParent.ClassName
-	if not damagerToolClassName 
-		or damagerToolClassName == "Workspace" 		-- 필드에 존재
-		or damagerToolClassName == "Backpack" then	-- 가방에 존재
+	local weaponToolParent = weaponTool.Parent
+	local weaponToolClassName = weaponToolParent.ClassName
+	if not weaponToolClassName 
+		or weaponToolClassName == "Workspace" 		-- 필드에 존재
+		or weaponToolClassName == "Backpack" then	-- 가방에 존재
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 	
 	-- 자기자신인 경우
-	if damagerToolParent == otherModel then
+	if weaponToolParent == otherModel then
 		return false
 	end
 	
 	return true
 end
 
-function Damager:CalcDamage(damagedActor, damageCauser)
+function Weapon:CalcDamage(damagedActor, damageCauser)
 	
     --[[
     local playerOfDamagedActor = game.Players:GetPlayerByUserId(damagedActor)
@@ -125,7 +125,7 @@ function Damager:CalcDamage(damagedActor, damageCauser)
     --]]
 end
 
-function Damager:AttackCharacter(attackerCharacter, attackeeCharacter)
+function Weapon:AttackCharacter(attackerCharacter, attackeeCharacter)
 
 	local damage = self:CalcDamage(attackerCharacter, attackeeCharacter)
 	Debug.Log("Damage : ".. tostring(damage))
@@ -142,7 +142,7 @@ function Damager:AttackCharacter(attackerCharacter, attackeeCharacter)
 	attackeeCharacterHumanoid:TakeDamage(damage)
 end
 
-function Damager:Attack(attackeePart)
+function Weapon:Attack(attackeePart)
 	if self:CanAttack(attackeePart) == false then
 		--Debug.Assert(false, "공격할 수 없습니다.")
 		return false
@@ -174,4 +174,4 @@ function Damager:Attack(attackeePart)
 	return true
 end
 
-return Damager
+return Weapon

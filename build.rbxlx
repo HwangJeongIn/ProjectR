@@ -35645,7 +35645,7 @@ return ObjectBase
           </Properties>
           <Item class="ModuleScript" referent="681">
             <Properties>
-              <string name="Name">Damager</string>
+              <string name="Name">Weapon</string>
               <string name="Source"><![CDATA[-- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
 
 local ServerStorage = game:GetService("ServerStorage")
@@ -35666,15 +35666,15 @@ local StatType = ServerEnum.StatType
 local ToolModule = ServerModuleFacade.ToolModule
 local Debris = game:GetService("Debris")
 
-local Damager = {}
-Damager.__index = Utility.Inheritable__index
-Damager.__newindex = Utility.Inheritable__newindex
-setmetatable(Damager, Utility:DeepCopy(require(ToolModule:WaitForChild("ToolBase"))))
+local Weapon = {}
+Weapon.__index = Utility.Inheritable__index
+Weapon.__newindex = Utility.Inheritable__newindex
+setmetatable(Weapon, Utility:DeepCopy(require(ToolModule:WaitForChild("ToolBase"))))
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
-function Damager:InitializeDamager(gameDataType, damagerTool)
-    if not self:InitializeTool(gameDataType, damagerTool) then
+function Weapon:InitializeWeapon(gameDataType, WeaponTool)
+    if not self:InitializeTool(gameDataType, WeaponTool) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -35682,7 +35682,7 @@ function Damager:InitializeDamager(gameDataType, damagerTool)
     return true
 end
 
-function Damager:CanAttack(otherPart)
+function Weapon:CanAttack(otherPart)
 	if not otherPart then
 		Debug.Assert(false, "대상이 존재하지 않습니다.")
 		return false
@@ -35694,30 +35694,30 @@ function Damager:CanAttack(otherPart)
 		return false
 	end
 	
-    local damagerTool = self:Root()
-	if not damagerTool then
+    local WeaponTool = self:Root()
+	if not WeaponTool then
 		Debug.Assert(false, "도구가 없습니다.")
 		return false
 	end
 	
-	local damagerToolParent = damagerTool.Parent
-	local damagerToolClassName = damagerToolParent.ClassName
-	if not damagerToolClassName 
-		or damagerToolClassName == "Workspace" 		-- 필드에 존재
-		or damagerToolClassName == "Backpack" then	-- 가방에 존재
+	local WeaponToolParent = WeaponTool.Parent
+	local WeaponToolClassName = WeaponToolParent.ClassName
+	if not WeaponToolClassName 
+		or WeaponToolClassName == "Workspace" 		-- 필드에 존재
+		or WeaponToolClassName == "Backpack" then	-- 가방에 존재
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 	
 	-- 자기자신인 경우
-	if damagerToolParent == otherModel then
+	if WeaponToolParent == otherModel then
 		return false
 	end
 	
 	return true
 end
 
-function Damager:CalcDamage(damagedActor, damageCauser)
+function Weapon:CalcDamage(damagedActor, damageCauser)
 	
     --[[
     local playerOfDamagedActor = game.Players:GetPlayerByUserId(damagedActor)
@@ -35773,7 +35773,7 @@ function Damager:CalcDamage(damagedActor, damageCauser)
     --]]
 end
 
-function Damager:AttackCharacter(attackerCharacter, attackeeCharacter)
+function Weapon:AttackCharacter(attackerCharacter, attackeeCharacter)
 
 	local damage = self:CalcDamage(attackerCharacter, attackeeCharacter)
 	Debug.Log("Damage : ".. tostring(damage))
@@ -35790,7 +35790,7 @@ function Damager:AttackCharacter(attackerCharacter, attackeeCharacter)
 	attackeeCharacterHumanoid:TakeDamage(damage)
 end
 
-function Damager:Attack(attackeePart)
+function Weapon:Attack(attackeePart)
 	if self:CanAttack(attackeePart) == false then
 		--Debug.Assert(false, "공격할 수 없습니다.")
 		return
@@ -35817,13 +35817,13 @@ function Damager:Attack(attackeePart)
 	--]]
 end
 
-return Damager
+return Weapon
 ]]></string>
             </Properties>
           </Item>
           <Item class="ModuleScript" referent="682">
             <Properties>
-              <string name="Name">DamagerController</string>
+              <string name="Name">WeaponController</string>
               <string name="Source">-- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
 
 local ServerStorage = game:GetService("ServerStorage")
@@ -35837,61 +35837,61 @@ local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
 local StatType = ServerEnum.StatType
 
---local DamagerModuleScript = ServerModuleFacade.ToolModule:WaitForChild("Damager")
+--local WeaponModuleScript = ServerModuleFacade.ToolModule:WaitForChild("Weapon")
 local Debris = game:GetService("Debris")
 
-local DamagerController = {}
+local WeaponController = {}
 
-function DamagerController:InitializeDamagerController(gameDataType, damagerTool)
-	self.DamagerTool = damagerTool
-	self.Damager = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("Damager")))
+function WeaponController:InitializeWeaponController(gameDataType, WeaponTool)
+	self.WeaponTool = WeaponTool
+	self.Weapon = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("Weapon")))
 
-    if not self.Damager:InitializeDamager(gameDataType, damagerTool) then
+    if not self.Weapon:InitializeWeapon(gameDataType, WeaponTool) then
 		Debug.Assert(false, "비정상입니다.")
         return false
     end
 
 	--[[
-	local clonedDamagerScriptRaw = Utility:AddClonedObjectModuleScriptToObject(damagerTool, damagerScript)
-    self.Damager = clonedDamagerScriptRaw
+	local clonedWeaponScriptRaw = Utility:AddClonedObjectModuleScriptToObject(WeaponTool, WeaponScript)
+    self.Weapon = clonedWeaponScriptRaw
 
 	--]]
 
-	local Anim1 = self.DamagerTool:WaitForChild("Anim1")
-	local Attacker = self.DamagerTool:WaitForChild("Attacker")
+	local Anim1 = self.WeaponTool:WaitForChild("Anim1")
+	local Attacker = self.WeaponTool:WaitForChild("Attacker")
 	local IsAttacking = false
 
 	self.Anim1 = Anim1
 	self.Attacker = Attacker
 	self.IsAttacking = IsAttacking
 
-	damagerTool.Activated:Connect(function() OnActivated(DamagerController) end)
-	damagerTool.Attacker.Touched:Connect(function(touchedActor) OnTouched(DamagerController, touchedActor) end)
+	WeaponTool.Activated:Connect(function() OnActivated(WeaponController) end)
+	WeaponTool.Attacker.Touched:Connect(function(touchedActor) OnTouched(WeaponController, touchedActor) end)
 
     return true
 end
 
-function OnTouched(DamagerController, touchedActor)
-	if DamagerController.IsAttacking == false then 
+function OnTouched(WeaponController, touchedActor)
+	if WeaponController.IsAttacking == false then 
 		return 
 	end
 
-	DamagerController.IsAttacking = false
-	DamagerController.Damager:Attack(touchedActor)
+	WeaponController.IsAttacking = false
+	WeaponController.Weapon:Attack(touchedActor)
 end
 
-function OnActivated(DamagerController)
+function OnActivated(WeaponController)
 	--Debug.Assert(false, ToolBase:GetGameDataKey())
-	DamagerController.IsAttacking = true
-	local humanoid = DamagerController.DamagerTool.Parent:FindFirstChild("Humanoid")
-	local anim1Track = humanoid:LoadAnimation(DamagerController.Anim1)
+	WeaponController.IsAttacking = true
+	local humanoid = WeaponController.WeaponTool.Parent:FindFirstChild("Humanoid")
+	local anim1Track = humanoid:LoadAnimation(WeaponController.Anim1)
 	anim1Track:Play()
 
-	anim1Track.Stopped:Connect(function() DamagerController.IsAttacking = false end)
+	anim1Track.Stopped:Connect(function() WeaponController.IsAttacking = false end)
 	--humanoid:TakeDamage(50)
 end
 
-return DamagerController</string>
+return WeaponController</string>
             </Properties>
           </Item>
           <Item class="Script" referent="683">
@@ -37279,7 +37279,7 @@ local ToolTypeConverter = ToolType.Converter
 local Tools = ServerStorage:WaitForChild("Tools")
 
 local ToolModule = ServerModuleFacade.ToolModule
-local DamagerController = ToolModule:WaitForChild("DamagerController")
+local WeaponController = ToolModule:WaitForChild("WeaponController")
 
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local SystemModule = ServerModule:WaitForChild("WorldSystemModule")
@@ -42114,7 +42114,7 @@ return SuperClassCDO</string>
           </Item>
           <Item class="BoolValue" referent="812">
             <Properties>
-              <string name="Name">Damager</string>
+              <string name="Name">Weapon</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>
@@ -42689,7 +42689,7 @@ return SuperClassCDO</string>
           </Item>
           <Item class="BoolValue" referent="828">
             <Properties>
-              <string name="Name">Damager</string>
+              <string name="Name">Weapon</string>
               <BinaryString name="AttributesSerialize"></BinaryString>
               <int64 name="SourceAssetId">-1</int64>
               <BinaryString name="Tags"></BinaryString>

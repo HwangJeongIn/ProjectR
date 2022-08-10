@@ -18,7 +18,7 @@ local ToolTypeConverter = ToolType.Converter
 local Tools = ServerStorage:WaitForChild("Tools")
 
 local ToolModule = ServerModuleFacade.ToolModule
-local DamagerController = ToolModule:WaitForChild("DamagerController")
+local WeaponController = ToolModule:WaitForChild("WeaponController")
 
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local SystemModule = ServerModule:WaitForChild("WorldSystemModule")
@@ -138,8 +138,8 @@ function ToolSystem:GetClonedToolScript(toolType, tool)
 
     local targetScript = nil
     if ToolType.Weapon == toolType then
-        targetScript = Utility:DeepCopy(DamagerController)
-        if not targetScript:InitializeDamagerController(GameDataType.Tool, tool) then
+        targetScript = Utility:DeepCopy(WeaponController)
+        if not targetScript:InitializeWeaponController(GameDataType.Tool, tool) then
             Debug.Assert(false, "비정상입니다.")
             return nil
         end

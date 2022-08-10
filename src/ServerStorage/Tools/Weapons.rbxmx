@@ -414,7 +414,7 @@
 			<Item class="BoolValue" referent="RBXF99E5FD3B3494038B193D4208EB9C874">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">Damager</string>
+					<string name="Name">Weapon</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<bool name="Value">false</bool>
@@ -980,7 +980,7 @@
 			<Item class="BoolValue" referent="RBX8090AED747164E108E357667A861BD36">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">Damager</string>
+					<string name="Name">Weapon</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<bool name="Value">false</bool>
