@@ -10173,7 +10173,7 @@ local GuiDraggingSystem = {
 -- 더 정리할 필요있음
 function OnInputBegan(input)
     if not GuiDraggingSystem.SlotControllerCandidate then 
-        Debug.Print("후보가 없습니다.")
+        --Debug.Print("후보가 없습니다.")
         return
     end
     
@@ -10203,7 +10203,7 @@ function OnInputEnded(input)
 
     if not GuiDraggingSystem.SlotController then
         GuiDraggingSystem:ClearSlotController()
-        Debug.Print("처음에 선택한 위치에 슬롯이 없습니다.")
+        --Debug.Print("처음에 선택한 위치에 슬롯이 없습니다.")
         return
     end
 
@@ -10220,13 +10220,15 @@ function OnInputEnded(input)
         currentSlotIndex = GuiDraggingSystem.SlotControllerCandidate.SlotIndex
     end
 
-    print("Swap Slot => ")
-    print("From => ".. SlotTypeConverter[prevSlotType] .. " : " .. tostring(prevSlotIndex))
+    --[[
+    Debug.Print("Swap Slot => ")
+    Debug.Print("From => ".. SlotTypeConverter[prevSlotType] .. " : " .. tostring(prevSlotIndex))
     if currentSlotType then
-        print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
+        Debug.Print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
     else
-        print("To => ".. "nil : nil")
+        Debug.Print("To => ".. "nil : nil")
     end
+    --]]
 
     if prevSlotType == SlotType.InventorySlot then
         if not currentSlotType then
@@ -10342,7 +10344,7 @@ end
 
 function GuiDraggingSystem:CheckAndClearSlotControllerCandidate(slotControllerCandidate)
     if self.SlotControllerCandidate == slotControllerCandidate then
-        print("self.SlotControllerCandidate = nil")
+        --Debug.Print("self.SlotControllerCandidate = nil")
         self.SlotControllerCandidate = nil
     end
 end
@@ -11587,13 +11589,12 @@ function GuiSlotController:newRaw(slotType, slotIndex, newGuiSlot)
 
 	newGuiSlotController.GuiSlot.MouseEnter:Connect(function(x,y)
 		newGuiSlotController.GuiSlot.ImageTransparency = 0.5
-		Debug.Print("SetSlotControllerCandidate => " .. tostring(newGuiSlotController.SlotIndex))
+		--Debug.Print("SetSlotControllerCandidate => " .. tostring(newGuiSlotController.SlotIndex))
 		GuiDraggingSystem:SetSlotControllerCandidate(newGuiSlotController)
 	end)
 
 	newGuiSlotController.GuiSlot.MouseLeave:Connect(function()
 		newGuiSlotController.GuiSlot.ImageTransparency = 0
-		--Debug.Print("SetSlotControllerCandidate => nil")
 		GuiDraggingSystem:CheckAndClearSlotControllerCandidate(newGuiSlotController)
 	end)
 	newGuiSlotController:InitializeImage(slotType, slotIndex)
@@ -14174,9 +14175,6 @@ function Temp()
 		Initializer:PushDefaulArmorTools(player)
 	end
 
-	while true do
-		wait(5)
-	end
 end
 
 while #game.Players:GetPlayers() < 1 do
@@ -14186,7 +14184,7 @@ end
 wait(3)
 Temp()
 
-while false  do
+while true  do
 	
 	
 	-- 다른 플레이어를 기다리는 중
@@ -14317,7 +14315,7 @@ while false  do
 		end
 	end
 
-	wait(100)
+	wait(3)
 	if winnerType == WinnerType.Player then
 		NotifyWinnerSTC:FireAllClients(winnerType, winnerName, winnerReward)
 	else
@@ -49285,8 +49283,26 @@ function ServerGlobalStorage:RemoveTool(playerId, tool)
 	RemoveToolSTC:FireClient(player, slotIndex, tool)
 
 	-- 삭제하려면 Parent가 nil이다.
+	-- 인벤토리에서 빼고 삭제해야해서 이방식대로 처리한다.
 	if not tool.Parent then
-		Debris:AddItem(tool, 0)
+		local character = player.Character
+		local targetCFrame = nil
+		if character then
+			local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+			if humanoidRootPart then
+				local characterCFrame = humanoidRootPart.CFrame
+				targetCFrame = characterCFrame + characterCFrame.LookVector * 3
+			end
+		end
+
+		if targetCFrame then
+			tool.Handle.CFrame = targetCFrame
+		end
+
+		if not self:DestroyTool(tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
 	end
 	return true
 end
@@ -49703,6 +49719,7 @@ function ObjectSystemBase:PostDestroy(object)
             Debris:AddItem(joint, 0)
         end
     end
+
 	Debris:AddItem(object, 5)
 
     if self.PostDestroyImpl then
@@ -49909,7 +49926,7 @@ function ToolSystem:Initialize()
         local targetToolFolderTools = targetToolFolder:GetChildren()
         for _, tool in pairs(targetToolFolderTools) do
             local toolName = tool.Name
-            if ToolTemplateTable[toolName] then
+            if ToolTemplateTable[toolType][toolName] then
                 Debug.Assert(false, "툴이름이 동일합니다. 변경해야합니다. => " .. targetToolFolderName .. " => " .. toolName)
                 return false
             end
@@ -49919,7 +49936,7 @@ function ToolSystem:Initialize()
                 return false
             end
 
-            ToolTemplateTable[toolName] = tool
+            ToolTemplateTable[toolType][toolName] = tool
         end
     end
     
@@ -49983,14 +50000,14 @@ end
 function ToolSystem:FindObjectJoints(tool)
     local joints = {}
 
-    local handle = tool:FindFirstChild("Handle")
-    table.insert(joints, handle)
+    local trigger = tool.Handle.Trigger
+    table.insert(joints, trigger)
 
-    local mesh = tool:FindObjectJoints("Mesh")
-    local parts = mesh:FindFirstChild("Parts")
-
+    local mesh = tool:FindFirstChild("Mesh")
+    local partsFolder = mesh:FindFirstChild("Parts")
+    local parts = partsFolder:GetChildren()
     for _, part in pairs(parts) do
-        local joint = part:FindfirstChild("Joint")
+        local joint = part:FindFirstChild("Joint")
         if not joint then
             continue
         end
@@ -50770,7 +50787,7 @@ return SuperClassCDO]]></ProtectedString>
 				<Item class="Tool" referent="RBX4E90E237F6764EE4AC18FA35A0C37B96">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
-						<bool name="CanBeDropped">true</bool>
+						<bool name="CanBeDropped">false</bool>
 						<bool name="Enabled">true</bool>
 						<CoordinateFrame name="Grip">
 							<X>0</X>
@@ -51406,7 +51423,7 @@ return SuperClassCDO]]></ProtectedString>
 				<Item class="Tool" referent="RBX115FAE85724445558E249E689CA2758C">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
-						<bool name="CanBeDropped">true</bool>
+						<bool name="CanBeDropped">false</bool>
 						<bool name="Enabled">true</bool>
 						<CoordinateFrame name="Grip">
 							<X>0</X>
@@ -52228,7 +52245,7 @@ return SuperClassCDO]]></ProtectedString>
 				<Item class="Tool" referent="RBX5F9AF98661D947FFAD66CAD2098A43F2">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
-						<bool name="CanBeDropped">true</bool>
+						<bool name="CanBeDropped">false</bool>
 						<bool name="Enabled">true</bool>
 						<CoordinateFrame name="Grip">
 							<X>0</X>
@@ -53036,7 +53053,7 @@ return SuperClassCDO]]></ProtectedString>
 				<Item class="Tool" referent="RBXD62B5D118397435B9811092E3F8CE14D">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
-						<bool name="CanBeDropped">true</bool>
+						<bool name="CanBeDropped">false</bool>
 						<bool name="Enabled">true</bool>
 						<CoordinateFrame name="Grip">
 							<X>0</X>
@@ -54368,15 +54385,6 @@ return SuperClassCDO]]></ProtectedString>
 					</Item>
 				</Item>
 			</Item>
-			<Item class="Folder" referent="RBX8E41D9F9A9CC49BA808409F3906E7C4B">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">Comsumables</string>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<UniqueId name="UniqueId">4090acec3eeebbbc030524980002ec9c</UniqueId>
-				</Properties>
-			</Item>
 			<Item class="Folder" referent="RBXC816A6B1DB4C41DFACA05D7CD9158B50">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -54388,7 +54396,7 @@ return SuperClassCDO]]></ProtectedString>
 				<Item class="Tool" referent="RBXE66657789A6A4579A23A5950E34FC362">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
-						<bool name="CanBeDropped">true</bool>
+						<bool name="CanBeDropped">false</bool>
 						<bool name="Enabled">true</bool>
 						<CoordinateFrame name="Grip">
 							<X>0</X>
@@ -54536,7 +54544,7 @@ return SuperClassCDO]]></ProtectedString>
 							</CoordinateFrame>
 							<bool name="CanCollide">true</bool>
 							<bool name="CanQuery">true</bool>
-							<bool name="CanTouch">true</bool>
+							<bool name="CanTouch">false</bool>
 							<bool name="CastShadow">true</bool>
 							<int name="CollisionGroupId">0</int>
 							<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
@@ -54970,7 +54978,7 @@ return SuperClassCDO]]></ProtectedString>
 				<Item class="Tool" referent="RBXE7D1546925EB4682B5D0855905341B9D">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
-						<bool name="CanBeDropped">true</bool>
+						<bool name="CanBeDropped">false</bool>
 						<bool name="Enabled">true</bool>
 						<CoordinateFrame name="Grip">
 							<X>0</X>
@@ -55023,7 +55031,7 @@ return SuperClassCDO]]></ProtectedString>
 							</CoordinateFrame>
 							<bool name="CanCollide">true</bool>
 							<bool name="CanQuery">true</bool>
-							<bool name="CanTouch">true</bool>
+							<bool name="CanTouch">false</bool>
 							<bool name="CastShadow">true</bool>
 							<int name="CollisionGroupId">0</int>
 							<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
@@ -55641,6 +55649,15 @@ return SuperClassCDO]]></ProtectedString>
 						</Item>
 					</Item>
 				</Item>
+			</Item>
+			<Item class="Folder" referent="RBXDD85E022339F411EAE9FBCEABAA75DF1">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<string name="Name">Consumables</string>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<UniqueId name="UniqueId">3a61eac534da8b04030558b7000526b2</UniqueId>
+				</Properties>
 			</Item>
 		</Item>
 	</Item>

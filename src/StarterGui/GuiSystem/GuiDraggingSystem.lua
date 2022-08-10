@@ -32,7 +32,7 @@ local GuiDraggingSystem = {
 -- 더 정리할 필요있음
 function OnInputBegan(input)
     if not GuiDraggingSystem.SlotControllerCandidate then 
-        Debug.Print("후보가 없습니다.")
+        --Debug.Print("후보가 없습니다.")
         return
     end
     
@@ -62,7 +62,7 @@ function OnInputEnded(input)
 
     if not GuiDraggingSystem.SlotController then
         GuiDraggingSystem:ClearSlotController()
-        Debug.Print("처음에 선택한 위치에 슬롯이 없습니다.")
+        --Debug.Print("처음에 선택한 위치에 슬롯이 없습니다.")
         return
     end
 
@@ -79,13 +79,15 @@ function OnInputEnded(input)
         currentSlotIndex = GuiDraggingSystem.SlotControllerCandidate.SlotIndex
     end
 
-    print("Swap Slot => ")
-    print("From => ".. SlotTypeConverter[prevSlotType] .. " : " .. tostring(prevSlotIndex))
+    --[[
+    Debug.Print("Swap Slot => ")
+    Debug.Print("From => ".. SlotTypeConverter[prevSlotType] .. " : " .. tostring(prevSlotIndex))
     if currentSlotType then
-        print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
+        Debug.Print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
     else
-        print("To => ".. "nil : nil")
+        Debug.Print("To => ".. "nil : nil")
     end
+    --]]
 
     if prevSlotType == SlotType.InventorySlot then
         if not currentSlotType then
@@ -201,7 +203,7 @@ end
 
 function GuiDraggingSystem:CheckAndClearSlotControllerCandidate(slotControllerCandidate)
     if self.SlotControllerCandidate == slotControllerCandidate then
-        print("self.SlotControllerCandidate = nil")
+        --Debug.Print("self.SlotControllerCandidate = nil")
         self.SlotControllerCandidate = nil
     end
 end

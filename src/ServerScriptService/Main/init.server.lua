@@ -72,9 +72,6 @@ function Temp()
 		Initializer:PushDefaulArmorTools(player)
 	end
 
-	while true do
-		wait(5)
-	end
 end
 
 while #game.Players:GetPlayers() < 1 do
@@ -84,7 +81,7 @@ end
 wait(3)
 Temp()
 
-while false  do
+while true  do
 	
 	
 	-- 다른 플레이어를 기다리는 중
@@ -215,7 +212,7 @@ while false  do
 		end
 	end
 
-	wait(100)
+	wait(3)
 	if winnerType == WinnerType.Player then
 		NotifyWinnerSTC:FireAllClients(winnerType, winnerName, winnerReward)
 	else

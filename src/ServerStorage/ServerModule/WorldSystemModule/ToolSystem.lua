@@ -167,8 +167,8 @@ function ToolSystem:DestroyTool(tool)
         return false
     end
 
-    local typeString = type(tool)
-    if "Tool" ~= typeString then
+    local className = tool.ClassName
+    if "Tool" ~= className then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -184,8 +184,8 @@ end
 function ToolSystem:FindObjectJoints(tool)
     local joints = {}
 
-    local handle = tool:FindFirstChild("Handle")
-    table.insert(joints, handle)
+    local trigger = tool.Handle.Trigger
+    table.insert(joints, trigger)
 
     local mesh = tool:FindFirstChild("Mesh")
     local partsFolder = mesh:FindFirstChild("Parts")

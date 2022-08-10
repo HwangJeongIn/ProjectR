@@ -304,9 +304,6 @@ function ServerGlobalStorage:SetArmorHandleEnabled(armor, enabled)
 		weldConstraint.Enabled = enabled
 	end
 
-	handle.CanCollide = enabled
-	handle.CanTouch = enabled
-
 	return true
 end
 
@@ -612,8 +609,26 @@ function ServerGlobalStorage:RemoveTool(playerId, tool)
 	RemoveToolSTC:FireClient(player, slotIndex, tool)
 
 	-- 삭제하려면 Parent가 nil이다.
+	-- 인벤토리에서 빼고 삭제해야해서 이방식대로 처리한다.
 	if not tool.Parent then
-		Debris:AddItem(tool, 0)
+		local character = player.Character
+		local targetCFrame = nil
+		if character then
+			local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+			if humanoidRootPart then
+				local characterCFrame = humanoidRootPart.CFrame
+				targetCFrame = characterCFrame + characterCFrame.LookVector * 3
+			end
+		end
+
+		if targetCFrame then
+			tool.Handle.CFrame = targetCFrame
+		end
+
+		if not self:DestroyTool(tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
 	end
 	return true
 end

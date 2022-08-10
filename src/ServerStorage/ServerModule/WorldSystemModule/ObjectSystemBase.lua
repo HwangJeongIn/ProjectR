@@ -89,6 +89,7 @@ function ObjectSystemBase:PostCreate(createdObject, ...)
 end
 
 function ObjectSystemBase:Destroy(object)
+    local joints = self:GetJoints(object)
     if not self:PreDestroy(object) then
         Debug.Assert(false, "비정상입니다.")
         return false
@@ -99,7 +100,7 @@ function ObjectSystemBase:Destroy(object)
         return false
     end
 
-    if not self:PostDestroy(object) then
+    if not self:PostDestroy(object, joints) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -123,15 +124,18 @@ function ObjectSystemBase:PreDestroy(object)
     return true
 end
 
-function ObjectSystemBase:PostDestroy(object)
-    local joints = self:GetJoints(object)
+function ObjectSystemBase:PostDestroy(object, joints)
+    
+
     if joints then
         for _, joint in pairs(joints) do
             Debris:AddItem(joint, 0)
         end
     end
-	Debris:AddItem(object, 5)
 
+	Debris:AddItem(object, 5)
+    object.Parent = game.workspace
+    
     if self.PostDestroyImpl then
         if not self:PostDestroyImpl() then
             Debug.Assert(false, "비정상입니다.")
