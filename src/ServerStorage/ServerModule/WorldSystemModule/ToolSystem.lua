@@ -11,6 +11,8 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 local ServerEnum = ServerModuleFacade.ServerEnum
 
+local GameDataType = ServerEnum.GameDataType
+
 local ToolType = ServerEnum.ToolType
 local ToolTypeConverter = ToolType.Converter
 local Tools = ServerStorage:WaitForChild("Tools")
@@ -136,7 +138,11 @@ function ToolSystem:GetClonedToolScript(toolType, tool)
 
     local targetScript = nil
     if ToolType.Weapon == toolType then
-        
+        targetScript = Utility:DeepCopy(DamagerController)
+        if not targetScript:InitializeDamagerController(GameDataType.Tool, tool) then
+            Debug.Assert(false, "비정상입니다.")
+            return nil
+        end
     elseif ToolType.Armor == toolType then
 
     elseif ToolType.Comsumable == toolType then

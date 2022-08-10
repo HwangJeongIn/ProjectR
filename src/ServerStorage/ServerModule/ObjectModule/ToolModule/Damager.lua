@@ -145,7 +145,7 @@ end
 function Damager:Attack(attackeePart)
 	if self:CanAttack(attackeePart) == false then
 		--Debug.Assert(false, "공격할 수 없습니다.")
-		return
+		return false
 	end
 	
 	local attackeePlayer = game.Players:GetPlayerFromCharacter(attackeePart.Parent)
@@ -158,7 +158,10 @@ function Damager:Attack(attackeePart)
 	else
 		local attackerCharacter = Tool.Parent
 		local attackeeCharacter = attackeePart.Parent
-		self:AttackCharacter(attackerCharacter, attackeeCharacter)
+		if not self:AttackCharacter(attackerCharacter, attackeeCharacter) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
 	end
 --[[
 	local attackerTag = Instance.new("ObjectValue")
@@ -167,6 +170,8 @@ function Damager:Attack(attackeePart)
 	attackerTag.Parent = attackeeHumanoid
 	Debris:AddItem(attackerTag, 3.5)
 	--]]
+
+	return true
 end
 
 return Damager
