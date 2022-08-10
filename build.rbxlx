@@ -194,6 +194,7 @@ local CommonEnum = {
 		Armor = 2,
 		Consumable = 3,
 		All = 4,
+		Count = 5,
 	},
 
 	EquipType = {
@@ -2215,9 +2216,6 @@ function Temp()
 		Initializer:PushDefaulArmorTools(player)
 	end
 
-	while true do
-		wait(5)
-	end
 end
 
 while #game.Players:GetPlayers() &lt; 1 do
@@ -2227,7 +2225,7 @@ end
 wait(3)
 Temp()
 
-while false  do
+while true  do
 	
 	
 	-- 다른 플레이어를 기다리는 중
@@ -2358,7 +2356,7 @@ while false  do
 		end
 	end
 
-	wait(100)
+	wait(3)
 	if winnerType == WinnerType.Player then
 		NotifyWinnerSTC:FireAllClients(winnerType, winnerName, winnerReward)
 	else
@@ -2392,7 +2390,9 @@ local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Debug = ServerModuleFacade.Debug
-local GameStateType = ServerModuleFacade.CommonEnum.GameStateType
+local CommonEnum = ServerModuleFacade.CommonEnum
+local GameStateType = CommonEnum.GameStateType
+local ToolType = CommonEnum.ToolType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
@@ -2530,25 +2530,15 @@ function Initializer:ClearPlayers(players)
 end
 
 function Initializer:PushDefaulArmorTools(player)
-	local Boots = ArmorTools.Boots:Clone()
-	Boots.Parent = player.Backpack
-
-	local Chestplate = ArmorTools.Chestplate:Clone()
-	Chestplate.Parent = player.Backpack
-
-	local Helmet = ArmorTools.Helmet:Clone()
-	Helmet.Parent = player.Backpack
-
-	local Leggings = ArmorTools.Leggings:Clone()
-	Leggings.Parent = player.Backpack
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Boots", player)
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Chestplate", player)
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Helmet", player)
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Leggings", player)
 end
 
 function Initializer:PushDefaulWeaponTools(player)
-	local Sword = WeaponTools.Sword:Clone()
-	Sword.Parent = player.Backpack
-
-	local Axe = WeaponTools.Axe:Clone()
-	Axe.Parent = player.Backpack
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Weapon, "Sword", player)
+	ServerGlobalStorage:CreateToolToPlayer(ToolType.Weapon, "Axe", player)
 end
 
 function Initializer:StartGame(playersInGame)
@@ -35643,7 +35633,88 @@ return ObjectBase
           <Properties>
             <string name="Name">ToolModule</string>
           </Properties>
-          <Item class="ModuleScript" referent="681">
+          <Item class="Script" referent="681">
+            <Properties>
+              <string name="Name">InteractorController</string>
+              <string name="Source"><![CDATA[local InteractorController = {}
+
+local ObjectBase = require(script.Parent:WaitForChild("ObjectBase"))
+
+return InteractorController
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="682">
+            <Properties>
+              <string name="Name">ToolBase</string>
+              <string name="Source"><![CDATA[-- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
+local ServerStorage = game:GetService("ServerStorage")
+local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
+
+local Utility = ServerModuleFacade.Utility
+local ServerEnum = ServerModuleFacade.ServerEnum
+local GameDataType = ServerEnum.GameDataType
+
+local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
+local GameDataManager = ServerModuleFacade.GameDataManager
+local Debug = ServerModuleFacade.Debug
+
+local ObjectModule = ServerModuleFacade.ObjectModule
+
+local ToolBase = {}
+ToolBase.__index = Utility.Inheritable__index
+ToolBase.__newindex = Utility.Inheritable__newindex
+setmetatable(ToolBase, Utility:DeepCopy(require(ObjectModule:WaitForChild("ObjectBase"))))
+
+function ToolBase:InitializeTool(gameDataType, tool)
+	if not self:InitializeObject(gameDataType, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	--tool.Equipped:Connect(function() OnEquipped(self) end)
+	--tool.Unequipped:Connect(function() OnUnequipped(self) end)
+	--tool.Equipped:Connect(function() Debug.Print("OnEquipped : " .. tostring(tool)) end)
+	--tool.Unequipped:Connect(function() Debug.Print("OnUnequipped : ".. tostring(tool)) end)
+	return true
+end
+
+--[[
+function OnEquipped(toolBase)
+
+	local tool = toolBase.Root()
+	--local temp = getmetatable(toolBase)
+	--local temp2 = temp.GetGameDataKey()
+	--local temp = ServerGlobalStorage
+	
+	-- 캐릭터가 장착중인 상태 -- Character의 Parent는 Workspace이다 주의해야한다.
+	-- tool =(parent)> Character
+	
+	local character = tool.Parent
+	local player = game.Players:GetPlayerFromCharacter(character)
+	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
+end
+
+
+function OnUnequipped(toolBase)
+	
+	local tool = toolBase.Root()
+	--local temp = getmetatable(toolBase)
+	
+	--Backpack에 존재 
+	-- tool =(parent)> Backpack =(parent)> Player > Character
+	local player = tool.Parent.Parent
+	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
+end
+--]]
+
+-- 반환 코드 ------------------------------------------------------------------------------------------------------
+
+return ToolBase
+]]></string>
+            </Properties>
+          </Item>
+          <Item class="ModuleScript" referent="683">
             <Properties>
               <string name="Name">Weapon</string>
               <string name="Source"><![CDATA[-- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
@@ -35673,8 +35744,8 @@ setmetatable(Weapon, Utility:DeepCopy(require(ToolModule:WaitForChild("ToolBase"
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
-function Weapon:InitializeWeapon(gameDataType, WeaponTool)
-    if not self:InitializeTool(gameDataType, WeaponTool) then
+function Weapon:InitializeWeapon(gameDataType, weaponTool)
+    if not self:InitializeTool(gameDataType, weaponTool) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -35694,23 +35765,23 @@ function Weapon:CanAttack(otherPart)
 		return false
 	end
 	
-    local WeaponTool = self:Root()
-	if not WeaponTool then
+    local weaponTool = self:Root()
+	if not weaponTool then
 		Debug.Assert(false, "도구가 없습니다.")
 		return false
 	end
 	
-	local WeaponToolParent = WeaponTool.Parent
-	local WeaponToolClassName = WeaponToolParent.ClassName
-	if not WeaponToolClassName 
-		or WeaponToolClassName == "Workspace" 		-- 필드에 존재
-		or WeaponToolClassName == "Backpack" then	-- 가방에 존재
+	local weaponToolParent = weaponTool.Parent
+	local weaponToolClassName = weaponToolParent.ClassName
+	if not weaponToolClassName 
+		or weaponToolClassName == "Workspace" 		-- 필드에 존재
+		or weaponToolClassName == "Backpack" then	-- 가방에 존재
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 	
 	-- 자기자신인 경우
-	if WeaponToolParent == otherModel then
+	if weaponToolParent == otherModel then
 		return false
 	end
 	
@@ -35793,7 +35864,7 @@ end
 function Weapon:Attack(attackeePart)
 	if self:CanAttack(attackeePart) == false then
 		--Debug.Assert(false, "공격할 수 없습니다.")
-		return
+		return false
 	end
 	
 	local attackeePlayer = game.Players:GetPlayerFromCharacter(attackeePart.Parent)
@@ -35806,7 +35877,10 @@ function Weapon:Attack(attackeePart)
 	else
 		local attackerCharacter = Tool.Parent
 		local attackeeCharacter = attackeePart.Parent
-		self:AttackCharacter(attackerCharacter, attackeeCharacter)
+		if not self:AttackCharacter(attackerCharacter, attackeeCharacter) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
 	end
 --[[
 	local attackerTag = Instance.new("ObjectValue")
@@ -35815,13 +35889,15 @@ function Weapon:Attack(attackeePart)
 	attackerTag.Parent = attackeeHumanoid
 	Debris:AddItem(attackerTag, 3.5)
 	--]]
+
+	return true
 end
 
 return Weapon
 ]]></string>
             </Properties>
           </Item>
-          <Item class="ModuleScript" referent="682">
+          <Item class="ModuleScript" referent="684">
             <Properties>
               <string name="Name">WeaponController</string>
               <string name="Source">-- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
@@ -35842,11 +35918,11 @@ local Debris = game:GetService("Debris")
 
 local WeaponController = {}
 
-function WeaponController:InitializeWeaponController(gameDataType, WeaponTool)
-	self.WeaponTool = WeaponTool
+function WeaponController:InitializeWeaponController(gameDataType, weaponTool)
+	self.WeaponTool = weaponTool
 	self.Weapon = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("Weapon")))
 
-    if not self.Weapon:InitializeWeapon(gameDataType, WeaponTool) then
+    if not self.Weapon:InitializeWeapon(gameDataType, weaponTool) then
 		Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -35865,8 +35941,8 @@ function WeaponController:InitializeWeaponController(gameDataType, WeaponTool)
 	self.Attacker = Attacker
 	self.IsAttacking = IsAttacking
 
-	WeaponTool.Activated:Connect(function() OnActivated(WeaponController) end)
-	WeaponTool.Attacker.Touched:Connect(function(touchedActor) OnTouched(WeaponController, touchedActor) end)
+	self.WeaponTool.Activated:Connect(function() OnActivated(WeaponController) end)
+	self.WeaponTool.Attacker.Touched:Connect(function(touchedActor) OnTouched(WeaponController, touchedActor) end)
 
     return true
 end
@@ -35892,87 +35968,6 @@ function OnActivated(WeaponController)
 end
 
 return WeaponController</string>
-            </Properties>
-          </Item>
-          <Item class="Script" referent="683">
-            <Properties>
-              <string name="Name">InteractorController</string>
-              <string name="Source"><![CDATA[local InteractorController = {}
-
-local ObjectBase = require(script.Parent:WaitForChild("ObjectBase"))
-
-return InteractorController
-]]></string>
-            </Properties>
-          </Item>
-          <Item class="ModuleScript" referent="684">
-            <Properties>
-              <string name="Name">ToolBase</string>
-              <string name="Source"><![CDATA[-- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
-local ServerStorage = game:GetService("ServerStorage")
-local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
-
-local Utility = ServerModuleFacade.Utility
-local ServerEnum = ServerModuleFacade.ServerEnum
-local GameDataType = ServerEnum.GameDataType
-
-local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
-local GameDataManager = ServerModuleFacade.GameDataManager
-local Debug = ServerModuleFacade.Debug
-
-local ObjectModule = ServerModuleFacade.ObjectModule
-
-local ToolBase = {}
-ToolBase.__index = Utility.Inheritable__index
-ToolBase.__newindex = Utility.Inheritable__newindex
-setmetatable(ToolBase, Utility:DeepCopy(require(ObjectModule:WaitForChild("ObjectBase"))))
-
-function ToolBase:InitializeTool(gameDataType, tool)
-	if not self:InitializeObject(gameDataType, tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-	
-	--tool.Equipped:Connect(function() OnEquipped(self) end)
-	--tool.Unequipped:Connect(function() OnUnequipped(self) end)
-	--tool.Equipped:Connect(function() Debug.Print("OnEquipped : " .. tostring(tool)) end)
-	--tool.Unequipped:Connect(function() Debug.Print("OnUnequipped : ".. tostring(tool)) end)
-	return true
-end
-
---[[
-function OnEquipped(toolBase)
-
-	local tool = toolBase.Root()
-	--local temp = getmetatable(toolBase)
-	--local temp2 = temp.GetGameDataKey()
-	--local temp = ServerGlobalStorage
-	
-	-- 캐릭터가 장착중인 상태 -- Character의 Parent는 Workspace이다 주의해야한다.
-	-- tool =(parent)> Character
-	
-	local character = tool.Parent
-	local player = game.Players:GetPlayerFromCharacter(character)
-	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
-end
-
-
-function OnUnequipped(toolBase)
-	
-	local tool = toolBase.Root()
-	--local temp = getmetatable(toolBase)
-	
-	--Backpack에 존재 
-	-- tool =(parent)> Backpack =(parent)> Player > Character
-	local player = tool.Parent.Parent
-	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
-end
---]]
-
--- 반환 코드 ------------------------------------------------------------------------------------------------------
-
-return ToolBase
-]]></string>
             </Properties>
           </Item>
         </Item>
@@ -36273,6 +36268,61 @@ function ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, monst
 	return true
 end
 
+function ServerGlobalStorage:CreateTool(toolType, toolName, parent, toolCFrame)
+	if not parent then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local toolSystem = self:GetToolSystem()
+	local createdTool = toolSystem:CreateTool(toolType, toolName)
+	if not createdTool then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	createdTool.Parent = parent
+	if toolCFrame then
+		createdTool.Handle.CFrame = toolCFrame
+	end
+	return createdTool
+end
+
+function ServerGlobalStorage:CreateToolToPlayer(toolType, toolName, player)
+	local createdTool = self:CreateTool(toolType, toolName, player.Backpack, nil)
+	if not createdTool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	return true
+end
+
+function ServerGlobalStorage:CreateToolToWorkspace(toolType, toolName, toolCFrame)
+	local createdTool = self:CreateTool(toolType, toolName, game.workspace, toolCFrame)
+	if not createdTool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
+	return true
+end
+
+function ServerGlobalStorage:DestroyTool(tool)
+	if not tool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local toolSystem = self:GetToolSystem()
+	if not toolSystem:DestroyTool(tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
 function ServerGlobalStorage:DropToolRaw(character, tool)
 	
 
@@ -36468,9 +36518,6 @@ function ServerGlobalStorage:SetArmorHandleEnabled(armor, enabled)
 	for _, weldConstraint in weldContraints do
 		weldConstraint.Enabled = enabled
 	end
-
-	handle.CanCollide = enabled
-	handle.CanTouch = enabled
 
 	return true
 end
@@ -36777,8 +36824,26 @@ function ServerGlobalStorage:RemoveTool(playerId, tool)
 	RemoveToolSTC:FireClient(player, slotIndex, tool)
 
 	-- 삭제하려면 Parent가 nil이다.
+	-- 인벤토리에서 빼고 삭제해야해서 이방식대로 처리한다.
 	if not tool.Parent then
-		Debris:AddItem(tool, 0)
+		local character = player.Character
+		local targetCFrame = nil
+		if character then
+			local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+			if humanoidRootPart then
+				local characterCFrame = humanoidRootPart.CFrame
+				targetCFrame = characterCFrame + characterCFrame.LookVector * 3
+			end
+		end
+
+		if targetCFrame then
+			tool.Handle.CFrame = targetCFrame
+		end
+
+		if not self:DestroyTool(tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
 	end
 	return true
 end
@@ -37132,6 +37197,7 @@ function ObjectSystemBase:PostCreate(createdObject, ...)
 end
 
 function ObjectSystemBase:Destroy(object)
+    local joints = self:GetJoints(object)
     if not self:PreDestroy(object) then
         Debug.Assert(false, "비정상입니다.")
         return false
@@ -37142,7 +37208,7 @@ function ObjectSystemBase:Destroy(object)
         return false
     end
 
-    if not self:PostDestroy(object) then
+    if not self:PostDestroy(object, joints) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -37166,15 +37232,18 @@ function ObjectSystemBase:PreDestroy(object)
     return true
 end
 
-function ObjectSystemBase:PostDestroy(object)
-    local joints = self:GetJoints(object)
+function ObjectSystemBase:PostDestroy(object, joints)
+    
+
     if joints then
         for _, joint in pairs(joints) do
             Debris:AddItem(joint, 0)
         end
     end
-	Debris:AddItem(object, 5)
 
+	Debris:AddItem(object, 5)
+    object.Parent = game.workspace
+    
     if self.PostDestroyImpl then
         if not self:PostDestroyImpl() then
             Debug.Assert(false, "비정상입니다.")
@@ -37274,6 +37343,8 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 local ServerEnum = ServerModuleFacade.ServerEnum
 
+local GameDataType = ServerEnum.GameDataType
+
 local ToolType = ServerEnum.ToolType
 local ToolTypeConverter = ToolType.Converter
 local Tools = ServerStorage:WaitForChild("Tools")
@@ -37283,7 +37354,7 @@ local WeaponController = ToolModule:WaitForChild("WeaponController")
 
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local SystemModule = ServerModule:WaitForChild("WorldSystemModule")
-local ObjectSystemBase = SystemModule:WaitForChild("ObjectSystemBase")
+local ObjectSystemBase = require(SystemModule:WaitForChild("ObjectSystemBase"))
 
 --[[
 local ServerConstant = ServerModuleFacade.ServerConstant
@@ -37295,8 +37366,7 @@ local GameDataType = ServerEnum.GameDataType
 local StatusType = ServerEnum.StatusType
 local EquipType = ServerEnum.EquipType
 --]]
-local ToolSystem = {
-}
+local ToolSystem = {}--Utility:DeepCopy(ObjectSystemBase)
 
 ToolSystem.__index = Utility.Inheritable__index
 ToolSystem.__newindex = Utility.Inheritable__newindex
@@ -37320,7 +37390,7 @@ function ToolSystem:InitializeToolTemplate(tool)
         return false
     end
 
-    local mesh = tool:FindObjectJoints("Mesh")
+    local mesh = tool:FindFirstChild("Mesh")
     if not mesh then
         Debug.Assert(false, "메시 정보가 없습니다. => " .. tool.Name)
         return false
@@ -37360,7 +37430,8 @@ end
 function ToolSystem:Initialize()
     local ToolTemplateTable = {}
 
-    local toolTypeCount = #ToolType - 1
+    
+    local toolTypeCount = ToolType.Count - 2
     for toolType = 1, toolTypeCount do
         local targetToolFolderName = ToolTypeConverter[toolType] .. "s"
         local targetToolFolder = Tools:WaitForChild(targetToolFolderName)
@@ -37370,9 +37441,10 @@ function ToolSystem:Initialize()
         end
 
         ToolTemplateTable[toolType] = {}
-        for _, tool in pairs(targetToolFolder) do
+        local targetToolFolderTools = targetToolFolder:GetChildren()
+        for _, tool in pairs(targetToolFolderTools) do
             local toolName = tool.Name
-            if ToolTemplateTable[toolName] then
+            if ToolTemplateTable[toolType][toolName] then
                 Debug.Assert(false, "툴이름이 동일합니다. 변경해야합니다. => " .. targetToolFolderName .. " => " .. toolName)
                 return false
             end
@@ -37382,7 +37454,7 @@ function ToolSystem:Initialize()
                 return false
             end
 
-            ToolTemplateTable[toolName] = tool
+            ToolTemplateTable[toolType][toolName] = tool
         end
     end
     
@@ -37398,7 +37470,11 @@ function ToolSystem:GetClonedToolScript(toolType, tool)
 
     local targetScript = nil
     if ToolType.Weapon == toolType then
-        
+        targetScript = Utility:DeepCopy(WeaponController)
+        if not targetScript:InitializeWeaponController(GameDataType.Tool, tool) then
+            Debug.Assert(false, "비정상입니다.")
+            return nil
+        end
     elseif ToolType.Armor == toolType then
 
     elseif ToolType.Comsumable == toolType then
@@ -37409,7 +37485,7 @@ function ToolSystem:GetClonedToolScript(toolType, tool)
 end
 
 function ToolSystem:CreateTool(toolType, toolName)
-    if not toolType or toolName then
+    if not toolType or not toolName then
         Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolType) .. " : " .. toolName)
         return nil
     end
@@ -37429,8 +37505,8 @@ function ToolSystem:DestroyTool(tool)
         return false
     end
 
-    local typeString = type(tool)
-    if "Tool" ~= typeString then
+    local className = tool.ClassName
+    if "Tool" ~= className then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -37446,14 +37522,14 @@ end
 function ToolSystem:FindObjectJoints(tool)
     local joints = {}
 
-    local handle = tool:FindFirstChild("Handle")
-    table.insert(joints, handle)
+    local trigger = tool.Handle.Trigger
+    table.insert(joints, trigger)
 
-    local mesh = tool:FindObjectJoints("Mesh")
-    local parts = mesh:FindFirstChild("Parts")
-
+    local mesh = tool:FindFirstChild("Mesh")
+    local partsFolder = mesh:FindFirstChild("Parts")
+    local parts = partsFolder:GetChildren()
     for _, part in pairs(parts) do
-        local joint = part:FindfirstChild("Joint")
+        local joint = part:FindFirstChild("Joint")
         if not joint then
             continue
         end
@@ -38170,7 +38246,7 @@ return SuperClassCDO</string>
           <Properties>
             <string name="Name">Boots</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
-            <bool name="CanBeDropped">true</bool>
+            <bool name="CanBeDropped">false</bool>
             <bool name="Enabled">true</bool>
             <CoordinateFrame name="Grip">
               <X>0</X>
@@ -38294,9 +38370,9 @@ return SuperClassCDO</string>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
-                  <X>-0.5</X>
+                  <X>0</X>
                   <Y>0</Y>
-                  <Z>-0.65000004</Z>
+                  <Z>0</Z>
                   <R00>1</R00>
                   <R01>0</R01>
                   <R02>0</R02>
@@ -38310,44 +38386,11 @@ return SuperClassCDO</string>
                 <Ref name="Part0Internal">712</Ref>
                 <Ref name="Part1Internal">714</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
-            <Item class="Folder" referent="715">
-              <Properties>
-                <string name="Name">Binder</string>
-                <BinaryString name="AttributesSerialize"></BinaryString>
-                <int64 name="SourceAssetId">-1</int64>
-                <BinaryString name="Tags"></BinaryString>
-              </Properties>
-              <Item class="WeldConstraint" referent="716">
-                <Properties>
-                  <string name="Name">WeldConstraint</string>
-                  <BinaryString name="AttributesSerialize"></BinaryString>
-                  <CoordinateFrame name="CFrame0">
-                    <X>0.5</X>
-                    <Y>0</Y>
-                    <Z>-0.65000004</Z>
-                    <R00>1</R00>
-                    <R01>0</R01>
-                    <R02>0</R02>
-                    <R10>0</R10>
-                    <R11>1</R11>
-                    <R12>0</R12>
-                    <R20>0</R20>
-                    <R21>0</R21>
-                    <R22>1</R22>
-                  </CoordinateFrame>
-                  <Ref name="Part0Internal">712</Ref>
-                  <Ref name="Part1Internal">717</Ref>
-                  <int64 name="SourceAssetId">-1</int64>
-                  <int name="State">3</int>
-                  <BinaryString name="Tags"></BinaryString>
-                </Properties>
-              </Item>
-            </Item>
-            <Item class="Part" referent="718">
+            <Item class="Part" referent="715">
               <Properties>
                 <string name="Name">Trigger</string>
                 <bool name="Anchored">false</bool>
@@ -38441,14 +38484,14 @@ return SuperClassCDO</string>
                 </Vector3>
               </Properties>
             </Item>
-            <Item class="WeldConstraint" referent="719">
+            <Item class="WeldConstraint" referent="716">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
                   <X>0</X>
-                  <Y>0.62500334</Y>
-                  <Z>-0.65000004</Z>
+                  <Y>0</Y>
+                  <Z>0</Z>
                   <R00>1</R00>
                   <R01>0</R01>
                   <R02>0</R02>
@@ -38460,11 +38503,44 @@ return SuperClassCDO</string>
                   <R22>1</R22>
                 </CoordinateFrame>
                 <Ref name="Part0Internal">712</Ref>
-                <Ref name="Part1Internal">718</Ref>
+                <Ref name="Part1Internal">715</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
+            </Item>
+            <Item class="Folder" referent="717">
+              <Properties>
+                <string name="Name">Binder</string>
+                <BinaryString name="AttributesSerialize"></BinaryString>
+                <int64 name="SourceAssetId">-1</int64>
+                <BinaryString name="Tags"></BinaryString>
+              </Properties>
+              <Item class="WeldConstraint" referent="718">
+                <Properties>
+                  <string name="Name">WeldConstraint</string>
+                  <BinaryString name="AttributesSerialize"></BinaryString>
+                  <CoordinateFrame name="CFrame0">
+                    <X>0</X>
+                    <Y>0</Y>
+                    <Z>0</Z>
+                    <R00>1</R00>
+                    <R01>0</R01>
+                    <R02>0</R02>
+                    <R10>0</R10>
+                    <R11>1</R11>
+                    <R12>0</R12>
+                    <R20>0</R20>
+                    <R21>0</R21>
+                    <R22>1</R22>
+                  </CoordinateFrame>
+                  <Ref name="Part0Internal">712</Ref>
+                  <Ref name="Part1Internal">719</Ref>
+                  <int64 name="SourceAssetId">-1</int64>
+                  <int name="State">1</int>
+                  <BinaryString name="Tags"></BinaryString>
+                </Properties>
+              </Item>
             </Item>
           </Item>
           <Item class="IntValue" referent="720">
@@ -38497,14 +38573,6 @@ return SuperClassCDO</string>
                   <int64 name="SourceAssetId">-1</int64>
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
-                <Item class="Folder" referent="724">
-                  <Properties>
-                    <string name="Name">Joint</string>
-                    <BinaryString name="AttributesSerialize"></BinaryString>
-                    <int64 name="SourceAssetId">-1</int64>
-                    <BinaryString name="Tags"></BinaryString>
-                  </Properties>
-                </Item>
                 <Item class="Part" referent="714">
                   <Properties>
                     <string name="Name">MainPart</string>
@@ -38598,7 +38666,7 @@ return SuperClassCDO</string>
                       <Z>0</Z>
                     </Vector3>
                   </Properties>
-                  <Item class="Attachment" referent="725">
+                  <Item class="Attachment" referent="724">
                     <Properties>
                       <string name="Name">LeftAnkleRigAttachment</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
@@ -38620,7 +38688,7 @@ return SuperClassCDO</string>
                       <BinaryString name="Tags"></BinaryString>
                       <bool name="Visible">false</bool>
                     </Properties>
-                    <Item class="Vector3Value" referent="726">
+                    <Item class="Vector3Value" referent="725">
                       <Properties>
                         <string name="Name">OriginalPosition</string>
                         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -38635,6 +38703,14 @@ return SuperClassCDO</string>
                     </Item>
                   </Item>
                 </Item>
+                <Item class="Folder" referent="726">
+                  <Properties>
+                    <string name="Name">Joint</string>
+                    <BinaryString name="AttributesSerialize"></BinaryString>
+                    <int64 name="SourceAssetId">-1</int64>
+                    <BinaryString name="Tags"></BinaryString>
+                  </Properties>
+                </Item>
               </Item>
               <Item class="Folder" referent="727">
                 <Properties>
@@ -38643,15 +38719,7 @@ return SuperClassCDO</string>
                   <int64 name="SourceAssetId">-1</int64>
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
-                <Item class="Folder" referent="728">
-                  <Properties>
-                    <string name="Name">Joint</string>
-                    <BinaryString name="AttributesSerialize"></BinaryString>
-                    <int64 name="SourceAssetId">-1</int64>
-                    <BinaryString name="Tags"></BinaryString>
-                  </Properties>
-                </Item>
-                <Item class="Part" referent="717">
+                <Item class="Part" referent="719">
                   <Properties>
                     <string name="Name">MainPart</string>
                     <bool name="Anchored">false</bool>
@@ -38744,7 +38812,7 @@ return SuperClassCDO</string>
                       <Z>0</Z>
                     </Vector3>
                   </Properties>
-                  <Item class="Attachment" referent="729">
+                  <Item class="Attachment" referent="728">
                     <Properties>
                       <string name="Name">RightAnkleRigAttachment</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
@@ -38766,7 +38834,7 @@ return SuperClassCDO</string>
                       <BinaryString name="Tags"></BinaryString>
                       <bool name="Visible">false</bool>
                     </Properties>
-                    <Item class="Vector3Value" referent="730">
+                    <Item class="Vector3Value" referent="729">
                       <Properties>
                         <string name="Name">OriginalPosition</string>
                         <BinaryString name="AttributesSerialize"></BinaryString>
@@ -38781,6 +38849,14 @@ return SuperClassCDO</string>
                     </Item>
                   </Item>
                 </Item>
+                <Item class="Folder" referent="730">
+                  <Properties>
+                    <string name="Name">Joint</string>
+                    <BinaryString name="AttributesSerialize"></BinaryString>
+                    <int64 name="SourceAssetId">-1</int64>
+                    <BinaryString name="Tags"></BinaryString>
+                  </Properties>
+                </Item>
               </Item>
             </Item>
           </Item>
@@ -38789,7 +38865,7 @@ return SuperClassCDO</string>
           <Properties>
             <string name="Name">Chestplate</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
-            <bool name="CanBeDropped">true</bool>
+            <bool name="CanBeDropped">false</bool>
             <bool name="Enabled">true</bool>
             <CoordinateFrame name="Grip">
               <X>0</X>
@@ -38917,22 +38993,14 @@ return SuperClassCDO</string>
                 <Z>0</Z>
               </Vector3>
             </Properties>
-            <Item class="Folder" referent="734">
-              <Properties>
-                <string name="Name">Binder</string>
-                <BinaryString name="AttributesSerialize"></BinaryString>
-                <int64 name="SourceAssetId">-1</int64>
-                <BinaryString name="Tags"></BinaryString>
-              </Properties>
-            </Item>
-            <Item class="WeldConstraint" referent="735">
+            <Item class="WeldConstraint" referent="734">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
                   <X>0</X>
                   <Y>0</Y>
-                  <Z>-1.663327</Z>
+                  <Z>0</Z>
                   <R00>1</R00>
                   <R01>0</R01>
                   <R02>0</R02>
@@ -38944,13 +39012,13 @@ return SuperClassCDO</string>
                   <R22>1</R22>
                 </CoordinateFrame>
                 <Ref name="Part0Internal">733</Ref>
-                <Ref name="Part1Internal">736</Ref>
+                <Ref name="Part1Internal">735</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
-            <Item class="Part" referent="737">
+            <Item class="Part" referent="736">
               <Properties>
                 <string name="Name">Trigger</string>
                 <bool name="Anchored">false</bool>
@@ -39044,14 +39112,14 @@ return SuperClassCDO</string>
                 </Vector3>
               </Properties>
             </Item>
-            <Item class="WeldConstraint" referent="738">
+            <Item class="WeldConstraint" referent="737">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
                   <X>0</X>
-                  <Y>0.37500334</Y>
-                  <Z>-1.05</Z>
+                  <Y>0</Y>
+                  <Z>0</Z>
                   <R00>1</R00>
                   <R01>0</R01>
                   <R02>0</R02>
@@ -39063,9 +39131,17 @@ return SuperClassCDO</string>
                   <R22>1</R22>
                 </CoordinateFrame>
                 <Ref name="Part0Internal">733</Ref>
-                <Ref name="Part1Internal">737</Ref>
+                <Ref name="Part1Internal">736</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
+                <BinaryString name="Tags"></BinaryString>
+              </Properties>
+            </Item>
+            <Item class="Folder" referent="738">
+              <Properties>
+                <string name="Name">Binder</string>
+                <BinaryString name="AttributesSerialize"></BinaryString>
+                <int64 name="SourceAssetId">-1</int64>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
@@ -39091,7 +39167,7 @@ return SuperClassCDO</string>
                   <int64 name="SourceAssetId">-1</int64>
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
-                <Item class="Part" referent="736">
+                <Item class="Part" referent="735">
                   <Properties>
                     <string name="Name">MainPart</string>
                     <bool name="Anchored">false</bool>
@@ -39517,7 +39593,7 @@ return SuperClassCDO</string>
                       <CoordinateFrame name="CFrame0">
                         <X>0</X>
                         <Y>0</Y>
-                        <Z>1.226654</Z>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -39528,10 +39604,10 @@ return SuperClassCDO</string>
                         <R21>0</R21>
                         <R22>1</R22>
                       </CoordinateFrame>
-                      <Ref name="Part0Internal">736</Ref>
+                      <Ref name="Part0Internal">735</Ref>
                       <Ref name="Part1Internal">746</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -39540,9 +39616,9 @@ return SuperClassCDO</string>
                       <string name="Name">WeldConstraint</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
                       <CoordinateFrame name="CFrame0">
-                        <X>0.8499994</X>
-                        <Y>0.9000001</Y>
-                        <Z>0.61333466</Z>
+                        <X>0</X>
+                        <Y>0</Y>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -39553,10 +39629,10 @@ return SuperClassCDO</string>
                         <R21>0</R21>
                         <R22>1</R22>
                       </CoordinateFrame>
-                      <Ref name="Part0Internal">736</Ref>
+                      <Ref name="Part0Internal">735</Ref>
                       <Ref name="Part1Internal">745</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -39565,9 +39641,9 @@ return SuperClassCDO</string>
                       <string name="Name">WeldConstraint</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
                       <CoordinateFrame name="CFrame0">
-                        <X>-0.8500004</X>
-                        <Y>0.9000001</Y>
-                        <Z>0.61333466</Z>
+                        <X>0</X>
+                        <Y>0</Y>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -39578,10 +39654,10 @@ return SuperClassCDO</string>
                         <R21>0</R21>
                         <R22>1</R22>
                       </CoordinateFrame>
-                      <Ref name="Part0Internal">736</Ref>
+                      <Ref name="Part0Internal">735</Ref>
                       <Ref name="Part1Internal">744</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -39594,7 +39670,7 @@ return SuperClassCDO</string>
           <Properties>
             <string name="Name">Helmet</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
-            <bool name="CanBeDropped">true</bool>
+            <bool name="CanBeDropped">false</bool>
             <bool name="Enabled">true</bool>
             <CoordinateFrame name="Grip">
               <X>0</X>
@@ -39728,8 +39804,8 @@ return SuperClassCDO</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
                   <X>0</X>
-                  <Y>0.19999981</Y>
-                  <Z>-0.05000013</Z>
+                  <Y>0</Y>
+                  <Z>0</Z>
                   <R00>1</R00>
                   <R01>0</R01>
                   <R02>0</R02>
@@ -39743,19 +39819,11 @@ return SuperClassCDO</string>
                 <Ref name="Part0Internal">753</Ref>
                 <Ref name="Part1Internal">755</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
-            <Item class="Folder" referent="756">
-              <Properties>
-                <string name="Name">Binder</string>
-                <BinaryString name="AttributesSerialize"></BinaryString>
-                <int64 name="SourceAssetId">-1</int64>
-                <BinaryString name="Tags"></BinaryString>
-              </Properties>
-            </Item>
-            <Item class="Part" referent="757">
+            <Item class="Part" referent="756">
               <Properties>
                 <string name="Name">Trigger</string>
                 <bool name="Anchored">false</bool>
@@ -39849,14 +39917,14 @@ return SuperClassCDO</string>
                 </Vector3>
               </Properties>
             </Item>
-            <Item class="WeldConstraint" referent="758">
+            <Item class="WeldConstraint" referent="757">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
                   <X>0</X>
-                  <Y>0.32500315</Y>
-                  <Z>-0.65000004</Z>
+                  <Y>0</Y>
+                  <Z>0</Z>
                   <R00>1</R00>
                   <R01>0</R01>
                   <R02>0</R02>
@@ -39868,9 +39936,17 @@ return SuperClassCDO</string>
                   <R22>1</R22>
                 </CoordinateFrame>
                 <Ref name="Part0Internal">753</Ref>
-                <Ref name="Part1Internal">757</Ref>
+                <Ref name="Part1Internal">756</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
+                <BinaryString name="Tags"></BinaryString>
+              </Properties>
+            </Item>
+            <Item class="Folder" referent="758">
+              <Properties>
+                <string name="Name">Binder</string>
+                <BinaryString name="AttributesSerialize"></BinaryString>
+                <int64 name="SourceAssetId">-1</int64>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
@@ -40307,9 +40383,9 @@ return SuperClassCDO</string>
                       <string name="Name">WeldConstraint</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
                       <CoordinateFrame name="CFrame0">
-                        <X>-0.65</X>
+                        <X>0</X>
                         <Y>0</Y>
-                        <Z>-0.5999999</Z>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -40323,7 +40399,7 @@ return SuperClassCDO</string>
                       <Ref name="Part0Internal">755</Ref>
                       <Ref name="Part1Internal">762</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -40333,8 +40409,8 @@ return SuperClassCDO</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
                       <CoordinateFrame name="CFrame0">
                         <X>0</X>
-                        <Y>0.5</Y>
-                        <Z>-0.5999999</Z>
+                        <Y>0</Y>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -40348,7 +40424,7 @@ return SuperClassCDO</string>
                       <Ref name="Part0Internal">755</Ref>
                       <Ref name="Part1Internal">764</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -40357,9 +40433,9 @@ return SuperClassCDO</string>
                       <string name="Name">WeldConstraint</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
                       <CoordinateFrame name="CFrame0">
-                        <X>0.65</X>
+                        <X>0</X>
                         <Y>0</Y>
-                        <Z>-0.5999999</Z>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -40373,7 +40449,7 @@ return SuperClassCDO</string>
                       <Ref name="Part0Internal">755</Ref>
                       <Ref name="Part1Internal">765</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -40386,7 +40462,7 @@ return SuperClassCDO</string>
           <Properties>
             <string name="Name">Leggings</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
-            <bool name="CanBeDropped">true</bool>
+            <bool name="CanBeDropped">false</bool>
             <bool name="Enabled">true</bool>
             <CoordinateFrame name="Grip">
               <X>0</X>
@@ -40514,72 +40590,14 @@ return SuperClassCDO</string>
                 <Z>0</Z>
               </Vector3>
             </Properties>
-            <Item class="Folder" referent="773">
-              <Properties>
-                <string name="Name">Binder</string>
-                <BinaryString name="AttributesSerialize"></BinaryString>
-                <int64 name="SourceAssetId">-1</int64>
-                <BinaryString name="Tags"></BinaryString>
-              </Properties>
-              <Item class="WeldConstraint" referent="774">
-                <Properties>
-                  <string name="Name">WeldConstraint</string>
-                  <BinaryString name="AttributesSerialize"></BinaryString>
-                  <CoordinateFrame name="CFrame0">
-                    <X>1</X>
-                    <Y>-0.00000011920929</Y>
-                    <Z>-0.65000004</Z>
-                    <R00>1</R00>
-                    <R01>0</R01>
-                    <R02>0</R02>
-                    <R10>0</R10>
-                    <R11>1</R11>
-                    <R12>0</R12>
-                    <R20>0</R20>
-                    <R21>0</R21>
-                    <R22>1</R22>
-                  </CoordinateFrame>
-                  <Ref name="Part0Internal">772</Ref>
-                  <Ref name="Part1Internal">775</Ref>
-                  <int64 name="SourceAssetId">-1</int64>
-                  <int name="State">3</int>
-                  <BinaryString name="Tags"></BinaryString>
-                </Properties>
-              </Item>
-            </Item>
-            <Item class="WeldConstraint" referent="776">
-              <Properties>
-                <string name="Name">WeldConstraint</string>
-                <BinaryString name="AttributesSerialize"></BinaryString>
-                <CoordinateFrame name="CFrame0">
-                  <X>-1</X>
-                  <Y>-0.00000011920929</Y>
-                  <Z>-0.65000004</Z>
-                  <R00>1</R00>
-                  <R01>0</R01>
-                  <R02>0</R02>
-                  <R10>0</R10>
-                  <R11>1</R11>
-                  <R12>0</R12>
-                  <R20>0</R20>
-                  <R21>0</R21>
-                  <R22>1</R22>
-                </CoordinateFrame>
-                <Ref name="Part0Internal">772</Ref>
-                <Ref name="Part1Internal">777</Ref>
-                <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
-                <BinaryString name="Tags"></BinaryString>
-              </Properties>
-            </Item>
-            <Item class="WeldConstraint" referent="778">
+            <Item class="WeldConstraint" referent="773">
               <Properties>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
                   <X>0</X>
-                  <Y>0.8750026</Y>
-                  <Z>-0.65000004</Z>
+                  <Y>0</Y>
+                  <Z>0</Z>
                   <R00>1</R00>
                   <R01>0</R01>
                   <R02>0</R02>
@@ -40591,13 +40609,38 @@ return SuperClassCDO</string>
                   <R22>1</R22>
                 </CoordinateFrame>
                 <Ref name="Part0Internal">772</Ref>
-                <Ref name="Part1Internal">779</Ref>
+                <Ref name="Part1Internal">774</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
-            <Item class="Part" referent="779">
+            <Item class="WeldConstraint" referent="775">
+              <Properties>
+                <string name="Name">WeldConstraint</string>
+                <BinaryString name="AttributesSerialize"></BinaryString>
+                <CoordinateFrame name="CFrame0">
+                  <X>0</X>
+                  <Y>0</Y>
+                  <Z>0</Z>
+                  <R00>1</R00>
+                  <R01>0</R01>
+                  <R02>0</R02>
+                  <R10>0</R10>
+                  <R11>1</R11>
+                  <R12>0</R12>
+                  <R20>0</R20>
+                  <R21>0</R21>
+                  <R22>1</R22>
+                </CoordinateFrame>
+                <Ref name="Part0Internal">772</Ref>
+                <Ref name="Part1Internal">776</Ref>
+                <int64 name="SourceAssetId">-1</int64>
+                <int name="State">1</int>
+                <BinaryString name="Tags"></BinaryString>
+              </Properties>
+            </Item>
+            <Item class="Part" referent="776">
               <Properties>
                 <string name="Name">Trigger</string>
                 <bool name="Anchored">false</bool>
@@ -40690,6 +40733,39 @@ return SuperClassCDO</string>
                   <Z>0</Z>
                 </Vector3>
               </Properties>
+            </Item>
+            <Item class="Folder" referent="777">
+              <Properties>
+                <string name="Name">Binder</string>
+                <BinaryString name="AttributesSerialize"></BinaryString>
+                <int64 name="SourceAssetId">-1</int64>
+                <BinaryString name="Tags"></BinaryString>
+              </Properties>
+              <Item class="WeldConstraint" referent="778">
+                <Properties>
+                  <string name="Name">WeldConstraint</string>
+                  <BinaryString name="AttributesSerialize"></BinaryString>
+                  <CoordinateFrame name="CFrame0">
+                    <X>0</X>
+                    <Y>0</Y>
+                    <Z>0</Z>
+                    <R00>1</R00>
+                    <R01>0</R01>
+                    <R02>0</R02>
+                    <R10>0</R10>
+                    <R11>1</R11>
+                    <R12>0</R12>
+                    <R20>0</R20>
+                    <R21>0</R21>
+                    <R22>1</R22>
+                  </CoordinateFrame>
+                  <Ref name="Part0Internal">772</Ref>
+                  <Ref name="Part1Internal">779</Ref>
+                  <int64 name="SourceAssetId">-1</int64>
+                  <int name="State">1</int>
+                  <BinaryString name="Tags"></BinaryString>
+                </Properties>
+              </Item>
             </Item>
           </Item>
           <Item class="Folder" referent="780">
@@ -40901,7 +40977,7 @@ return SuperClassCDO</string>
                     </Vector3>
                   </Properties>
                 </Item>
-                <Item class="Part" referent="777">
+                <Item class="Part" referent="774">
                   <Properties>
                     <string name="Name">MainPart</string>
                     <bool name="Anchored">false</bool>
@@ -41124,7 +41200,7 @@ return SuperClassCDO</string>
                       <string name="Name">WeldConstraint</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
                       <CoordinateFrame name="CFrame0">
-                        <X>1</X>
+                        <X>0</X>
                         <Y>0</Y>
                         <Z>0</Z>
                         <R00>1</R00>
@@ -41137,10 +41213,10 @@ return SuperClassCDO</string>
                         <R21>0</R21>
                         <R22>1</R22>
                       </CoordinateFrame>
-                      <Ref name="Part0Internal">777</Ref>
+                      <Ref name="Part0Internal">774</Ref>
                       <Ref name="Part1Internal">784</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -41149,9 +41225,9 @@ return SuperClassCDO</string>
                       <string name="Name">WeldConstraint</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
                       <CoordinateFrame name="CFrame0">
-                        <X>-0.5</X>
+                        <X>0</X>
                         <Y>0</Y>
-                        <Z>0.5</Z>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -41165,7 +41241,7 @@ return SuperClassCDO</string>
                       <Ref name="Part0Internal">784</Ref>
                       <Ref name="Part1Internal">786</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -41176,7 +41252,7 @@ return SuperClassCDO</string>
                       <CoordinateFrame name="CFrame0">
                         <X>0</X>
                         <Y>0</Y>
-                        <Z>-1</Z>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -41190,7 +41266,7 @@ return SuperClassCDO</string>
                       <Ref name="Part0Internal">786</Ref>
                       <Ref name="Part1Internal">783</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -41297,7 +41373,7 @@ return SuperClassCDO</string>
                     </Vector3>
                   </Properties>
                 </Item>
-                <Item class="Part" referent="775">
+                <Item class="Part" referent="779">
                   <Properties>
                     <string name="Name">MainPart</string>
                     <bool name="Anchored">false</bool>
@@ -41614,9 +41690,9 @@ return SuperClassCDO</string>
                       <string name="Name">WeldConstraint</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
                       <CoordinateFrame name="CFrame0">
-                        <X>-0.5</X>
+                        <X>0</X>
                         <Y>0</Y>
-                        <Z>-0.5</Z>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -41630,7 +41706,7 @@ return SuperClassCDO</string>
                       <Ref name="Part0Internal">795</Ref>
                       <Ref name="Part1Internal">794</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -41639,9 +41715,9 @@ return SuperClassCDO</string>
                       <string name="Name">WeldConstraint</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
                       <CoordinateFrame name="CFrame0">
-                        <X>-0.5</X>
+                        <X>0</X>
                         <Y>0</Y>
-                        <Z>0.5</Z>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -41652,10 +41728,10 @@ return SuperClassCDO</string>
                         <R21>0</R21>
                         <R22>1</R22>
                       </CoordinateFrame>
-                      <Ref name="Part0Internal">775</Ref>
+                      <Ref name="Part0Internal">779</Ref>
                       <Ref name="Part1Internal">795</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -41664,9 +41740,9 @@ return SuperClassCDO</string>
                       <string name="Name">WeldConstraint</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
                       <CoordinateFrame name="CFrame0">
-                        <X>0.5</X>
+                        <X>0</X>
                         <Y>0</Y>
-                        <Z>-0.5</Z>
+                        <Z>0</Z>
                         <R00>1</R00>
                         <R01>0</R01>
                         <R02>0</R02>
@@ -41680,7 +41756,7 @@ return SuperClassCDO</string>
                       <Ref name="Part0Internal">794</Ref>
                       <Ref name="Part1Internal">792</Ref>
                       <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
+                      <int name="State">1</int>
                       <BinaryString name="Tags"></BinaryString>
                     </Properties>
                   </Item>
@@ -41692,7 +41768,7 @@ return SuperClassCDO</string>
       </Item>
       <Item class="Folder" referent="800">
         <Properties>
-          <string name="Name">Comsumables</string>
+          <string name="Name">Consumables</string>
           <BinaryString name="AttributesSerialize"></BinaryString>
           <int64 name="SourceAssetId">-1</int64>
           <BinaryString name="Tags"></BinaryString>
@@ -41709,7 +41785,7 @@ return SuperClassCDO</string>
           <Properties>
             <string name="Name">Sword</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
-            <bool name="CanBeDropped">true</bool>
+            <bool name="CanBeDropped">false</bool>
             <bool name="Enabled">true</bool>
             <CoordinateFrame name="Grip">
               <X>0</X>
@@ -41858,7 +41934,7 @@ return SuperClassCDO</string>
               </CoordinateFrame>
               <bool name="CanCollide">true</bool>
               <bool name="CanQuery">true</bool>
-              <bool name="CanTouch">true</bool>
+              <bool name="CanTouch">false</bool>
               <bool name="CastShadow">true</bool>
               <int name="CollisionGroupId">0</int>
               <Color3uint8 name="Color3uint8">10724005</Color3uint8>
@@ -41927,23 +42003,23 @@ return SuperClassCDO</string>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
-                  <X>-0.049987793</X>
-                  <Y>3.350009</Y>
-                  <Z>0.050868988</Z>
-                  <R00>0</R00>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <Z>0</Z>
+                  <R00>1</R00>
                   <R01>0</R01>
-                  <R02>-1</R02>
+                  <R02>0</R02>
                   <R10>0</R10>
-                  <R11>-1</R11>
+                  <R11>1</R11>
                   <R12>0</R12>
-                  <R20>-1</R20>
+                  <R20>0</R20>
                   <R21>0</R21>
-                  <R22>-0</R22>
+                  <R22>1</R22>
                 </CoordinateFrame>
                 <Ref name="Part0Internal">804</Ref>
                 <Ref name="Part1Internal">803</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
@@ -41952,23 +42028,23 @@ return SuperClassCDO</string>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
-                  <X>0.089141846</X>
-                  <Y>2.3503733</Y>
-                  <Z>-0.0007247925</Z>
-                  <R00>0</R00>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <Z>0</Z>
+                  <R00>1</R00>
                   <R01>0</R01>
-                  <R02>-1</R02>
+                  <R02>0</R02>
                   <R10>0</R10>
-                  <R11>-1</R11>
+                  <R11>1</R11>
                   <R12>0</R12>
-                  <R20>-1</R20>
+                  <R20>0</R20>
                   <R21>0</R21>
-                  <R22>-0</R22>
+                  <R22>1</R22>
                 </CoordinateFrame>
                 <Ref name="Part0Internal">804</Ref>
                 <Ref name="Part1Internal">807</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
@@ -42071,23 +42147,23 @@ return SuperClassCDO</string>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
-                  <X>0.0041532516</X>
-                  <Y>3.1813116</Y>
-                  <Z>-0.19997025</Z>
-                  <R00>0</R00>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <Z>0</Z>
+                  <R00>1</R00>
                   <R01>0</R01>
-                  <R02>1</R02>
+                  <R02>0</R02>
                   <R10>0</R10>
                   <R11>1</R11>
                   <R12>0</R12>
-                  <R20>-1</R20>
+                  <R20>0</R20>
                   <R21>0</R21>
-                  <R22>0</R22>
+                  <R22>1</R22>
                 </CoordinateFrame>
                 <Ref name="Part0Internal">804</Ref>
                 <Ref name="Part1Internal">808</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
@@ -42142,14 +42218,6 @@ return SuperClassCDO</string>
                   <int64 name="SourceAssetId">-1</int64>
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
-                <Item class="Folder" referent="816">
-                  <Properties>
-                    <string name="Name">Joint</string>
-                    <BinaryString name="AttributesSerialize"></BinaryString>
-                    <int64 name="SourceAssetId">-1</int64>
-                    <BinaryString name="Tags"></BinaryString>
-                  </Properties>
-                </Item>
                 <Item class="Part" referent="807">
                   <Properties>
                     <string name="Name">MainPart</string>
@@ -42243,7 +42311,7 @@ return SuperClassCDO</string>
                       <Z>0</Z>
                     </Vector3>
                   </Properties>
-                  <Item class="SpecialMesh" referent="817">
+                  <Item class="SpecialMesh" referent="816">
                     <Properties>
                       <string name="Name">Mesh</string>
                       <BinaryString name="AttributesSerialize"></BinaryString>
@@ -42276,6 +42344,14 @@ return SuperClassCDO</string>
                     </Properties>
                   </Item>
                 </Item>
+                <Item class="Folder" referent="817">
+                  <Properties>
+                    <string name="Name">Joint</string>
+                    <BinaryString name="AttributesSerialize"></BinaryString>
+                    <int64 name="SourceAssetId">-1</int64>
+                    <BinaryString name="Tags"></BinaryString>
+                  </Properties>
+                </Item>
               </Item>
             </Item>
           </Item>
@@ -42284,7 +42360,7 @@ return SuperClassCDO</string>
           <Properties>
             <string name="Name">Axe</string>
             <BinaryString name="AttributesSerialize"></BinaryString>
-            <bool name="CanBeDropped">true</bool>
+            <bool name="CanBeDropped">false</bool>
             <bool name="Enabled">true</bool>
             <CoordinateFrame name="Grip">
               <X>0</X>
@@ -42339,7 +42415,7 @@ return SuperClassCDO</string>
               </CoordinateFrame>
               <bool name="CanCollide">true</bool>
               <bool name="CanQuery">true</bool>
-              <bool name="CanTouch">true</bool>
+              <bool name="CanTouch">false</bool>
               <bool name="CastShadow">true</bool>
               <int name="CollisionGroupId">0</int>
               <Color3uint8 name="Color3uint8">10724005</Color3uint8>
@@ -42408,9 +42484,9 @@ return SuperClassCDO</string>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
-                  <X>0.099999964</X>
-                  <Y>2.5999985</Y>
-                  <Z>-0.33333302</Z>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <Z>0</Z>
                   <R00>1</R00>
                   <R01>0</R01>
                   <R02>0</R02>
@@ -42424,7 +42500,7 @@ return SuperClassCDO</string>
                 <Ref name="Part0Internal">819</Ref>
                 <Ref name="Part1Internal">821</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
@@ -42434,7 +42510,7 @@ return SuperClassCDO</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
                   <X>0</X>
-                  <Y>1.1666665</Y>
+                  <Y>0</Y>
                   <Z>0</Z>
                   <R00>1</R00>
                   <R01>0</R01>
@@ -42449,7 +42525,7 @@ return SuperClassCDO</string>
                 <Ref name="Part0Internal">819</Ref>
                 <Ref name="Part1Internal">823</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
@@ -42552,9 +42628,9 @@ return SuperClassCDO</string>
                 <string name="Name">WeldConstraint</string>
                 <BinaryString name="AttributesSerialize"></BinaryString>
                 <CoordinateFrame name="CFrame0">
-                  <X>-0.15</X>
-                  <Y>1.1416678</Y>
-                  <Z>-0.13333225</Z>
+                  <X>0</X>
+                  <Y>0</Y>
+                  <Z>0</Z>
                   <R00>1</R00>
                   <R01>0</R01>
                   <R02>0</R02>
@@ -42568,7 +42644,7 @@ return SuperClassCDO</string>
                 <Ref name="Part0Internal">819</Ref>
                 <Ref name="Part1Internal">824</Ref>
                 <int64 name="SourceAssetId">-1</int64>
-                <int name="State">3</int>
+                <int name="State">1</int>
                 <BinaryString name="Tags"></BinaryString>
               </Properties>
             </Item>
@@ -42717,39 +42793,6 @@ return SuperClassCDO</string>
                   <int64 name="SourceAssetId">-1</int64>
                   <BinaryString name="Tags"></BinaryString>
                 </Properties>
-                <Item class="Folder" referent="832">
-                  <Properties>
-                    <string name="Name">Joint</string>
-                    <BinaryString name="AttributesSerialize"></BinaryString>
-                    <int64 name="SourceAssetId">-1</int64>
-                    <BinaryString name="Tags"></BinaryString>
-                  </Properties>
-                  <Item class="WeldConstraint" referent="833">
-                    <Properties>
-                      <string name="Name">WeldConstraint</string>
-                      <BinaryString name="AttributesSerialize"></BinaryString>
-                      <CoordinateFrame name="CFrame0">
-                        <X>0</X>
-                        <Y>1.3333321</Y>
-                        <Z>-0.33333302</Z>
-                        <R00>1</R00>
-                        <R01>0</R01>
-                        <R02>0</R02>
-                        <R10>0</R10>
-                        <R11>1</R11>
-                        <R12>0</R12>
-                        <R20>0</R20>
-                        <R21>0</R21>
-                        <R22>1</R22>
-                      </CoordinateFrame>
-                      <Ref name="Part0Internal">823</Ref>
-                      <Ref name="Part1Internal">834</Ref>
-                      <int64 name="SourceAssetId">-1</int64>
-                      <int name="State">3</int>
-                      <BinaryString name="Tags"></BinaryString>
-                    </Properties>
-                  </Item>
-                </Item>
                 <Item class="Part" referent="823">
                   <Properties>
                     <string name="Name">MainPart</string>
@@ -42844,7 +42887,7 @@ return SuperClassCDO</string>
                     </Vector3>
                   </Properties>
                 </Item>
-                <Item class="Part" referent="834">
+                <Item class="Part" referent="832">
                   <Properties>
                     <string name="Name">Part</string>
                     <bool name="Anchored">false</bool>
@@ -42937,6 +42980,39 @@ return SuperClassCDO</string>
                       <Z>0</Z>
                     </Vector3>
                   </Properties>
+                </Item>
+                <Item class="Folder" referent="833">
+                  <Properties>
+                    <string name="Name">Joint</string>
+                    <BinaryString name="AttributesSerialize"></BinaryString>
+                    <int64 name="SourceAssetId">-1</int64>
+                    <BinaryString name="Tags"></BinaryString>
+                  </Properties>
+                  <Item class="WeldConstraint" referent="834">
+                    <Properties>
+                      <string name="Name">WeldConstraint</string>
+                      <BinaryString name="AttributesSerialize"></BinaryString>
+                      <CoordinateFrame name="CFrame0">
+                        <X>0</X>
+                        <Y>0</Y>
+                        <Z>0</Z>
+                        <R00>1</R00>
+                        <R01>0</R01>
+                        <R02>0</R02>
+                        <R10>0</R10>
+                        <R11>1</R11>
+                        <R12>0</R12>
+                        <R20>0</R20>
+                        <R21>0</R21>
+                        <R22>1</R22>
+                      </CoordinateFrame>
+                      <Ref name="Part0Internal">823</Ref>
+                      <Ref name="Part1Internal">832</Ref>
+                      <int64 name="SourceAssetId">-1</int64>
+                      <int name="State">1</int>
+                      <BinaryString name="Tags"></BinaryString>
+                    </Properties>
+                  </Item>
                 </Item>
               </Item>
             </Item>
@@ -46450,7 +46526,7 @@ local GuiDraggingSystem = {
 -- 더 정리할 필요있음
 function OnInputBegan(input)
     if not GuiDraggingSystem.SlotControllerCandidate then 
-        Debug.Print("후보가 없습니다.")
+        --Debug.Print("후보가 없습니다.")
         return
     end
     
@@ -46480,7 +46556,7 @@ function OnInputEnded(input)
 
     if not GuiDraggingSystem.SlotController then
         GuiDraggingSystem:ClearSlotController()
-        Debug.Print("처음에 선택한 위치에 슬롯이 없습니다.")
+        --Debug.Print("처음에 선택한 위치에 슬롯이 없습니다.")
         return
     end
 
@@ -46497,13 +46573,15 @@ function OnInputEnded(input)
         currentSlotIndex = GuiDraggingSystem.SlotControllerCandidate.SlotIndex
     end
 
-    print("Swap Slot => ")
-    print("From => ".. SlotTypeConverter[prevSlotType] .. " : " .. tostring(prevSlotIndex))
+    --[[
+    Debug.Print("Swap Slot => ")
+    Debug.Print("From => ".. SlotTypeConverter[prevSlotType] .. " : " .. tostring(prevSlotIndex))
     if currentSlotType then
-        print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
+        Debug.Print("To => ".. SlotTypeConverter[currentSlotType] .. " : " .. tostring(currentSlotIndex))
     else
-        print("To => ".. "nil : nil")
+        Debug.Print("To => ".. "nil : nil")
     end
+    --]]
 
     if prevSlotType == SlotType.InventorySlot then
         if not currentSlotType then
@@ -46619,7 +46697,7 @@ end
 
 function GuiDraggingSystem:CheckAndClearSlotControllerCandidate(slotControllerCandidate)
     if self.SlotControllerCandidate == slotControllerCandidate then
-        print("self.SlotControllerCandidate = nil")
+        --Debug.Print("self.SlotControllerCandidate = nil")
         self.SlotControllerCandidate = nil
     end
 end
@@ -47832,13 +47910,12 @@ function GuiSlotController:newRaw(slotType, slotIndex, newGuiSlot)
 
 	newGuiSlotController.GuiSlot.MouseEnter:Connect(function(x,y)
 		newGuiSlotController.GuiSlot.ImageTransparency = 0.5
-		Debug.Print("SetSlotControllerCandidate => " .. tostring(newGuiSlotController.SlotIndex))
+		--Debug.Print("SetSlotControllerCandidate => " .. tostring(newGuiSlotController.SlotIndex))
 		GuiDraggingSystem:SetSlotControllerCandidate(newGuiSlotController)
 	end)
 
 	newGuiSlotController.GuiSlot.MouseLeave:Connect(function()
 		newGuiSlotController.GuiSlot.ImageTransparency = 0
-		--Debug.Print("SetSlotControllerCandidate => nil")
 		GuiDraggingSystem:CheckAndClearSlotControllerCandidate(newGuiSlotController)
 	end)
 	newGuiSlotController:InitializeImage(slotType, slotIndex)

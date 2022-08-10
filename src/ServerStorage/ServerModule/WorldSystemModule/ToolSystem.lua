@@ -18,7 +18,7 @@ local ToolTypeConverter = ToolType.Converter
 local Tools = ServerStorage:WaitForChild("Tools")
 
 local ToolModule = ServerModuleFacade.ToolModule
-local WeaponController = ToolModule:WaitForChild("WeaponController")
+local WeaponController = require(ToolModule:WaitForChild("WeaponController"))
 
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local SystemModule = ServerModule:WaitForChild("WorldSystemModule")
