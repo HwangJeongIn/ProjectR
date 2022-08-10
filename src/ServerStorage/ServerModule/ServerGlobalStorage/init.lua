@@ -225,13 +225,13 @@ function ServerGlobalStorage:SetArmorHandleEnabled(armor, enabled)
 		return false
 	end
 
-	local toolBinder = handle:FindFirstChild("ToolBinder")
-	if not toolBinder then
-		Debug.Assert(false, "ToolBinder가 없습니다.")
+	local binder = handle:FindFirstChild("Binder")
+	if not binder then
+		Debug.Assert(false, "Binder가 없습니다.")
 		return false
 	end
 	
-	local weldContraints = toolBinder:GetChildren()
+	local weldContraints = binder:GetChildren()
 	for _, weldConstraint in weldContraints do
 		weldConstraint.Enabled = enabled
 	end

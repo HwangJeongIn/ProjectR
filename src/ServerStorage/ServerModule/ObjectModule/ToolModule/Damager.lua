@@ -127,7 +127,7 @@ end
 
 function Damager:AttackCharacter(attackerCharacter, attackeeCharacter)
 
-	local damage = CalcDamage(attackerCharacter, attackeeCharacter)
+	local damage = self:CalcDamage(attackerCharacter, attackeeCharacter)
 	Debug.Log("Damage : ".. tostring(damage))
 	if damage == 0 then
 		return
@@ -147,7 +147,6 @@ function Damager:Attack(attackeePart)
 		--Debug.Assert(false, "공격할 수 없습니다.")
 		return
 	end
-	
 	
 	local attackeePlayer = game.Players:GetPlayerFromCharacter(attackeePart.Parent)
 	print(attackeePlayer)

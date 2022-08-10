@@ -14,19 +14,21 @@ local StatType = ServerEnum.StatType
 --local DamagerModuleScript = ServerModuleFacade.ToolModule:WaitForChild("Damager")
 local Debris = game:GetService("Debris")
 
-local DamagerTool = script.Parent
- 
 local DamagerController = {}
 
 function DamagerController:InitializeDamagerController(gameDataType, damagerTool)
-	self.DamagerTool = DamagerTool
+	self.DamagerTool = damagerTool
 	self.Damager = Utility.DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("Damager")))
+
+    if not self.Damager:InitializeDamager(gameDataType, damagerTool) then
+		Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
 	--[[
 	local clonedDamagerScriptRaw = Utility:AddClonedObjectModuleScriptToObject(damagerTool, damagerScript)
     self.Damager = clonedDamagerScriptRaw
-    if not self.Damager:InitializeDamager(gameDataType, damagerTool) then
-        return false
-    end
+
 	--]]
 
 	local Anim1 = self.DamagerTool:WaitForChild("Anim1")
@@ -36,6 +38,9 @@ function DamagerController:InitializeDamagerController(gameDataType, damagerTool
 	self.Anim1 = Anim1
 	self.Attacker = Attacker
 	self.IsAttacking = IsAttacking
+
+	damagerTool.Activated:Connect(function() OnActivated(DamagerController) end)
+	damagerTool.Attacker.Touched:Connect(function(touchedActor) OnTouched(DamagerController, touchedActor) end)
 
     return true
 end
@@ -60,8 +65,4 @@ function OnActivated(DamagerController)
 	--humanoid:TakeDamage(50)
 end
 
--- 이벤트 바인드
-DamagerTool.Activated:Connect(function() OnActivated(DamagerController) end)
-DamagerTool.Attacker.Touched:Connect(function(touchedActor) OnTouched(DamagerController, touchedActor) end)
-
-DamagerController:InitializeDamagerController(GameDataType.Tool, DamagerTool)
+return DamagerController

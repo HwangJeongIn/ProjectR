@@ -27,10 +27,10 @@ local CommonEnum = {
 	},
 	
 	ToolType = {
-		All = 1,
-		Weapon = 2,
-		Armor = 3,
-		Consumable = 4
+		Weapon = 1,
+		Armor = 2,
+		Consumable = 3,
+		All = 4,
 	},
 
 	EquipType = {

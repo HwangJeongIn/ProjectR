@@ -2,14 +2,14 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="Folder" referent="796">
+	<Item class="Folder" referent="890">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<string name="Name">Weapons</string>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Tool" referent="797">
+		<Item class="Tool" referent="891">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<bool name="CanBeDropped">true</bool>
@@ -36,7 +36,7 @@
 				<Content name="TextureId"><null></null></Content>
 				<string name="ToolTip"></string>
 			</Properties>
-			<Item class="Part" referent="798">
+			<Item class="Part" referent="892">
 				<Properties>
 					<bool name="Anchored">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -130,7 +130,7 @@
 					</Vector3>
 				</Properties>
 			</Item>
-			<Item class="Part" referent="799">
+			<Item class="Part" referent="893">
 				<Properties>
 					<bool name="Anchored">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -223,7 +223,7 @@
 						<Z>0.200000003</Z>
 					</Vector3>
 				</Properties>
-				<Item class="WeldConstraint" referent="800">
+				<Item class="WeldConstraint" referent="894">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<CoordinateFrame name="CFrame0">
@@ -241,14 +241,14 @@
 							<R22>-0</R22>
 						</CoordinateFrame>
 						<string name="Name">WeldConstraint</string>
-						<Ref name="Part0Internal">799</Ref>
-						<Ref name="Part1Internal">798</Ref>
+						<Ref name="Part0Internal">893</Ref>
+						<Ref name="Part1Internal">892</Ref>
 						<int64 name="SourceAssetId">-1</int64>
 						<int name="State">3</int>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="WeldConstraint" referent="801">
+				<Item class="WeldConstraint" referent="895">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<CoordinateFrame name="CFrame0">
@@ -266,14 +266,14 @@
 							<R22>-0</R22>
 						</CoordinateFrame>
 						<string name="Name">WeldConstraint</string>
-						<Ref name="Part0Internal">799</Ref>
-						<Ref name="Part1Internal">802</Ref>
+						<Ref name="Part0Internal">893</Ref>
+						<Ref name="Part1Internal">896</Ref>
 						<int64 name="SourceAssetId">-1</int64>
 						<int name="State">3</int>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="Part" referent="803">
+				<Item class="Part" referent="897">
 					<Properties>
 						<bool name="Anchored">false</bool>
 						<BinaryString name="AttributesSerialize"></BinaryString>
@@ -367,7 +367,7 @@
 						</Vector3>
 					</Properties>
 				</Item>
-				<Item class="WeldConstraint" referent="804">
+				<Item class="WeldConstraint" referent="898">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<CoordinateFrame name="CFrame0">
@@ -385,15 +385,15 @@
 							<R22>0</R22>
 						</CoordinateFrame>
 						<string name="Name">WeldConstraint</string>
-						<Ref name="Part0Internal">799</Ref>
-						<Ref name="Part1Internal">803</Ref>
+						<Ref name="Part0Internal">893</Ref>
+						<Ref name="Part1Internal">897</Ref>
 						<int64 name="SourceAssetId">-1</int64>
 						<int name="State">3</int>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Animation" referent="805">
+			<Item class="Animation" referent="899">
 				<Properties>
 					<Content name="AnimationId"><url>rbxassetid://10147183892</url></Content>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -402,7 +402,7 @@
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="IntValue" referent="806">
+			<Item class="IntValue" referent="900">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">Key</string>
@@ -411,7 +411,7 @@
 					<int64 name="Value">2</int64>
 				</Properties>
 			</Item>
-			<Item class="BoolValue" referent="807">
+			<Item class="BoolValue" referent="901">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">Damager</string>
@@ -420,36 +420,36 @@
 					<bool name="Value">false</bool>
 				</Properties>
 			</Item>
-			<Item class="Folder" referent="808">
+			<Item class="Folder" referent="902">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">Mesh</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="Folder" referent="809">
+				<Item class="Folder" referent="903">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Parts</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="Folder" referent="810">
+					<Item class="Folder" referent="904">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Body</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="Folder" referent="811">
+						<Item class="Folder" referent="905">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
-								<string name="Name">Weld</string>
+								<string name="Name">Joint</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
 						</Item>
-						<Item class="Part" referent="802">
+						<Item class="Part" referent="896">
 							<Properties>
 								<bool name="Anchored">false</bool>
 								<BinaryString name="AttributesSerialize"></BinaryString>
@@ -542,7 +542,7 @@
 									<Z>0.429999977</Z>
 								</Vector3>
 							</Properties>
-							<Item class="SpecialMesh" referent="812">
+							<Item class="SpecialMesh" referent="906">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<token name="LODX">2</token>
@@ -575,7 +575,7 @@
 				</Item>
 			</Item>
 		</Item>
-		<Item class="Tool" referent="813">
+		<Item class="Tool" referent="907">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<bool name="CanBeDropped">true</bool>
@@ -602,7 +602,7 @@
 				<Content name="TextureId"><null></null></Content>
 				<string name="ToolTip"></string>
 			</Properties>
-			<Item class="Part" referent="814">
+			<Item class="Part" referent="908">
 				<Properties>
 					<bool name="Anchored">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -695,7 +695,7 @@
 						<Z>0.333333343</Z>
 					</Vector3>
 				</Properties>
-				<Item class="WeldConstraint" referent="815">
+				<Item class="WeldConstraint" referent="909">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<CoordinateFrame name="CFrame0">
@@ -713,14 +713,14 @@
 							<R22>1</R22>
 						</CoordinateFrame>
 						<string name="Name">WeldConstraint</string>
-						<Ref name="Part0Internal">814</Ref>
-						<Ref name="Part1Internal">816</Ref>
+						<Ref name="Part0Internal">908</Ref>
+						<Ref name="Part1Internal">910</Ref>
 						<int64 name="SourceAssetId">-1</int64>
 						<int name="State">3</int>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="WeldConstraint" referent="817">
+				<Item class="WeldConstraint" referent="911">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<CoordinateFrame name="CFrame0">
@@ -738,14 +738,14 @@
 							<R22>1</R22>
 						</CoordinateFrame>
 						<string name="Name">WeldConstraint</string>
-						<Ref name="Part0Internal">814</Ref>
-						<Ref name="Part1Internal">818</Ref>
+						<Ref name="Part0Internal">908</Ref>
+						<Ref name="Part1Internal">912</Ref>
 						<int64 name="SourceAssetId">-1</int64>
 						<int name="State">3</int>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
-				<Item class="Part" referent="819">
+				<Item class="Part" referent="913">
 					<Properties>
 						<bool name="Anchored">false</bool>
 						<BinaryString name="AttributesSerialize"></BinaryString>
@@ -839,7 +839,7 @@
 						</Vector3>
 					</Properties>
 				</Item>
-				<Item class="WeldConstraint" referent="820">
+				<Item class="WeldConstraint" referent="914">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<CoordinateFrame name="CFrame0">
@@ -857,15 +857,15 @@
 							<R22>1</R22>
 						</CoordinateFrame>
 						<string name="Name">WeldConstraint</string>
-						<Ref name="Part0Internal">814</Ref>
-						<Ref name="Part1Internal">819</Ref>
+						<Ref name="Part0Internal">908</Ref>
+						<Ref name="Part1Internal">913</Ref>
 						<int64 name="SourceAssetId">-1</int64>
 						<int name="State">3</int>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Part" referent="816">
+			<Item class="Part" referent="910">
 				<Properties>
 					<bool name="Anchored">false</bool>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -959,7 +959,7 @@
 					</Vector3>
 				</Properties>
 			</Item>
-			<Item class="Animation" referent="821">
+			<Item class="Animation" referent="915">
 				<Properties>
 					<Content name="AnimationId"><url>rbxassetid://10147183892</url></Content>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -968,7 +968,7 @@
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
 			</Item>
-			<Item class="IntValue" referent="822">
+			<Item class="IntValue" referent="916">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">Key</string>
@@ -977,7 +977,7 @@
 					<int64 name="Value">3</int64>
 				</Properties>
 			</Item>
-			<Item class="BoolValue" referent="823">
+			<Item class="BoolValue" referent="917">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">Damager</string>
@@ -986,35 +986,35 @@
 					<bool name="Value">false</bool>
 				</Properties>
 			</Item>
-			<Item class="Folder" referent="824">
+			<Item class="Folder" referent="918">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<string name="Name">Mesh</string>
 					<int64 name="SourceAssetId">-1</int64>
 					<BinaryString name="Tags"></BinaryString>
 				</Properties>
-				<Item class="Folder" referent="825">
+				<Item class="Folder" referent="919">
 					<Properties>
 						<BinaryString name="AttributesSerialize"></BinaryString>
 						<string name="Name">Parts</string>
 						<int64 name="SourceAssetId">-1</int64>
 						<BinaryString name="Tags"></BinaryString>
 					</Properties>
-					<Item class="Folder" referent="826">
+					<Item class="Folder" referent="920">
 						<Properties>
 							<BinaryString name="AttributesSerialize"></BinaryString>
 							<string name="Name">Body</string>
 							<int64 name="SourceAssetId">-1</int64>
 							<BinaryString name="Tags"></BinaryString>
 						</Properties>
-						<Item class="Folder" referent="827">
+						<Item class="Folder" referent="921">
 							<Properties>
 								<BinaryString name="AttributesSerialize"></BinaryString>
-								<string name="Name">Weld</string>
+								<string name="Name">Joint</string>
 								<int64 name="SourceAssetId">-1</int64>
 								<BinaryString name="Tags"></BinaryString>
 							</Properties>
-							<Item class="WeldConstraint" referent="828">
+							<Item class="WeldConstraint" referent="922">
 								<Properties>
 									<BinaryString name="AttributesSerialize"></BinaryString>
 									<CoordinateFrame name="CFrame0">
@@ -1032,15 +1032,15 @@
 										<R22>1</R22>
 									</CoordinateFrame>
 									<string name="Name">WeldConstraint</string>
-									<Ref name="Part0Internal">818</Ref>
-									<Ref name="Part1Internal">829</Ref>
+									<Ref name="Part0Internal">912</Ref>
+									<Ref name="Part1Internal">923</Ref>
 									<int64 name="SourceAssetId">-1</int64>
 									<int name="State">3</int>
 									<BinaryString name="Tags"></BinaryString>
 								</Properties>
 							</Item>
 						</Item>
-						<Item class="Part" referent="818">
+						<Item class="Part" referent="912">
 							<Properties>
 								<bool name="Anchored">false</bool>
 								<BinaryString name="AttributesSerialize"></BinaryString>
@@ -1134,7 +1134,7 @@
 								</Vector3>
 							</Properties>
 						</Item>
-						<Item class="Part" referent="829">
+						<Item class="Part" referent="923">
 							<Properties>
 								<bool name="Anchored">false</bool>
 								<BinaryString name="AttributesSerialize"></BinaryString>
