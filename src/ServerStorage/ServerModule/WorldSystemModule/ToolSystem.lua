@@ -32,11 +32,11 @@ local GameDataType = ServerEnum.GameDataType
 local StatusType = ServerEnum.StatusType
 local EquipType = ServerEnum.EquipType
 --]]
-local ToolSystem = Utility.DeepCopy(ObjectSystemBase)
+local ToolSystem = {}--Utility:DeepCopy(ObjectSystemBase)
 
 ToolSystem.__index = Utility.Inheritable__index
 ToolSystem.__newindex = Utility.Inheritable__newindex
---setmetatable(ToolSystem, Utility.DeepCopy(ObjectSystemBase))
+setmetatable(ToolSystem, Utility:DeepCopy(ObjectSystemBase))
 
 function ToolSystem:InitializeToolTemplate(tool)
     if not tool then
@@ -56,7 +56,7 @@ function ToolSystem:InitializeToolTemplate(tool)
         return false
     end
 
-    local mesh = tool:FindObjectJoints("Mesh")
+    local mesh = tool:FindFirstChild("Mesh")
     if not mesh then
         Debug.Assert(false, "메시 정보가 없습니다. => " .. tool.Name)
         return false
@@ -96,7 +96,8 @@ end
 function ToolSystem:Initialize()
     local ToolTemplateTable = {}
 
-    local toolTypeCount = #ToolType - 1
+    
+    local toolTypeCount = ToolType.Count - 2
     for toolType = 1, toolTypeCount do
         local targetToolFolderName = ToolTypeConverter[toolType] .. "s"
         local targetToolFolder = Tools:WaitForChild(targetToolFolderName)
@@ -106,9 +107,10 @@ function ToolSystem:Initialize()
         end
 
         ToolTemplateTable[toolType] = {}
-        for _, tool in pairs(targetToolFolder) do
+        local targetToolFolderTools = targetToolFolder:GetChildren()
+        for _, tool in pairs(targetToolFolderTools) do
             local toolName = tool.Name
-            if ToolTemplateTable[toolName] then
+            if ToolTemplateTable[toolType][toolName] then
                 Debug.Assert(false, "툴이름이 동일합니다. 변경해야합니다. => " .. targetToolFolderName .. " => " .. toolName)
                 return false
             end
@@ -118,7 +120,7 @@ function ToolSystem:Initialize()
                 return false
             end
 
-            ToolTemplateTable[toolName] = tool
+            ToolTemplateTable[toolType][toolName] = tool
         end
     end
     
@@ -185,11 +187,11 @@ function ToolSystem:FindObjectJoints(tool)
     local handle = tool:FindFirstChild("Handle")
     table.insert(joints, handle)
 
-    local mesh = tool:FindObjectJoints("Mesh")
-    local parts = mesh:FindFirstChild("Parts")
-
+    local mesh = tool:FindFirstChild("Mesh")
+    local partsFolder = mesh:FindFirstChild("Parts")
+    local parts = partsFolder:GetChildren()
     for _, part in pairs(parts) do
-        local joint = part:FindfirstChild("Joint")
+        local joint = part:FindFirstChild("Joint")
         if not joint then
             continue
         end

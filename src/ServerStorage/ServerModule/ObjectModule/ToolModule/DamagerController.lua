@@ -18,7 +18,7 @@ local DamagerController = {}
 
 function DamagerController:InitializeDamagerController(gameDataType, damagerTool)
 	self.DamagerTool = damagerTool
-	self.Damager = Utility.DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("Damager")))
+	self.Damager = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("Damager")))
 
     if not self.Damager:InitializeDamager(gameDataType, damagerTool) then
 		Debug.Assert(false, "비정상입니다.")

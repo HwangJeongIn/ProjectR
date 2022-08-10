@@ -31,6 +31,7 @@ local CommonEnum = {
 		Armor = 2,
 		Consumable = 3,
 		All = 4,
+		Count = 5,
 	},
 
 	EquipType = {

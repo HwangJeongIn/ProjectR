@@ -101,7 +101,7 @@ function ClassBase.public:GetClassTypeForCDO()
 	return self.public.GetClassTypeForInstance()
 end
 
-function ClassBase.public.DeepCopy(target)
+function ClassBase.public:DeepCopy(target)
 	return DeepCopyDetail(target)
 end
 

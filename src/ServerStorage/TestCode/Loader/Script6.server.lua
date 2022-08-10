@@ -63,7 +63,7 @@ local a  =2
 
 function SuperClassCDO.Clone()
 	
-	local baseCopy = SuperClassCDO.DeepCopy(SuperClassCDO)
+	local baseCopy = SuperClassCDO:DeepCopy(SuperClassCDO)
 	return setmetatable({}, baseCopy)
 	
 end
@@ -86,7 +86,7 @@ function SuperClassCDO.public:PrintBase()
 end
 
 -- 마지막에 연결해야한다.
-setmetatable(SuperClassCDO, ClassBase.public.DeepCopy(ClassBase))
+setmetatable(SuperClassCDO, ClassBase.public:DeepCopy(ClassBase))
 SuperClassCDO.SetType(SuperClassCDO, "SuperClass")
 
 -- SubClass 구현
@@ -114,7 +114,7 @@ SubClassCDO.__newindex = ClassBase.__newindex
 
 function SubClassCDO.Clone()
 
-	local derivedCopy = SubClassCDO.DeepCopy(SubClassCDO)
+	local derivedCopy = SubClassCDO:DeepCopy(SubClassCDO)
 	return setmetatable({}, derivedCopy)
 
 end
@@ -142,7 +142,7 @@ function SubClassCDO.private:PrintPrivateDerived()
 end
 
 -- 마지막에 연결해야한다.
-setmetatable(SubClassCDO, SuperClassCDO.DeepCopy(SuperClassCDO))
+setmetatable(SubClassCDO, SuperClassCDO:DeepCopy(SuperClassCDO))
 SubClassCDO:SetType("SubClass")
 
 

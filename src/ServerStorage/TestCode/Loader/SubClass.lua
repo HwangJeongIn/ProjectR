@@ -22,7 +22,7 @@ SubClassCDO.__newindex = SuperClassCDO.__newindex
 
 function SubClassCDO.Clone()
 
-	local derivedCopy = SubClassCDO.DeepCopy(SubClassCDO)
+	local derivedCopy = SubClassCDO:DeepCopy(SubClassCDO)
 	return setmetatable({}, derivedCopy)
 
 end
@@ -49,7 +49,7 @@ end
 
 -- 같은 이름의 함수를 허용하려면 이 위로 정의한다.
 
-setmetatable(SubClassCDO, SuperClassCDO.DeepCopy(SuperClassCDO))
+setmetatable(SubClassCDO, SuperClassCDO:DeepCopy(SuperClassCDO))
 SubClassCDO:SetType("SubClass")
 
 -- 같은 이름의 함수를 완전히 덮어쓰려면 이 아래에 정의한다. -- 오버라이딩과 비슷하게 동작한다.
