@@ -53,14 +53,14 @@ function ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, monst
 	return true
 end
 
-function ServerGlobalStorage:CreateTool(toolType, toolName, parent, toolCFrame)
+function ServerGlobalStorage:CreateTool(toolKey, parent, toolCFrame)
 	if not parent then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
 	end
 
 	local toolSystem = self:GetToolSystem()
-	local createdTool = toolSystem:CreateTool(toolType, toolName)
+	local createdTool = toolSystem:CreateTool(toolKey)
 	if not createdTool then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
@@ -73,8 +73,8 @@ function ServerGlobalStorage:CreateTool(toolType, toolName, parent, toolCFrame)
 	return createdTool
 end
 
-function ServerGlobalStorage:CreateToolToPlayer(toolType, toolName, player)
-	local createdTool = self:CreateTool(toolType, toolName, player.Backpack, nil)
+function ServerGlobalStorage:CreateToolToPlayer(toolKey, player)
+	local createdTool = self:CreateTool(toolKey, player.Backpack, nil)
 	if not createdTool then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -83,8 +83,8 @@ function ServerGlobalStorage:CreateToolToPlayer(toolType, toolName, player)
 	return true
 end
 
-function ServerGlobalStorage:CreateToolToWorkspace(toolType, toolName, toolCFrame)
-	local createdTool = self:CreateTool(toolType, toolName, game.workspace, toolCFrame)
+function ServerGlobalStorage:CreateToolToWorkspace(toolKey, toolCFrame)
+	local createdTool = self:CreateTool(toolKey, game.workspace, toolCFrame)
 	if not createdTool then
 		Debug.Assert(false, "비정상입니다.")
 		return false

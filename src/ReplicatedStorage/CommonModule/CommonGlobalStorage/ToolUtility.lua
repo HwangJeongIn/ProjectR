@@ -28,6 +28,17 @@ local ToolUtility = {
 	}
 }
 
+
+function ToolUtility:GetToolGameDataByKey(key)
+	local toolGameData = CommonGameDataManager[GameDataType.Tool]:Get(key)
+	if not toolGameData then
+		Debug.Assert(false, "ToolGameData가 존재하지 않습니다. [key] => " .. tostring(key))
+		return nil
+	end
+
+	return toolGameData
+end
+
 function ToolUtility:GetToolGameData(tool)
 	if not tool then
 		Debug.Assert(false, "비정상입니다.")
@@ -44,7 +55,7 @@ function ToolUtility:GetToolGameData(tool)
 	--]]
 
 	local key = tool.Key.Value
-	local toolGameData = CommonGameDataManager[GameDataType.Tool]:Get(key)
+	local toolGameData = self:GetToolGameDataByKey(key)
 	if not toolGameData then
 		Debug.Assert(false, "ToolGameData가 존재하지 않습니다. [key] => " .. tostring(key))
 		return nil

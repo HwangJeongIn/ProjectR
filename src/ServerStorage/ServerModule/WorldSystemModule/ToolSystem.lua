@@ -4,6 +4,7 @@ local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleF
 
 local Debug = CommonModuleFacade.Debug
 local Utility = CommonModuleFacade.Utility
+local ToolUtility = CommonModuleFacade.ToolUtility
 
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
@@ -94,29 +95,33 @@ function ToolSystem:Initialize()
 
     
     local toolTypeCount = ToolType.Count - 2
-    for toolType = 1, toolTypeCount do
-        local targetToolFolderName = ToolTypeConverter[toolType] .. "s"
-        local targetToolFolder = Tools:WaitForChild(targetToolFolderName)
-        if not targetToolFolder then
-            Debug.Assert(false, "해당 이름의 툴폴더가 없습니다. => " .. targetToolFolderName)
-            return false
-        end
 
-        ToolTemplateTable[toolType] = {}
+    local allToolFolders = Tools:GetChildren()
+    for _, targetToolFolder in pairs(allToolFolders) do
+
         local targetToolFolderTools = targetToolFolder:GetChildren()
         for _, tool in pairs(targetToolFolderTools) do
-            local toolName = tool.Name
-            if ToolTemplateTable[toolType][toolName] then
-                Debug.Assert(false, "툴이름이 동일합니다. 변경해야합니다. => " .. targetToolFolderName .. " => " .. toolName)
+
+            local key = tool:FindFirstChild("Key")
+            if not key then
+                Debug.Assert(false, "도구에 키가 없습니다. => " .. tool.Name)
+            end
+            key = key.Value
+
+            local toolGameData = ToolUtility:GetToolGameDataByKey(key)
+            local toolModelName = tool.Name
+            tool.Name = toolGameData.Name
+            if ToolTemplateTable[key] then
+                Debug.Assert(false, "같은 키를 가진 도구가 있습니다. 키를 변경하세요 => " .. tostring(key) .. " => " .. toolModelName)
                 return false
             end
 
             if not self:InitializeToolTemplate(tool) then
-                Debug.Assert(false, "툴 템플릿 초기화에 실패했습니다. => " .. toolName)
+                Debug.Assert(false, "툴 템플릿 초기화에 실패했습니다. => " .. toolModelName)
                 return false
             end
 
-            ToolTemplateTable[toolType][toolName] = tool
+            ToolTemplateTable[key] = {Tool = tool, ToolGameData = toolGameData}
         end
     end
     
@@ -146,15 +151,15 @@ function ToolSystem:GetClonedToolScript(toolType, tool)
     return targetScript
 end
 
-function ToolSystem:CreateTool(toolType, toolName)
-    if not toolType or not toolName then
-        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolType) .. " : " .. toolName)
+function ToolSystem:CreateTool(toolKey)
+    if not toolKey then
+        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolKey))
         return nil
     end
 
-    local createdTool = self:Create(toolType, toolName) 
+    local createdTool = self:Create(toolKey) 
     if not createdTool then
-        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolType) .. " : " .. toolName)
+        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolKey))
         return nil
     end
 
@@ -201,27 +206,22 @@ function ToolSystem:FindObjectJoints(tool)
     return joints
 end
 
-function ToolSystem:CreateImpl(toolType, toolName)
-    local targetToolFolder = self.ToolTemplateTable[toolType]
-    if not targetToolFolder then
-        Debug.Assert(false, "해당 툴타입 관련 툴폴더가 없습니다. => " .. tostring(toolType))
+function ToolSystem:CreateImpl(toolKey)
+    local targetTool = self.ToolTemplateTable[toolKey]
+
+    if not targetTool then
+        Debug.Assert(false, "툴이 존재하지 않습니다. 게임데이터만 있을 가능성이 높습니다. => " .. tostring(toolKey))
         return nil
     end
 
-    local targetTool = targetToolFolder[toolName]
-    if not targetTool then
-        Debug.Assert(false, "툴이 없습니다. => " .. toolName)
-        return nil
-    end
-    
-    local clonedTargetTool = targetTool:Clone()
+    local clonedTargetTool = targetTool.Tool:Clone()
 	clonedTargetTool.Parent = nil
 
     return clonedTargetTool
 end
 
-function ToolSystem:PostCreateImpl(createdTool, toolType, toolName)
-    local targetScript = self:GetClonedToolScript(toolType, createdTool)
+function ToolSystem:PostCreateImpl(createdTool, toolKey)
+    local targetScript = self:GetClonedToolScript(self.ToolTemplateTable[toolKey].ToolGameData.ToolType, createdTool)
 
      -- 없는 것도 존재할 수 있다.
     if targetScript then

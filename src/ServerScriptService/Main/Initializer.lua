@@ -149,15 +149,15 @@ function Initializer:ClearPlayers(players)
 end
 
 function Initializer:PushDefaulArmorTools(player)
-	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Boots", player)
-	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Chestplate", player)
-	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Helmet", player)
-	ServerGlobalStorage:CreateToolToPlayer(ToolType.Armor, "Leggings", player)
+	ServerGlobalStorage:CreateToolToPlayer(101, player) -- DefaultHelmet
+	ServerGlobalStorage:CreateToolToPlayer(102, player) -- DefaultChestplate
+	ServerGlobalStorage:CreateToolToPlayer(103, player) -- DefaultLeggings
+	ServerGlobalStorage:CreateToolToPlayer(104, player) -- DefaultBoots
 end
 
 function Initializer:PushDefaulWeaponTools(player)
-	ServerGlobalStorage:CreateToolToPlayer(ToolType.Weapon, "Sword", player)
-	ServerGlobalStorage:CreateToolToPlayer(ToolType.Weapon, "Axe", player)
+	ServerGlobalStorage:CreateToolToPlayer(2, player) -- DefaultSword
+	ServerGlobalStorage:CreateToolToPlayer(3, player) -- DefaultAxe
 end
 
 function Initializer:StartGame(playersInGame)

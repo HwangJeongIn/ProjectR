@@ -21,6 +21,24 @@ function ToolGameData:LoadAdditionalData(gameData, gameDataManager)
 end
 
 function ToolGameData:ValidateData(gameData, gameDataManager)
+	if not gameData.Name then
+		Debug.Assert(false, "툴 이름이 없습니다. => " .. tostring(gameData:GetKey()))
+		return false
+	end
+
+	local toolType = gameData.ToolType
+	if not toolType then
+		Debug.Assert(false, "툴 타입이 없습니다. => " .. tostring(gameData:GetKey()))
+		return false
+	end
+
+	if ToolTypeSelector.Armor == toolType or ToolTypeSelector.Weapon == toolType then
+		if not gameData.EquipType then
+			Debug.Assert(false, "툴 타입이 Armor, Weapon 타입인데 EquipType이 없습니다. => " .. tostring(gameData:GetKey()))
+			return false
+		end
+	end
+
 	return true
 end
 
@@ -42,16 +60,16 @@ Sight : 시야
 --]]
 
 -- 무기 종류
---[[ 기본 무기 	--]] ToolGameData:InsertData(1, {ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10, Skill = ""})
---[[ 검 			--]] ToolGameData:InsertData(2, {ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, Skill = ""})
---[[ 도끼		--]] ToolGameData:InsertData(3, {ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10, Skill = ""})
+--[[ 기본 무기 	--]] ToolGameData:InsertData(1, {Name = "DefaultWeapon", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10, Skill = ""})
+--[[ 검 			--]] ToolGameData:InsertData(2, {Name = "DefaultSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, Skill = ""})
+--[[ 도끼		--]] ToolGameData:InsertData(3, {Name = "DefaultAxe", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10, Skill = ""})
 
 
 -- 방어구 종류
---[[ 기본 머리	--]] ToolGameData:InsertData(101, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Helmet, DEF = 15})
---[[ 기본 가슴	--]] ToolGameData:InsertData(102, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 30, Move = -5})
---[[ 기본 다리	--]] ToolGameData:InsertData(103, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 20, Move = 5})
---[[ 기본 발		--]] ToolGameData:InsertData(104, {ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 10})
+--[[ 기본 머리	--]] ToolGameData:InsertData(101, {Name = "DefaultHelmet", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Helmet, DEF = 15})
+--[[ 기본 가슴	--]] ToolGameData:InsertData(102, {Name = "DefaultChestplate", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 30, Move = -5})
+--[[ 기본 다리	--]] ToolGameData:InsertData(103, {Name = "DefaultLeggings", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 20, Move = 5})
+--[[ 기본 발		--]] ToolGameData:InsertData(104, {Name = "DefaultBoots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 10})
 
 
 
