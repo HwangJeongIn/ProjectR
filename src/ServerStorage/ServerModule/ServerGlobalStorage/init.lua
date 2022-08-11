@@ -70,7 +70,7 @@ function ServerGlobalStorage:CreateTool(toolKey, parent, toolCFrame)
 	if toolCFrame then
 		createdTool.Handle.CFrame = toolCFrame
 	end
-	return createdTool
+	return createdTool 
 end
 
 function ServerGlobalStorage:CreateToolToPlayer(toolKey, player)
