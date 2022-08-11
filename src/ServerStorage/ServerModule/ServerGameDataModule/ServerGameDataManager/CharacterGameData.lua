@@ -8,10 +8,19 @@ local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
+local CharacterGameData = {Name = "CharacterGameData"}
 
-local CharacterGameData = setmetatable({Name = "CharacterGameData"}, GameDataBase)
+-- 내부 함수 먼저 정의
+function CharacterGameData:LoadAdditionalData(gameData, gameDataManager)
+	return true
+end
+
+function CharacterGameData:ValidateData(gameData, gameDataManager)
+	return true
+end
+
+setmetatable(CharacterGameData, GameDataBase)
 CharacterGameData:Initialize(GameDataType.Character)
-
 
 --[[
 HP : 체력

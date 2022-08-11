@@ -314,9 +314,8 @@ function ServerGlobalStorage:FindAllAttachmentsOfArmor(armor, output)
 	end
 
 	local mesh = armor:FindFirstChild("Mesh")
-	local parts = mesh:FindFirstChild("Parts")
 
-	local allParts = parts:GetChildren()
+	local allParts = mesh:GetChildren()
 
 	for _, part in allParts do
 		local mainPart = part:FindFirstChild("MainPart")

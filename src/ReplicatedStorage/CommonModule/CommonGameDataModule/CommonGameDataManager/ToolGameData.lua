@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
+local Debug = require(CommonModule:WaitForChild("Debug"))
 
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
@@ -12,7 +13,18 @@ local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
 
-local ToolGameData = setmetatable({Name = "ToolGameData"}, GameDataBase)
+local ToolGameData = {Name = "ToolGameData"}
+
+-- 내부 함수 먼저 정의
+function ToolGameData:LoadAdditionalData(gameData, gameDataManager)
+	return true
+end
+
+function ToolGameData:ValidateData(gameData, gameDataManager)
+	return true
+end
+
+setmetatable(ToolGameData, GameDataBase)
 ToolGameData:Initialize(GameDataType.Tool)
 
 --[[

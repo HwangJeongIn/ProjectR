@@ -12,16 +12,49 @@ local GameDataBase = {}
 GameDataBase.__index = Utility.Inheritable__index
 GameDataBase.__newindex = Utility.Immutable__newindex
 
+function GameDataBase:LoadAdditionalData(gameData, gameDataManager)
+	Debug.Assert(false, "재정의해야합니다. GameDataType => " .. tostring(self:GetGameDataType()))
+	return false
+end
+
+function GameDataBase:ValidateData(gameData, gameDataManager)
+	Debug.Assert(false, "재정의해야합니다. GameDataType => " .. tostring(self:GetGameDataType()))
+	return false
+end
+
+function GameDataBase:LoadAllAdditionalData(gameDataManager)
+	for gameDataKey, gameData in pairs(self.Value) do
+		if not self:LoadAdditionalData(gameData, gameDataManager) then
+			Debug.Assert(false, "LoadAllAdditionalData에 실패했습니다. GameDataType => " .. tostring(self:GetGameDataType()))
+			return false
+		end
+	end
+	Debug.Print("!!")
+	return true
+end
+
+function GameDataBase:ValidateAllData(gameDataManager)
+	for gameDataKey, gameData in pairs(self.Value) do
+		if not self:ValidateData(gameData, gameDataManager) then
+			Debug.Assert(false, "ValidateAllData에 실패했습니다. GameDataType => " .. tostring(self:GetGameDataType()))
+			return false
+		end
+	end
+	
+	return true
+end
+
 -- readonly로 만들어준다.
 function GameDataBase:Initialize(gameDataType)
-	rawset(self, "__index", Utility.Inheritable__index)
-	rawset(self, "__newindex", Utility.Immutable__newindex)
-	
 	if not gameDataType then
-		Debug.Assert(false, "비정상적인 Enum 값입니다." .. tostring(gameDataType))
+		Debug.Assert(false, "비정상적인 게임데이터 타입입니다." .. tostring(gameDataType))
 		return
 	end
-	GameDataBase.GetGameDataType = function() return gameDataType end
+
+	rawset(self, "__index", Utility.Inheritable__index)
+	rawset(self, "__newindex", Utility.Immutable__newindex)
+	rawset(self, "Value", {})
+	rawset(self, "GetGameDataType", function() return gameDataType end)
 end
 
 function GameDataBase:Get(key)
@@ -33,7 +66,7 @@ function GameDataBase:Get(key)
 		return nil
 	end
 	
-	local value = self[key]
+	local value = self.Value[key]
 	
 	if not value then
 		Debug.Assert(false, "존재하지 않는 키값입니다. => ".. tostring(key))
@@ -52,7 +85,7 @@ function GameDataBase:InsertData(key, value)
 		return
 	end
 	
-	if self[key] ~= nil then
+	if self.Value[key] ~= nil then
 		Debug.Assert(false, "중복 삽입하려고 합니다.")
 		return
 	end
@@ -74,7 +107,7 @@ function GameDataBase:InsertData(key, value)
 	value.__index = Utility.Inheritable__index
 	value.__newindex = Utility.Immutable__newindex
 	
-	rawset(self, key, setmetatable({}, value))
+	rawset(self.Value, key, setmetatable({}, value))
 	
 end
 

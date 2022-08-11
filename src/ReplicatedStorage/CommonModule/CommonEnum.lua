@@ -1,5 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
+
+local Debug = require(CommonModule:WaitForChild("Debug"))
 local Utility = require(CommonModule:WaitForChild("Utility"))
 
 local CommonEnum = {
@@ -74,6 +76,13 @@ local CommonEnum = {
 }
 
 -- 필요하면 추가
+CommonEnum.GameDataType.Converter = {
+	[CommonEnum.GameDataType.Character] = "Character",
+	[CommonEnum.GameDataType.Tool] = "Tool",
+	[CommonEnum.GameDataType.Vehicle] = "Vehicle",
+	[CommonEnum.GameDataType.WorldInteractor] = "WorldInteractor"
+}
+
 CommonEnum.ToolType.Converter = {
 	[CommonEnum.ToolType.Weapon] = "Weapon",
 	[CommonEnum.ToolType.Armor] = "Armor",

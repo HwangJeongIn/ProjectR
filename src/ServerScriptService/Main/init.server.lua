@@ -81,7 +81,7 @@ end
 wait(3)
 Temp()
 
-while true  do
+while false  do
 	
 	
 	-- 다른 플레이어를 기다리는 중

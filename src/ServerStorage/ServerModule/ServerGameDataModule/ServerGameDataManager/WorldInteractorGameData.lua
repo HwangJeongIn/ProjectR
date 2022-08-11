@@ -9,7 +9,18 @@ local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
 
-local WorldInteractorGameData = setmetatable({Name = "WorldInteractorGameData"}, GameDataBase)
+local WorldInteractorGameData = {Name = "WorldInteractorGameData"}
+
+-- 내부 함수 먼저 정의
+function WorldInteractorGameData:LoadAdditionalData(gameData, gameDataManager)
+	return true
+end
+
+function WorldInteractorGameData:ValidateData(gameData, gameDataManager)
+	return true
+end
+
+setmetatable(WorldInteractorGameData, GameDataBase)
 WorldInteractorGameData:Initialize(GameDataType.WorldInteractor)
 
 
