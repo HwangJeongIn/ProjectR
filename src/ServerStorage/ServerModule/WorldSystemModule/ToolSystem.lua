@@ -64,12 +64,6 @@ function ToolSystem:InitializeToolTemplate(tool)
         return false
     end
 
-    local parts = mesh:FindFirstChild("Parts")
-    if not parts then
-        Debug.Assert(false, "파츠 정보가 없습니다. => " .. tool.Name)
-        return false
-    end
-
     local trigger = handle:FindFirstChild("Trigger")
     if not trigger then
         Debug.Assert(false, "도구에 트리거가 없습니다. => " .. tool.Name)
@@ -194,8 +188,7 @@ function ToolSystem:FindObjectJoints(tool)
     table.insert(joints, trigger)
 
     local mesh = tool:FindFirstChild("Mesh")
-    local partsFolder = mesh:FindFirstChild("Parts")
-    local parts = partsFolder:GetChildren()
+    local parts = mesh:GetChildren()
     for _, part in pairs(parts) do
         local joint = part:FindFirstChild("Joint")
         if not joint then
