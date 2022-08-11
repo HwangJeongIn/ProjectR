@@ -24,7 +24,7 @@ setmetatable(WorldInteractorGameData, GameDataBase)
 WorldInteractorGameData:Initialize(GameDataType.WorldInteractor)
 
 
---[[ 검 드롭		--]] WorldInteractorGameData:InsertData(1, {DropToolGameDataKey = 2})
---[[ 도끼 상자   --]] WorldInteractorGameData:InsertData(2, {DropToolGameDataKey = 3})
+--[[ 검 드롭	--]] WorldInteractorGameData:InsertData(1, {DropToolGameDataKey = 2})
+--[[ 도끼 상자  --]] WorldInteractorGameData:InsertData(2, {DropToolGameDataKey = 3})
 
 return setmetatable({}, WorldInteractorGameData)

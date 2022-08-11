@@ -11,14 +11,16 @@ local CommonEnum = {
 		Starting = 2,
 		Playing = 3,
 		Dead = 4,
-		WaitingForFinishing = 5
+		WaitingForFinishing = 5,
+		Count = 6
 	},
 	
 	WinnerType =  {
-		Player = 0,
-		NoOne_TimeIsUp = 1,
-		NoOne_AllPlayersWereDead = 2,
-		Ai = 3
+		Player = 1,
+		NoOne_TimeIsUp = 2,
+		NoOne_AllPlayersWereDead = 3,
+		Ai = 4,
+		Count = 5
 	},
 	
 	GameDataType = {
@@ -26,6 +28,7 @@ local CommonEnum = {
 		Tool = 2,
 		Vehicle = 3,
 		WorldInteractor = 4,
+		Count = 5
 	},
 	
 	ToolType = {
@@ -33,7 +36,7 @@ local CommonEnum = {
 		Armor = 2,
 		Consumable = 3,
 		All = 4,
-		Count = 5,
+		Count = 5
 	},
 
 	EquipType = {
@@ -49,7 +52,8 @@ local CommonEnum = {
 		InventorySlot = 1,
 		EquipSlot = 2,
 		QuickSlot = 3,
-		SkillSlot = 4
+		SkillSlot = 4,
+		Count = 5
 	},
 	
 	StatusType = {
@@ -57,6 +61,7 @@ local CommonEnum = {
 		EquipSlots = 2,
 		Inventory = 3,
 		QuickSlots = 4, -- 클라이언트 전용
+		Count = 5
 	},
 	
 	StatType = {
@@ -71,7 +76,8 @@ local CommonEnum = {
 		Dodge = 8,
 		Block = 9,
 		Critical = 10,
-		Sight = 11
+		Sight = 11,
+		Count = 12
 	}
 }
 
@@ -82,6 +88,7 @@ CommonEnum.GameDataType.Converter = {
 	[CommonEnum.GameDataType.Vehicle] = "Vehicle",
 	[CommonEnum.GameDataType.WorldInteractor] = "WorldInteractor"
 }
+Debug.Assert(CommonEnum.GameDataType.Count == #CommonEnum.GameDataType.Converter + 1, "비정상입니다.")
 
 CommonEnum.ToolType.Converter = {
 	[CommonEnum.ToolType.Weapon] = "Weapon",
@@ -89,6 +96,7 @@ CommonEnum.ToolType.Converter = {
 	[CommonEnum.ToolType.Consumable] = "Consumable",
 	[CommonEnum.ToolType.All] = "All",
 }
+Debug.Assert(CommonEnum.ToolType.Count == #CommonEnum.ToolType.Converter + 1, "비정상입니다.")
 
 CommonEnum.EquipType.Converter = {
 	[CommonEnum.EquipType.Weapon] = "Weapon",
@@ -97,6 +105,7 @@ CommonEnum.EquipType.Converter = {
 	[CommonEnum.EquipType.Leggings] = "Leggings",
 	[CommonEnum.EquipType.Boots] = "Boots"
 }
+Debug.Assert(CommonEnum.EquipType.Count == #CommonEnum.EquipType.Converter + 1, "비정상입니다.")
 
 CommonEnum.SlotType.Converter = {
 	[CommonEnum.SlotType.InventorySlot] = "InventorySlot",
@@ -104,6 +113,7 @@ CommonEnum.SlotType.Converter = {
 	[CommonEnum.SlotType.QuickSlot] = "QuickSlot",
 	[CommonEnum.SlotType.SkillSlot] = "SkillSlot"
 }
+Debug.Assert(CommonEnum.SlotType.Count == #CommonEnum.SlotType.Converter + 1, "비정상입니다.")
 
 CommonEnum.StatType.Converter = {
 	[CommonEnum.StatType.STR] = "STR",
@@ -118,7 +128,7 @@ CommonEnum.StatType.Converter = {
 	[CommonEnum.StatType.Critical] = "Critical",
 	[CommonEnum.StatType.Sight] = "Sight"
 }
-
+Debug.Assert(CommonEnum.StatType.Count == #CommonEnum.StatType.Converter + 1, "비정상입니다.")
 
 CommonEnum.__index = Utility.Inheritable__index
 CommonEnum.__newindex = Utility.Inheritable__newindex

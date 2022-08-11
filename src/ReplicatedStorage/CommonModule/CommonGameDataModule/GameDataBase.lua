@@ -29,7 +29,6 @@ function GameDataBase:LoadAllAdditionalData(gameDataManager)
 			return false
 		end
 	end
-	Debug.Print("!!")
 	return true
 end
 
@@ -40,7 +39,6 @@ function GameDataBase:ValidateAllData(gameDataManager)
 			return false
 		end
 	end
-	
 	return true
 end
 
