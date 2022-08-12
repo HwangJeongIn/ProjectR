@@ -86,7 +86,7 @@ function WorldInteractorSystem:Initialize()
             end
 
             if not self:InitializeWorldInteractorTemplate(worldInteractor) then
-                Debug.Assert(false, "툴 템플릿 초기화에 실패했습니다. => " .. worldInteractorName)
+                Debug.Assert(false, "WorldInteractor 템플릿 초기화에 실패했습니다. => " .. worldInteractorName)
                 return false
             end
 
@@ -121,13 +121,13 @@ end
 
 function WorldInteractorSystem:CreateWorldInteractor(worldInteractorKey)
     if not worldInteractorKey then
-        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(worldInteractorKey))
+        Debug.Assert(false, "WorldInteractor 생성에 실패했습니다. => " .. tostring(worldInteractorKey))
         return nil
     end
 
     local createdWorldInteractor = self:Create(worldInteractorKey) 
     if not createdWorldInteractor then
-        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(worldInteractorKey))
+        Debug.Assert(false, "WorldInteractor 생성에 실패했습니다. => " .. tostring(worldInteractorKey))
         return nil
     end
 
@@ -177,7 +177,7 @@ function WorldInteractorSystem:CreateImpl(worldInteractorKey)
     local targetWorldInteractor = self.WorldInteractorTemplateTable[worldInteractorKey]
 
     if not targetWorldInteractor then
-        Debug.Assert(false, "툴이 존재하지 않습니다. 게임데이터만 있을 가능성이 높습니다. => " .. tostring(worldInteractorKey))
+        Debug.Assert(false, "WorldInteractor가 존재하지 않습니다. 게임데이터만 있을 가능성이 높습니다. => " .. tostring(worldInteractorKey))
         return nil
     end
 
