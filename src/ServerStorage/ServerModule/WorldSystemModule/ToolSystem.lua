@@ -93,9 +93,7 @@ end
 function ToolSystem:Initialize()
     local ToolTemplateTable = {}
 
-    
     local toolTypeCount = ToolType.Count - 2
-
     local allToolFolders = Tools:GetChildren()
     for _, targetToolFolder in pairs(allToolFolders) do
 
@@ -108,7 +106,7 @@ function ToolSystem:Initialize()
             end
             key = key.Value
 
-            local toolGameData = ToolUtility:GetToolGameDataByKey(key)
+            local toolGameData = ToolUtility:GetGameDataByKey(key)
             local toolModelName = tool.Name
             tool.Name = toolGameData.Name
             if ToolTemplateTable[key] then

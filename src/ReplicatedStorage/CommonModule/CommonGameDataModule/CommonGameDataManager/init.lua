@@ -30,12 +30,17 @@ function CommonGameDataManager:LoadGameData(gameDataOwner, gameTypeArray)
 	end
 
 	if not self:LoadAdditionalData(loadedGameDataSet) then
-		Debug.Assert(false, "비정상입니다.")
+		Debug.Assert(false, "LoadAdditionalData에 실패했습니다.")
 		return false
 	end
 
 	if not self:ValidateData(loadedGameDataSet) then
-		Debug.Assert(false, "비정상입니다.")
+		Debug.Assert(false, "ValidateData에 실패했습니다.")
+		return false
+	end
+
+	if not self:ValidateDataFinally(loadedGameDataSet) then
+		Debug.Assert(false, "ValidateAllDataFinally에 실패했습니다.")
 		return false
 	end
 
@@ -64,6 +69,16 @@ function CommonGameDataManager:ValidateData(gameDataSet)
 	return true
 end
 
+function CommonGameDataManager:ValidateDataFinally(gameDataSet)
+	for _, gameData in pairs(gameDataSet) do
+		if not gameData:ValidateAllDataFinally(self) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+	end
+
+	return true
+end
 
 if not CommonGameDataManager:LoadGameData(script,
 										{GameDataType.Tool,

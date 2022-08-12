@@ -28,8 +28,26 @@ local ToolUtility = {
 	}
 }
 
+function ToolUtility:GetGameDataKeyByToolModelName(toolModelName)
 
-function ToolUtility:GetToolGameDataByKey(key)
+end
+
+function ToolUtility:GetGameDataByToolModelName(toolModelName)
+	if not toolModelName then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local toolGameData = CommonGameDataManager[GameDataType.Tool]:GetGameDataByModelName(toolModelName)
+	if not toolGameData then
+		Debug.Assert(false, "ToolGameData가 존재하지 않습니다. [ModelName] => " .. toolModelName)
+		return nil
+	end
+
+	return toolGameData
+end
+
+function ToolUtility:GetGameDataByKey(key)
 	local toolGameData = CommonGameDataManager[GameDataType.Tool]:Get(key)
 	if not toolGameData then
 		Debug.Assert(false, "ToolGameData가 존재하지 않습니다. [key] => " .. tostring(key))
@@ -39,12 +57,19 @@ function ToolUtility:GetToolGameDataByKey(key)
 	return toolGameData
 end
 
-function ToolUtility:GetToolGameData(tool)
+function ToolUtility:GetGameData(tool)
 	if not tool then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
 	end
 
+	local toolGameData = self:GetGameDataByToolModelName(tool.Name)
+	if not toolGameData then
+		Debug.Assert(false, "모델과 일치하는 데이터가 Mapping Table을 확인해봐야 합니다. => " .. tool.Name)
+		return nil
+	end
+
+	return toolGameData
 	-- FindFirstChild를 쓰면 가끔 못찾는 경우가 있다. 확인해봐야한다.
 	--[[
 	local key = tool:WaitForChild("Key")
@@ -54,18 +79,20 @@ function ToolUtility:GetToolGameData(tool)
 	end
 	--]]
 
+	--[[
 	local key = tool.Key.Value
-	local toolGameData = self:GetToolGameDataByKey(key)
+	local toolGameData = self:GetGameDataByKey(key)
 	if not toolGameData then
 		Debug.Assert(false, "ToolGameData가 존재하지 않습니다. [key] => " .. tostring(key))
 		return nil
 	end
 
 	return toolGameData
+	--]]
 end
 
 function ToolUtility:IsValidTool(tool)
-	return (self:GetToolGameData(tool) ~= nil)
+	return (self:GetGameData(tool) ~= nil)
 end
 
 function ToolUtility:CheckEquipableToolGameData(toolGameData)
@@ -83,7 +110,7 @@ function ToolUtility:CheckEquipableToolGameData(toolGameData)
 end
 
 function ToolUtility:CheckEquipableTool(tool)
-    local toolGameData = self:GetToolGameData(tool)
+    local toolGameData = self:GetGameData(tool)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -98,7 +125,7 @@ function ToolUtility:CheckEquipableTool(tool)
 end
 
 function ToolUtility:GetEquipType(tool)
-    local toolGameData = self:GetToolGameData(tool)
+    local toolGameData = self:GetGameData(tool)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -122,7 +149,7 @@ function ToolUtility:CheckWeaponToolGameData(toolGameData)
 end
 
 function ToolUtility:CheckWeaponTool(tool)
-    local toolGameData = self:GetToolGameData(tool)
+    local toolGameData = self:GetGameData(tool)
     if not self:CheckWeaponToolGameData(toolGameData) then
         Debug.Assert(false, "비정상입니다.")
 		return false

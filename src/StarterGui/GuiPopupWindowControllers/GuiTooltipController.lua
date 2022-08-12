@@ -381,7 +381,7 @@ function GuiTooltipController:InitializeByToolSlot(toolSlot)
 	end
 
 	local tool = toolSlot:GetTool()
-	local toolGameData = ToolUtility:GetToolGameData(tool)
+	local toolGameData = ToolUtility:GetGameData(tool)
 	if not toolGameData then
 		self:ClearToolData()
 		Debug.Assert(false, "비정상입니다.")

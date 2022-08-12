@@ -228,7 +228,7 @@ function CommonGlobalStorage:EquipTool(playerId, equipType, tool)
 		return nil, nil
 	end
 
-	local currentToolGameData = ToolUtility:GetToolGameData(currentTool)
+	local currentToolGameData = ToolUtility:GetGameData(currentTool)
 	if not currentToolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return nil, nil
@@ -236,7 +236,7 @@ function CommonGlobalStorage:EquipTool(playerId, equipType, tool)
 
 	local prevToolGameData = nil
 	if prevTool then
-		prevToolGameData = ToolUtility:GetToolGameData(currentTool)
+		prevToolGameData = ToolUtility:GetGameData(currentTool)
 		if not prevToolGameData then
 			Debug.Assert(false, "비정상입니다.")
 			return nil, nil
@@ -264,7 +264,7 @@ function CommonGlobalStorage:UnequipTool(playerId, equipType)
 		return nil
 	end
 
-	local prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+	local prevToolGameData = ToolUtility:GetGameData(prevTool)
 	if not prevToolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
@@ -287,7 +287,7 @@ function CommonGlobalStorage:UnequipToolByTool(playerId, tool)
 		return nil
 	end
 
-	local prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+	local prevToolGameData = ToolUtility:GetGameData(prevTool)
 	if not prevToolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
@@ -351,7 +351,7 @@ function CommonGlobalStorage:CheckAndGetArmorData(armor)
 		return nil
 	end
 
-	local toolGameData = self:GetToolGameData(armor)
+	local toolGameData = self:GetGameData(armor)
 	if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return nil

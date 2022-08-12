@@ -127,7 +127,7 @@ function GuiToolSlotController:SetTool(tool)
 		return true
 	end
 
-	local toolGameData = ToolUtility:GetToolGameData(tool)
+	local toolGameData = ToolUtility:GetGameData(tool)
 	if not toolGameData then
 		self:ClearToolData()
 		Debug.Assert(false, "비정상입니다.")

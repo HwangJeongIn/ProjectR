@@ -76,7 +76,7 @@ function Inventory:AddToolToSlot(slotIndex, tool)
 		return false
 	end
 
-	local toolGameData = ToolUtility:GetToolGameData(tool)
+	local toolGameData = ToolUtility:GetGameData(tool)
 	if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -101,7 +101,7 @@ function Inventory:RemoveToolFromSlot(slotIndex, tool)
 		return false
 	end
 
-	local toolGameData = ToolUtility:GetToolGameData(tool)
+	local toolGameData = ToolUtility:GetGameData(tool)
 	if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -116,7 +116,7 @@ function Inventory:RemoveToolFromSlot(slotIndex, tool)
 end
 
 function Inventory:AddTool(tool)
-	local toolGameData = ToolUtility:GetToolGameData(tool)
+	local toolGameData = ToolUtility:GetGameData(tool)
 	if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false
@@ -136,7 +136,7 @@ function Inventory:AddTool(tool)
 end
 
 function Inventory:RemoveTool(tool)
-	local toolGameData = ToolUtility:GetToolGameData(tool)
+	local toolGameData = ToolUtility:GetGameData(tool)
 	if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return false

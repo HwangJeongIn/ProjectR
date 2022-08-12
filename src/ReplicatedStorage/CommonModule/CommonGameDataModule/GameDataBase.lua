@@ -6,6 +6,7 @@ local Debug = require(CommonModule:WaitForChild("Debug"))
 local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
+local GameDataTypeConverter = GameDataType.Converter
 
 
 local GameDataBase = {}
@@ -18,6 +19,11 @@ function GameDataBase:LoadAdditionalData(gameData, gameDataManager)
 end
 
 function GameDataBase:ValidateData(gameData, gameDataManager)
+	Debug.Assert(false, "재정의해야합니다. GameDataType => " .. tostring(self:GetGameDataType()))
+	return false
+end
+
+function GameDataBase:ValidateAllDataFinally(gameDataManager)
 	Debug.Assert(false, "재정의해야합니다. GameDataType => " .. tostring(self:GetGameDataType()))
 	return false
 end
@@ -49,8 +55,13 @@ function GameDataBase:Initialize(gameDataType)
 		return
 	end
 
+	local gameDataTypeString = GameDataTypeConverter[gameDataType]
+	local gameDataString = gameDataTypeString .. "GameData"
+
 	rawset(self, "__index", Utility.Inheritable__index)
 	rawset(self, "__newindex", Utility.Immutable__newindex)
+	
+	rawset(self, "Name", gameDataString)
 	rawset(self, "Value", {})
 	rawset(self, "GetGameDataType", function() return gameDataType end)
 end

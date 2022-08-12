@@ -43,7 +43,7 @@ function EquipSlots:UnequipTool(equipType)
     end
 
     --[[
-    local prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+    local prevToolGameData = ToolUtility:GetGameData(prevTool)
     if not prevToolGameData then
         Debug.Assert(false, "도구는 존재하지만 데이터가 존재하지 않습니다.")
         return nil
@@ -58,7 +58,7 @@ function EquipSlots:UnequipToolByTool(tool)
 		return nil
     end
 
-    local toolGameData = ToolUtility:GetToolGameData(tool)
+    local toolGameData = ToolUtility:GetGameData(tool)
     if not toolGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
@@ -91,7 +91,7 @@ function EquipSlots:EquipTool(equipType, tool)
 		return nil, nil
     end
 
-    local toolGameData = ToolUtility:GetToolGameData(tool)
+    local toolGameData = ToolUtility:GetGameData(tool)
     if not toolGameData then
         Debug.Assert(false, "비정상입니다.")
         return nil, nil
@@ -108,7 +108,7 @@ function EquipSlots:EquipTool(equipType, tool)
     --[[
     local prevToolGameData = nil
     if prevTool then
-        prevToolGameData = ToolUtility:GetToolGameData(prevTool)
+        prevToolGameData = ToolUtility:GetGameData(prevTool)
         if not prevToolGameData then
             Debug.Assert(false, "도구는 존재하지만 데이터가 존재하지 않습니다.")
         end

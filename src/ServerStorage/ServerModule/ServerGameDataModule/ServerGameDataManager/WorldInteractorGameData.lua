@@ -12,7 +12,7 @@ local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
 
-local WorldInteractorGameData = {Name = "WorldInteractorGameData"}
+local WorldInteractorGameData = {}
 
 -- 내부 함수 먼저 정의
 function WorldInteractorGameData:LoadAdditionalData(gameData, gameDataManager)
@@ -34,6 +34,10 @@ function WorldInteractorGameData:ValidateData(gameData, gameDataManager)
 		end
 	end
 
+	return true
+end
+
+function WorldInteractorGameData:ValidateAllDataFinally(gameDataManager)
 	return true
 end
 
