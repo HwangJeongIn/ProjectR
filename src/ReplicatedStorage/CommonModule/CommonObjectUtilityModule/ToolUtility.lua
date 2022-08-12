@@ -5,14 +5,13 @@ local Debug = require(CommonModule:WaitForChild("Debug"))
 local Utility = require(CommonModule:WaitForChild("Utility"))
 
 local CommonObjectUtilityModule = CommonModule:WaitForChild("CommonObjectUtilityModule")
-local ObjectUtilityBase = require(CommonObjectUtilityModule:WaitForChild("ObjectUtilityBase"))
 
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
 local ToolType = CommonEnum.ToolType
 
 
-local ToolUtility = ObjectUtilityBase
+local ToolUtility = Utility:DeepCopy(require(CommonObjectUtilityModule:WaitForChild("ObjectUtilityBase")))
 
 function ToolUtility:Initialize()
 	local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")

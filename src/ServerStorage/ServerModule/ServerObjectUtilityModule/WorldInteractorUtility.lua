@@ -5,21 +5,18 @@ local Debug = CommonModuleFacade.Debug
 local Utility = CommonModuleFacade.Utility
 
 local CommonObjectUtilityModule = CommonModuleFacade.CommonObjectUtilityModule
-local ObjectUtilityBase = require(CommonObjectUtilityModule:WaitForChild("ObjectUtilityBase"))
 
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
-local ServerEnum = require(ServerModule:WaitForChild("SErverEnum"))
+local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 
 local GameDataType = ServerEnum.GameDataType
-local ToolType = ServerEnum.ToolType
+local WorldInteractorType = ServerEnum.WorldInteractorType
 
 
-local WorldInteractorUtility = ObjectUtilityBase
+local WorldInteractorUtility = Utility:DeepCopy(require(CommonObjectUtilityModule:WaitForChild("ObjectUtilityBase")))
 
 function WorldInteractorUtility:Initialize()
-	local ServerStorage = game:GetService("ServerStorage")
-	local ServerModule = ServerStorage:WaitForChild("ServerModule")
 	local ServerGameDataModule = ServerModule:WaitForChild("ServerGameDataModule")
 	local ServerGameDataManager = require(ServerGameDataModule:WaitForChild("ServerGameDataManager"))
 

@@ -4,14 +4,16 @@ local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleF
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 
--- 서버 상수
 local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
 local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 
--- 서버 전역변수
+local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
+local WorldInteractorUtility = require(ServerObjectUtilityModule:WaitForChild("WorldInteractorUtility"))
+
+
 local ServerGlobalStorage = require(ServerModule:WaitForChild("ServerGlobalStorage"))
 
--- 게임 데이터 매니저
+
 local ServerGameDataModule = ServerModule:WaitForChild("ServerGameDataModule")
 local ServerGameDataManager = require(ServerGameDataModule:WaitForChild("ServerGameDataManager"))
 
@@ -30,6 +32,8 @@ local ServerModuleFacade = {
 	ServerModule = ServerModule,
 	ServerConstant = ServerConstant,
 	ServerEnum = ServerEnum,
+	WorldInteractorUtility = WorldInteractorUtility,
+
 	ServerGlobalStorage = ServerGlobalStorage,
 	ServerGameDataManager = ServerGameDataManager,
 	

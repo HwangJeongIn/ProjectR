@@ -9,7 +9,7 @@ local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild(
 
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
-local ServerEnum = require(ServerModule:WaitForChild("SErverEnum"))
+local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 
 local GameDataType = ServerEnum.GameDataType
 local WorldInteractorTypeSelector = ServerEnum.WorldInteractorType

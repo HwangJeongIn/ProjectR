@@ -47,11 +47,13 @@ function ToolSystem:InitializeToolTemplate(tool)
         return false
     end
 
+    --[[
     local key = tool:FindFirstChild("Key")
     if not key then
         Debug.Assert(false, "도구에 Key 정보가 없습니다. => " .. tool.Name)
         return false
     end
+    --]]
 
     local handle = tool:FindFirstChild("Handle")
     if not handle then
@@ -93,7 +95,6 @@ end
 function ToolSystem:Initialize()
     local ToolTemplateTable = {}
 
-    local toolTypeCount = ToolType.Count - 2
     local allToolFolders = Tools:GetChildren()
     for _, targetToolFolder in pairs(allToolFolders) do
 
@@ -104,6 +105,7 @@ function ToolSystem:Initialize()
             local key = ToolUtility:GetGameDataKey(tool)
             if not key then
                 Debug.Assert(false, "도구에 키가 없습니다. => " .. toolName)
+                return false
             end
             
             if ToolTemplateTable[key] then

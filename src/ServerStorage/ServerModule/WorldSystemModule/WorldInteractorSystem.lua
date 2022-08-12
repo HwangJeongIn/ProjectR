@@ -1,25 +1,21 @@
 local Debris = game:GetService("Debris")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
-
-local Debug = CommonModuleFacade.Debug
-local Utility = CommonModuleFacade.Utility
-local ToolUtility = CommonModuleFacade.ToolUtility
-
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
+
+local Debug = ServerModuleFacade.Debug
+local Utility = ServerModuleFacade.Utility
+local WorldInteractorUtility = ServerModuleFacade.WorldInteractorUtility
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 local ServerEnum = ServerModuleFacade.ServerEnum
 
 local GameDataType = ServerEnum.GameDataType
 
-local ToolType = ServerEnum.ToolType
-local ToolTypeConverter = ToolType.Converter
-local Tools = ServerStorage:WaitForChild("Tools")
+local WorldInteractorType = ServerEnum.WorldInteractorType
+local WorldInteractors = ServerStorage:WaitForChild("WorldInteractors")
 
-local ToolModule = ServerModuleFacade.ToolModule
-local WeaponController = require(ToolModule:WaitForChild("WeaponController"))
+local WorldInteractorModule = ServerModuleFacade.WorldInteractorModule
+--local ItemBoxController = require(WorldInteractorModule:WaitForChild("ItemBoxController"))
 
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local SystemModule = ServerModule:WaitForChild("WorldSystemModule")
@@ -37,11 +33,14 @@ function WorldInteractorSystem:InitializeWorldInteractorTemplate(worldInteractor
         return false
     end
 
+    --[[
     local key = worldInteractor:FindFirstChild("Key")
     if not key then
-        Debug.Assert(false, "도구에 Key 정보가 없습니다. => " .. worldInteractor.Name)
+        Debug.Assert(false, "WorldInteractor에 Key 정보가 없습니다. => " .. worldInteractor.Name)
         return false
     end
+    --]]
+
     local mesh = worldInteractor:FindFirstChild("Mesh")
     if not mesh then
         Debug.Assert(false, "메시 정보가 없습니다. => " .. worldInteractor.Name)
@@ -50,7 +49,7 @@ function WorldInteractorSystem:InitializeWorldInteractorTemplate(worldInteractor
 
     local trigger = worldInteractor:FindFirstChild("Trigger")
     if not trigger then
-        Debug.Assert(false, "도구에 트리거가 없습니다. => " .. worldInteractor.Name)
+        Debug.Assert(false, "WorldInteractor에 트리거가 없습니다. => " .. worldInteractor.Name)
         return false
     end
 
@@ -66,90 +65,88 @@ function WorldInteractorSystem:InitializeWorldInteractorTemplate(worldInteractor
 end
 
 function WorldInteractorSystem:Initialize()
-    local ToolTemplateTable = {}
+    local worldInteractorTemplateTable = {}
 
-    local toolTypeCount = ToolType.Count - 2
-    local allToolFolders = Tools:GetChildren()
-    for _, targetToolFolder in pairs(allToolFolders) do
+    local allWorldInteractorFolders = WorldInteractors:GetChildren()
+    for _, targetWorldInteractorFolder in pairs(allWorldInteractorFolders) do
 
-        local targetToolFolderTools = targetToolFolder:GetChildren()
-        for _, tool in pairs(targetToolFolderTools) do
+        local targetWorldInteractors = targetWorldInteractorFolder:GetChildren()
+        for _, worldInteractor in pairs(targetWorldInteractors) do
 
-            local toolName = tool.Name
-            local key = ToolUtility:GetGameDataKey(tool)
+            local worldInteractorName = worldInteractor.Name
+            local key = WorldInteractorUtility:GetGameDataKey(worldInteractor)
             if not key then
-                Debug.Assert(false, "도구에 키가 없습니다. => " .. toolName)
+                Debug.Assert(false, "WorldInteractor에 키가 없습니다. => " .. worldInteractorName)
+                return false
             end
             
-            if ToolTemplateTable[key] then
-                Debug.Assert(false, "같은 키를 가진 도구가 있습니다. 키를 변경하세요 => " .. tostring(key) .. " => " .. toolName)
+            if worldInteractorTemplateTable[key] then
+                Debug.Assert(false, "같은 키를 가진 WorldInteractor가 있습니다. 키를 변경하세요 => " .. tostring(key) .. " => " .. worldInteractorName)
                 return false
             end
 
-            if not self:InitializeWorldInteractorTemplate(tool) then
-                Debug.Assert(false, "툴 템플릿 초기화에 실패했습니다. => " .. toolName)
+            if not self:InitializeWorldInteractorTemplate(worldInteractor) then
+                Debug.Assert(false, "툴 템플릿 초기화에 실패했습니다. => " .. worldInteractorName)
                 return false
             end
 
-            local toolGameData = ToolUtility:GetGameDataByKey(key)
-            ToolTemplateTable[key] = {Tool = tool, ToolGameData = toolGameData}
+            local worldInteractorGameData = WorldInteractorUtility:GetGameDataByKey(key)
+            worldInteractorTemplateTable[key] = {WorldInteractor = worldInteractor, WorldInteractorGameData = worldInteractorGameData}
         end
     end
     
-    self.ToolTemplateTable = ToolTemplateTable
+    self.WorldInteractorTemplateTable = worldInteractorTemplateTable
     return true
 end
 
-function WorldInteractorSystem:GetClonedToolScript(toolType, tool)
-    if not toolType or not tool then
+function WorldInteractorSystem:GetClonedWorldInteractorScript(worldInteractorType, worldInteractor)
+    if not worldInteractorType or not worldInteractor then
         Debug.Assert(false, "비정상입니다.")
         return nil
     end
 
     local targetScript = nil
-    if ToolType.Weapon == toolType then
+    if WorldInteractorType.ItemBox == worldInteractorType then
+        --[[
         targetScript = Utility:DeepCopy(WeaponController)
-        if not targetScript:InitializeWeaponController(GameDataType.Tool, tool) then
+        if not targetScript:InitializeWeaponController(GameDataType.WorldInteractor, worldInteractor) then
             Debug.Assert(false, "비정상입니다.")
             return nil
         end
-    elseif ToolType.Armor == toolType then
-
-    elseif ToolType.Comsumable == toolType then
-        
+        --]]
     end
 
     return targetScript
 end
 
-function WorldInteractorSystem:CreateTool(toolKey)
-    if not toolKey then
-        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolKey))
+function WorldInteractorSystem:CreateWorldInteractor(worldInteractorKey)
+    if not worldInteractorKey then
+        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(worldInteractorKey))
         return nil
     end
 
-    local createdTool = self:Create(toolKey) 
-    if not createdTool then
-        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolKey))
+    local createdWorldInteractor = self:Create(worldInteractorKey) 
+    if not createdWorldInteractor then
+        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(worldInteractorKey))
         return nil
     end
 
-    return createdTool
+    return createdWorldInteractor
 end
 
-function WorldInteractorSystem:DestroyTool(tool)
-    if not tool then
+function WorldInteractorSystem:DestroyWorldInteractor(worldInteractor)
+    if not worldInteractor then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
 
-    local className = tool.ClassName
-    if "Tool" ~= className then
+    local className = worldInteractor.ClassName
+    if "WorldInteractor" ~= className then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
 
-    if not self:Destroy(tool) then
+    if not self:Destroy(worldInteractor) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -157,14 +154,13 @@ function WorldInteractorSystem:DestroyTool(tool)
     return true
 end
 
-function WorldInteractorSystem:FindObjectJoints(tool)
+function WorldInteractorSystem:FindObjectJoints(worldInteractor)
     local joints = {}
 
-    local trigger = tool.Handle.Trigger
+    local trigger = worldInteractor.Trigger
     table.insert(joints, trigger)
 
-    local mesh = tool:FindFirstChild("Mesh")
-    local parts = mesh:GetChildren()
+    local parts = worldInteractor.Mesh:GetChildren()
     for _, part in pairs(parts) do
         local joint = part:FindFirstChild("Joint")
         if not joint then
@@ -177,35 +173,35 @@ function WorldInteractorSystem:FindObjectJoints(tool)
     return joints
 end
 
-function WorldInteractorSystem:CreateImpl(toolKey)
-    local targetTool = self.ToolTemplateTable[toolKey]
+function WorldInteractorSystem:CreateImpl(worldInteractorKey)
+    local targetWorldInteractor = self.WorldInteractorTemplateTable[worldInteractorKey]
 
-    if not targetTool then
-        Debug.Assert(false, "툴이 존재하지 않습니다. 게임데이터만 있을 가능성이 높습니다. => " .. tostring(toolKey))
+    if not targetWorldInteractor then
+        Debug.Assert(false, "툴이 존재하지 않습니다. 게임데이터만 있을 가능성이 높습니다. => " .. tostring(worldInteractorKey))
         return nil
     end
 
-    local clonedTargetTool = targetTool.Tool:Clone()
-	clonedTargetTool.Parent = nil
+    local clonedTargetWorldInteractor = targetWorldInteractor.WorldInteractor:Clone()
+	clonedTargetWorldInteractor.Parent = nil
 
-    return clonedTargetTool
+    return clonedTargetWorldInteractor
 end
 
-function WorldInteractorSystem:PostCreateImpl(createdTool, toolKey)
-    local targetScript = self:GetClonedToolScript(self.ToolTemplateTable[toolKey].ToolGameData.ToolType, createdTool)
+function WorldInteractorSystem:PostCreateImpl(createdWorldInteractor, worldInteractorKey)
+    local targetScript = self:GetClonedWorldInteractorScript(self.WorldInteractorTemplateTable[worldInteractorKey].WorldInteractorGameData.WorldInteractorType, createdWorldInteractor)
 
      -- 없는 것도 존재할 수 있다.
     if targetScript then
-        if not self:SetScript(createdTool, targetScript) then
+        if not self:SetScript(createdWorldInteractor, targetScript) then
             Debug.Assert(false, "비정상입니다.")
             return nil
         end
     end
 
-    return createdTool
+    return createdWorldInteractor
 end
 
-function WorldInteractorSystem:DestroyImpl(tool)
+function WorldInteractorSystem:DestroyImpl(WorldInteractor)
     return true
 end
 
