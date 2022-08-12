@@ -24,22 +24,12 @@ function ToolBase:InitializeTool(gameDataType, tool)
 		return false
 	end
 	
-	local toolGameData = self:GetGameData()
-	self.ToolType = toolGameData.ToolType
+	--local toolGameData = self:GetGameData()
+	--self.ToolType = toolGameData.ToolType
 	return true
 end
 
 function ToolBase:GetToolOwnerIfPlayer(equipType)
-	--[[
-	local targetCharacter = nil
-	local tool = self:Root()
-	if EquipType.Weapon == equipType then
-		targetCharacter = tool.Parent
-	elseif EquipType.Armor == equipType then
-		targetCharacter = tool.Parent.Parent
-	end
-	--]]
-
 	local tool = self:Root()
 	local targetCharacter = tool.Parent
 	if not targetCharacter then

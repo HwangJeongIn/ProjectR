@@ -1,13 +1,10 @@
-local Debris = game:GetService("Debris")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
-
-local Debug = CommonModuleFacade.Debug
-local Utility = CommonModuleFacade.Utility
-local ToolUtility = CommonModuleFacade.ToolUtility
-
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
+
+local Debug = ServerModuleFacade.Debug
+local Utility = ServerModuleFacade.Utility
+local ToolUtility = ServerModuleFacade.ToolUtility
+local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 local ServerEnum = ServerModuleFacade.ServerEnum
@@ -119,6 +116,7 @@ function ToolSystem:Initialize()
             end
 
             local toolGameData = ToolUtility:GetGameDataByKey(key)
+            ObjectTagUtility:AddTag(tool, ToolTypeConverter[toolGameData.ToolType])
             ToolTemplateTable[key] = {Tool = tool, ToolGameData = toolGameData}
         end
     end

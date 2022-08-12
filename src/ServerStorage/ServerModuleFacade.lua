@@ -8,8 +8,8 @@ local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
 local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 
 local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
+local ObjectTagUtility = require(ServerObjectUtilityModule:WaitForChild("ObjectTagUtility"))
 local WorldInteractorUtility = require(ServerObjectUtilityModule:WaitForChild("WorldInteractorUtility"))
-
 
 local ServerGlobalStorage = require(ServerModule:WaitForChild("ServerGlobalStorage"))
 
@@ -32,6 +32,7 @@ local ServerModuleFacade = {
 	ServerModule = ServerModule,
 	ServerConstant = ServerConstant,
 	ServerEnum = ServerEnum,
+	ObjectTagUtility = ObjectTagUtility,
 	WorldInteractorUtility = WorldInteractorUtility,
 
 	ServerGlobalStorage = ServerGlobalStorage,

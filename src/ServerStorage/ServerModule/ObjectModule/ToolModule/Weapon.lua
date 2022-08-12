@@ -2,10 +2,12 @@
 
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
-local Utility = ServerModuleFacade.Utility
---local ToolUtility = ServerModuleFacade.ToolUtility
 
 local Debug = ServerModuleFacade.Debug
+local Utility = ServerModuleFacade.Utility
+--local ToolUtility = ServerModuleFacade.ToolUtility
+local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
+
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
 
@@ -17,6 +19,8 @@ local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
 local StatType = ServerEnum.StatType
 local EquipType = ServerEnum.EquipType
+local WorldInteractorType = ServerEnum.WorldInteractorType
+local ToolType = ServerEnum.ToolType
 
 local ToolModule = ServerModuleFacade.ToolModule
 local Debris = game:GetService("Debris")
@@ -48,6 +52,11 @@ function Weapon:IsInteractableObject(object)
 	if not object then
 		Debug.Assert(false, "비정상입니다.")
 		return false
+	end
+
+	local objectTag = ObjectTagUtility:GetTag(object)
+	if WorldInteractorType[objectTag] then
+		
 	end
 end
 

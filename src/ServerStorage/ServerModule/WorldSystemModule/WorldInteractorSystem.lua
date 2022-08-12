@@ -4,6 +4,7 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 
 local Debug = ServerModuleFacade.Debug
 local Utility = ServerModuleFacade.Utility
+local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
 local WorldInteractorUtility = ServerModuleFacade.WorldInteractorUtility
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
@@ -12,6 +13,7 @@ local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
 
 local WorldInteractorType = ServerEnum.WorldInteractorType
+local WorldInteractorTypeConverter = WorldInteractorType.Converter
 local WorldInteractors = ServerStorage:WaitForChild("WorldInteractors")
 
 local WorldInteractorModule = ServerModuleFacade.WorldInteractorModule
@@ -91,6 +93,8 @@ function WorldInteractorSystem:Initialize()
             end
 
             local worldInteractorGameData = WorldInteractorUtility:GetGameDataByKey(key)
+            
+            ObjectTagUtility:AddTag(worldInteractor, WorldInteractorTypeConverter[worldInteractorGameData.WorldInteractorType])
             worldInteractorTemplateTable[key] = {WorldInteractor = worldInteractor, WorldInteractorGameData = worldInteractorGameData}
         end
     end

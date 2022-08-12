@@ -29,6 +29,20 @@ function ObjectTagUtility:HasTag(instance, tagString)
     return CollectionService:HasTag(instance, tagString)
 end
 
+function ObjectTagUtility:GetTag(instance)
+    local tags = CollectionService:GetTags(instance)
+    if not tags then
+        return nil
+    end
+
+    local tagCount = #tags
+    if 1 < tagCount then
+        Debug.Print("태그가 1개이상 존재합니다. 가장 첫번째 태그를 가져옵니다.")
+    end
+
+    return tags[1]
+end
+
 function ObjectTagUtility:RemoveAllTags(instance)
     Debug.Assert(instance, "비정상입니다.")
     
