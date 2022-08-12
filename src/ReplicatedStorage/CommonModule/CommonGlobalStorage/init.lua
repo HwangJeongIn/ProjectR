@@ -171,11 +171,6 @@ function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
 end
 
 function CommonGlobalStorage:IsInBackpack(playerId, tool)
-	if not self:CheckPlayer(playerId) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
 	local player = game.Players:GetPlayerByUserId(playerId)
 	return player.Backpack == tool.Parent
 end
@@ -190,7 +185,7 @@ function CommonGlobalStorage:IsInCharacterRaw(playerId, tool)
 	return (character == tool.Parent)
 end
 
-function CommonGlobalStorage:IsInCharacter(playerId, equipType, equippedTool, findAll)
+function CommonGlobalStorage:IsInCharacter(playerId, equipType, tool, findAll)
 	local player = game.Players:GetPlayerByUserId(playerId)
 	local character = player.Character
 	if not character then
@@ -199,10 +194,10 @@ function CommonGlobalStorage:IsInCharacter(playerId, equipType, equippedTool, fi
 	end
 
 	if equipType == EquipType.Weapon or not equipType then
-		return (character == equippedTool.Parent)
+		return (character == tool.Parent)
 	elseif equipType == EquipType.Armor then
 
-		if findAll and (character == equippedTool.Parent) then
+		if findAll and (character == tool.Parent) then
 			return true
 		end
 
@@ -211,7 +206,7 @@ function CommonGlobalStorage:IsInCharacter(playerId, equipType, equippedTool, fi
 			Debug.Assert(false, "비정상입니다.")
 			return false
 		end
-		return (characterArmorsFolder == equippedTool.Parent)
+		return (characterArmorsFolder == tool.Parent)
 	end
 	
 	return true

@@ -3,6 +3,8 @@
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 local Utility = ServerModuleFacade.Utility
+--local ToolUtility = ServerModuleFacade.ToolUtility
+
 local Debug = ServerModuleFacade.Debug
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
@@ -14,6 +16,7 @@ local DefaultSTRFactor = ServerConstant.DefaultSTRFactor
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
 local StatType = ServerEnum.StatType
+local EquipType = ServerEnum.EquipType
 
 local ToolModule = ServerModuleFacade.ToolModule
 local Debris = game:GetService("Debris")
@@ -31,7 +34,21 @@ function Weapon:InitializeWeapon(gameDataType, weaponTool)
         return false
     end
 
+	local  gameData = self:GetGameData()
+	self.SkillSet = {
+		[1] = gameData.Skill1,
+		[2] = gameData.Skill2,
+		[3] = gameData.Skill3,
+	}
+
     return true
+end
+
+function Weapon:IsInteractableObject(object)
+	if not object then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
 end
 
 function Weapon:CanAttack(otherPart)
@@ -69,7 +86,7 @@ function Weapon:CanAttack(otherPart)
 	return true
 end
 
-function Weapon:CalcDamage(damagedActor, damageCauser)
+function Weapon:CalcDamageByDefaultSkill(damagedActor, damageCauser)
 	
     --[[
     local playerOfDamagedActor = game.Players:GetPlayerByUserId(damagedActor)
@@ -125,7 +142,7 @@ function Weapon:CalcDamage(damagedActor, damageCauser)
     --]]
 end
 
-function Weapon:AttackCharacter(attackerCharacter, attackeeCharacter)
+function Weapon:AttackCharacterByDefaultSkill(attackerCharacter, attackeeCharacter)
 
 	local damage = self:CalcDamage(attackerCharacter, attackeeCharacter)
 	Debug.Log("Damage : ".. tostring(damage))
@@ -142,7 +159,8 @@ function Weapon:AttackCharacter(attackerCharacter, attackeeCharacter)
 	attackeeCharacterHumanoid:TakeDamage(damage)
 end
 
-function Weapon:Attack(attackeePart)
+
+function Weapon:AttackByDefaultSkill(attackeePart)
 	if self:CanAttack(attackeePart) == false then
 		--Debug.Assert(false, "공격할 수 없습니다.")
 		return false

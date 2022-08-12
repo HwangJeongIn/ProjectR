@@ -5,6 +5,7 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 local Utility = ServerModuleFacade.Utility
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
+local EquipType = ServerEnum.EquipType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 local GameDataManager = ServerModuleFacade.GameDataManager
@@ -23,42 +24,33 @@ function ToolBase:InitializeTool(gameDataType, tool)
 		return false
 	end
 	
-	--tool.Equipped:Connect(function() OnEquipped(self) end)
-	--tool.Unequipped:Connect(function() OnUnequipped(self) end)
-	--tool.Equipped:Connect(function() Debug.Print("OnEquipped : " .. tostring(tool)) end)
-	--tool.Unequipped:Connect(function() Debug.Print("OnUnequipped : ".. tostring(tool)) end)
+	local toolGameData = self:GetGameData()
+	self.ToolType = toolGameData.ToolType
 	return true
 end
 
---[[
-function OnEquipped(toolBase)
+function ToolBase:GetToolOwnerIfPlayer(equipType)
+	--[[
+	local targetCharacter = nil
+	local tool = self:Root()
+	if EquipType.Weapon == equipType then
+		targetCharacter = tool.Parent
+	elseif EquipType.Armor == equipType then
+		targetCharacter = tool.Parent.Parent
+	end
+	--]]
 
-	local tool = toolBase.Root()
-	--local temp = getmetatable(toolBase)
-	--local temp2 = temp.GetGameDataKey()
-	--local temp = ServerGlobalStorage
-	
-	-- 캐릭터가 장착중인 상태 -- Character의 Parent는 Workspace이다 주의해야한다.
-	-- tool =(parent)> Character
-	
-	local character = tool.Parent
-	local player = game.Players:GetPlayerFromCharacter(character)
-	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
+	local tool = self:Root()
+	local targetCharacter = tool.Parent
+	if not targetCharacter then
+		return nil
+	end
+
+	if not game.Players:GetPlayerFromCharacter(targetCharacter) then
+		return nil
+	end
+
+	return targetCharacter
 end
-
-
-function OnUnequipped(toolBase)
-	
-	local tool = toolBase.Root()
-	--local temp = getmetatable(toolBase)
-	
-	--Backpack에 존재 
-	-- tool =(parent)> Backpack =(parent)> Player > Character
-	local player = tool.Parent.Parent
-	ServerGlobalStorage:CheckAndEquipIfWeapon(player.UserId, tool)
-end
---]]
-
--- 반환 코드 ------------------------------------------------------------------------------------------------------
 
 return ToolBase

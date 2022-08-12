@@ -1,5 +1,3 @@
 local SkillImpl = {}
 
-
-
 return SkillImpl
