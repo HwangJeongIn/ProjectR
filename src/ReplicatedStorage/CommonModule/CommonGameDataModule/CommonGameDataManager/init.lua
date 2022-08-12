@@ -40,7 +40,7 @@ function CommonGameDataManager:LoadGameData(gameDataOwner, gameTypeArray)
 	end
 
 	if not self:ValidateDataFinally(loadedGameDataSet) then
-		Debug.Assert(false, "ValidateAllDataFinally에 실패했습니다.")
+		Debug.Assert(false, "ValidateDataFinally에 실패했습니다.")
 		return false
 	end
 

@@ -19,7 +19,8 @@ local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonG
 
 InventoryRaw:Initialize(MaxInventorySlotCount)
 
-local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
+local CommonObjectUtilityModule = CommonModule:WaitForChild("CommonObjectUtilityModule")
+local ToolUtility = require(CommonObjectUtilityModule:WaitForChild("ToolUtility"))
 
 local Inventory = {}
 Inventory.InventoryRaw = InventoryRaw

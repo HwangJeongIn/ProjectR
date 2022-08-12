@@ -13,7 +13,7 @@ local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
 
-local ToolGameData = {ToolModelToKeyMappingTable = require(script:WaitForChild("ToolModelToKeyMappingTable"))}
+local ToolGameData = {ModelToKeyMappingTable = require(script:WaitForChild("ToolModelToKeyMappingTable"))}
 
 -- 내부 함수 먼저 정의
 function ToolGameData:LoadAdditionalData(gameData, gameDataManager)
@@ -42,25 +42,7 @@ function ToolGameData:ValidateData(gameData, gameDataManager)
 	return true
 end
 
-function ToolGameData:ValidateAllDataFinally(gameDataManager)
-	for toolModelName, toolGameDataKey in pairs(self.ToolModelToKeyMappingTable) do
-		if not self:Get(toolGameDataKey) then
-			Debug.Assert(false, "해당 키가 존재하지 않습니다. => " .. toolModelName .. " : " .. tostring(toolGameDataKey))
-			return false
-		end
-	end
-
-	rawset(self, "GetGameDataByModelName", function(targetModelName)
-		local targetKey = self.ToolModelToKeyMappingTable[targetModelName]
-		if not targetKey then
-			Debug.Assert(false, "모델이 등록된 키가 없습니다. => " .. targetModelName)
-			return nil
-		end
-
-		-- 처음에 검증했기 때문에 무조건 존재한다. 추가 검증 없이 사용한다.
-		return self:Get(targetKey)
-	end)
-
+function ToolGameData:ValidateDataFinally(gameDataManager)
 	return true
 end
 
@@ -96,6 +78,5 @@ Sight : 시야
 
 
 -- 소모품 종류
-
 
 return setmetatable({}, ToolGameData)

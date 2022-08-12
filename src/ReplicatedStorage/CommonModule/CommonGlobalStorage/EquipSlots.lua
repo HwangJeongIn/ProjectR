@@ -14,7 +14,9 @@ local ContainerModule = CommonModule:WaitForChild("ContainerModule")
 local EquipSlotsRaw = Utility:DeepCopy(require(ContainerModule:WaitForChild("TArray")))
 EquipSlotsRaw:Initialize(MaxEquipSlotCount)
 
-local ToolUtility = require(script.Parent:WaitForChild("ToolUtility"))
+local CommonObjectUtilityModule = CommonModule:WaitForChild("CommonObjectUtilityModule")
+local ToolUtility = require(CommonObjectUtilityModule:WaitForChild("ToolUtility"))
+
 local EquipSlots = {}
 EquipSlots.EquipSlotsRaw = EquipSlotsRaw
 

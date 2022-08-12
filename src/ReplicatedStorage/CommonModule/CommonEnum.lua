@@ -78,11 +78,6 @@ local CommonEnum = {
 		Critical = 10,
 		Sight = 11,
 		Count = 12
-	},
-
-	InteractorActionType = {
-		DropItem = 1,
-		Count = 2
 	}
 }
 

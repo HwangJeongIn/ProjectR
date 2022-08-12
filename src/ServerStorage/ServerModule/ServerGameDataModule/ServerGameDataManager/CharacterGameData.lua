@@ -19,7 +19,7 @@ function CharacterGameData:ValidateData(gameData, gameDataManager)
 	return true
 end
 
-function CharacterGameData:ValidateAllDataFinally(gameDataManager)
+function CharacterGameData:ValidateDataFinally(gameDataManager)
 	return true
 end
 

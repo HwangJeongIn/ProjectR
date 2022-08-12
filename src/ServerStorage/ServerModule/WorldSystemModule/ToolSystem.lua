@@ -100,25 +100,23 @@ function ToolSystem:Initialize()
         local targetToolFolderTools = targetToolFolder:GetChildren()
         for _, tool in pairs(targetToolFolderTools) do
 
-            local key = tool:FindFirstChild("Key")
+            local toolName = tool.Name
+            local key = ToolUtility:GetGameDataKey(tool)
             if not key then
-                Debug.Assert(false, "도구에 키가 없습니다. => " .. tool.Name)
+                Debug.Assert(false, "도구에 키가 없습니다. => " .. toolName)
             end
-            key = key.Value
-
-            local toolGameData = ToolUtility:GetGameDataByKey(key)
-            local toolModelName = tool.Name
-            tool.Name = toolGameData.Name
+            
             if ToolTemplateTable[key] then
-                Debug.Assert(false, "같은 키를 가진 도구가 있습니다. 키를 변경하세요 => " .. tostring(key) .. " => " .. toolModelName)
+                Debug.Assert(false, "같은 키를 가진 도구가 있습니다. 키를 변경하세요 => " .. tostring(key) .. " => " .. toolName)
                 return false
             end
 
             if not self:InitializeToolTemplate(tool) then
-                Debug.Assert(false, "툴 템플릿 초기화에 실패했습니다. => " .. toolModelName)
+                Debug.Assert(false, "툴 템플릿 초기화에 실패했습니다. => " .. toolName)
                 return false
             end
 
+            local toolGameData = ToolUtility:GetGameDataByKey(key)
             ToolTemplateTable[key] = {Tool = tool, ToolGameData = toolGameData}
         end
     end

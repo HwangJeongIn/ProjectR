@@ -13,9 +13,10 @@ local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
 --local GameDataBase = require(CommonGameDataModule:WaitForChild("GameDataBase"))
 
-local CommonGlobalStorage = CommonModule:WaitForChild("CommonGlobalStorage")
-local ToolUtility = require(CommonGlobalStorage:WaitForChild("ToolUtility"))
-CommonGlobalStorage = require(CommonGlobalStorage)
+local CommonObjectUtilityModule = CommonModule:WaitForChild("CommonObjectUtilityModule")
+local ToolUtility = require(CommonObjectUtilityModule:WaitForChild("ToolUtility"))
+
+local CommonGlobalStorage = require(CommonModule:WaitForChild("CommonGlobalStorage"))
 
 local CommonModuleFacade = {
 	CommonModule = CommonModule,
@@ -25,6 +26,7 @@ local CommonModuleFacade = {
 	CommonGameDataManager = CommonGameDataManager,
 	--GameDataBase = GameDataBase,
 	CommonGlobalStorage = CommonGlobalStorage,
+	CommonObjectUtilityModule = CommonObjectUtilityModule,
 	ToolUtility = ToolUtility,
 	TArray = TArray,
 	TList = TList,

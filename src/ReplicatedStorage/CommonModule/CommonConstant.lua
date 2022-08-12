@@ -2,6 +2,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
 local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
+
+local GameDataType = CommonEnum.GameDataType
 local EquipSlotCount = CommonEnum.EquipType.Count - 1
 
 
@@ -32,7 +34,12 @@ local CommonConstant = {
 	MaxDistanceToIdentifyObject = 30,
 	MaxPickupDistance = 15,
 
-	MaxDropDistance = 3
+	MaxDropDistance = 3,
+
+	ObjectGameDataTypeTable = {
+		[GameDataType.Tool] = true,
+		[GameDataType.WorldInteractor] = true,
+	}
 }
 
 CommonConstant.__index = Utility.Inheritable__index

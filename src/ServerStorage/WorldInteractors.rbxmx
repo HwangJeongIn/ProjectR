@@ -6875,7 +6875,7 @@
 					<bool name="Massless">false</bool>
 					<token name="Material">512</token>
 					<string name="MaterialVariantSerialized"></string>
-					<string name="Name">Handle</string>
+					<string name="Name">Trigger</string>
 					<CoordinateFrame name="PivotOffset">
 						<X>0</X>
 						<Y>0</Y>
