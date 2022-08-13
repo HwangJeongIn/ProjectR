@@ -64,8 +64,8 @@ function GuiSkillSlotController:ExecuteSkill(args)
 	end
 end
 
-function GuiSkillSlotController:InitializeSkill(skillKey)
-	if not skillKey then
+function GuiSkillSlotController:InitializeSkill(skillGameDataKey)
+	if not skillGameDataKey then
 		return false
 	end
 

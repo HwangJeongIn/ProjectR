@@ -29,12 +29,12 @@ end
 setmetatable(SkillGameData, GameDataBase)
 SkillGameData:Initialize(GameDataType.Skill)
 
---[[ 기본 공격 		--]] SkillGameData:InsertData(1, {Name = "BaseAttack", SkillType = SkillTypeSelector.AttackSkill, Description = ""})
---[[ 휠윈드			--]] SkillGameData:InsertData(2, {Name = "WhirlwindSlash", SkillType = SkillTypeSelector.AttackSkill, Description = "Spin around, inflicting ?% Damage."})
---[[ 템페스트 슬래시--]] SkillGameData:InsertData(3, {Name = "TempestSlash", SkillType = SkillTypeSelector.AttackSkill, Description = "Charge and slash, inflicting ?% Damage."})
+--[[ 기본 공격 		--]] SkillGameData:InsertData(1, {Name = "BaseAttack", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 0.5, Description = ""})
+--[[ 휠윈드			--]] SkillGameData:InsertData(2, {Name = "WhirlwindSlash", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, Description = "Spin around, inflicting ?% Damage."})
+--[[ 템페스트 슬래시--]] SkillGameData:InsertData(3, {Name = "TempestSlash", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, Description = "Charge and slash, inflicting ?% Damage."})
 
---[[ 파워 스트라이크--]] SkillGameData:InsertData(4, {Name = "PowerStrike", SkillType = SkillTypeSelector.AttackSkill, Description = "Deliver a powerful attack, inflicting ?% Damage."})
---[[ 스톰 블레이드	--]] SkillGameData:InsertData(5, {Name = "StormBlade", SkillType = SkillTypeSelector.AttackSkill, Description = "Smash the ground to create a storm of blades, inflicting ?% Damage"})
+--[[ 파워 스트라이크--]] SkillGameData:InsertData(4, {Name = "PowerStrike", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, Description = "Deliver a powerful attack, inflicting ?% Damage."})
+--[[ 스톰 블레이드	--]] SkillGameData:InsertData(5, {Name = "StormBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, Description = "Smash the ground to create a storm of blades, inflicting ?% Damage"})
 
 
 return setmetatable({}, SkillGameData)

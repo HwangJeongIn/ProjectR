@@ -18,8 +18,8 @@ local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild(
 local ToolGameData = {ModelToKeyMappingTable = require(script:WaitForChild("ToolModelToKeyMappingTable"))}
 
 -- 내부 함수 먼저 정의
-function ToolGameData:LoadSkillGameDataBySkillKey(skillKey, gameDataManager)
-	local skillGameData = gameDataManager[GameDataType.Skill]:Get(skillKey)
+function ToolGameData:LoadSkillGameDataBySkillGameDataKey(skillGameDataKey, gameDataManager)
+	local skillGameData = gameDataManager[GameDataType.Skill]:Get(skillGameDataKey)
 	if not skillGameData then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
@@ -37,10 +37,10 @@ function ToolGameData:LoadAdditionalData(gameData, gameDataManager)
 			return false
 		end
 
-		for index, skillKey in pairs(gameData.SkillSet) do
-			local skillGameData = self:LoadSkillGameDataBySkillKey(skillKey, gameDataManager)
+		for index, skillGameDataKey in pairs(gameData.SkillSet) do
+			local skillGameData = self:LoadSkillGameDataBySkillGameDataKey(skillGameDataKey, gameDataManager)
 			if not skillGameData then
-				Debug.Assert(false, "해당 스킬 데이터가 존재하지 않습니다. [Key] => " .. tostring(key) .. " : [SkillKey] => " .. tostring(skillKey))
+				Debug.Assert(false, "해당 스킬 데이터가 존재하지 않습니다. [Key] => " .. tostring(key) .. " : [SkillGameDataKey] => " .. tostring(skillGameDataKey))
 				return false
 			end
 

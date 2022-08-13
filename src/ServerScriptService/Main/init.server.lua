@@ -156,7 +156,7 @@ while false  do
 	
 	while true do
 		
-		prevTime = os.time()
+		prevTime = os.clock()
 		
 		wait(1)
 		
@@ -180,7 +180,7 @@ while false  do
 			end
 		end
 		
-		elapsedTime = os.time() - prevTime
+		elapsedTime = os.clock() - prevTime
 		currentGameLength -= elapsedTime
 		if currentGameLength < 0 then
 			currentGameLength = 0

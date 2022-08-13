@@ -1,3 +1,0 @@
-local SkillTemplate = {}
-
-return SkillTemplate

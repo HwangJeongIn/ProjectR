@@ -127,6 +127,7 @@ function GameDataBase:Initialize(gameDataType)
 	
 	rawset(self, "Name", gameDataString)
 	rawset(self, "Value", {})
+	rawset(self, "GetAllData", function() return self.Value end)
 	rawset(self, "GetGameDataType", function() return gameDataType end)
 
 	if self:IsObjectGameData() then
