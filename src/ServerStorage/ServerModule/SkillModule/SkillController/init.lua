@@ -49,14 +49,15 @@ function SkillController:ApplySkillToTargets(toolOwner, targets)
 end
 
 function SkillController:Activate(toolOwner)
-
     local currentTime = os.clock()
-    local elapsedTime = currentTime - self.LastActivationTime
-    if elapsedTime < self.Cooldown then
-        Debug.Print(tostring(self.Cooldown - elapsedTime) .. "초 후에 사용할 수 있습니다.")
-        return true
+    if self.LastActivationTime then
+        local elapsedTime = currentTime - self.LastActivationTime
+        if elapsedTime < self.Cooldown then
+            Debug.Print(tostring(self.Cooldown - elapsedTime) .. "초 후에 사용할 수 있습니다.")
+            return true
+        end
     end
-    
+
     self.LastActivationTime = currentTime
     if not self:UseSkill(toolOwner) then
         Debug.Print(self.Name .. "에 실패했습니다.")
@@ -74,7 +75,7 @@ function SkillController:Activate(toolOwner)
     return true
 end
 
-function SkillController:InitializeSkill(skillGameDataKey)
+function SkillController:SetSkill(toolOwnerPlayer, tool, skillGameDataKey)
     local targetSkillTemplate = SkillTemplate:GetSkillTemplateByKey(skillGameDataKey)
     if not targetSkillTemplate then
         Debug.Assert(false, "비정상입니다.")
@@ -86,9 +87,15 @@ function SkillController:InitializeSkill(skillGameDataKey)
     self.ApplySkillToTarget = targetSkillTemplate.ApplySkillToTarget
 
     local skillGameData = targetSkillTemplate.GameData
+    self.Tool = tool
+    self.ToolOwner = toolOwnerPlayer.Character
+
     self.Name = skillGameData.Name
     self.Cooldown = skillGameData.Cooldown
-    self.LastActivationTime = os.clock() -- 처음 착용하고 바로 못쓴다.
+
+    local playerId = toolOwnerPlayer.UserId
+    --self.LastActivationTime = ServerGlobalStorage:GetCooldown(playerId, tool, skillGameDataKey)
+    self.LastActivationTime = nil
     return true
 end
 
