@@ -30,6 +30,8 @@ end
 
 function ToolGameData:LoadAdditionalData(gameData, gameDataManager)
 	if gameData.SkillSet then
+		gameData.SkillGameDataSet = {}
+		
 		local key = gameData:GetKey()
 		local skillCount = #gameData.SkillSet
 		if MaxSkillCount < skillCount then
@@ -44,7 +46,7 @@ function ToolGameData:LoadAdditionalData(gameData, gameDataManager)
 				return false
 			end
 
-			gameData.SkillSet[index] = skillGameData
+			gameData.SkillGameDataSet[index] = skillGameData
 		end
 	end
 	return true

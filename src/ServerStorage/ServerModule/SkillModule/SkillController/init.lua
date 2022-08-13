@@ -15,29 +15,29 @@ local ServerEnum = ServerModuleFacade.ServerEnum
 
 local SkillTemplate = require(script:WaitForChild("SkillTemplate"))
 
-local Skill = {}
-Skill.__index = Utility.Inheritable__index
-Skill.__newindex = Utility.Inheritable__newindex
+local SkillController = {}
+SkillController.__index = Utility.Inheritable__index
+SkillController.__newindex = Utility.Inheritable__newindex
 
 
 -- pure virtual function
-function Skill:UseSkill(toolOwner)
+function SkillController:UseSkill(toolOwner)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return false
 end
 
-function Skill:FindTargetsInRange(toolOwner)
+function SkillController:FindTargetsInRange(toolOwner)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return nil
 end
 
-function Skill:ApplySkillToTarget(toolOwner, target)
+function SkillController:ApplySkillToTarget(toolOwner, target)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return false
 end
 
 -- function
-function Skill:ApplySkillToTargets(toolOwner, targets)
+function SkillController:ApplySkillToTargets(toolOwner, targets)
     for _, target in pairs(targets) do
         if not self:ApplySkillToTarget(toolOwner, target) then
             Debug.Assert(false, "비정상입니다.")
@@ -48,7 +48,7 @@ function Skill:ApplySkillToTargets(toolOwner, targets)
     return true
 end
 
-function Skill:Activate(toolOwner)
+function SkillController:Activate(toolOwner)
 
     local currentTime = os.clock()
     local elapsedTime = currentTime - self.LastActivationTime
@@ -74,8 +74,7 @@ function Skill:Activate(toolOwner)
     return true
 end
 
-function Skill:InitializeSkill(skillGameDataKey)
-    
+function SkillController:InitializeSkill(skillGameDataKey)
     local targetSkillTemplate = SkillTemplate:GetSkillTemplateByKey(skillGameDataKey)
     if not targetSkillTemplate then
         Debug.Assert(false, "비정상입니다.")
@@ -93,4 +92,4 @@ function Skill:InitializeSkill(skillGameDataKey)
     return true
 end
 
-return Skill
+return SkillController
