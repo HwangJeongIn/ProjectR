@@ -48,17 +48,6 @@ function Weapon:InitializeWeapon(gameDataType, weaponTool)
     return true
 end
 
-function Weapon:IsInteractableObject(object)
-	if not object then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	local objectTag = ObjectTagUtility:GetTag(object)
-	if WorldInteractorType[objectTag] then
-		
-	end
-end
 
 function Weapon:CanAttack(otherPart)
 	if not otherPart then
@@ -96,7 +85,6 @@ function Weapon:CanAttack(otherPart)
 end
 
 function Weapon:CalcDamageByDefaultSkill(damagedActor, damageCauser)
-	
     --[[
     local playerOfDamagedActor = game.Players:GetPlayerByUserId(damagedActor)
     local playerOfDamageCauser = game.Players:GetPlayerByUserId(damageCauser)

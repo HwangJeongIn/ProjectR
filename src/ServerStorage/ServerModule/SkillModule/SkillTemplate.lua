@@ -1,0 +1,3 @@
+local SkillTemplate = {}
+
+return SkillTemplate

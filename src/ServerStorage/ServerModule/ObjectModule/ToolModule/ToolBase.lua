@@ -3,9 +3,12 @@ local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Utility = ServerModuleFacade.Utility
+local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
+
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
 local EquipType = ServerEnum.EquipType
+local WorldInteractorType = ServerEnum.WorldInteractorType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 local GameDataManager = ServerModuleFacade.GameDataManager
@@ -41,6 +44,19 @@ function ToolBase:GetToolOwnerIfPlayer(equipType)
 	end
 
 	return targetCharacter
+end
+
+function ToolBase:IsWorldInteractor(object)
+	local objectTag = ObjectTagUtility:GetTag(object)
+	if not objectTag then
+		return false
+	end
+
+	return (nil ~= WorldInteractorType[objectTag])
+end
+
+function ToolBase:IsPlayerCharacter(object)
+	return (nil ~= game.Players:GetPlayerFromCharacter(object))
 end
 
 return ToolBase

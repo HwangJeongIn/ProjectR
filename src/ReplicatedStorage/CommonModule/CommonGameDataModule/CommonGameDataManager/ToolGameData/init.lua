@@ -7,6 +7,8 @@ local GameDataType = CommonEnum.GameDataType
 local ToolTypeSelector = CommonEnum.ToolType
 local EquipTypeSelector = CommonEnum.EquipType
 
+local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
+local MaxSkillCount = CommonConstant.MaxSkillCount
 
 local Utility = require(CommonModule:WaitForChild("Utility"))
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
@@ -16,7 +18,35 @@ local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild(
 local ToolGameData = {ModelToKeyMappingTable = require(script:WaitForChild("ToolModelToKeyMappingTable"))}
 
 -- 내부 함수 먼저 정의
+function ToolGameData:LoadSkillGameDataBySkillKey(skillKey, gameDataManager)
+	local skillGameData = gameDataManager[GameDataType.Skill]:Get(skillKey)
+	if not skillGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return skillGameData
+end
+
 function ToolGameData:LoadAdditionalData(gameData, gameDataManager)
+	if gameData.SkillSet then
+		local key = gameData:GetKey()
+		local skillCount = #gameData.SkillSet
+		if MaxSkillCount < skillCount then
+			Debug.Assert(false, "스킬 최대 개수를 넘겼습니다. [Key] => " .. tostring(key))
+			return false
+		end
+
+		for index, skillKey in pairs(gameData.SkillSet) do
+			local skillGameData = self:LoadSkillGameDataBySkillKey(skillKey, gameDataManager)
+			if not skillGameData then
+				Debug.Assert(false, "해당 스킬 데이터가 존재하지 않습니다. [Key] => " .. tostring(key) .. " : [SkillKey] => " .. tostring(skillKey))
+				return false
+			end
+
+			gameData.SkillSet[index] = skillGameData
+		end
+	end
 	return true
 end
 
@@ -64,9 +94,9 @@ Sight : 시야
 --]]
 
 -- 무기 종류
---[[ 기본 무기 	--]] ToolGameData:InsertData(1, {Name = "DefaultWeapon", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10, Skill = ""})
---[[ 검 		--]] ToolGameData:InsertData(2, {Name = "DefaultSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, Skill = ""})
---[[ 도끼		--]] ToolGameData:InsertData(3, {Name = "DefaultAxe", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10, Skill = ""})
+--[[ 기본 무기 	--]] ToolGameData:InsertData(1, {Name = "DefaultWeapon", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10})
+--[[ 검 		--]] ToolGameData:InsertData(2, {Name = "DefaultSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
+--[[ 도끼		--]] ToolGameData:InsertData(3, {Name = "DefaultAxe", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10, SkillSet = {4}})
 
 
 -- 방어구 종류

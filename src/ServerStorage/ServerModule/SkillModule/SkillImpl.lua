@@ -1,3 +1,0 @@
-local SkillImpl = {}
-
-return SkillImpl
