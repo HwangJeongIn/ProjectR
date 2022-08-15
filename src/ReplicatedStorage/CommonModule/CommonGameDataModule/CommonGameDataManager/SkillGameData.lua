@@ -11,7 +11,7 @@ local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
 
-local SkillGameData = {ModelToKeyMappingTable = require(script:WaitForChild("ToolModelToKeyMappingTable"))}
+local SkillGameData = {}
 
 -- 내부 함수 먼저 정의
 function SkillGameData:LoadAdditionalData(gameData, gameDataManager)

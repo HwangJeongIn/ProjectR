@@ -70,7 +70,23 @@ function Temp()
 	for i, player in pairs(players) do
 		Initializer:PushDefaulWeaponTools(player)
 		Initializer:PushDefaulArmorTools(player)
+
+		
+		local tempPart = Instance.new("Part")
+		tempPart.Parent = game.workspace
+		tempPart.Size =  Vector3.new(100, 100, 100)
+
+		tempPart.CanTouch = false
+		tempPart.CanCollide = false
+		tempPart.CanQuery = true
+
+		tempPart.CFrame = player.Character.HumanoidRootPart.CFrame
+
+		local touchingParts = tempPart:GetTouchingParts()
+
+		local a = 3
 	end
+
 
 end
 

@@ -30,23 +30,25 @@ end
 
 function ToolGameData:LoadAdditionalData(gameData, gameDataManager)
 	if gameData.SkillSet then
-		gameData.SkillGameDataSet = {}
+		
+		local gameDataRaw = getmetatable(gameData)
+		gameDataRaw.SkillGameDataSet = {}
 		
 		local key = gameData:GetKey()
-		local skillCount = #gameData.SkillSet
+		local skillCount = #gameDataRaw.SkillSet
 		if MaxSkillCount < skillCount then
 			Debug.Assert(false, "스킬 최대 개수를 넘겼습니다. [Key] => " .. tostring(key))
 			return false
 		end
 
-		for index, skillGameDataKey in pairs(gameData.SkillSet) do
+		for index, skillGameDataKey in pairs(gameDataRaw.SkillSet) do
 			local skillGameData = self:LoadSkillGameDataBySkillGameDataKey(skillGameDataKey, gameDataManager)
 			if not skillGameData then
 				Debug.Assert(false, "해당 스킬 데이터가 존재하지 않습니다. [Key] => " .. tostring(key) .. " : [SkillGameDataKey] => " .. tostring(skillGameDataKey))
 				return false
 			end
 
-			gameData.SkillGameDataSet[index] = skillGameData
+			gameDataRaw.SkillGameDataSet[index] = skillGameData
 		end
 	end
 	return true

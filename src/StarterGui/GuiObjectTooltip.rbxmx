@@ -26,7 +26,7 @@
 				<Z>0</Z>
 			</Vector3>
 			<float name="LightInfluence">1</float>
-			<float name="MaxDistance">INF</float>
+			<float name="MaxDistance">200</float>
 			<string name="Name">GuiObjectTooltip</string>
 			<Ref name="PlayerToHideFrom">null</Ref>
 			<bool name="ResetOnSpawn">true</bool>
