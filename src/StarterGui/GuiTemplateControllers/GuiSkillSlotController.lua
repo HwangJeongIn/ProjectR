@@ -13,6 +13,8 @@ local MaxSkillCount = CommonConstant.SkillCount
 local CommonEnum = ClientModuleFacade.CommonEnum
 local SlotType = CommonEnum.SlotType
 
+local KeyBinder = ClientModuleFacade.KeyBinder
+
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
@@ -37,17 +39,26 @@ function GuiSkillSlotController:new(slotIndex, newGuiSlot)
 		newGuiSkillSlotController.GuiSlot.ImageTransparency = 0
 	end)
 
-	if newGuiSkillSlotController.SlotType == SlotType.SkillSlot then
-		--[[
-		newGuiSkillSlotController.GuiSlot.Activated:connect(function(inputObject)
-			local targetTool = newGuiSkillSlotController.Tool
-			if not targetTool then
-				return
-			end
-			GuiTooltipController:InitializeByToolSlot(newGuiSkillSlotController)
-		end)
-		--]]
+	newGuiSkillSlotController.GuiSlot.GuiImage.GuiNumber.Size =  UDim2.new(0.3, 0, 0.3, 0)
+	newGuiSkillSlotController.GuiSlot.GuiImage.GuiNumber.Position =  UDim2.new(0, 0, 0, 0)
+
+
+	local targetSlotIndexEnum = ToolUtility.SkillSlotIndexToKeyCodeTable[newGuiSkillSlotController.SlotIndex]
+	if not targetSlotIndexEnum then
+		Debug.Assert(false, "비정상입니다. 슬롯이 늘어났는지 확인해보세요")
+		return
 	end
+
+	local skillSlotActionName = tostring(targetSlotIndexEnum)
+	newGuiSkillSlotController.SkillKeyName = string.sub(skillSlotActionName, -1)
+
+	KeyBinder:BindAction(Enum.UserInputState.Begin, targetSlotIndexEnum, skillSlotActionName, function(inputObject)
+		Debug.Print(skillSlotActionName)
+	end)
+
+	newGuiSkillSlotController.GuiSlot.Activated:connect(function(inputObject)
+		Debug.Print(skillSlotActionName)
+	end)
 
 	newGuiSkillSlotController:ClearSkillData()
 	return newGuiSkillSlotController
@@ -86,7 +97,7 @@ function GuiSkillSlotController:SetSkill(skillOwnerTool, skillGameData)
 		self:ClearSkillData()
 		return true
 	end
-	
+
 	if not skillGameData then
 		Debug.Assert(false, "스킬 정보 초기화에 실패했습니다.")
 		self:ClearSkillData()
@@ -101,6 +112,7 @@ function GuiSkillSlotController:SetSkill(skillOwnerTool, skillGameData)
 
 	self:SetImage(skillGameData.Image)
 	self:SetName(skillGameData.Name)
+	self:SetNumber(self.SkillKeyName)
 
 	self.SkillOwnerTool = skillOwnerTool
 	self.SkillGameData = skillGameData

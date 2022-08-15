@@ -6,6 +6,10 @@ local Utility = require(CommonModule:WaitForChild("Utility"))
 
 local CommonObjectUtilityModule = CommonModule:WaitForChild("CommonObjectUtilityModule")
 
+local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
+local MaxQuickSlotCount = CommonConstant.MaxQuickSlotCount
+local MaxSkillCount = CommonConstant.MaxSkillCount
+
 local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 local GameDataType = CommonEnum.GameDataType
 local ToolType = CommonEnum.ToolType
@@ -36,7 +40,16 @@ function ToolUtility:Initialize()
 		[4] = Enum.KeyCode.Four,
 		[5] = Enum.KeyCode.Five
 	}
-	
+	Debug.Assert(MaxQuickSlotCount == #self.QuickSlotIndexToKeyCodeTable, "여기도 갱신해야합니다.")
+
+	self.SkillSlotIndexToKeyCodeTable = {
+		[1] = Enum.KeyCode.Q,
+		[2] = Enum.KeyCode.E,
+		[3] = Enum.KeyCode.R,
+		[4] = Enum.KeyCode.T,
+	}
+	Debug.Assert(MaxSkillCount == #self.SkillSlotIndexToKeyCodeTable, "여기도 갱신해야합니다.")
+
 	return true
 end
 

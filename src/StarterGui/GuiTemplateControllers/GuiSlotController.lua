@@ -98,6 +98,7 @@ function GuiSlotController:newRaw(slotType, slotIndex, newGuiSlot)
 		newGuiSlotController.GuiSlot.ImageTransparency = 0
 		GuiDraggingSystem:CheckAndClearSlotControllerCandidate(newGuiSlotController)
 	end)
+	
 	newGuiSlotController:InitializeImage(slotType, slotIndex)
 	return newGuiSlotController
 end

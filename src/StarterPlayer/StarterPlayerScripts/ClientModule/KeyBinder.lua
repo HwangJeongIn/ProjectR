@@ -81,6 +81,28 @@ function KeyBinder:BindCustomAction(keyCodeOrUserInputType, userInputState, cust
 end
 --]]
 
+function KeyBinder:UnbindAction(userInputState, keyCodeOrUserInputType, actionName)
+	if not userInputState then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local targetInputStateActions = InputToActionMappingTable[userInputState]
+	if not targetInputStateActions then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not keyCodeOrUserInputType then
+		targetInputStateActions.Always[actionName] = nil
+	else
+		if targetInputStateActions[keyCodeOrUserInputType] then
+			targetInputStateActions[keyCodeOrUserInputType][actionName] = nil
+		end
+	end
+
+	return true
+end
 
 function KeyBinder:BindAction(userInputState, keyCodeOrUserInputType, actionName, action)
 	if not userInputState or not action then
@@ -118,6 +140,7 @@ function KeyBinder:BindAction(userInputState, keyCodeOrUserInputType, actionName
 		end
 	end
 
+	return true
 end
 
 function KeyBinder:Initialize()
