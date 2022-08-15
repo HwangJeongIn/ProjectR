@@ -41,6 +41,7 @@ function ToolGameData:LoadAdditionalData(gameData, gameDataManager)
 			return false
 		end
 
+		gameDataRaw.SkillCount = 0
 		for index, skillGameDataKey in pairs(gameDataRaw.SkillSet) do
 			local skillGameData = self:LoadSkillGameDataBySkillGameDataKey(skillGameDataKey, gameDataManager)
 			if not skillGameData then
@@ -49,6 +50,7 @@ function ToolGameData:LoadAdditionalData(gameData, gameDataManager)
 			end
 
 			gameDataRaw.SkillGameDataSet[index] = skillGameData
+			gameDataRaw.SkillCount += 1
 		end
 	end
 	return true

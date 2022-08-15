@@ -125,8 +125,6 @@ function ObjectSystemBase:PreDestroy(object)
 end
 
 function ObjectSystemBase:PostDestroy(object, joints)
-    
-
     if joints then
         for _, joint in pairs(joints) do
             Debris:AddItem(joint, 0)
@@ -145,8 +143,6 @@ function ObjectSystemBase:PostDestroy(object, joints)
 
     return true
 end
-
-
 
 function ObjectSystemBase:IsValid(object)
     return nil ~= self.Objects[object]

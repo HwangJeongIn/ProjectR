@@ -1,14 +1,18 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
-local Debug = CommonMoudleFacade.Debug
-local Utility = CommonMoudleFacade.Utility
-local ToolUtility = CommonMoudleFacade.ToolUtility
+local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
 
-local CommonEnum = CommonMoudleFacade.CommonEnum
+local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
+local Debug = ClientModuleFacade.Debug
+local Utility = ClientModuleFacade.Utility
+local ToolUtility = ClientModuleFacade.ToolUtility
+
+
+local CommonEnum = ClientModuleFacade.CommonEnum
 local SlotType = CommonEnum.SlotType
 --local EquipType = CommonEnum.EquipType
 
-local CommonConstant = CommonMoudleFacade.CommonConstant
+local CommonConstant = ClientModuleFacade.CommonConstant
 local MaxSkillCount = CommonConstant.MaxSkillCount
 local GuiSkillSlotOffsetRatio = CommonConstant.GuiSkillSlotOffsetRatio
 
@@ -20,9 +24,9 @@ local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 local GuiSkillSlots = GuiFacade.GuiSkillSlots
 local GuiToolSlotTemplate = GuiFacade.GuiTemplate.GuiSlot
 local GuiSkillSlotController = GuiFacade.GuiTemplateController.GuiSkillSlotController
+local GuiSkillOwnerToolSlotController = GuiFacade.GuiTemplateController.GuiSkillOwnerToolSlotController
 
-
-local GuiSkillSlotsRaw = Utility:DeepCopy(CommonMoudleFacade.TArray)
+local GuiSkillSlotsRaw = Utility:DeepCopy(ClientModuleFacade.TArray)
 GuiSkillSlotsRaw:Initialize(MaxSkillCount)
 local GuiSkillSlotsController = {
 	GuiSkillSlotsRaw = GuiSkillSlotsRaw
@@ -76,10 +80,8 @@ function GuiSkillSlotsController:Initialize()
     newGuiMainToolSlot.Parent = GuiSkillSlots
     newGuiMainToolSlot.Name = tostring("MainToolSlot")
 
-    self.GuiMainToolSlotController = GuiSkillSlotController:new(SlotType.SkillSlot, 1, newGuiMainToolSlot)
-
-
-
+    self.GuiMainToolSlotController = GuiSkillOwnerToolSlotController:new(1, newGuiMainToolSlot)
+    
 
 	--local startRadian = math.rad(math.pi  * (1 / 2))
     --local endRadian = math.rad(math.pi * (1))
@@ -101,8 +103,82 @@ function GuiSkillSlotsController:Initialize()
         newGuiToolSlot.Parent = GuiSkillSlots
         newGuiToolSlot.Name = tostring(slotIndex)
 
-        self.GuiSkillSlotsRaw:Set(slotIndex, GuiSkillSlotController:new(SlotType.SkillSlot, slotIndex, newGuiToolSlot))
+        self.GuiSkillSlotsRaw:Set(slotIndex, GuiSkillSlotController:new(slotIndex, newGuiToolSlot))
     end
+end
+
+function GuiSkillSlotsController:ClearSkillSlot(skillIndex)
+	local targetGuiSkillSlotController = self.GuiSkillSlotsRaw:Get(skillIndex)
+    if not targetGuiSkillSlotController then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    targetGuiSkillSlotController:SetSkill(nil, nil)
+    return true
+end
+
+function GuiSkillSlotsController:ClearData()
+    if not self.GuiMainToolSlotController:SetSkillOwnerTool(nil) then
+        Debug.Assert(false, "비정상입니다.")
+    end
+
+    for skillIndex = 1, MaxSkillCount do
+        if not self:ClearSkillSlot(skillIndex) then
+            Debug.Assert(false, "비정상입니다.")
+        end
+    end
+end
+
+function GuiSkillSlotsController:SetSkillSlot(skillIndex, skillOwnerTool, skillGameData)
+	local targetGuiSkillSlotController = self.GuiSkillSlotsRaw:Get(skillIndex)
+    if not targetGuiSkillSlotController then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    if not skillOwnerTool or not skillGameData then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    if not targetGuiSkillSlotController:SetSkill(skillOwnerTool, skillGameData) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    return true
+end
+
+function GuiSkillSlotsController:SetSkillOwnerToolSlot(skillOwnerTool)
+	if not skillOwnerTool then
+        self:ClearData()
+		return true
+	end
+
+    if not self.GuiMainToolSlotController:SetSkillOwnerTool(skillOwnerTool) then
+        Debug.Assert(false, "비정상입니다.")
+		return false
+    end
+
+    local skillOwnerToolGameData = ToolUtility:GetGameData(skillOwnerTool)
+    local skillCount = skillOwnerToolGameData.SkillCount
+
+    for skillIndex = 1, MaxSkillCount do
+        if skillCount >= skillIndex then
+            if not self:SetSkillSlot(skillIndex, skillOwnerTool, skillOwnerToolGameData.SkillGameDataSet[skillIndex]) then
+                Debug.Assert(false, "비정상입니다.")
+                return false
+            end
+        else
+            if not self:ClearSkillSlot(skillIndex) then
+                Debug.Assert(false, "비정상입니다.")
+                return false
+            end
+        end
+    end
+    
+	return true
 end
 
 GuiSkillSlotsController:Initialize()

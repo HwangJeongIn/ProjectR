@@ -106,6 +106,9 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
 				return
 			end
 		end)
+	else
+		Debug.Assert(false, "해당 슬롯 타입은 GuiToolSlotController에서 사용할 수 없습니다. => " .. tostring(newGuiToolSlotController.SlotType))
+		return
 	end
 
 	newGuiToolSlotController:ClearToolData()

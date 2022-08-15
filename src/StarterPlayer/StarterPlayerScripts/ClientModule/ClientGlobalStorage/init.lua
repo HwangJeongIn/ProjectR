@@ -31,6 +31,7 @@ local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
 local DropSelectedToolCTS = RemoteEvents:WaitForChild("DropSelectedToolCTS")
 local DropToolCTS = RemoteEvents:WaitForChild("DropToolCTS")
 local PickupToolCTS = RemoteEvents:WaitForChild("PickupToolCTS")
+local ActivateToolSkillCTS = RemoteEvents:WaitForChild("ActivateToolSkillCTS")
 
 local QuickSlots = require(script:WaitForChild("QuickSlots"))
 local ClientGlobalStorage = CommonGlobalStorage
@@ -55,6 +56,34 @@ function ClientGlobalStorage:Initialize(guiController)
 	--self.GuiController = guiController
 	local ClientRemoteEventImpl = require(script:WaitForChild("ClientRemoteEventImpl"))
 	ClientRemoteEventImpl:InitializeRemoteEvents(self, guiController)
+	return true
+end
+
+function ClientGlobalStorage:SendActivateToolSkill(tool, skillIndex)
+	if not tool or not skillIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local toolGameData = ToolUtility:GetGameData(tool)
+	local equipType = toolGameData.EquipType
+	if not equipType then
+		Debug.Assert(false, "장착할 수 있는 장비만 스킬을 사용할 수 있습니다.")
+		return false
+	end
+
+	 if toolGameData.SkillCount < skillIndex or 0 >= skillIndex then
+		Debug.Assert(false, "스킬인덱스가 비정상입니다. => " .. tostring(skillIndex))
+		return false
+	 end
+
+	-- 장착 검증
+	if not self:IsInCharacter(PlayerId, equipType, tool) then
+		Debug.Assert(false, "캐릭터가 해당 도구를 장착하고 있지 않습니다.")
+		return false
+	end
+
+	ActivateToolSkillCTS:FireServer(tool, skillIndex)
 	return true
 end
 

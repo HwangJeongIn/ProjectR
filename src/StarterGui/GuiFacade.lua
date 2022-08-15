@@ -68,9 +68,11 @@ function GuiFacade:Initialize()
     local GuiTemplateControllers = PlayerGui:WaitForChild("GuiTemplateControllers")
     local GuiToolSlotController = require(GuiTemplateControllers:WaitForChild("GuiToolSlotController"))
     local GuiSkillSlotController = require(GuiTemplateControllers:WaitForChild("GuiSkillSlotController"))
+    local GuiSkillOwnerToolSlotController = require(GuiTemplateControllers:WaitForChild("GuiSkillOwnerToolSlotController"))
     self.GuiTemplateController = {
         GuiToolSlotController = GuiToolSlotController,
-        GuiSkillSlotController = GuiSkillSlotController
+        GuiSkillSlotController = GuiSkillSlotController,
+        GuiSkillOwnerToolSlotController = GuiSkillOwnerToolSlotController
     }
 
     -- GuiPopupWindowControllers

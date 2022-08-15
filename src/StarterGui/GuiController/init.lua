@@ -4,8 +4,10 @@ local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModu
 
 local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
 local Debug = ClientModuleFacade.Debug
-local GameStateType = ClientModuleFacade.CommonEnum.GameStateType
-local WinnerType = ClientModuleFacade.CommonEnum.WinnerType
+local CommonEnum = ClientModuleFacade.CommonEnum
+local GameStateType = CommonEnum.GameStateType
+local WinnerType = CommonEnum.WinnerType
+local EquipType = CommonEnum.EquipType
 
 local KeyBinder = ClientModuleFacade.KeyBinder
 
@@ -265,6 +267,13 @@ function GuiController:SetEquipToolSlot(equipType, tool)
 	if not self.GuiEquipSlotsController:SetToolSlot(equipType, tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
+	end
+
+	if EquipType.Weapon == equipType then
+		if not self.GuiSkillSlotsController:SetSkillOwnerToolSlot(tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
 	end
 
 	return true

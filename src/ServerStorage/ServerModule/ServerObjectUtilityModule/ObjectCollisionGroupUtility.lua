@@ -29,7 +29,6 @@ local ObjectCollisionGroupUtility = {
     }
 }
 
-
 function ObjectCollisionGroupUtility:Initialize()
 
     self.CollidableGroupIdQueryTable[self.DefaultCollisionGroupId] = {}

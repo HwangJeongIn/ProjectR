@@ -73,6 +73,7 @@ function Temp()
 		Initializer:PushDefaulArmorTools(player)
 
 		
+		--[[
 		local tempPart = Instance.new("Part")
 		ObjectCollisionGroupUtility:SetSkillCollisionGroup(tempPart)
 
@@ -104,6 +105,7 @@ function Temp()
 		connection:Disconnect()
 
 		local a = 3
+		--]]
 	end
 
 

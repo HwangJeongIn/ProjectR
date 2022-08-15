@@ -54,7 +54,8 @@ local CommonEnum = {
 		EquipSlot = 2,
 		QuickSlot = 3,
 		SkillSlot = 4,
-		Count = 5
+		SkillOwnerToolSlot = 5,
+		Count = 6
 	},
 	
 	StatusType = {
@@ -118,7 +119,8 @@ CommonEnum.SlotType.Converter = {
 	[CommonEnum.SlotType.InventorySlot] = "InventorySlot",
 	[CommonEnum.SlotType.EquipSlot] = "EquipSlot",
 	[CommonEnum.SlotType.QuickSlot] = "QuickSlot",
-	[CommonEnum.SlotType.SkillSlot] = "SkillSlot"
+	[CommonEnum.SlotType.SkillSlot] = "SkillSlot",
+	[CommonEnum.SlotType.SkillOwnerToolSlot] = "SkillOwnerToolSlot"
 }
 Debug.Assert(CommonEnum.SlotType.Count == #CommonEnum.SlotType.Converter + 1, "비정상입니다.")
 

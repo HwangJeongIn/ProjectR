@@ -41,6 +41,10 @@
 
     
     {
+      "Name": "ActivateToolSkillCTS",
+      "ClassName": "RemoteEvent"
+    },
+    {
       "Name": "DropToolCTS",
       "ClassName": "RemoteEvent"
     },

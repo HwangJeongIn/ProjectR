@@ -1,11 +1,12 @@
 -- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
-
+local Debris = game:GetService("Debris")
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Debug = ServerModuleFacade.Debug
 local Utility = ServerModuleFacade.Utility
 local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
+local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
@@ -36,7 +37,77 @@ function SkillController:ApplySkillToTarget(toolOwner, target)
     return false
 end
 
+
+function SkillController:GetSkillCollisionParameter(toolOwner)
+    Debug.Assert(false, "상위에서 구현해야합니다.")
+    return nil
+end
+
+
 -- function
+function SkillController:ValidateSkillCollisionParameter(skillCollisionParameter)
+    if not skillCollisionParameter then
+        Debug.Assert(false, "정확히 반환하는 지 확인하세요.")
+        return false
+    end
+
+    if not skillCollisionParameter.Size then
+        Debug.Assert(false, "Size 정보가 없습니다.")
+        return false
+    end
+
+    if not skillCollisionParameter.CFrame then
+        Debug.Assert(false, "CFrame 정보가 없습니다.")
+        return false
+    end
+
+    --[[
+    if not skillCollisionParameter.Effect then
+        --Debug.Assert(false, "CFrame 정보가 없습니다.")
+        --return false
+    end
+    --]]
+
+    return true
+end
+
+function SkillController:FilterTargetsBySkillCollision(toolOwner)
+    local skillCollisionParameter = self:GetSkillCollisionParameter(toolOwner)
+    if not self:ValidateSkillCollisionParameter(toolOwner) then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
+
+    local tempSkillCollision = Instance.new("Part")
+    ObjectCollisionGroupUtility:SetSkillCollisionGroup(tempSkillCollision)
+
+    tempSkillCollision.Anchored = true
+    tempSkillCollision.Transparency = 1
+
+    --tempPart.CanTouch = false
+    tempSkillCollision.CanCollide = false
+    tempSkillCollision.CanQuery = true
+
+    tempSkillCollision.Parent = game.workspace
+    tempSkillCollision.Size =  skillCollisionParameter.Size
+    tempSkillCollision.CFrame = skillCollisionParameter.CFrame
+    --tempPart.Position = Vector3.new(0, 0, 0)
+
+    -- 찾아봤지만 따로 방법이 없다. 현재는 이게 최선인듯하다. 
+    local tempConnection = tempSkillCollision.Touched:Connect(function() end)
+    local touchingParts = tempSkillCollision:GetTouchingParts()
+    local finalTouchingParts = {}
+    for _, touchingPart in pairs(touchingParts) do
+        if ObjectCollisionGroupUtility:IsCollidableByPart(tempSkillCollision, touchingPart) then
+            table.insert(finalTouchingParts, touchingPart)
+        end
+    end
+    tempConnection:Disconnect()
+    Debris:AddItem(tempSkillCollision, 0)
+
+    return finalTouchingParts
+end
+
 function SkillController:ApplySkillToTargets(toolOwner, targets)
     for _, target in pairs(targets) do
         if not self:ApplySkillToTarget(toolOwner, target) then
@@ -64,9 +135,10 @@ function SkillController:Activate(toolOwner)
         return false
     end
 
-    local targets = self:FindTargetInRange(toolOwner)
-    if targets then
-        if not self:ApplySkillToTargets(toolOwner, targets) then
+    local targetsFilteredBySkillCollision = self:FilterTargetsBySkillCollision(toolOwner)
+    local finalTargets = self:FindTargetInRange(toolOwner, targetsFilteredBySkillCollision)
+    if finalTargets then
+        if not self:ApplySkillToTargets(toolOwner, finalTargets) then
             Debug.Print(self.Name .. "에 실패했습니다.")
             return false
         end

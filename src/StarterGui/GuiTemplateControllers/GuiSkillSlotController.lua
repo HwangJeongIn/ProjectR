@@ -1,10 +1,16 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonMoudleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
-local Debug = CommonMoudleFacade.Debug
-local Utility = CommonMoudleFacade.Utility
-local ToolUtility = CommonMoudleFacade.ToolUtility
+local StarterPlayer = game:GetService("StarterPlayer")
+local StarterPlayerScripts = StarterPlayer:WaitForChild("StarterPlayerScripts")
+local ClientModuleFacade = require(StarterPlayerScripts:WaitForChild("ClientModuleFacade"))
 
-local CommonEnum = CommonMoudleFacade.CommonEnum
+local ClientGlobalStorage = ClientModuleFacade.ClientGlobalStorage
+local Debug = ClientModuleFacade.Debug
+local Utility = ClientModuleFacade.Utility
+local ToolUtility = ClientModuleFacade.ToolUtility
+
+local CommonConstant = ClientModuleFacade.CommonConstant
+local MaxSkillCount = CommonConstant.SkillCount
+
+local CommonEnum = ClientModuleFacade.CommonEnum
 local SlotType = CommonEnum.SlotType
 
 local player = game.Players.LocalPlayer
@@ -20,14 +26,8 @@ local GuiSlotController = Utility:DeepCopy(require(script.Parent:WaitForChild("G
 
 local GuiSkillSlotController = GuiSlotController
 
-function GuiSkillSlotController:new(slotType, slotIndex, newGuiSlot)
-
-	if not slotType == SlotType.SkillSlot then
-		Debug.Assert(false, "비정상입니다.")
-		return nil
-	end
-
-	local newGuiSkillSlotController = self:newRaw(slotType, slotIndex, newGuiSlot)
+function GuiSkillSlotController:new(slotIndex, newGuiSlot)
+	local newGuiSkillSlotController = self:newRaw(SlotType.SkillSlot, slotIndex, newGuiSlot)
 	
 	newGuiSkillSlotController.GuiSlot.MouseEnter:connect(function(x,y)
 		newGuiSkillSlotController.GuiSlot.ImageTransparency = 0.5
@@ -55,21 +55,57 @@ end
 
 function GuiSkillSlotController:ClearSkillData()
 	self:ClearData()
-	self.Skill = nil
+	self.SkillOwnerTool = nil
+	self.SkillGameData = nil
+
+	self:SetVisible(false)
 end
 
-function GuiSkillSlotController:ExecuteSkill(args)
-	if not self.Skill(args) then
-		Debug.Assert(false, "스킬 사용에 실패했습니다.")
-	end
-end
-
-function GuiSkillSlotController:InitializeSkill(skillGameDataKey)
-	if not skillGameDataKey then
+function GuiSkillSlotController:ActivateSkill()
+	local skillIndex = self:GetSlotIndex()
+	if not skillIndex then
+		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-	-- ...
+	if not self.SkillOwnerTool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not ClientGlobalStorage:SendActivateToolSkill(skillIndex, self.SkillOwnerTool) then
+		Debug.Assert(false, "스킬 사용에 실패했습니다.")
+		return false
+	end
+
+	return true
+end
+
+function GuiSkillSlotController:SetSkill(skillOwnerTool, skillGameData)
+	if not skillOwnerTool then
+		self:ClearSkillData()
+		return true
+	end
+	
+	if not skillGameData then
+		Debug.Assert(false, "스킬 정보 초기화에 실패했습니다.")
+		self:ClearSkillData()
+		return false
+	end
+
+	if not skillGameData then
+		Debug.Assert(false, "스킬 정보 초기화에 실패했습니다.")
+		self:ClearSkillData()
+		return false
+	end
+
+	self:SetImage(skillGameData.Image)
+	self:SetName(skillGameData.Name)
+
+	self.SkillOwnerTool = skillOwnerTool
+	self.SkillGameData = skillGameData
+
+	self:SetVisible(true)
 	return true
 end
 

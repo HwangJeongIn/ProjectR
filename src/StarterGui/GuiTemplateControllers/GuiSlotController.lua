@@ -28,7 +28,10 @@ function GuiSlotController:InitializeImage(slotType, slotIndex)
 		self.DefaultSlotImage = ToolUtility.DefaultCircularSlotImage
 		
 		--self.GuiToolSlot.ImageTransparency = 0.65
-
+	elseif slotType == SlotType.SkillOwnerToolSlot then
+		self.DefaultImage = ToolUtility.DefaultToolImage
+		self.EmptyImage = ToolUtility.EmptyToolImage
+		self.DefaultSlotImage = ToolUtility.DefaultCircularSlotImage
 	else
 		self.DefaultImage = ToolUtility.DefaultToolImage
 		self.EmptyImage = ToolUtility.EmptyToolImage
@@ -97,6 +100,10 @@ function GuiSlotController:newRaw(slotType, slotIndex, newGuiSlot)
 	end)
 	newGuiSlotController:InitializeImage(slotType, slotIndex)
 	return newGuiSlotController
+end
+
+function GuiSlotController:SetVisible(isVisible)
+	self.GuiSlot.Visible = isVisible
 end
 
 function GuiSlotController:GetImage()

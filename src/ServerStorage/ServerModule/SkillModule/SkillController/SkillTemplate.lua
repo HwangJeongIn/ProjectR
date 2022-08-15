@@ -101,7 +101,7 @@ function SkillTemplate:BaseAttack_UseSkill(skill, toolOwner)
     return false
 end
 
-function SkillTemplate:BaseAttack_FindTargetsInRange(skill, toolOwner)
+function SkillTemplate:BaseAttack_FindTargetsInRange(skill, toolOwner, filteredTargets)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return nil
 end
@@ -118,7 +118,7 @@ function SkillTemplate:WhirlwindSlash_UseSkill(skill, toolOwner)
     return false
 end
 
-function SkillTemplate:WhirlwindSlash_FindTargetsInRange(skill, toolOwner)
+function SkillTemplate:WhirlwindSlash_FindTargetsInRange(skill, toolOwner, filteredTargets)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return nil
 end
@@ -135,7 +135,7 @@ function SkillTemplate:TempestSlash_UseSkill(skill, toolOwner)
     return false
 end
 
-function SkillTemplate:TempestSlash_FindTargetsInRange(skill, toolOwner)
+function SkillTemplate:TempestSlash_FindTargetsInRange(skill, toolOwner, filteredTargets)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return nil
 end
@@ -152,7 +152,7 @@ function SkillTemplate:PowerStrike_UseSkill(skill, toolOwner)
     return false
 end
 
-function SkillTemplate:PowerStrike_FindTargetsInRange(skill, toolOwner)
+function SkillTemplate:PowerStrike_FindTargetsInRange(skill, toolOwner, filteredTargets)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return nil
 end
@@ -169,7 +169,7 @@ function SkillTemplate:StormBlade_UseSkill(skill, toolOwner)
     return false
 end
 
-function SkillTemplate:StormBlade_FindTargetsInRange(skill, toolOwner)
+function SkillTemplate:StormBlade_FindTargetsInRange(skill, toolOwner, filteredTargets)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return nil
 end
