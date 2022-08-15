@@ -4,53 +4,104 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonModuleFacade.Debug
 
---[[
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
---]]
+local CollisionGroupType = ServerEnum.CollisionGroupType
+
 
 local ObjectCollisionGroupUtility = {
-    CollisionNames = {
-        Player = "PlayerCollision",
-        Skill = "SkiilCollision",
+
+    DefaultCollisionGroupName = "Default",
+    DefaultCollisionGroupId = 0,
+
+    CollisionGroupNameTable = {
+        [CollisionGroupType.Player] = "PlayerCollision",
+        [CollisionGroupType.Skill] = "SkillCollision",
+    },
+
+    CollisionGroupIdTable = {
+
+    },
+
+    CollidableGroupIdQueryTable = {
+        
     }
 }
 
-function ObjectCollisionGroupUtility:DisableCollisionGroup(targetCollisionName)
-    PhysicsService:CollisionGroupSetCollidable(targetCollisionName, "Default", false)
-
-    local allCollisionNames = self.CollisionNames
-    for _, collisionName in pairs(allCollisionNames) do
-        PhysicsService:CollisionGroupSetCollidable(targetCollisionName, collisionName, false)
-    end
-end
-
-function ObjectCollisionGroupUtility:EnableCollisionGroup(collisionName1, collisionName2)
-    PhysicsService:CollisionGroupSetCollidable(collisionName1, collisionName2, true)
-end
 
 function ObjectCollisionGroupUtility:Initialize()
-    local allCollisionNames = self.CollisionNames
-    for _, collisionName in pairs(allCollisionNames) do
-        PhysicsService:CreateCollisionGroup(collisionName)
+
+    self.CollidableGroupIdQueryTable[self.DefaultCollisionGroupId] = {}
+    local collisionGroupNames = self.CollisionGroupNameTable
+    for collisionGroupType, collisionGroupName in pairs(collisionGroupNames) do
+        PhysicsService:CreateCollisionGroup(collisionGroupName)
+        local groupId = PhysicsService:GetCollisionGroupId(collisionGroupName)
+        self.CollisionGroupIdTable[collisionGroupType] = groupId
+        self.CollidableGroupIdQueryTable[groupId] = {}
+        Debug.Print(collisionGroupName .. " => " .. tostring(groupId))
     end
 
-    self:DisableCollisionGroup(allCollisionNames.Skill)
-    self:EnableCollisionGroup(allCollisionNames.Skill, allCollisionNames.Player)
+    for _, collisionGroupName in pairs(collisionGroupNames) do
+        self:SetEnableAllCollisionGroups(collisionGroupName, true)
+    end
+    
+    self:SetEnableAllCollisionGroups(self.CollisionGroupNameTable[CollisionGroupType.Skill], false)
+    self:SetEnableCollisionGroup(self.CollisionGroupNameTable[CollisionGroupType.Skill],  self.CollisionGroupNameTable[CollisionGroupType.Player], true)
 end
 
-function ObjectCollisionGroupUtility:RegisterCollision(part, collisionName)
-    if not collisionName or not part then
+function ObjectCollisionGroupUtility:SetEnableCollisionGroup(collisionGroupName1, collisionGroupName2, isEnable)
+    PhysicsService:CollisionGroupSetCollidable(collisionGroupName1, collisionGroupName2, isEnable)
+    
+    local collisionGroupId1 = PhysicsService:GetCollisionGroupId(collisionGroupName1)
+    local collisionGroupId2 = PhysicsService:GetCollisionGroupId(collisionGroupName2)
+
+    self.CollidableGroupIdQueryTable[collisionGroupId1][collisionGroupId2] = isEnable
+    self.CollidableGroupIdQueryTable[collisionGroupId2][collisionGroupId1] = isEnable
+end
+
+function ObjectCollisionGroupUtility:SetEnableAllCollisionGroups(targetCollisionGroupName, isEnable)
+    self:SetEnableCollisionGroup(targetCollisionGroupName, self.DefaultCollisionGroupName, isEnable)
+    local collisionGroupNames = self.CollisionGroupNameTable
+    for _, collisionGroupName in pairs(collisionGroupNames) do
+        PhysicsService:CollisionGroupSetCollidable(targetCollisionGroupName, collisionGroupName, isEnable)
+    end
+end
+
+function ObjectCollisionGroupUtility:SetCollisionGroup(part, collisionGroupName)
+    if not collisionGroupName or not part then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
     
-    PhysicsService:SetPartCollisionGroup(part, collisionName)
+    PhysicsService:SetPartCollisionGroup(part, collisionGroupName)
     return true
 end
 
-function ObjectCollisionGroupUtility:RegisterPlayerCollision(player)
+function ObjectCollisionGroupUtility:IsCollidable(collisionGroupId1, collisionGroupId2)
+    if not self.CollidableGroupIdQueryTable[collisionGroupId1] then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    return self.CollidableGroupIdQueryTable[collisionGroupId1][collisionGroupId2]
+end
+
+function ObjectCollisionGroupUtility:IsCollidableByPart(part1, part2)
+    local collisionGroupId1 = part1.CollisionGroupId
+    local collisionGroupId2 = part2.CollisionGroupId
+
+    return self:IsCollidable(collisionGroupId1, collisionGroupId2)
+end
+
+function ObjectCollisionGroupUtility:IsCollidableByCollisionGroupName(collisionGroupName1, collisionGroupName2)
+    local collisionGroupId1 = PhysicsService:GetCollisionGroupId(collisionGroupName1)
+    local collisionGroupId2 = PhysicsService:GetCollisionGroupId(collisionGroupName2)
+
+    return self:IsCollidable(collisionGroupId1, collisionGroupId2)
+end
+
+function ObjectCollisionGroupUtility:SetPlayerCollisionGroup(player)
     if not player then
         Debug.Assert(false, "비정상입니다.")
         return false
@@ -68,7 +119,7 @@ function ObjectCollisionGroupUtility:RegisterPlayerCollision(player)
         return false
     end
 
-    if not self:RegisterCollision(humanoidRootPart, self.CollisionNames.Player) then
+    if not self:SetCollisionGroup(humanoidRootPart, self.CollisionGroupNameTable[CollisionGroupType.Player]) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -76,13 +127,13 @@ function ObjectCollisionGroupUtility:RegisterPlayerCollision(player)
     return true
 end
 
-function ObjectCollisionGroupUtility:RegisterSkillCollision(skillCollision)
+function ObjectCollisionGroupUtility:SetSkillCollisionGroup(skillCollision)
     if not skillCollision then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
 
-    if not self:RegisterCollision(skillCollision, self.CollisionNames.Skill) then
+    if not self:SetCollisionGroup(skillCollision, self.CollisionGroupNameTable[CollisionGroupType.Skill]) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end

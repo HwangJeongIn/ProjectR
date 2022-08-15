@@ -13,6 +13,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
+local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility
 local ServerConstant = ServerModuleFacade.ServerConstant
 local IsTestMode = ServerConstant.IsTestMode
 
@@ -73,16 +74,34 @@ function Temp()
 
 		
 		local tempPart = Instance.new("Part")
-		tempPart.Parent = game.workspace
-		tempPart.Size =  Vector3.new(100, 100, 100)
+		ObjectCollisionGroupUtility:SetSkillCollisionGroup(tempPart)
 
-		tempPart.CanTouch = false
+		tempPart.Anchored = true
+		--tempPart.CanTouch = false
 		tempPart.CanCollide = false
 		tempPart.CanQuery = true
 
+		tempPart.Parent = game.workspace
+		tempPart.Size =  Vector3.new(2, 2, 2)
+		--tempPart.Position = Vector3.new(0, 0, 0)
+
 		tempPart.CFrame = player.Character.HumanoidRootPart.CFrame
 
+		print(tempPart.CollisionGroupId)
+
+		local connection = tempPart.Touched:Connect(function() end)
 		local touchingParts = tempPart:GetTouchingParts()
+
+		local finalTouchingParts = {}
+		for _, touchingPart in pairs(touchingParts) do
+			print("_" .. tostring(touchingPart.CollisionGroupId))
+
+			if ObjectCollisionGroupUtility:IsCollidableByPart(tempPart, touchingPart) then
+				table.insert(finalTouchingParts, touchingPart)
+			end
+		end
+
+		connection:Disconnect()
 
 		local a = 3
 	end

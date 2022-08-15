@@ -9,6 +9,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Debug = ServerModuleFacade.Debug
+local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility
 local CommonEnum = ServerModuleFacade.CommonEnum
 local GameStateType = CommonEnum.GameStateType
 local ToolType = CommonEnum.ToolType
@@ -87,6 +88,10 @@ function OnCharacterAdded(player, character)
 	local armorsFolder = Instance.new("Folder")
 	armorsFolder.Name = "Armors"
 	armorsFolder.Parent = character
+
+	if not ObjectCollisionGroupUtility:SetPlayerCollisionGroup(player) then
+		Debug.Assert(false, "비정상입니다.")
+	end
 
 	if not ServerGlobalStorage:RegisterPlayerEvent(player) then
 		Debug.Assert(false, "비정상입니다.")

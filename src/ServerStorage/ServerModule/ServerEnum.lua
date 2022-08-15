@@ -16,6 +16,12 @@ local ServerEnum = {
 		Count = 2
 	},
 
+	CollisionGroupType = {
+		Player = 1,
+		Skill = 2,
+		Count = 3
+	}
+
 
 }
 
