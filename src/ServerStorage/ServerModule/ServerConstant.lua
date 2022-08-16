@@ -22,6 +22,9 @@ local ServerConstant = {
 		[EquipType.Leggings] = {[1] = "LeftLowerLeg", [2] = "RightLowerLeg"},
 		[EquipType.Boots] = {[1] = "LeftFoot", [2] = "RightFoot"},
 	},
+
+	DefaultWeaponSkillGameDataKey = 1,
+	DefaultArmorSkillGameDataKey = 100,
 }
 
 ServerConstant.__index = Utility.Inheritable__index

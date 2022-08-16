@@ -177,6 +177,16 @@ function SkillController:SetToolOwnerPlayer(toolOwnerPlayer)
     end
 end
 
+function SkillController:SetSkillAsDefaultWeaponSkill(weaponTool)
+    local defaultWeaponSkillGameData = SkillTemplate:GetDefaultWeaponSkillGameData()
+    if not self:SetSkill(weaponTool, defaultWeaponSkillGameData) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    return true
+end
+
 function SkillController:SetSkill(tool, skillGameData)
     local skillGameDataKey = skillGameData:GetKey()
     local targetSkillTemplate = SkillTemplate:GetSkillTemplateByKey(skillGameDataKey)

@@ -216,4 +216,5 @@ function OnActivated(WeaponController)
 	--humanoid:TakeDamage(50)
 end
 --]]
+
 return WeaponController

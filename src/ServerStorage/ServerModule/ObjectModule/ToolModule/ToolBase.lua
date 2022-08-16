@@ -8,6 +8,7 @@ local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
 local EquipType = ServerEnum.EquipType
+local ToolType = ServerEnum.ToolType
 local WorldInteractorType = ServerEnum.WorldInteractorType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
@@ -44,8 +45,26 @@ function ToolBase:InitializeTool(gameDataType, tool)
 		self.SkillControllers[skillIndex] = skillController
 	end
 
-	self.ToolOwnerPlayer = nil
+	local toolType = toolGameData.ToolType
+	if ToolType.Weapon == toolType then
+		local tool = self:Root()
+		local defaultSkillController = Utility:DeepCopy(SkillController)
+		if not defaultSkillController:SetSkillAsDefaultWeaponSkill(tool) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+	
+		self.DefaultSkillController = defaultSkillController
+		-- 임시 추후 변경
+		tool.Activated:Connect(function() self:ActivateDefaultSkill(self.ToolOwnerPlayer) end)
+		
+	elseif ToolType.Armor == toolType then
 
+	elseif ToolType.Consumable == toolType then
+
+	end
+
+	self.ToolOwnerPlayer = nil
 	return true
 end
 
@@ -53,6 +72,10 @@ function ToolBase:SetToolOwnerPlayer(toolOwnerPlayer)
 	self.ToolOwnerPlayer = toolOwnerPlayer
 	for _, skillController in pairs(self.SkillControllers) do
 		skillController:SetToolOwnerPlayer(toolOwnerPlayer)
+	end
+
+	if not self.DefaultSkillController then
+		self.DefaultSkillController:SetToolOwnerPlayer(toolOwnerPlayer)
 	end
 end
 
@@ -65,6 +88,19 @@ function ToolBase:ActivateSkill(player, skillIndex)
 	local targetSkillController = self.SkillControllers[skillIndex]
 	Debug.Assert(targetSkillController, "코드 버그")
 	if not targetSkillController:Activate(player) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+function ToolBase:ActivateDefaultSkill(player)
+	if not self.DefaultSkillController then
+		return true
+	end
+
+	if not self.DefaultSkillController:Activate(player) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end

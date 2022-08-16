@@ -5,6 +5,11 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 local Utility = ServerModuleFacade.Utility
 local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
 
+local ServerConstant = ServerModuleFacade.ServerConstant
+local DefaultWeaponSkillGameDataKey = ServerConstant.DefaultWeaponSkillGameDataKey
+--local DefaultArmorSkillGameDataKey = ServerConstant.DefaultArmorSkillGameDataKey
+
+
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
 local EquipType = ServerEnum.EquipType
@@ -21,7 +26,9 @@ local ObjectModule = ServerModuleFacade.ObjectModule
 local SkillCollisionSizeString = "SkillCollisionSize"
 local SkillCollisionOffsetString = "SkillCollisionOffset"
 
+
 local SkillTemplate = { SkillTemplateTable = {} }
+
 
 function SkillTemplate:GetSkillTemplateByKey(skillGameDataKey)
     if not self.SkillTemplateTable[skillGameDataKey] then
@@ -85,8 +92,13 @@ function SkillTemplate:RegisterSkillImpl(skillName, skillImplType, inputFunction
 end
 
 function SkillTemplate:InitializeAllTemplates()
-    local allData = ServerGameDataManager[GameDataType.Skill]:GetAllData()
 
+    local defaultWeaponSkillGameData = ServerGameDataManager[GameDataType.Skill]:Get(DefaultWeaponSkillGameDataKey)
+    Debug.Assert(defaultWeaponSkillGameData, "DefaultWeaponSkillGameDataKey에 해당하는 데이터가 없습니다.")
+    self.GetDefaultWeaponSkillGameData = function() return defaultWeaponSkillGameData  end
+
+
+    local allData = ServerGameDataManager[GameDataType.Skill]:GetAllData()
     for skillGameDataKey, skillGameData in pairs(allData) do
         self.SkillTemplateTable[skillGameDataKey] = {}
         local skillName = skillGameData.Name
