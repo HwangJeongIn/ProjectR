@@ -46,12 +46,16 @@ function CommonGlobalStorage:CreateEmptyStatistic()
 	}
 end
 
-function CommonGlobalStorage:CreateEmptyData()
+function CommonGlobalStorage:CreateEmptyPlayerData()
 	local playerData = {
 		[StatusType.Statistic] = Utility:DeepCopy(PlayerStatistic),
 		[StatusType.EquipSlots] = Utility:DeepCopy(EquipSlots),
 		[StatusType.Inventory] = Utility:DeepCopy(Inventory)
 	}
+
+	if self.OnCreateEmptyPlayerData then
+		self:OnCreateEmptyPlayerData(playerData)
+	end
 	
 	return playerData
 end
@@ -75,7 +79,7 @@ function CommonGlobalStorage:AddPlayer(player)
 		return false
 	end
 	
-	self.PlayerTable[playerId] = self:CreateEmptyData()
+	self.PlayerTable[playerId] = self:CreateEmptyPlayerData()
 	return true
 end
 
@@ -104,7 +108,7 @@ function CommonGlobalStorage:ClearPlayer(player)
 		return false
 	end
 
-	self.PlayerTable[playerId] = self:CreateEmptyData()
+	self.PlayerTable[playerId] = self:CreateEmptyPlayerData()
 	return true
 end
 

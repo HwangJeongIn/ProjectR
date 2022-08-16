@@ -20,9 +20,15 @@ local ServerEnum = {
 		Player = 1,
 		Skill = 2,
 		Count = 3
+	},
+
+	SkillImplType = {
+		UseSkill = 1,
+        FindTargetsInRange = 2,
+        ApplySkillToTarget = 3,
+		GetSkillCollisionParameter = 4,
+		Count = 5
 	}
-
-
 }
 
 -- 필요하면 추가
@@ -36,6 +42,14 @@ ServerEnum.WorldInteractorType.Converter = {
 	[ServerEnum.WorldInteractorType.ItemBox] = "ItemBox"
 }
 Debug.Assert(ServerEnum.WorldInteractorType.Count == #ServerEnum.WorldInteractorType.Converter + 1, "비정상입니다.")
+
+ServerEnum.SkillImplType.Converter = {
+	[ServerEnum.SkillImplType.UseSkill] = "UseSkill",
+	[ServerEnum.SkillImplType.FindTargetsInRange] = "FindTargetsInRange",
+	[ServerEnum.SkillImplType.ApplySkillToTarget] = "ApplySkillToTarget",
+	[ServerEnum.SkillImplType.GetSkillCollisionParameter] = "GetSkillCollisionParameter",
+}
+Debug.Assert(ServerEnum.SkillImplType.Count == #ServerEnum.SkillImplType.Converter + 1, "비정상입니다.")
 
 
 ServerEnum.__index = Utility.Inheritable__index

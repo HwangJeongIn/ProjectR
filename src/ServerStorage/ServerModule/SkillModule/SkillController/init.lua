@@ -23,23 +23,23 @@ SkillController.__newindex = Utility.Inheritable__newindex
 
 -- pure virtual function
 function SkillController:UseSkill(toolOwnerPlayer)
-    Debug.Assert(false, "상위에서 구현해야합니다.")
+    Debug.Assert(false, "UseSkill 상위에서 구현해야합니다.")
     return false
 end
 
 function SkillController:FindTargetsInRange(toolOwnerPlayer)
-    Debug.Assert(false, "상위에서 구현해야합니다.")
+    Debug.Assert(false, "FindTargetsInRange 상위에서 구현해야합니다.")
     return nil
 end
 
 function SkillController:ApplySkillToTarget(toolOwnerPlayer, target)
-    Debug.Assert(false, "상위에서 구현해야합니다.")
+    Debug.Assert(false, "ApplySkillToTarget 상위에서 구현해야합니다.")
     return false
 end
 
 
-function SkillController:GetSkillCollisionParameter(toolOwnerPlayer)
-    Debug.Assert(false, "상위에서 구현해야합니다.")
+function SkillController:GetSkillCollisionParameter(toolOwnerPlayerCFrame)
+    Debug.Assert(false, "GetSkillCollisionParameter 상위에서 구현해야합니다.")
     return nil
 end
 
@@ -71,9 +71,10 @@ function SkillController:ValidateSkillCollisionParameter(skillCollisionParameter
     return true
 end
 
-function SkillController:FilterTargetsBySkillCollision(toolOwnerPlayer)
-    local skillCollisionParameter = self:GetSkillCollisionParameter(toolOwnerPlayer)
-    if not self:ValidateSkillCollisionParameter(toolOwnerPlayer) then
+function SkillController:FilterTargetsBySkillCollision(toolOwnerPlayerCharacter)
+	local humanoidRootPart = toolOwnerPlayerCharacter:FindFirstChild("HumanoidRootPart")
+    local skillCollisionParameter = self:GetSkillCollisionParameter(humanoidRootPart.CFrame)
+    if not self:ValidateSkillCollisionParameter(skillCollisionParameter) then
         Debug.Assert(false, "비정상입니다.")
         return nil
     end
@@ -135,12 +136,18 @@ function SkillController:Activate(player)
     end
 
     self.LastActivationTime = currentTime
+    local character = player.character
+    if not character then
+        Debug.Assert(false, "캐릭터가 없습니다.")
+        return false
+    end
+
     if not self:UseSkill(player) then
         Debug.Print(self.Name .. "에 실패했습니다.")
         return false
     end
 
-    local targetsFilteredBySkillCollision = self:FilterTargetsBySkillCollision(player)
+    local targetsFilteredBySkillCollision = self:FilterTargetsBySkillCollision(character)
     local finalTargets = self:FindTargetInRange(player, targetsFilteredBySkillCollision)
     if finalTargets then
         if not self:ApplySkillToTargets(player, finalTargets) then
@@ -153,19 +160,20 @@ function SkillController:Activate(player)
 end
 
 function SkillController:SetToolOwnerPlayer(toolOwnerPlayer)
-    if not toolOwnerPlayer then
-        if self.ToolOwnerPlayer then
-           local prevPlayerId = self.ToolOwnerPlayer.UserId 
-           if self.LastActivationTime then
-                ServerGlobalStorage:SetSkillLastActivationTime(prevPlayerId, self.SkillGameDataKey, self.LastActivationTime)
-           end
+    if self.ToolOwnerPlayer then
+        local prevPlayerId = self.ToolOwnerPlayer.UserId 
+        if self.LastActivationTime then
+             ServerGlobalStorage:SetSkillLastActivationTime(prevPlayerId, self.SkillGameDataKey, self.LastActivationTime)
         end
+        
         self.LastActivationTime = nil
-        self.ToolOwnerPlayer = nil
-    else
-        local playerId = toolOwnerPlayer.UserId
+    end
+
+    self.ToolOwnerPlayer = toolOwnerPlayer
+    if self.ToolOwnerPlayer  then
+        local playerId = self.ToolOwnerPlayer.UserId
         local playerLastActivationTime = ServerGlobalStorage:GetSkillLastActivationTime(playerId, self.SkillGameDataKey)
-        self.LastActivationTime = playerLastActivationTime
+        self.LastActivationTime = playerLastActivationTime 
     end
 end
 

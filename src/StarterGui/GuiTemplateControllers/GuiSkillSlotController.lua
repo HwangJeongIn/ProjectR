@@ -53,14 +53,14 @@ function GuiSkillSlotController:new(slotIndex, newGuiSlot)
 	newGuiSkillSlotController.SkillKeyName = string.sub(skillSlotActionName, -1)
 
 	KeyBinder:BindAction(Enum.UserInputState.Begin, targetSlotIndexEnum, skillSlotActionName, function(inputObject)
-		if not self:ActivateSkill() then
+		if not newGuiSkillSlotController:ActivateSkill() then
 			Debug.Assert(false, "비정상입니다.")
 			return
 		end
 	end)
 
 	newGuiSkillSlotController.GuiSlot.Activated:Connect(function(inputObject)
-		if not self:ActivateSkill() then
+		if not newGuiSkillSlotController:ActivateSkill() then
 			Debug.Assert(false, "비정상입니다.")
 			return
 		end
@@ -90,7 +90,7 @@ function GuiSkillSlotController:ActivateSkill()
 		return false
 	end
 
-	if not ClientGlobalStorage:SendActivateToolSkill(skillIndex, self.SkillOwnerTool) then
+	if not ClientGlobalStorage:SendActivateToolSkill(self.SkillOwnerTool, skillIndex) then
 		Debug.Assert(false, "스킬 사용에 실패했습니다.")
 		return false
 	end

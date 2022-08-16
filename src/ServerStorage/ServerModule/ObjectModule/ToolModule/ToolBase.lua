@@ -52,7 +52,7 @@ end
 function ToolBase:SetToolOwnerPlayer(toolOwnerPlayer)
 	self.ToolOwnerPlayer = toolOwnerPlayer
 	for _, skillController in pairs(self.SkillControllers) do
-		skillController:SetToolOnwerPlayer(toolOwnerPlayer)
+		skillController:SetToolOwnerPlayer(toolOwnerPlayer)
 	end
 end
 

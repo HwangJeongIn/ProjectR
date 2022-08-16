@@ -62,8 +62,7 @@ local CommonEnum = {
 		Statistic = 1,
 		EquipSlots = 2,
 		Inventory = 3,
-		QuickSlots = 4, -- 클라이언트 전용
-		Count = 5
+		Count = 4
 	},
 	
 	StatType = {

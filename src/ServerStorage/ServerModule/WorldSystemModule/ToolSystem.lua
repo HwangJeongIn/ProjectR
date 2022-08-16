@@ -157,12 +157,11 @@ function ToolSystem:SetToolOwnerPlayer(tool, toolOwnerPlayer)
     --]]
 
     local toolScript = self:GetScript(tool)
-    if not toolScript then
-        Debug.Assert(false, "비정상입니다.")
-        return false
+    -- 없을 수 있다.
+    if toolScript then
+        toolScript:SetToolOwnerPlayer(toolOwnerPlayer)
     end
 
-    toolScript:SetToolOwnerPlayer(toolOwnerPlayer)
     return true
 end
 

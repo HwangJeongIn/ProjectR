@@ -54,6 +54,40 @@ function ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, monst
 	return true
 end
 
+
+function ServerGlobalStorage:OnCreateEmptyPlayerData(playerData)
+	playerData.SkillLastActivationTimeTable = {}
+end
+
+function ServerGlobalStorage:SetSkillLastActivationTime(playerId, skillGameDataKey, lastActivationTime)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return false
+	end
+
+	if not skillGameDataKey then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	self.PlayerTable[playerId].SkillLastActivationTimeTable[skillGameDataKey] = lastActivationTime
+	return true
+end
+
+function ServerGlobalStorage:GetSkillLastActivationTime(playerId, skillGameDataKey)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return nil
+	end
+
+	if not skillGameDataKey then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return self.PlayerTable[playerId].SkillLastActivationTimeTable[skillGameDataKey]
+end
+
 function ServerGlobalStorage:ActivateToolSkill(player, tool, skillIndex)
 	if not tool or not skillIndex then
 		Debug.Assert(false, "비정상입니다.")
@@ -82,7 +116,7 @@ function ServerGlobalStorage:ActivateToolSkill(player, tool, skillIndex)
 	end
 
 	local toolSystem = self:GetToolSystem()
-	if not toolSystem:ActivateToolSkill(tool, skillIndex) then
+	if not toolSystem:ActivateToolSkill(player, tool, skillIndex) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
