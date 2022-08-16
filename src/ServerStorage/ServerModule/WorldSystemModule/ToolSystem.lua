@@ -147,6 +147,23 @@ function ToolSystem:GetClonedToolScript(toolType, tool)
     return targetScript
 end
 
+function ToolSystem:ActivateToolSkill(tool, skillIndex)
+    if not tool or skillIndex then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    local toolScript = self:GetScript(tool)
+    if not toolScript then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    스킬 사용
+
+    return true
+end
+
 function ToolSystem:CreateTool(toolKey)
     if not toolKey then
         Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolKey))

@@ -13,6 +13,7 @@ local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
 
 local MaxPickupDistance = ServerConstant.MaxPickupDistance
 local MaxDropDistance = ServerConstant.MaxDropDistance
+local MaxSkillCount = ServerConstant.MaxSkillCount
 
 local EquipTypeToBoneMappingTable = ServerConstant.EquipTypeToBoneMappingTable
 
@@ -50,6 +51,43 @@ function ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, monst
 	local ServerRemoteEventImpl = require(script:WaitForChild("ServerRemoteEventImpl"))
 	ServerRemoteEventImpl:InitializeRemoteEvents(self)
 
+	return true
+end
+
+function ServerGlobalStorage:ActivateToolSkill(player, tool, skillIndex)
+	if not tool or not skillIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local toolGameData = ToolUtility:GetGameData(tool)
+	local equipType = toolGameData.EquipType
+	if not equipType then
+		Debug.Assert(false, "장착할 수 있는 장비만 스킬을 사용할 수 있습니다.")
+		return false
+	end
+
+	
+	 if  MaxSkillCount < toolGameData.SkillCount
+	 or toolGameData.SkillCount < skillIndex 
+	 or 0 >= skillIndex then
+		Debug.Assert(false, "스킬인덱스가 비정상입니다. => " .. tostring(skillIndex))
+		return false
+	 end
+
+	-- 장착 검증
+	local playerId = player.UserId
+	if not self:IsInCharacter(playerId, equipType, tool) then
+		Debug.Assert(false, "캐릭터가 해당 도구를 장착하고 있지 않습니다.")
+		return false
+	end
+
+	local toolSystem = self:GetToolSystem()
+	if not toolSystem:ActivateToolSkill(tool, skillIndex) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	
 	return true
 end
 

@@ -15,6 +15,8 @@ local GameDataManager = ServerModuleFacade.GameDataManager
 local Debug = ServerModuleFacade.Debug
 
 local ObjectModule = ServerModuleFacade.ObjectModule
+local SkillModule = ServerModuleFacade.SkillModule
+local SkillController = require(SkillModule:WaitForChild("SkillController"))
 
 local ToolBase = {}
 ToolBase.__index = Utility.Inheritable__index
@@ -27,6 +29,22 @@ function ToolBase:InitializeTool(gameDataType, tool)
 		return false
 	end
 	
+	local toolGameData = self:GetGameData()
+	
+	self.SkillObjects = {}
+	for skillIndex = 1, toolGameData.SkillCount do
+		local skillGameData = toolGameData.SkillGameDataSet[skillIndex]
+		local skillController = Utility:DeepCopy(SkillController)
+		self.SkillObjects[skillIndex] = {
+			SkillGameData = skillGameData
+		}
+	end
+
+	self.SkillSet = toolGameData.SkillSet{
+		[1] = gameData.Skill1,
+		[2] = gameData.Skill2,
+		[3] = gameData.Skill3,
+	}
 	--local toolGameData = self:GetGameData()
 	--self.ToolType = toolGameData.ToolType
 	return true

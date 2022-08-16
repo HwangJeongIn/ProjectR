@@ -22,23 +22,23 @@ SkillController.__newindex = Utility.Inheritable__newindex
 
 
 -- pure virtual function
-function SkillController:UseSkill(toolOwner)
+function SkillController:UseSkill(toolOwnerPlayer)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return false
 end
 
-function SkillController:FindTargetsInRange(toolOwner)
+function SkillController:FindTargetsInRange(toolOwnerPlayer)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return nil
 end
 
-function SkillController:ApplySkillToTarget(toolOwner, target)
+function SkillController:ApplySkillToTarget(toolOwnerPlayer, target)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return false
 end
 
 
-function SkillController:GetSkillCollisionParameter(toolOwner)
+function SkillController:GetSkillCollisionParameter(toolOwnerPlayer)
     Debug.Assert(false, "상위에서 구현해야합니다.")
     return nil
 end
@@ -71,9 +71,9 @@ function SkillController:ValidateSkillCollisionParameter(skillCollisionParameter
     return true
 end
 
-function SkillController:FilterTargetsBySkillCollision(toolOwner)
-    local skillCollisionParameter = self:GetSkillCollisionParameter(toolOwner)
-    if not self:ValidateSkillCollisionParameter(toolOwner) then
+function SkillController:FilterTargetsBySkillCollision(toolOwnerPlayer)
+    local skillCollisionParameter = self:GetSkillCollisionParameter(toolOwnerPlayer)
+    if not self:ValidateSkillCollisionParameter(toolOwnerPlayer) then
         Debug.Assert(false, "비정상입니다.")
         return nil
     end
@@ -108,9 +108,9 @@ function SkillController:FilterTargetsBySkillCollision(toolOwner)
     return finalTouchingParts
 end
 
-function SkillController:ApplySkillToTargets(toolOwner, targets)
+function SkillController:ApplySkillToTargets(toolOwnerPlayer, targets)
     for _, target in pairs(targets) do
-        if not self:ApplySkillToTarget(toolOwner, target) then
+        if not self:ApplySkillToTarget(toolOwnerPlayer, target) then
             Debug.Assert(false, "비정상입니다.")
             return false
         end
@@ -119,7 +119,9 @@ function SkillController:ApplySkillToTargets(toolOwner, targets)
     return true
 end
 
-function SkillController:Activate(toolOwner)
+function SkillController:Activate(toolOwnerPlayer)
+    local toolOwnerPlayerId = toolOwnerPlayer.UserId
+    
     local currentTime = os.clock()
     if self.LastActivationTime then
         local elapsedTime = currentTime - self.LastActivationTime
@@ -129,16 +131,17 @@ function SkillController:Activate(toolOwner)
         end
     end
 
+    ServerGlobalStorage:SetSkillLastActivationTime(playerId, self.SkillGameDataKey)
     self.LastActivationTime = currentTime
-    if not self:UseSkill(toolOwner) then
+    if not self:UseSkill(toolOwnerPlayer) then
         Debug.Print(self.Name .. "에 실패했습니다.")
         return false
     end
 
-    local targetsFilteredBySkillCollision = self:FilterTargetsBySkillCollision(toolOwner)
-    local finalTargets = self:FindTargetInRange(toolOwner, targetsFilteredBySkillCollision)
+    local targetsFilteredBySkillCollision = self:FilterTargetsBySkillCollision(toolOwnerPlayer)
+    local finalTargets = self:FindTargetInRange(toolOwnerPlayer, targetsFilteredBySkillCollision)
     if finalTargets then
-        if not self:ApplySkillToTargets(toolOwner, finalTargets) then
+        if not self:ApplySkillToTargets(toolOwnerPlayer, finalTargets) then
             Debug.Print(self.Name .. "에 실패했습니다.")
             return false
         end
@@ -147,7 +150,19 @@ function SkillController:Activate(toolOwner)
     return true
 end
 
-function SkillController:SetSkill(toolOwnerPlayer, tool, skillGameDataKey)
+function SkillController:SettoolOwnerPlayer(toolOwnerPlayerPlayer)
+    self.toolOwnerPlayerPlayer = toolOwnerPlayerPlayer
+    if not toolOwnerPlayerPlayer then
+        self.LastActivationTime = nil
+    end
+
+    local playerId = toolOwnerPlayerPlayer.UserId
+    local playerLastActivationTime = ServerGlobalStorage:GetSkillLastActivationTime(playerId, self.SkillGameDataKey)
+    self.LastActivationTime = playerLastActivationTime
+end
+
+function SkillController:SetSkill(tool, skillGameData)
+    local skillGameDataKey = skillGameData:GetKey()
     local targetSkillTemplate = SkillTemplate:GetSkillTemplateByKey(skillGameDataKey)
     if not targetSkillTemplate then
         Debug.Assert(false, "비정상입니다.")
@@ -158,15 +173,11 @@ function SkillController:SetSkill(toolOwnerPlayer, tool, skillGameDataKey)
     self.FindTargetsInRange = targetSkillTemplate.FindTargetsInRange
     self.ApplySkillToTarget = targetSkillTemplate.ApplySkillToTarget
 
-    local skillGameData = targetSkillTemplate.GameData
     self.Tool = tool
-    self.ToolOwner = toolOwnerPlayer.Character
-
+    self.SkillGameDataKey = skillGameDataKey
     self.Name = skillGameData.Name
     self.Cooldown = skillGameData.Cooldown
 
-    local playerId = toolOwnerPlayer.UserId
-    --self.LastActivationTime = ServerGlobalStorage:GetCooldown(playerId, tool, skillGameDataKey)
     self.LastActivationTime = nil
     return true
 end

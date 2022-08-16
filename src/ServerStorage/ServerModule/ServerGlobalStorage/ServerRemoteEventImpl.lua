@@ -29,9 +29,17 @@ local SwapInventorySlotCTS = RemoteEvents:WaitForChild("SwapInventorySlotCTS")
 local PickupToolCTS = RemoteEvents:WaitForChild("PickupToolCTS")
 local DropToolCTS = RemoteEvents:WaitForChild("DropToolCTS")
 local DropSelectedToolCTS = RemoteEvents:WaitForChild("DropSelectedToolCTS")
+local ActivateToolSkillCTS = RemoteEvents:WaitForChild("ActivateToolSkillCTS")
 
 
 function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
+
+    ActivateToolSkillCTS.OnServerEvent:Connect(function(player, tool, skillIndex)
+        if not ServerGlobalStorage:DropTool(player, tool) then
+            Debug.Assert(false, "비정상입니다.")
+            return
+        end
+    end)
 
     DropToolCTS.OnServerEvent:Connect(function(player, tool)
         if not ServerGlobalStorage:DropTool(player, tool) then

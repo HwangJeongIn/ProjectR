@@ -48,7 +48,6 @@ function Weapon:InitializeWeapon(gameDataType, weaponTool)
     return true
 end
 
-
 function Weapon:CanAttack(otherPart)
 	if not otherPart then
 		Debug.Assert(false, "대상이 존재하지 않습니다.")

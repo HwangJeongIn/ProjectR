@@ -53,11 +53,17 @@ function GuiSkillSlotController:new(slotIndex, newGuiSlot)
 	newGuiSkillSlotController.SkillKeyName = string.sub(skillSlotActionName, -1)
 
 	KeyBinder:BindAction(Enum.UserInputState.Begin, targetSlotIndexEnum, skillSlotActionName, function(inputObject)
-		Debug.Print(skillSlotActionName)
+		if not self:ActivateSkill() then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 	end)
 
-	newGuiSkillSlotController.GuiSlot.Activated:connect(function(inputObject)
-		Debug.Print(skillSlotActionName)
+	newGuiSkillSlotController.GuiSlot.Activated:Connect(function(inputObject)
+		if not self:ActivateSkill() then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
 	end)
 
 	newGuiSkillSlotController:ClearSkillData()
