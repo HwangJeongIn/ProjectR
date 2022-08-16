@@ -11,7 +11,7 @@ local EquipType = ServerEnum.EquipType
 local WorldInteractorType = ServerEnum.WorldInteractorType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
-local GameDataManager = ServerModuleFacade.GameDataManager
+local ServerGameDataManager = ServerModuleFacade.ServerGameDataManager
 local Debug = ServerModuleFacade.Debug
 
 local ObjectModule = ServerModuleFacade.ObjectModule
@@ -36,7 +36,7 @@ function ToolBase:InitializeTool(gameDataType, tool)
 	for skillIndex = 1, self.SkillCount do
 		local skillGameData = toolGameData.SkillGameDataSet[skillIndex]
 		local skillController = Utility:DeepCopy(SkillController)
-		if not skillController:InitializeTool(tool, skillGameData) then
+		if not skillController:SetSkill(tool, skillGameData) then
 			Debug.Assert(false, "비정상입니다.")
 			return false
 		end

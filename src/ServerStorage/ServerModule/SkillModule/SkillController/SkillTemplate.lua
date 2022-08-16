@@ -11,7 +11,7 @@ local EquipType = ServerEnum.EquipType
 local WorldInteractorType = ServerEnum.WorldInteractorType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
-local GameDataManager = ServerModuleFacade.GameDataManager
+local ServerGameDataManager = ServerModuleFacade.ServerGameDataManager
 local Debug = ServerModuleFacade.Debug
 
 local ObjectModule = ServerModuleFacade.ObjectModule
@@ -47,7 +47,7 @@ function SkillTemplate:RegisterSkillTemplate(skillGameDataKey,
 end
 
 function SkillTemplate:InitializeAllTemplates()
-    local allData = GameDataManager[GameDataType.Skill]:GetAllData()
+    local allData = ServerGameDataManager[GameDataType.Skill]:GetAllData()
 
     local UseSkillName = nil
     local FindTargetsInRangeName = nil
@@ -58,11 +58,11 @@ function SkillTemplate:InitializeAllTemplates()
     local ApplySkillToTarget = nil
 
     for skillGameDataKey, skillGameData in pairs(allData) do
-        local skillName = skillGameData
+        local skillName = skillGameData.Name
 
         UseSkillName = skillName .. "_" .. "UseSkill"
         FindTargetsInRangeName = skillName .. "_" .. "FindTargetsInRange"
-        ApplySkillToTargetName = skillName .. "_" .. "UseSkillApplySkillToTarget"
+        ApplySkillToTargetName = skillName .. "_" .. "ApplySkillToTarget"
 
         if not self[UseSkillName] then
             Debug.Assert(false, UseSkillName .. "가 정의되어 있지 않습니다.")

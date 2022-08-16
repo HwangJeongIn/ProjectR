@@ -25,30 +25,23 @@ local ToolType = ServerEnum.ToolType
 local ToolModule = ServerModuleFacade.ToolModule
 local Debris = game:GetService("Debris")
 
-local Weapon = {}
-Weapon.__index = Utility.Inheritable__index
-Weapon.__newindex = Utility.Inheritable__newindex
-setmetatable(Weapon, Utility:DeepCopy(require(ToolModule:WaitForChild("ToolBase"))))
+local WeaponController = {}
+WeaponController.__index = Utility.Inheritable__index
+WeaponController.__newindex = Utility.Inheritable__newindex
+setmetatable(WeaponController, Utility:DeepCopy(require(ToolModule:WaitForChild("ToolBase"))))
 
 -- 함수 정의 ------------------------------------------------------------------------------------------------------
 
-function Weapon:InitializeWeapon(gameDataType, weaponTool)
+function WeaponController:InitializeWeaponController(gameDataType, weaponTool)
     if not self:InitializeTool(gameDataType, weaponTool) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
 
-	local  gameData = self:GetGameData()
-	self.SkillSet = {
-		[1] = gameData.Skill1,
-		[2] = gameData.Skill2,
-		[3] = gameData.Skill3,
-	}
-
     return true
 end
 
-function Weapon:CanAttack(otherPart)
+function WeaponController:CanAttack(otherPart)
 	if not otherPart then
 		Debug.Assert(false, "대상이 존재하지 않습니다.")
 		return false
@@ -83,7 +76,7 @@ function Weapon:CanAttack(otherPart)
 	return true
 end
 
-function Weapon:CalcDamageByDefaultSkill(damagedActor, damageCauser)
+function WeaponController:CalcDamageByDefaultSkill(damagedActor, damageCauser)
     --[[
     local playerOfDamagedActor = game.Players:GetPlayerByUserId(damagedActor)
     local playerOfDamageCauser = game.Players:GetPlayerByUserId(damageCauser)
@@ -138,7 +131,7 @@ function Weapon:CalcDamageByDefaultSkill(damagedActor, damageCauser)
     --]]
 end
 
-function Weapon:AttackCharacterByDefaultSkill(attackerCharacter, attackeeCharacter)
+function WeaponController:AttackCharacterByDefaultSkill(attackerCharacter, attackeeCharacter)
 
 	local damage = self:CalcDamage(attackerCharacter, attackeeCharacter)
 	Debug.Log("Damage : ".. tostring(damage))
@@ -156,7 +149,7 @@ function Weapon:AttackCharacterByDefaultSkill(attackerCharacter, attackeeCharact
 end
 
 
-function Weapon:AttackByDefaultSkill(attackeePart)
+function WeaponController:AttackByDefaultSkill(attackeePart)
 	if self:CanAttack(attackeePart) == false then
 		--Debug.Assert(false, "공격할 수 없습니다.")
 		return false
@@ -188,4 +181,53 @@ function Weapon:AttackByDefaultSkill(attackeePart)
 	return true
 end
 
-return Weapon
+function WeaponController:InitializeWeaponController(gameDataType, weaponTool)
+	self.WeaponTool = weaponTool
+	self.Weapon = Utility:DeepCopy(require(ServerModuleFacade.ToolModule:WaitForChild("Weapon")))
+
+    if not self.Weapon:InitializeWeapon(gameDataType, weaponTool) then
+		Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+	--[[
+	local clonedWeaponScriptRaw = Utility:AddClonedObjectModuleScriptToObject(WeaponTool, WeaponScript)
+    self.Weapon = clonedWeaponScriptRaw
+
+	--]]
+
+	local Anim1 = self.WeaponTool:WaitForChild("Anim1")
+	local Attacker = self.WeaponTool:WaitForChild("Attacker")
+	local IsAttacking = false
+
+	self.Anim1 = Anim1
+	self.Attacker = Attacker
+	self.IsAttacking = IsAttacking
+
+	self.WeaponTool.Activated:Connect(function() OnActivated(WeaponController) end)
+	self.WeaponTool.Attacker.Touched:Connect(function(touchedActor) OnTouched(WeaponController, touchedActor) end)
+
+    return true
+end
+
+function OnTouched(WeaponController, touchedActor)
+	if WeaponController.IsAttacking == false then 
+		return 
+	end
+
+	WeaponController.IsAttacking = false
+	WeaponController.Weapon:Attack(touchedActor)
+end
+
+function OnActivated(WeaponController)
+	--Debug.Assert(false, ToolBase:GetGameDataKey())
+	WeaponController.IsAttacking = true
+	local humanoid = WeaponController.WeaponTool.Parent:FindFirstChild("Humanoid")
+	local anim1Track = humanoid:LoadAnimation(WeaponController.Anim1)
+	anim1Track:Play()
+
+	anim1Track.Stopped:Connect(function() WeaponController.IsAttacking = false end)
+	--humanoid:TakeDamage(50)
+end
+
+return WeaponController

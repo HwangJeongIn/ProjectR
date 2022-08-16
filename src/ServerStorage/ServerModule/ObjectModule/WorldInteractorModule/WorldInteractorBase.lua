@@ -8,7 +8,7 @@ local GameDataType = ServerEnum.GameDataType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
-local GameDataManager = ServerModuleFacade.GameDataManager
+local ServerGameDataManager = ServerModuleFacade.ServerGameDataManager
 local Debug = ServerModuleFacade.Debug
 
 local ObjectModule = ServerModuleFacade.ObjectModule
