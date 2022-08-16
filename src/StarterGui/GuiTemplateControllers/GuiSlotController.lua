@@ -89,13 +89,17 @@ function GuiSlotController:newRaw(slotType, slotIndex, newGuiSlot)
 --]]
 
 	newGuiSlotController.GuiSlot.MouseEnter:Connect(function(x,y)
-		newGuiSlotController.GuiSlot.ImageTransparency = 0.5
+		if newGuiSlotController.OnMouseEnter then
+			newGuiSlotController:OnMouseEnter()
+		end 
 		--Debug.Print("SetSlotControllerCandidate => " .. tostring(newGuiSlotController.SlotIndex))
 		GuiDraggingSystem:SetSlotControllerCandidate(newGuiSlotController)
 	end)
 
 	newGuiSlotController.GuiSlot.MouseLeave:Connect(function()
-		newGuiSlotController.GuiSlot.ImageTransparency = 0
+		if newGuiSlotController.OnMouseLeave then
+			newGuiSlotController:OnMouseLeave()
+		end 
 		GuiDraggingSystem:CheckAndClearSlotControllerCandidate(newGuiSlotController)
 	end)
 	

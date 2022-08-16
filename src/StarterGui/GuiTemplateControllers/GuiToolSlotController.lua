@@ -43,6 +43,14 @@ function SelectToolActionForQuickSlot(tool)
 	return true
 end
 
+function GuiToolSlotController:OnMouseEnter()
+	self.GuiSlot.ImageTransparency = 0.5
+end
+
+function GuiToolSlotController:OnMouseLeave()
+	self.GuiSlot.ImageTransparency = 0
+end 
+
 function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
 
 	if not slotType == SlotType.InventorySlot 
