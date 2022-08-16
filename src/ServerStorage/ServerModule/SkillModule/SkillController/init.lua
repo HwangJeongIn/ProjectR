@@ -13,6 +13,7 @@ local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 local ServerConstant = ServerModuleFacade.ServerConstant
 
 local ServerEnum = ServerModuleFacade.ServerEnum
+local SkillImplType = ServerEnum.SkillImplType
 
 local SkillTemplate = require(script:WaitForChild("SkillTemplate"))
 
@@ -36,7 +37,6 @@ function SkillController:ApplySkillToTarget(toolOwnerPlayer, target)
     Debug.Assert(false, "ApplySkillToTarget 상위에서 구현해야합니다.")
     return false
 end
-
 
 function SkillController:GetSkillCollisionParameter(toolOwnerPlayerCFrame)
     Debug.Assert(false, "GetSkillCollisionParameter 상위에서 구현해야합니다.")
@@ -189,15 +189,16 @@ end
 
 function SkillController:SetSkill(tool, skillGameData)
     local skillGameDataKey = skillGameData:GetKey()
-    local targetSkillTemplate = SkillTemplate:GetSkillTemplateByKey(skillGameDataKey)
-    if not targetSkillTemplate then
+    local targetSkillImplTemplate = SkillTemplate:GetSkillImplTemplateByKey(skillGameDataKey)
+    if not targetSkillImplTemplate then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
 
-    self.UseSkill = targetSkillTemplate.UseSkill
-    self.FindTargetsInRange = targetSkillTemplate.FindTargetsInRange
-    self.ApplySkillToTarget = targetSkillTemplate.ApplySkillToTarget
+    self.UseSkill = targetSkillImplTemplate[SkillImplType.UseSkill]
+    self.FindTargetsInRange = targetSkillImplTemplate[SkillImplType.FindTargetsInRange]
+    self.ApplySkillToTarget = targetSkillImplTemplate[SkillImplType.ApplySkillToTarget]
+    self.GetSkillCollisionParameter = targetSkillImplTemplate[SkillImplType.GetSkillCollisionParameter]
 
     self.Tool = tool
     self.SkillGameDataKey = skillGameDataKey

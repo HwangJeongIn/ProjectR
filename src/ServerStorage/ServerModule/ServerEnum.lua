@@ -28,6 +28,12 @@ local ServerEnum = {
         ApplySkillToTarget = 3,
 		GetSkillCollisionParameter = 4,
 		Count = 5
+	},
+
+	SkillCollisionParameterType = {
+		SkillCollisionSize = 1,
+        SkillCollisionOffset = 2,
+		Count = 3
 	}
 }
 
@@ -38,10 +44,12 @@ ServerEnum.InteractableObjectType.Converter = {
 }
 Debug.Assert(ServerEnum.InteractableObjectType.Count == #ServerEnum.InteractableObjectType.Converter + 1, "비정상입니다.")
 
+
 ServerEnum.WorldInteractorType.Converter = {
 	[ServerEnum.WorldInteractorType.ItemBox] = "ItemBox"
 }
 Debug.Assert(ServerEnum.WorldInteractorType.Count == #ServerEnum.WorldInteractorType.Converter + 1, "비정상입니다.")
+
 
 ServerEnum.SkillImplType.Converter = {
 	[ServerEnum.SkillImplType.UseSkill] = "UseSkill",
@@ -51,6 +59,12 @@ ServerEnum.SkillImplType.Converter = {
 }
 Debug.Assert(ServerEnum.SkillImplType.Count == #ServerEnum.SkillImplType.Converter + 1, "비정상입니다.")
 
+
+ServerEnum.SkillCollisionParameterType.Converter = {
+	[ServerEnum.SkillCollisionParameterType.SkillCollisionSize] = "SkillCollisionSize",
+	[ServerEnum.SkillCollisionParameterType.SkillCollisionOffset] = "SkillCollisionOffset"
+}
+Debug.Assert(ServerEnum.SkillCollisionParameterType.Count == #ServerEnum.SkillCollisionParameterType.Converter + 1, "비정상입니다.")
 
 ServerEnum.__index = Utility.Inheritable__index
 ServerEnum.__newindex = Utility.Inheritable__newindex

@@ -57,7 +57,7 @@ function ToolBase:InitializeTool(gameDataType, tool)
 		self.DefaultSkillController = defaultSkillController
 		-- 임시 추후 변경
 		tool.Activated:Connect(function() self:ActivateDefaultSkill(self.ToolOwnerPlayer) end)
-		
+
 	elseif ToolType.Armor == toolType then
 
 	elseif ToolType.Consumable == toolType then
