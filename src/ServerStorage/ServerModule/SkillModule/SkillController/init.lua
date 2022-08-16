@@ -119,9 +119,12 @@ function SkillController:ApplySkillToTargets(toolOwnerPlayer, targets)
     return true
 end
 
-function SkillController:Activate(toolOwnerPlayer)
-    local toolOwnerPlayerId = toolOwnerPlayer.UserId
-    
+function SkillController:Activate(player)
+    if player ~= self.ToolOwnerPlayer then
+        Debug.Assert(false, "비정상입니다. 원인을 파악해야합니다.")
+        return false
+    end
+
     local currentTime = os.clock()
     if self.LastActivationTime then
         local elapsedTime = currentTime - self.LastActivationTime
@@ -131,17 +134,16 @@ function SkillController:Activate(toolOwnerPlayer)
         end
     end
 
-    ServerGlobalStorage:SetSkillLastActivationTime(playerId, self.SkillGameDataKey)
     self.LastActivationTime = currentTime
-    if not self:UseSkill(toolOwnerPlayer) then
+    if not self:UseSkill(player) then
         Debug.Print(self.Name .. "에 실패했습니다.")
         return false
     end
 
-    local targetsFilteredBySkillCollision = self:FilterTargetsBySkillCollision(toolOwnerPlayer)
-    local finalTargets = self:FindTargetInRange(toolOwnerPlayer, targetsFilteredBySkillCollision)
+    local targetsFilteredBySkillCollision = self:FilterTargetsBySkillCollision(player)
+    local finalTargets = self:FindTargetInRange(player, targetsFilteredBySkillCollision)
     if finalTargets then
-        if not self:ApplySkillToTargets(toolOwnerPlayer, finalTargets) then
+        if not self:ApplySkillToTargets(player, finalTargets) then
             Debug.Print(self.Name .. "에 실패했습니다.")
             return false
         end
@@ -150,15 +152,21 @@ function SkillController:Activate(toolOwnerPlayer)
     return true
 end
 
-function SkillController:SettoolOwnerPlayer(toolOwnerPlayerPlayer)
-    self.toolOwnerPlayerPlayer = toolOwnerPlayerPlayer
-    if not toolOwnerPlayerPlayer then
+function SkillController:SetToolOwnerPlayer(toolOwnerPlayer)
+    if not toolOwnerPlayer then
+        if self.ToolOwnerPlayer then
+           local prevPlayerId = self.ToolOwnerPlayer.UserId 
+           if self.LastActivationTime then
+                ServerGlobalStorage:SetSkillLastActivationTime(prevPlayerId, self.SkillGameDataKey, self.LastActivationTime)
+           end
+        end
         self.LastActivationTime = nil
+        self.ToolOwnerPlayer = nil
+    else
+        local playerId = toolOwnerPlayer.UserId
+        local playerLastActivationTime = ServerGlobalStorage:GetSkillLastActivationTime(playerId, self.SkillGameDataKey)
+        self.LastActivationTime = playerLastActivationTime
     end
-
-    local playerId = toolOwnerPlayerPlayer.UserId
-    local playerLastActivationTime = ServerGlobalStorage:GetSkillLastActivationTime(playerId, self.SkillGameDataKey)
-    self.LastActivationTime = playerLastActivationTime
 end
 
 function SkillController:SetSkill(tool, skillGameData)

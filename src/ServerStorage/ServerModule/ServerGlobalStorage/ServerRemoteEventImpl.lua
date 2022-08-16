@@ -35,7 +35,7 @@ local ActivateToolSkillCTS = RemoteEvents:WaitForChild("ActivateToolSkillCTS")
 function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
 
     ActivateToolSkillCTS.OnServerEvent:Connect(function(player, tool, skillIndex)
-        if not ServerGlobalStorage:DropTool(player, tool) then
+        if not ServerGlobalStorage:ActivateToolSkill(player, tool, skillIndex) then
             Debug.Assert(false, "비정상입니다.")
             return
         end

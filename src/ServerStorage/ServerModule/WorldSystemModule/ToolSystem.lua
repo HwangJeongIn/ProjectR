@@ -147,8 +147,27 @@ function ToolSystem:GetClonedToolScript(toolType, tool)
     return targetScript
 end
 
-function ToolSystem:ActivateToolSkill(tool, skillIndex)
-    if not tool or skillIndex then
+function ToolSystem:SetToolOwnerPlayer(tool, toolOwnerPlayer)
+    -- 없을 수 있다.
+    --[[
+    if not toolOwnerPlayer then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+    --]]
+
+    local toolScript = self:GetScript(tool)
+    if not toolScript then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    toolScript:SetToolOwnerPlayer(toolOwnerPlayer)
+    return true
+end
+
+function ToolSystem:ActivateToolSkill(player, tool, skillIndex)
+    if not player or not tool or not skillIndex then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -159,7 +178,10 @@ function ToolSystem:ActivateToolSkill(tool, skillIndex)
         return false
     end
 
-    스킬 사용
+    if not toolScript:ActivateSkill(player, skillIndex) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
 
     return true
 end

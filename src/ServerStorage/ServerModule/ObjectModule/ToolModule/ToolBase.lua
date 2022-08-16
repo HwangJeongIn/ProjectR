@@ -30,23 +30,45 @@ function ToolBase:InitializeTool(gameDataType, tool)
 	end
 	
 	local toolGameData = self:GetGameData()
-	
-	self.SkillObjects = {}
-	for skillIndex = 1, toolGameData.SkillCount do
+
+	self.SkillCount = toolGameData.SkillCount
+	self.SkillControllers = {}
+	for skillIndex = 1, self.SkillCount do
 		local skillGameData = toolGameData.SkillGameDataSet[skillIndex]
 		local skillController = Utility:DeepCopy(SkillController)
-		self.SkillObjects[skillIndex] = {
-			SkillGameData = skillGameData
-		}
+		if not skillController:InitializeTool(tool, skillGameData) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+
+		self.SkillControllers[skillIndex] = skillController
 	end
 
-	self.SkillSet = toolGameData.SkillSet{
-		[1] = gameData.Skill1,
-		[2] = gameData.Skill2,
-		[3] = gameData.Skill3,
-	}
-	--local toolGameData = self:GetGameData()
-	--self.ToolType = toolGameData.ToolType
+	self.ToolOwnerPlayer = nil
+
+	return true
+end
+
+function ToolBase:SetToolOwnerPlayer(toolOwnerPlayer)
+	self.ToolOwnerPlayer = toolOwnerPlayer
+	for _, skillController in pairs(self.SkillControllers) do
+		skillController:SetToolOnwerPlayer(toolOwnerPlayer)
+	end
+end
+
+function ToolBase:ActivateSkill(player, skillIndex)
+	if self.SkillCount < skillIndex then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local targetSkillController = self.SkillControllers[skillIndex]
+	Debug.Assert(targetSkillController, "코드 버그")
+	if not targetSkillController:Activate(player) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
 	return true
 end
 

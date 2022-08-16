@@ -40,8 +40,7 @@ function SkillTemplate:RegisterSkillTemplate(skillGameDataKey,
     self.SkillTemplateTable[skillGameDataKey] = {
         UseSkill = UseSkillFunction,
         FindTargetsInRange = FindTargetsInRangeFunction,
-        ApplySkillToTarget = ApplySkillToTargetFunction,
-        GameData = GameDataManager[GameDataType.Skill]:Get(skillGameDataKey)
+        ApplySkillToTarget = ApplySkillToTargetFunction
     }
 
     return true

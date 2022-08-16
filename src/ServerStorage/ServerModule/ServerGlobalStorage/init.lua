@@ -66,7 +66,6 @@ function ServerGlobalStorage:ActivateToolSkill(player, tool, skillIndex)
 		Debug.Assert(false, "장착할 수 있는 장비만 스킬을 사용할 수 있습니다.")
 		return false
 	end
-
 	
 	 if  MaxSkillCount < toolGameData.SkillCount
 	 or toolGameData.SkillCount < skillIndex 
@@ -114,6 +113,12 @@ end
 function ServerGlobalStorage:CreateToolToPlayer(toolKey, player)
 	local createdTool = self:CreateTool(toolKey, player.Backpack, nil)
 	if not createdTool then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local toolSystem = self:GetToolSystem()
+	if not toolSystem:SetToolOwnerPlayer(createdTool, player) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -183,7 +188,6 @@ function ServerGlobalStorage:DropToolRaw(character, tool)
 	return true
 end
 
-
 function ServerGlobalStorage:DropTool(player, tool)
 	local playerId = player.UserId
 	if not tool then
@@ -203,6 +207,12 @@ function ServerGlobalStorage:DropTool(player, tool)
 	end
 
 	if not self:DropToolRaw(character, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local toolSystem = self:GetToolSystem()
+	if not toolSystem:SetToolOwnerPlayer(tool, nil) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -285,6 +295,12 @@ function ServerGlobalStorage:SelectWorkspaceTool(player, tool)
 	end
 
 	if not self:SelectTool(player, tool, true) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local toolSystem = self:GetToolSystem()
+	if not toolSystem:SetToolOwnerPlayer(tool, player) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
