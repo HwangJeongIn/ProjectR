@@ -295,6 +295,7 @@ SkillTemplate:RegisterSkillImpl(
 SkillTemplate:RegisterSkillImpl(
     "TempestSlash",
     SkillImplType.ApplySkillToTarget,
+    
     function(skillController, toolOwnerPlayer, target)
         Debug.Assert(false, "상위에서 구현해야합니다.")
         return false
