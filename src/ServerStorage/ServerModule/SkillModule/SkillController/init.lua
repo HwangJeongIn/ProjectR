@@ -15,7 +15,8 @@ local ServerConstant = ServerModuleFacade.ServerConstant
 local ServerEnum = ServerModuleFacade.ServerEnum
 local SkillImplType = ServerEnum.SkillImplType
 
-local SkillTemplate = require(script:WaitForChild("SkillTemplate"))
+local SkillModule = ServerModuleFacade.SkillModule
+local SkillTemplate = require(SkillModule:WaitForChild("SkillTemplate"))
 
 local SkillController = {}
 SkillController.__index = Utility.Inheritable__index
@@ -189,18 +190,19 @@ end
 
 function SkillController:SetSkill(tool, skillGameData)
     local skillGameDataKey = skillGameData:GetKey()
-    local targetSkillImplTemplate = SkillTemplate:GetSkillImplTemplateByKey(skillGameDataKey)
-    if not targetSkillImplTemplate then
+    local targetSkillTemplate = SkillTemplate:GetSkillTemplateByKey(skillGameDataKey)
+    if not targetSkillTemplate then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
 
-    self.UseSkill = targetSkillImplTemplate[SkillImplType.UseSkill]
-    self.FindTargetsInRange = targetSkillImplTemplate[SkillImplType.FindTargetsInRange]
-    self.ApplySkillToTarget = targetSkillImplTemplate[SkillImplType.ApplySkillToTarget]
-    self.GetSkillCollisionParameter = targetSkillImplTemplate[SkillImplType.GetSkillCollisionParameter]
+    self.UseSkill = targetSkillTemplate:GetSkillImpl(SkillImplType.UseSkill)
+    self.FindTargetsInRange = targetSkillTemplate:GetSkillImpl(SkillImplType.FindTargetsInRange)
+    self.ApplySkillToTarget = targetSkillTemplate:GetSkillImpl(SkillImplType.ApplySkillToTarget)
+    self.GetSkillCollisionParameter = targetSkillTemplate:GetSkillImpl(SkillImplType.GetSkillCollisionParameter)
 
     self.Tool = tool
+    self.SkillTemplateData = targetSkillTemplate
     self.SkillGameDataKey = skillGameDataKey
     self.Name = skillGameData.Name
     self.Cooldown = skillGameData.Cooldown

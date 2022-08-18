@@ -4,6 +4,7 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 
 local Utility = ServerModuleFacade.Utility
 local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
+local ToolUtility = ServerModuleFacade.ToolUtility
 
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
@@ -25,12 +26,12 @@ ToolBase.__newindex = Utility.Inheritable__newindex
 setmetatable(ToolBase, Utility:DeepCopy(require(ObjectModule:WaitForChild("ObjectBase"))))
 
 function ToolBase:InitializeTool(gameDataType, tool)
-	if not self:InitializeObject(gameDataType, tool) then
+	local toolGameData = ToolUtility:GetGameData(tool)
+
+	if not self:InitializeObject(gameDataType, tool, toolGameData) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
-	
-	local toolGameData = self:GetGameData()
 
 	self.SkillCount = toolGameData.SkillCount
 	self.SkillControllers = {}

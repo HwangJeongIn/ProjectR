@@ -100,16 +100,24 @@ Sight : 시야
 --]]
 
 -- 무기 종류
---[[ 기본 무기 	--]] ToolGameData:InsertData(1, {Name = "DefaultWeapon", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10})
---[[ 검 		--]] ToolGameData:InsertData(2, {Name = "DefaultSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
---[[ 도끼		--]] ToolGameData:InsertData(3, {Name = "DefaultAxe", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10, SkillSet = {4}})
+ToolGameData:InsertData(1, {Name = "WoodStick", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10})
+ToolGameData:InsertData(2, {Name = "Sword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
+ToolGameData:InsertData(3, {Name = "Axe", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10, SkillSet = {4}})
+
+ToolGameData:InsertData(4, {Name = "RustySword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
+ToolGameData:InsertData(5, {Name = "SmallKnife", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
+ToolGameData:InsertData(6, {Name = "Knife", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
+ToolGameData:InsertData(7, {Name = "BlueSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
+ToolGameData:InsertData(8, {Name = "FlameSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
+ToolGameData:InsertData(9, {Name = "FrostSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
+ToolGameData:InsertData(10, {Name = "BloodSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
 
 
 -- 방어구 종류
---[[ 기본 머리	--]] ToolGameData:InsertData(101, {Name = "DefaultHelmet", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Helmet, DEF = 15})
---[[ 기본 가슴	--]] ToolGameData:InsertData(102, {Name = "DefaultChestplate", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 30, Move = -5})
---[[ 기본 다리	--]] ToolGameData:InsertData(103, {Name = "DefaultLeggings", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 20, Move = 5})
---[[ 기본 발	--]] ToolGameData:InsertData(104, {Name = "DefaultBoots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 10})
+ToolGameData:InsertData(101, {Name = "Helmet", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Helmet, DEF = 15})
+ToolGameData:InsertData(102, {Name = "Chestplate", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 30, Move = -5})
+ToolGameData:InsertData(103, {Name = "Leggings", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 20, Move = 5})
+ToolGameData:InsertData(104, {Name = "Boots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 10})
 
 
 

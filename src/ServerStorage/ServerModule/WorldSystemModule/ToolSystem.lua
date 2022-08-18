@@ -64,7 +64,7 @@ function ToolSystem:InitializeToolTemplate(tool)
         return false
     end
 
-    local trigger = handle:FindFirstChild("Trigger")
+    local trigger = tool:FindFirstChild("Trigger")
     if not trigger then
         Debug.Assert(false, "도구에 트리거가 없습니다. => " .. tool.Name)
         return false
@@ -223,7 +223,7 @@ end
 function ToolSystem:FindObjectJoints(tool)
     local joints = {}
 
-    local trigger = tool.Handle.Trigger
+    local trigger = tool.Trigger
     table.insert(joints, trigger)
 
     local mesh = tool:FindFirstChild("Mesh")

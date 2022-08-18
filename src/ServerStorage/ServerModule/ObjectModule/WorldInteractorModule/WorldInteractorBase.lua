@@ -3,6 +3,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Utility = ServerModuleFacade.Utility
+local WorldInteractorUtility = ServerModuleFacade.WorldInteractorUtility
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
 
@@ -26,8 +27,13 @@ function OnDestroying(worldInteractorBase)
 end
 
 function WorldInteractorBase:InitializeWorldInteractor(gameDataType, worldInteractor)
-	self:InitializeObject(gameDataType, worldInteractor)
+	local worldInteractorGameData = WorldInteractorUtility:GetGameData(worldInteractor)
+	if not self:InitializeObject(gameDataType, worldInteractor, worldInteractorGameData) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
 	worldInteractor.Destroying:Connect(function() OnDestroying(self) end)
+	return true
 end
 
 

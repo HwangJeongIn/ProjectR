@@ -3,8 +3,9 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 
 local Debug = ServerModuleFacade.Debug
 local SkillsFolder = ServerStorage:WaitForChild("Skills")
-local SkillAnimationsFolder = SkillsFolder:WaitForChild("Animations")
-local SkillKeyframeSequencesFolder = SkillsFolder:WaitForChild("KeyframeSequences")
+local CharacterAnimationsFolder = SkillsFolder:WaitForChild("CharacterAnimations")
+local AnimationsFolder = CharacterAnimationsFolder:WaitForChild("Animations")
+local KeyframeSequencesFolder = CharacterAnimationsFolder:WaitForChild("KeyframeSequences")
 
 local KeyframeSequenceProvider = game:GetService("KeyframeSequenceProvider")
 
@@ -12,6 +13,15 @@ local SkillAnimationTemplate = {
     Value = {},
 }
 
+
+function SkillAnimationTemplate:Get(skillAnimationName)
+    if not skillAnimationName then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
+
+    return self.Value[skillAnimationName]
+end
 
 function SkillAnimationTemplate:ValidateSkillAnimation(skillAnimation)
     -- 추가 검증 여기에 작성
@@ -24,7 +34,7 @@ function SkillAnimationTemplate:ValidateSkillKeyframeSequence(skillKeyframeSeque
 end
 
 function SkillAnimationTemplate:InitializeAllSkillAnimation()
-    local allSkillAnimations = SkillAnimationsFolder:GetChildren()
+    local allSkillAnimations = AnimationsFolder:GetChildren()
     for _, skillAnimation in pairs(allSkillAnimations) do
         local skillAnimationName = skillAnimation.Name
 
@@ -40,7 +50,7 @@ function SkillAnimationTemplate:InitializeAllSkillAnimation()
 end
 
 function SkillAnimationTemplate:InitializeAllSkillKeyframeSequence()
-    local allSkillKeyframeSequences = SkillKeyframeSequencesFolder:GetChildren()
+    local allSkillKeyframeSequences = KeyframeSequencesFolder:GetChildren()
     for _, skillKeyframeSequence in pairs(allSkillKeyframeSequences) do
         local skillKeyframeSequenceName = skillKeyframeSequence.Name
 

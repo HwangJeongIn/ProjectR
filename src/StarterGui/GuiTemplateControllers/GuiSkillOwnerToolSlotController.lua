@@ -53,7 +53,7 @@ function GuiSkillOwnerToolSlotController:SetSkillOwnerTool(tool)
 	end
 
 	self:SetImage(toolGameData.Image)
-	self:SetName(tool.Name)
+	self:SetName(toolGameData.Name)
 	self.Tool = tool
 	return true
 end

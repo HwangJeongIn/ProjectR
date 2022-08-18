@@ -40,13 +40,15 @@ function GuiWorldInteractionSystem:GetToolFromTrigger(targetPart)
 		return nil
 	end
 
-	local targetTool = targetPart
+	local targetTool = targetPart.Parent
+	--[[
 	for count = 1, 2 do
 		targetTool = targetTool.Parent
 		if not targetTool then
 			return nil
 		end
 	end
+	--]]
 
 	if targetTool.ClassName ~= "Tool" then
 		return nil
@@ -75,7 +77,8 @@ function OnInputChanged(input)
 	end
 
 	GuiObjectTooltip.Adornee = Mouse.Target
-	GuiObjectName.Text = tool.Name
+	local toolGameData = ToolUtility:GetGameDataByModelName(tool.Name)
+	GuiObjectName.Text = toolGameData.Name 
 
 	GuiObjectTooltip.Enabled = true
 	-- targetParent.Name

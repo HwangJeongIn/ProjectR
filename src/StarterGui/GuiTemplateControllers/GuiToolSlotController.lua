@@ -146,7 +146,7 @@ function GuiToolSlotController:SetTool(tool)
 	end
 
 	self:SetImage(toolGameData.Image)
-	self:SetName(tool.Name)
+	self:SetName(toolGameData.Name)
 	self.Tool = tool
 
 	-- 여러개 소유할 수 있다면 변경될 수 있다.

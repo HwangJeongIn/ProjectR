@@ -3,12 +3,21 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 
 local Debug = ServerModuleFacade.Debug
 local SkillsFolder = ServerStorage:WaitForChild("Skills")
-local SkillEffectsFolder = SkillsFolder:WaitForChild("Effects")
+local SkillEffectsFolder = SkillsFolder:WaitForChild("SkillEffects")
 
 
-local SkillEffectTemplate = { 
+local SkillEffectTemplate = {
     Value = {},
 }
+
+function SkillEffectTemplate:Get(skillEffectName)
+    if not skillEffectName then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
+
+    return self.Value[skillEffectName]
+end
 
 function SkillEffectTemplate:ValidateSkillEffect(skillEffect)
     -- 추가 검증 여기에 작성

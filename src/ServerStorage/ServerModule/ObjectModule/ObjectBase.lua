@@ -27,7 +27,7 @@ ObjectBase.__index = Utility.Inheritable__index
 ObjectBase.__newindex = Utility.Inheritable__newindex
 
 
-function ObjectBase:InitializeObject(objectGameDataType, objectRoot)
+function ObjectBase:InitializeObject(objectGameDataType, objectRoot, objectGameData)
 	if not objectRoot then
 		Debug.Assert(false, "입력이 비정상입니다. GameDataType => " .. tostring(objectGameDataType))
 		return false
@@ -39,21 +39,7 @@ function ObjectBase:InitializeObject(objectGameDataType, objectRoot)
 		return false
 	end
 
-
-	local objectGameDataKey = objectRoot:FindFirstChild("Key")
-	if not objectGameDataKey then
-		Debug.Assert(false, "객체에 키 태그가 존재하지 않습니다.")
-		return false
-	end
-
-	objectGameDataKey = objectGameDataKey.Value
-
-	local objectGameData = ServerGameDataManager[objectGameDataType]:Get(objectGameDataKey)
-	if not objectGameData then
-		Debug.Assert(false, "데이터가 존재하지 않습니다.")
-		return false
-	end
-	
+	local objectGameDataKey = objectGameData:GetKey()
 	local interalData = {
 		root = objectRoot,
 		gameDataType = objectGameDataType,

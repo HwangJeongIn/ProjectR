@@ -12,11 +12,12 @@ local DefaultWeaponSkillGameDataKey = ServerConstant.DefaultWeaponSkillGameDataK
 
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
+
+local SkillDataType = ServerEnum.SkillDataType
 local EquipType = ServerEnum.EquipType
 local WorldInteractorType = ServerEnum.WorldInteractorType
 local SkillImplType = ServerEnum.SkillImplType
 local SkillImplTypeConverter = SkillImplType.Converter
-
 local SkillDataParameterType = ServerEnum.SkillDataParameterType
 local SkillDataParameterTypeConverter = SkillDataParameterType.Converter
 
@@ -32,7 +33,7 @@ local SkillTemplate = {
     RawSkillData = {}
 }
 
-function SkillTemplate:GetSkillImplTemplateByKey(skillGameDataKey)
+function SkillTemplate:GetSkillTemplateByKey(skillGameDataKey)
     if not self.SkillImplTemplateTable[skillGameDataKey] then
         Debug.Assert(false, "비정상입니다.")
         return nil
@@ -41,68 +42,95 @@ function SkillTemplate:GetSkillImplTemplateByKey(skillGameDataKey)
     return self.SkillImplTemplateTable[skillGameDataKey]
 end
 
---[[
 function SkillTemplate:RegisterSkillName(skillName)
     self.RawSkillData[skillName] = {}
-    self.RawSkillData[skillName].SkillCollisionParameter = {}
-end
---]]
-
-function SkillTemplate:GetSkillCollisionParameter(skillName, SkillDataParameterType)
-    if not skillName or not SkillDataParameterType then
-        Debug.Assert(false, "비정상입니다.")
-        return nil
-    end
-    
-    if not self.RawSkillData[skillName].SkillCollisionParameter then
-        Debug.Assert(false, "비정상입니다.")
-        return nil
-    end
-
-    return self.RawSkillData[skillName].SkillCollisionParameter[SkillDataParameterType]
+    self.RawSkillData[skillName][SkillDataType.SkillImpl] = {}
+    self.RawSkillData[skillName][SkillDataType.SkillDataParameter] = {}
 end
 
-function SkillTemplate:RegisterSkillCollisionParameter(skillName, SkillDataParameterType, inputValue)
-    if not skillName or not SkillDataParameterType then
-        Debug.Assert(false, "비정상입니다.")
+function SkillTemplate:ValidateSkillDataParameter(skillDataParameter)
+    local skillName = skillDataParameter.SkillName
+    if not skillDataParameter.SkillName then
+        Debug.Assert(false, "SkillName이 없습니다.")
         return false
     end
 
-    local SkillDataParameterTypeString = SkillDataParameterTypeConverter[SkillDataParameterType]
-    if not SkillDataParameterTypeString then
-        Debug.Assert(false, "비정상입니다. => " .. skillName)
+    if not skillDataParameter[SkillDataParameterType.SkillCollisionSize] then
+        Debug.Assert(false, "SkillCollisionSize가 없습니다. => " .. skillName)
         return false
     end
 
-    if not self.RawSkillData[skillName] then
-        self.RawSkillData[skillName] = {}
+    if not skillDataParameter[SkillDataParameterType.SkillCollisionOffset] then
+        Debug.Assert(false, "SkillCollisionOffset이 없습니다. => " .. skillName)
+        return false
+    end
+
+    if not skillDataParameter[SkillDataParameterType.SkillAnimation] then
+        Debug.Assert(false, "SkillAnimation이 없습니다. => " .. skillName)
+        return false
     end
     
-    if not self.RawSkillData[skillName].SkillCollisionParameter then
-        self.RawSkillData[skillName].SkillCollisionParameter = {}
-    end
-
-    if self.RawSkillData[skillName].SkillCollisionParameter[SkillDataParameterType] then
-        Debug.Assert(false, skillName .. "_" .. SkillDataParameterTypeString .. "를 두번 등록하려 합니다.")
+    if not skillDataParameter[SkillDataParameterType.SkillEffect] then
+        Debug.Assert(false, "SkillEffect가 없습니다. => " .. skillName)
         return false
     end
 
-    self.RawSkillData[skillName].SkillCollisionParameter[SkillDataParameterType] = inputValue
     return true
 end
 
-function SkillTemplate:GetSkillImpl(skillName, skillImplType)
+function SkillTemplate:GetSkillDataParameterFromRawSkillData(skillName, SkillDataParameterType)
+    if not skillName or not SkillDataParameterType then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
+    
+    if not self.RawSkillData[skillName][SkillDataType.SkillDataParameter] then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
+
+    return self.RawSkillData[skillName][SkillDataType.SkillDataParameter][SkillDataParameterType]
+end
+
+function SkillTemplate:RegisterSkillDataParameter(skillDataParameter)
+    if not self:ValidateSkillDataParameter(skillDataParameter) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    local skillAnimationName = skillDataParameter[SkillDataParameterType.SkillAnimation]
+    local skillAnimation = SkillAnimationTemplate:Get(skillAnimationName)
+    if not skillAnimation then
+        Debug.Assert(false, "이름을 가진 애니메이션이 존재하지 않습니다. => " .. skillAnimationName)
+        return false
+    end
+    skillDataParameter[SkillDataParameterType.SkillAnimation] = skillAnimation
+
+    local skillEffectName = skillDataParameter[SkillDataParameterType.SkillEffect]
+    local skillEffect = SkillEffectTemplate:Get(skillEffectName)
+    if not skillEffect then
+        Debug.Assert(false, "이름을 가진 이펙트가 존재하지 않습니다. => " .. skillEffectName)
+        return false
+    end
+    skillDataParameter[SkillDataParameterType.SkillEffect] = skillEffect
+
+    local skillName = skillDataParameter.SkillName
+    self.RawSkillData[skillName][SkillDataType.SkillDataParameter] = skillDataParameter
+    return true
+end
+
+function SkillTemplate:GetSkillImplFromRawSkillData(skillName, skillImplType)
     if not skillName or not skillImplType then
         Debug.Assert(false, "비정상입니다.")
         return nil
     end
 
-    if not self.RawSkillData[skillName] then
+    if not self.RawSkillData[skillName][SkillDataType.SkillImpl] then
         Debug.Assert(false, "비정상입니다.")
         return nil
     end
 
-    return self.RawSkillData[skillName][skillImplType]
+    return self.RawSkillData[skillName][SkillDataType.SkillImpl][skillImplType]
 end
 
 function SkillTemplate:RegisterSkillImpl(skillName, skillImplType, inputFunction)
@@ -122,16 +150,57 @@ function SkillTemplate:RegisterSkillImpl(skillName, skillImplType, inputFunction
         return false
     end
 
-    if not self.RawSkillData[skillName] then
-        self.RawSkillData[skillName] = {}
-    end
-
-    if self.RawSkillData[skillName][skillImplType] then
+    if self.RawSkillData[skillName][SkillDataType.SkillImpl][skillImplType] then
         Debug.Assert(false, skillName .. "_" .. skillImplString .. "를 두번 등록하려 합니다.")
         return false
     end
     
-    self.RawSkillData[skillName][skillImplType] = inputFunction
+    self.RawSkillData[skillName][SkillDataType.SkillImpl][skillImplType] = inputFunction
+    return true
+end
+
+function SkillTemplate:ValidateSkillTemplate(skillName)
+    local lastSkillImplIndex = (SkillImplType.Count - 1)
+    for skillImplIndex = 1, lastSkillImplIndex do
+        local skillImplFunction = self:GetSkillImplFromRawSkillData(skillName, skillImplIndex)
+
+        if not skillImplFunction then
+            local skillImplString = SkillImplTypeConverter[skillImplIndex]
+            local tempSkillImplFunctionName = skillName .. "_" .. skillImplString
+            Debug.Assert(false, tempSkillImplFunctionName .. "가 정의되어 있지 않습니다.")
+            return false
+        end
+    end
+
+    return true
+end
+
+function SkillTemplate:InitializeAdditionalData(skillName)
+    local skillCollisionSize = self:GetSkillDataParameterFromRawSkillData(skillName, SkillDataParameterType.SkillCollisionSize)
+    if not skillCollisionSize then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    local skillCollisionOffset = self:GetSkillDataParameterFromRawSkillData(skillName, SkillDataParameterType.SkillCollisionOffset)
+    if not skillCollisionOffset then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+    
+
+    self:RegisterSkillImpl(skillName,
+        SkillImplType.GetSkillCollisionParameter,
+        function(skillController, toolOwnerPlayerCFrame)
+            local skillCollisionParameter = {}
+
+            local finalOffsetVector = toolOwnerPlayerCFrame.LookVector * skillCollisionOffset.X 
+            + toolOwnerPlayerCFrame.RightVector * skillCollisionOffset.Y
+            skillCollisionParameter.Size = skillCollisionSize
+            skillCollisionParameter.CFrame = toolOwnerPlayerCFrame + finalOffsetVector
+            return skillCollisionParameter
+        end)
+
     return true
 end
 
@@ -145,37 +214,29 @@ function SkillTemplate:InitializeAllSkillTemplates()
         self.SkillImplTemplateTable[skillGameDataKey] = {}
         local skillName = skillGameData.Name
 
-        -- 파라미터에 따라서 GetSkillCollisionParameter 자동 등록
-        local skillCollisionSize = self:GetSkillCollisionParameter(skillName, SkillDataParameterType.SkillCollisionSize)
-        Debug.Assert(skillCollisionSize, "비정상입니다.")
+        if not self:InitializeAdditionalData(skillName) then
+            Debug.Assert(false, "비정상입니다.")
+            return false
+        end
 
-        local skillCollisionOffset = self:GetSkillCollisionParameter(skillName, SkillDataParameterType.SkillCollisionOffset)
-        Debug.Assert(skillCollisionOffset, "비정상입니다.")
+        if not self:ValidateSkillTemplate(skillName) then
+            Debug.Assert(false, "비정상입니다.")
+            return false
+        end
 
-        self:RegisterSkillImpl(skillName,
-            SkillImplType.GetSkillCollisionParameter,
-            function(skillController, toolOwnerPlayerCFrame)
-                local skillCollisionParameter = {}
+        self.SkillImplTemplateTable[skillGameDataKey] = self.RawSkillData[skillName]
+        local currentSkillTemplate = self.SkillImplTemplateTable[skillGameDataKey]
+        
+        self.SkillImplTemplateTable[skillGameDataKey].GetSkillImpl = function(_, skillImplType) 
+            return currentSkillTemplate[SkillDataType.SkillImpl][skillImplType] 
+        end
 
-                local finalOffsetVector = toolOwnerPlayerCFrame.LookVector * skillCollisionOffset.X 
-                + toolOwnerPlayerCFrame.RightVector * skillCollisionOffset.Y
-                skillCollisionParameter.Size = skillCollisionSize
-                skillCollisionParameter.CFrame = toolOwnerPlayerCFrame + finalOffsetVector
-                return skillCollisionParameter
-            end)
+        self.SkillImplTemplateTable[skillGameDataKey].GetSkillDataParameter = function(_, skillDataParameterType) 
+            return currentSkillTemplate[SkillDataType.SkillDataParameter][skillDataParameterType] 
+        end
 
-        local lastSkillImplIndex = (SkillImplType.Count - 1)
-        for skillImplIndex = 1, lastSkillImplIndex do
-            local skillImplFunction = self:GetSkillImpl(skillName, skillImplIndex)
-
-            if not skillImplFunction then
-                local skillImplString = SkillImplTypeConverter[skillImplIndex]
-                local tempSkillImplFunctionName = skillName .. "_" .. skillImplString
-                Debug.Assert(false, tempSkillImplFunctionName .. "가 정의되어 있지 않습니다.")
-                return false
-            end
-
-            self.SkillImplTemplateTable[skillGameDataKey][skillImplIndex] = skillImplFunction
+        self.SkillImplTemplateTable[skillGameDataKey].GetSkillGameData = function(_)
+            return skillGameData
         end
     end
     return true
@@ -183,26 +244,16 @@ end
 
 
 --1, Name = "BaseAttack"
+SkillTemplate:RegisterSkillName("BaseAttack")
 
 -- 데이터 로드해서 받아올 수 있도록 수정하면 좋을듯
-local SkillData = 
-{
-    [SkillDataParameterType.SkillCollisionSize] = 1,
-    [SkillDataParameterType.SkillCollisionOffset] = 1,
-
-
-}
-SkillTemplate:RegisterSkillCollisionParameter(
-    "BaseAttack",
-    SkillDataParameterType.SkillCollisionSize,
-    Vector3.new(2, 2, 2)
-)
-
-SkillTemplate:RegisterSkillCollisionParameter(
-    "BaseAttack",
-    SkillDataParameterType.SkillCollisionOffset,
-    Vector2.new(5, 0)
-)
+SkillTemplate:RegisterSkillDataParameter({
+    SkillName = "BaseAttack",
+    [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
+    [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+    [SkillDataParameterType.SkillAnimation] = "LeftSlash",
+    [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+})
 
 SkillTemplate:RegisterSkillImpl(
     "BaseAttack",
@@ -233,17 +284,15 @@ SkillTemplate:RegisterSkillImpl(
 
 
 --2, Name = "WhirlwindSlash"
-SkillTemplate:RegisterSkillCollisionParameter(
-    "WhirlwindSlash",
-    SkillDataParameterType.SkillCollisionSize,
-    Vector3.new(2, 2, 2)
-)
+SkillTemplate:RegisterSkillName("WhirlwindSlash")
 
-SkillTemplate:RegisterSkillCollisionParameter(
-    "WhirlwindSlash",
-    SkillDataParameterType.SkillCollisionOffset,
-    Vector2.new(5, 0)
-)
+SkillTemplate:RegisterSkillDataParameter({
+    SkillName = "WhirlwindSlash",
+    [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
+    [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+    [SkillDataParameterType.SkillAnimation] = "LeftSlash",
+    [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+})
 
 SkillTemplate:RegisterSkillImpl(
     "WhirlwindSlash",
@@ -274,17 +323,16 @@ SkillTemplate:RegisterSkillImpl(
 
 
 --3, Name = "TempestSlash"
-SkillTemplate:RegisterSkillCollisionParameter(
-    "TempestSlash",
-    SkillDataParameterType.SkillCollisionSize,
-    Vector3.new(2, 2, 2)
-)
+SkillTemplate:RegisterSkillName("TempestSlash")
 
-SkillTemplate:RegisterSkillCollisionParameter(
-    "TempestSlash",
-    SkillDataParameterType.SkillCollisionOffset,
-    Vector2.new(5, 0)
-)
+SkillTemplate:RegisterSkillDataParameter({
+    SkillName = "TempestSlash",
+    [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
+    [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+    [SkillDataParameterType.SkillAnimation] = "LeftSlash",
+    [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+})
+
 
 SkillTemplate:RegisterSkillImpl(
     "TempestSlash",
@@ -316,17 +364,15 @@ SkillTemplate:RegisterSkillImpl(
 
 
 --4, Name = "PowerStrike"
-SkillTemplate:RegisterSkillCollisionParameter(
-    "PowerStrike",
-    SkillDataParameterType.SkillCollisionSize,
-    Vector3.new(2, 2, 2)
-)
+SkillTemplate:RegisterSkillName("PowerStrike")
 
-SkillTemplate:RegisterSkillCollisionParameter(
-    "PowerStrike",
-    SkillDataParameterType.SkillCollisionOffset,
-    Vector2.new(5, 0)
-)
+SkillTemplate:RegisterSkillDataParameter({
+    SkillName = "PowerStrike",
+    [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
+    [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+    [SkillDataParameterType.SkillAnimation] = "LeftSlash",
+    [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+})
 
 SkillTemplate:RegisterSkillImpl(
     "PowerStrike",
@@ -357,17 +403,15 @@ SkillTemplate:RegisterSkillImpl(
 
 
 --5, Name = "StormBlade"
-SkillTemplate:RegisterSkillCollisionParameter(
-    "StormBlade",
-    SkillDataParameterType.SkillCollisionSize,
-    Vector3.new(2, 2, 2)
-)
+SkillTemplate:RegisterSkillName("StormBlade")
 
-SkillTemplate:RegisterSkillCollisionParameter(
-    "StormBlade",
-    SkillDataParameterType.SkillCollisionOffset,
-    Vector2.new(5, 0)
-)
+SkillTemplate:RegisterSkillDataParameter({
+    SkillName = "StormBlade",
+    [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
+    [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+    [SkillDataParameterType.SkillAnimation] = "LeftSlash",
+    [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+})
 
 SkillTemplate:RegisterSkillImpl(
     "StormBlade",
