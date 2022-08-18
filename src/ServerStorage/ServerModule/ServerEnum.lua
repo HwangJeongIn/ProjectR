@@ -30,7 +30,7 @@ local ServerEnum = {
 		Count = 5
 	},
 
-	SkillCollisionParameterType = {
+	SkillDataParameterType = {
 		SkillCollisionSize = 1,
         SkillCollisionOffset = 2,
 		Count = 3
@@ -60,11 +60,11 @@ ServerEnum.SkillImplType.Converter = {
 Debug.Assert(ServerEnum.SkillImplType.Count == #ServerEnum.SkillImplType.Converter + 1, "비정상입니다.")
 
 
-ServerEnum.SkillCollisionParameterType.Converter = {
-	[ServerEnum.SkillCollisionParameterType.SkillCollisionSize] = "SkillCollisionSize",
-	[ServerEnum.SkillCollisionParameterType.SkillCollisionOffset] = "SkillCollisionOffset"
+ServerEnum.SkillDataParameterType.Converter = {
+	[ServerEnum.SkillDataParameterType.SkillCollisionSize] = "SkillCollisionSize",
+	[ServerEnum.SkillDataParameterType.SkillCollisionOffset] = "SkillCollisionOffset"
 }
-Debug.Assert(ServerEnum.SkillCollisionParameterType.Count == #ServerEnum.SkillCollisionParameterType.Converter + 1, "비정상입니다.")
+Debug.Assert(ServerEnum.SkillDataParameterType.Count == #ServerEnum.SkillDataParameterType.Converter + 1, "비정상입니다.")
 
 ServerEnum.__index = Utility.Inheritable__index
 ServerEnum.__newindex = Utility.Inheritable__newindex
