@@ -69,6 +69,15 @@ function SkillTemplate:ValidateSkillDataParameter(skillDataParameter)
         Debug.Assert(false, "SkillAnimation이 없습니다. => " .. skillName)
         return false
     end
+
+    --[[
+    if not skillDataParameter[SkillDataParameterType.SkillDuration] then
+    end
+    --]]
+
+    if not skillDataParameter[SkillDataParameterType.SkillCollisionDuration] then
+        skillDataParameter[SkillDataParameterType.SkillCollisionDuration] = 0
+    end
     
     if not skillDataParameter[SkillDataParameterType.SkillEffect] then
         Debug.Assert(false, "SkillEffect가 없습니다. => " .. skillName)
@@ -254,6 +263,7 @@ SkillTemplate:RegisterSkillDataParameter({
     [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
     [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
     [SkillDataParameterType.SkillAnimation] = "LeftSlash",
+    [SkillDataParameterType.SkillDuration] = 0.5,
     [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
 })
 

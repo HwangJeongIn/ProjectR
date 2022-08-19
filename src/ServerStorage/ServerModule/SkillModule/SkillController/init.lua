@@ -14,6 +14,7 @@ local ServerConstant = ServerModuleFacade.ServerConstant
 
 local ServerEnum = ServerModuleFacade.ServerEnum
 local SkillImplType = ServerEnum.SkillImplType
+local SkillDataParameterType = ServerEnum.SkillDataParameterType
 
 local SkillModule = ServerModuleFacade.SkillModule
 local SkillTemplate = require(SkillModule:WaitForChild("SkillTemplate"))
@@ -72,13 +73,13 @@ function SkillController:ValidateSkillCollisionParameter(skillCollisionParameter
     return true
 end
 
-function SkillController:FilterTargetsBySkillCollision(toolOwnerPlayerCharacter)
-	local humanoidRootPart = toolOwnerPlayerCharacter:FindFirstChild("HumanoidRootPart")
-    local skillCollisionParameter = self:GetSkillCollisionParameter(humanoidRootPart.CFrame)
-    if not self:ValidateSkillCollisionParameter(skillCollisionParameter) then
-        Debug.Assert(false, "비정상입니다.")
-        return nil
-    end
+function SkillController:CreateSkillCollision(originCFrame)
+    local skillCollisionSize = self.SkillTemplate:GetSkillDataParameter(SkillDataParameterType.SkillCollisionSize)
+    local skillCollisionOffset = self.SkillTemplate:GetSkillDataParameter(SkillDataParameterType.SkillCollisionOffset)
+    local finalOffsetVector = originCFrame.LookVector * skillCollisionOffset.X
+                            + originCFrame.RightVector * skillCollisionOffset.Y
+
+    local skillCollisionCFrame = originCFrame + finalOffsetVector
 
     local tempSkillCollision = Instance.new("Part")
     ObjectCollisionGroupUtility:SetSkillCollisionGroup(tempSkillCollision)
@@ -91,32 +92,103 @@ function SkillController:FilterTargetsBySkillCollision(toolOwnerPlayerCharacter)
     tempSkillCollision.CanQuery = true
 
     tempSkillCollision.Parent = game.workspace
-    tempSkillCollision.Size =  skillCollisionParameter.Size
-    tempSkillCollision.CFrame = skillCollisionParameter.CFrame
-    --tempPart.Position = Vector3.new(0, 0, 0)
+    tempSkillCollision.Size =  skillCollisionSize
+    tempSkillCollision.CFrame = skillCollisionCFrame
 
-    -- 찾아봤지만 따로 방법이 없다. 현재는 이게 최선인듯하다. 
-    local tempConnection = tempSkillCollision.Touched:Connect(function() end)
-    local touchingParts = tempSkillCollision:GetTouchingParts()
-    local finalTouchingParts = {}
-    for _, touchingPart in pairs(touchingParts) do
-        if ObjectCollisionGroupUtility:IsCollidableByPart(tempSkillCollision, touchingPart) then
-            table.insert(finalTouchingParts, touchingPart)
-        end
+    local skillEffect = self.SkillTemplate:GetSkillDataParameter(SkillDataParameterType.SkillEffect)
+    if skillEffect then
+        local tempSkillEffect = skillEffect:Clone()
+        tempSkillEffect.Parent = tempSkillCollision
     end
-    tempConnection:Disconnect()
-    Debris:AddItem(tempSkillCollision, 0)
 
-    return finalTouchingParts
+    return tempSkillCollision
 end
 
-function SkillController:ApplySkillToTargets(toolOwnerPlayer, targets)
-    for _, target in pairs(targets) do
-        if not self:ApplySkillToTarget(toolOwnerPlayer, target) then
-            Debug.Assert(false, "비정상입니다.")
-            return false
+function SkillController:SimulateSkillCollision(skillCastingTime, originCFrame, skillCollisionHandler)
+    wait(skillCastingTime)
+    local createdSkillCollision = self:CreateSkillCollision(originCFrame)
+
+    local skillCollisionDuration = self.SkillTemplate:GetSkillDataParameter(SkillDataParameterType.SkillCollisionDuration)
+    local skillCollisionDirection = self.SkillTemplate:GetSkillDataParameter(SkillDataParameterType.skillCollisionDirection)
+    local skillCollisionSpeed = self.SkillTemplate:GetSkillDataParameter(SkillDataParameterType.SkillCollisionSpeed)
+    local skillCollisionDetailMovementType = self.SkillTemplate:GetSkillDataParameter(SkillDataParameterType.SkillCollisionDetailMovementType)
+    
+    local skillCollisionConnection = createdSkillCollision.Touched:Connect(function(touchedPart) 
+        skillCollisionHandler(createdSkillCollision, touchedPart) 
+    end)
+
+    if not skillCollisionDirection then
+        wait(skillCollisionDuration)
+    else
+        local prevTime = os.clock()
+        local currentTime = prevTime
+        local deltaTime = 0
+        local remainingSkillCollisionDuration = skillCollisionDuration
+
+        while remainingSkillCollisionDuration > 0 do
+            prevTime = currentTime
+            currentTime = os.clock()
+            deltaTime = currentTime - prevTime
+            remainingSkillCollisionDuration -= (currentTime - prevTime)
+
+            createdSkillCollision.CFrame = createdSkillCollision.CFrame + (skillCollisionDirection * skillCollisionSpeed * deltaTime)
+            wait(0.1)
         end
     end
+
+    skillCollisionConnection:Disconnect()
+    Debris:AddItem(skillCollisionConnection, 0)
+end
+
+function SkillController:ActivateInternally(toolOwnerPlayer)
+    local toolOwnerPlayerCharacter = toolOwnerPlayer.character
+    if not toolOwnerPlayerCharacter then
+        Debug.Assert(false, "캐릭터가 없습니다.")
+        return false
+    end
+
+    local humanoid = toolOwnerPlayerCharacter:FindFirstChild("Humanoid")
+    Debug.Assert(humanoid, "비정상입니다.")
+
+	local humanoidRootPart = toolOwnerPlayerCharacter:FindFirstChild("HumanoidRootPart")
+    Debug.Assert(humanoidRootPart, "비정상입니다.")
+
+    local skillAnimation = self.SkillTemplate:GetSkillDataParameter(SkillDataParameterType.SkillAnimation)
+    local skillCastingTime = 0
+
+    if skillAnimation then
+	    local skillAnimationTrack = humanoid:LoadAnimation(skillAnimation)
+
+        local skillDuration = self.SkillTemplate:GetSkillDataParameter(SkillDataParameterType.SkillDuration)
+        if not skillDuration then
+            skillCastingTime = skillDuration / 2
+            local skillAnimationSpeed = skillAnimationTrack.Length / skillDuration
+            skillAnimationTrack:AdjustSpeed(skillAnimationSpeed)
+        else
+            skillCastingTime = skillAnimationTrack.Length / 2
+        end
+
+        skillAnimationTrack:Play()
+    end
+
+    --[[
+    local startCreatingSkillCollisionTime = os.clock()	
+    local createdSkillCollision = self:CreateSkillCollision(humanoidRootPart)
+
+    local remainingSkillCastingTime =  os.clock() - startCreatingSkillCollisionTime
+    if remainingSkillCastingTime < 0 then remainingSkillCastingTime = 0 end
+    --]]
+
+    local skillCollisionHandler = function(skillCollision, touchedPart)
+        if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
+            if self.FindTargetInRange(toolOwnerPlayer) then
+                self.ApplySkillToTarget(toolOwnerPlayer, touchedPart)
+            end
+        end
+    end
+
+    local simulateSkillCollisionCoroutine = coroutine.wrap(self.SimulateSkillCollision)
+    simulateSkillCollisionCoroutine(self, skillCastingTime, humanoidRootPart.CFrame, skillCollisionHandler)
 
     return true
 end
@@ -137,24 +209,9 @@ function SkillController:Activate(player)
     end
 
     self.LastActivationTime = currentTime
-    local character = player.character
-    if not character then
-        Debug.Assert(false, "캐릭터가 없습니다.")
-        return false
-    end
-
-    if not self:UseSkill(player) then
+    if not self:ActivateInternally(player) then
         Debug.Print(self.Name .. "에 실패했습니다.")
         return false
-    end
-
-    local targetsFilteredBySkillCollision = self:FilterTargetsBySkillCollision(character)
-    local finalTargets = self:FindTargetInRange(player, targetsFilteredBySkillCollision)
-    if finalTargets then
-        if not self:ApplySkillToTargets(player, finalTargets) then
-            Debug.Print(self.Name .. "에 실패했습니다.")
-            return false
-        end
     end
 
     return true
@@ -196,14 +253,17 @@ function SkillController:SetSkill(tool, skillGameData)
         return false
     end
 
+    
     self.UseSkill = targetSkillTemplate:GetSkillImpl(SkillImplType.UseSkill)
     self.FindTargetInRange = targetSkillTemplate:GetSkillImpl(SkillImplType.FindTargetInRange)
     self.ApplySkillToTarget = targetSkillTemplate:GetSkillImpl(SkillImplType.ApplySkillToTarget)
     self.GetSkillCollisionParameter = targetSkillTemplate:GetSkillImpl(SkillImplType.GetSkillCollisionParameter)
+    self.SkillTemplate = targetSkillTemplate
+
 
     self.Tool = tool
-    self.SkillTemplateData = targetSkillTemplate
-    self.SkillGameDataKey = skillGameDataKey
+    --self.SkillTemplateData = targetSkillTemplate
+    --self.SkillGameDataKey = skillGameDataKey
     self.Name = skillGameData.Name
     self.Cooldown = skillGameData.Cooldown
 

@@ -42,9 +42,13 @@ local ServerEnum = {
 		SkillCollisionDirection = 3,
 		SkillCollisionSpeed = 4,
 		SkillCollisionDetailMovementType = 5,
-		SkillAnimation = 6,
-		SkillEffect = 7,
-		Count = 8
+		SkillCollisionDuration = 6,
+
+		SkillAnimation = 7,
+		SkillDuration = 8,
+
+		SkillEffect = 9,
+		Count = 10
 	},
 
 	SkillCollisionDetailMovementType = {
@@ -81,7 +85,11 @@ ServerEnum.SkillDataParameterType.Converter = {
 	[ServerEnum.SkillDataParameterType.SkillCollisionDirection] = "SkillCollisionDirection",
 	[ServerEnum.SkillDataParameterType.SkillCollisionSpeed] = "SkillCollisionSpeed",
 	[ServerEnum.SkillDataParameterType.SkillCollisionDetailMovementType] = "SkillCollisionDetailMovementType",
+	[ServerEnum.SkillDataParameterType.SkillCollisionDuration] = "SkillCollisionDuration",
+
 	[ServerEnum.SkillDataParameterType.SkillAnimation] = "SkillAnimation",
+	[ServerEnum.SkillDataParameterType.SkillDuration] = "SkillDuration",
+	
 	[ServerEnum.SkillDataParameterType.SkillEffect] = "SkillEffect",
 }
 Debug.Assert(ServerEnum.SkillDataParameterType.Count == #ServerEnum.SkillDataParameterType.Converter + 1, "비정상입니다.")
