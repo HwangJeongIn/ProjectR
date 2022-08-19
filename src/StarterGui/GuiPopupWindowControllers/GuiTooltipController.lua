@@ -395,7 +395,7 @@ function GuiTooltipController:InitializeByToolSlot(toolSlot)
 	end
 
 	self.ToolSlot = toolSlot
-	self.GuiToolName.Text = tool.Name
+	self.GuiToolName.Text = toolGameData.Name
 	self:SetToolImage(toolGameData.Image)
 	self:SetToolType(toolGameData.ToolType)
 	self:SetToolDescription(toolGameData.Description)

@@ -4,6 +4,8 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 
 local Utility = ServerModuleFacade.Utility
 local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
+local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility
+
 
 local ServerConstant = ServerModuleFacade.ServerConstant
 local DefaultWeaponSkillGameDataKey = ServerConstant.DefaultWeaponSkillGameDataKey
@@ -12,6 +14,7 @@ local DefaultWeaponSkillGameDataKey = ServerConstant.DefaultWeaponSkillGameDataK
 
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
+local CollisionGroupType = ServerEnum.CollisionGroupType
 
 local SkillDataType = ServerEnum.SkillDataType
 local EquipType = ServerEnum.EquipType
@@ -248,17 +251,16 @@ SkillTemplate:RegisterSkillDataParameter({
     [SkillDataParameterType.SkillCollisionDuration] = 100,
     
     [SkillDataParameterType.SkillAnimation] = "LeftSlash",
-    [SkillDataParameterType.SkillDuration] = 10,
+    [SkillDataParameterType.SkillDuration] = 1.0,
     [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
 })
 
 
 SkillTemplate:RegisterSkillImpl(
     "BaseAttack",
-    SkillImplType.FindTargetInRange,
-    function(skillController, toolOwnerPlayer, filteredTargets)
-        Debug.Assert(false, "상위에서 구현해야합니다.")
-        return nil
+    SkillImplType.ValidateTargetInRange,
+    function(skillController, toolOwnerPlayer, target)
+        return true
     end
 )
 
@@ -266,8 +268,14 @@ SkillTemplate:RegisterSkillImpl(
     "BaseAttack",
     SkillImplType.ApplySkillToTarget,
     function(skillController, toolOwnerPlayer, target)
-        Debug.Assert(false, "상위에서 구현해야합니다.")
-        return false
+        local collisionGroupType = ObjectCollisionGroupUtility:GetCollisionGroupTypeByPart(target)
+        if CollisionGroupType.Player == collisionGroupType then
+            
+        elseif CollisionGroupType.WorldInteractor == collisionGroupType then
+
+        end
+
+        return true
     end
 )
 
@@ -280,22 +288,21 @@ SkillTemplate:RegisterSkillDataParameter({
     [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
     [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
     [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
-    [SkillDataParameterType.SkillCollisionSpeed] = 1,
+    [SkillDataParameterType.SkillCollisionSpeed] = 50,
     --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
-    --[SkillDataParameterType.SkillCollisionDuration] = 0,
+    [SkillDataParameterType.SkillCollisionDuration] = 100,
     
-    [SkillDataParameterType.SkillAnimation] = "LeftSlash",
-    [SkillDataParameterType.SkillDuration] = 0.5,
+    [SkillDataParameterType.SkillAnimation] = "RightSlash",
+    [SkillDataParameterType.SkillDuration] = 1.0,
     [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
 })
 
 
 SkillTemplate:RegisterSkillImpl(
     "WhirlwindSlash",
-    SkillImplType.FindTargetInRange,
-    function(skillController, toolOwnerPlayer, filteredTargets)
-        Debug.Assert(false, "상위에서 구현해야합니다.")
-        return nil
+    SkillImplType.ValidateTargetInRange,
+    function(skillController, toolOwnerPlayer, target)
+        return true
     end
 )
 
@@ -317,22 +324,21 @@ SkillTemplate:RegisterSkillDataParameter({
     [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
     [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
     [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
-    [SkillDataParameterType.SkillCollisionSpeed] = 1,
+    [SkillDataParameterType.SkillCollisionSpeed] = 50,
     --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
-    --[SkillDataParameterType.SkillCollisionDuration] = 0,
+    [SkillDataParameterType.SkillCollisionDuration] = 100,
     
-    [SkillDataParameterType.SkillAnimation] = "LeftSlash",
-    [SkillDataParameterType.SkillDuration] = 0.5,
+    [SkillDataParameterType.SkillAnimation] = "RightSlash",
+    [SkillDataParameterType.SkillDuration] = 1.0,
     [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
 })
 
 
 SkillTemplate:RegisterSkillImpl(
     "TempestSlash",
-    SkillImplType.FindTargetInRange,
-    function(skillController, toolOwnerPlayer, filteredTargets)
-        Debug.Assert(false, "상위에서 구현해야합니다.")
-        return nil
+    SkillImplType.ValidateTargetInRange,
+    function(skillController, toolOwnerPlayer, target)
+        return true
     end
 )
 
@@ -367,10 +373,9 @@ SkillTemplate:RegisterSkillDataParameter({
 
 SkillTemplate:RegisterSkillImpl(
     "PowerStrike",
-    SkillImplType.FindTargetInRange,
-    function(skillController, toolOwnerPlayer, filteredTargets)
-        Debug.Assert(false, "상위에서 구현해야합니다.")
-        return nil
+    SkillImplType.ValidateTargetInRange,
+    function(skillController, toolOwnerPlayer, target)
+        return true
     end
 )
 
@@ -392,22 +397,21 @@ SkillTemplate:RegisterSkillDataParameter({
     [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
     [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
     [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
-    [SkillDataParameterType.SkillCollisionSpeed] = 1,
+    [SkillDataParameterType.SkillCollisionSpeed] = 50,
     --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
-    --[SkillDataParameterType.SkillCollisionDuration] = 0,
+    [SkillDataParameterType.SkillCollisionDuration] = 100,
     
-    [SkillDataParameterType.SkillAnimation] = "LeftSlash",
-    [SkillDataParameterType.SkillDuration] = 0.5,
+    [SkillDataParameterType.SkillAnimation] = "MiddleSlash",
+    [SkillDataParameterType.SkillDuration] = 1.0,
     [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
 })
 
 
 SkillTemplate:RegisterSkillImpl(
     "StormBlade",
-    SkillImplType.FindTargetInRange,
-    function(skillController, toolOwnerPlayer, filteredTargets)
-        Debug.Assert(false, "상위에서 구현해야합니다.")
-        return nil
+    SkillImplType.ValidateTargetInRange,
+    function(skillController, toolOwnerPlayer, target)
+        return true
     end
 )
 

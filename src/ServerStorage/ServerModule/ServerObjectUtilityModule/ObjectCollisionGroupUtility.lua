@@ -18,6 +18,7 @@ local ObjectCollisionGroupUtility = {
     CollisionGroupNameTable = {
         [CollisionGroupType.Player] = "PlayerCollision",
         [CollisionGroupType.Skill] = "SkillCollision",
+        [CollisionGroupType.WorldInteractor] = "WorldInteractor"
     },
 
     CollisionGroupIdTable = {
@@ -36,7 +37,7 @@ function ObjectCollisionGroupUtility:Initialize()
     for collisionGroupType, collisionGroupName in pairs(collisionGroupNames) do
         PhysicsService:CreateCollisionGroup(collisionGroupName)
         local groupId = PhysicsService:GetCollisionGroupId(collisionGroupName)
-        self.CollisionGroupIdTable[collisionGroupType] = groupId
+        self.CollisionGroupIdTable[groupId] = collisionGroupType
         self.CollidableGroupIdQueryTable[groupId] = {}
         Debug.Print(collisionGroupName .. " => " .. tostring(groupId))
     end
@@ -46,7 +47,7 @@ function ObjectCollisionGroupUtility:Initialize()
     end
     
     self:SetEnableAllCollisionGroups(self.CollisionGroupNameTable[CollisionGroupType.Skill], false)
-    self:SetEnableCollisionGroup(self.CollisionGroupNameTable[CollisionGroupType.Skill],  self.CollisionGroupNameTable[CollisionGroupType.Player], true)
+    self:SetEnableCollisionGroup(self.CollisionGroupNameTable[CollisionGroupType.Skill], self.CollisionGroupNameTable[CollisionGroupType.Player], true)
 end
 
 function ObjectCollisionGroupUtility:SetEnableCollisionGroup(collisionGroupName1, collisionGroupName2, isEnable)
@@ -75,6 +76,19 @@ function ObjectCollisionGroupUtility:SetCollisionGroup(part, collisionGroupName)
     
     PhysicsService:SetPartCollisionGroup(part, collisionGroupName)
     return true
+end
+
+function ObjectCollisionGroupUtility:GetCollisionGroupTypeByCollisionGroupId(collisionGroupId)
+    if not self.CollisionGroupIdTable[collisionGroupId] then
+        Debug.Assert(false, "해당 아이디로 등록된 타입이 없습니다. => " .. tostring(collisionGroupId))
+        return nil
+    end
+    return self.CollisionGroupIdTable[collisionGroupId]
+end
+
+function ObjectCollisionGroupUtility:GetCollisionGroupTypeByPart(part)
+    local collisionGroupId = part.CollisionGroupId
+    return self:GetCollisionGroupTypeByCollisionGroupId(collisionGroupId)
 end
 
 function ObjectCollisionGroupUtility:IsCollidable(collisionGroupId1, collisionGroupId2)
@@ -133,6 +147,21 @@ function ObjectCollisionGroupUtility:SetSkillCollisionGroup(skillCollision)
     end
 
     if not self:SetCollisionGroup(skillCollision, self.CollisionGroupNameTable[CollisionGroupType.Skill]) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    return true
+end
+
+function ObjectCollisionGroupUtility:SetWorldInteractorCollisionGroup(worldInteractor)
+    if not worldInteractor then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    Debug.Assert(worldInteractor.Trigger, "비정상입니다.")
+    if not self:SetCollisionGroup(worldInteractor.Trigger, self.CollisionGroupNameTable[CollisionGroupType.WorldInteractor]) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end

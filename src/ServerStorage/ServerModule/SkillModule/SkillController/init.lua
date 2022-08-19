@@ -25,8 +25,8 @@ SkillController.__newindex = Utility.Inheritable__newindex
 
 
 -- pure virtual function
-function SkillController:FindTargetInRange(toolOwnerPlayer)
-    Debug.Assert(false, "FindTargetInRange 상위에서 구현해야합니다.")
+function SkillController:ValidateTargetInRange(toolOwnerPlayer)
+    Debug.Assert(false, "ValidateTargetInRange 상위에서 구현해야합니다.")
     return nil
 end
 
@@ -64,7 +64,26 @@ function SkillController:CreateSkillCollision(originCFrame)
     if skillEffect then
         local tempSkillEffect = skillEffect:Clone()
         tempSkillEffect.Parent = tempSkillCollision
-        tempSkillEffect.CFrame = tempSkillCollision.CFrame
+
+        local targetRotation = self.Tool.Handle.CFrame.Rotation
+        local skillCollisionRotation = tempSkillCollision.CFrame.Rotation
+
+        local dotResult = targetRotation.LookVector:Dot(skillCollisionRotation.LookVector)
+        if 0 > dotResult then
+            local rightVector = -targetRotation.RightVector
+            local upVector = targetRotation.UpVector
+            local lookVector = targetRotation.LookVector
+
+            targetRotation = CFrame.new(
+                0, 0, 0, 
+              --RightVector | UpVector | –LookVector
+              rightVector.X, upVector.X, lookVector.X,
+              rightVector.Y, upVector.Y, lookVector.Y, 
+              rightVector.Z, upVector.Z, lookVector.Z) 
+
+        end
+
+        tempSkillEffect.CFrame = targetRotation + tempSkillCollision.CFrame.Position
 
         local tempWeld = Instance.new("WeldConstraint")
         tempWeld.Name = "TempWeldConstraint"
@@ -152,7 +171,7 @@ function SkillController:ActivateInternally(toolOwnerPlayer)
 
     local skillCollisionHandler = function(skillCollision, touchedPart, optionalOutput)
         if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
-            if self.FindTargetInRange(toolOwnerPlayer) then
+            if self.ValidateTargetInRange(toolOwnerPlayer, touchedPart) then
                 self.ApplySkillToTarget(toolOwnerPlayer, touchedPart, optionalOutput)
             end
         end
@@ -160,7 +179,6 @@ function SkillController:ActivateInternally(toolOwnerPlayer)
 
     local simulateSkillCollisionCoroutine = coroutine.wrap(self.SimulateSkillCollision)
     simulateSkillCollisionCoroutine(self, skillCastingTime, humanoidRootPart, skillCollisionHandler)
-
     return true
 end
 
@@ -224,10 +242,9 @@ function SkillController:SetSkill(tool, skillGameData)
         return false
     end
 
-    self.FindTargetInRange = targetSkillTemplate:GetSkillImpl(SkillImplType.FindTargetInRange)
+    self.ValidateTargetInRange = targetSkillTemplate:GetSkillImpl(SkillImplType.ValidateTargetInRange)
     self.ApplySkillToTarget = targetSkillTemplate:GetSkillImpl(SkillImplType.ApplySkillToTarget)
     self.SkillTemplateData = targetSkillTemplate
-
 
     self.Tool = tool
     self.SkillGameDataKey = skillGameDataKey

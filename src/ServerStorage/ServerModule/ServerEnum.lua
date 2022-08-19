@@ -19,7 +19,8 @@ local ServerEnum = {
 	CollisionGroupType = {
 		Player = 1,
 		Skill = 2,
-		Count = 3
+		WorldInteractor = 3,
+		Count = 4
 	},
 
 	SkillDataType = {
@@ -29,7 +30,7 @@ local ServerEnum = {
 	},
 
 	SkillImplType = {
-        FindTargetInRange = 1,
+        ValidateTargetInRange = 1,
         ApplySkillToTarget = 2,
 		Count = 3
 	},
@@ -69,7 +70,7 @@ Debug.Assert(ServerEnum.WorldInteractorType.Count == #ServerEnum.WorldInteractor
 
 
 ServerEnum.SkillImplType.Converter = {
-	[ServerEnum.SkillImplType.FindTargetInRange] = "FindTargetInRange",
+	[ServerEnum.SkillImplType.ValidateTargetInRange] = "ValidateTargetInRange",
 	[ServerEnum.SkillImplType.ApplySkillToTarget] = "ApplySkillToTarget",
 }
 Debug.Assert(ServerEnum.SkillImplType.Count == #ServerEnum.SkillImplType.Converter + 1, "비정상입니다.")

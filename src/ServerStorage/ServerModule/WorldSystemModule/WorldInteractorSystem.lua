@@ -5,6 +5,7 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 local Debug = ServerModuleFacade.Debug
 local Utility = ServerModuleFacade.Utility
 local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
+local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility
 local WorldInteractorUtility = ServerModuleFacade.WorldInteractorUtility
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
@@ -34,14 +35,6 @@ function WorldInteractorSystem:InitializeWorldInteractorTemplate(worldInteractor
         Debug.Assert(false, "비정상입니다.")
         return false
     end
-
-    --[[
-    local key = worldInteractor:FindFirstChild("Key")
-    if not key then
-        Debug.Assert(false, "WorldInteractor에 Key 정보가 없습니다. => " .. worldInteractor.Name)
-        return false
-    end
-    --]]
 
     local mesh = worldInteractor:FindFirstChild("Mesh")
     if not mesh then
@@ -95,6 +88,12 @@ function WorldInteractorSystem:Initialize()
             local worldInteractorGameData = WorldInteractorUtility:GetGameDataByKey(key)
             
             ObjectTagUtility:AddTag(worldInteractor, WorldInteractorTypeConverter[worldInteractorGameData.WorldInteractorType])
+
+            if not ObjectCollisionGroupUtility:SetWorldInteractorCollisionGroup(worldInteractor) then
+                Debug.Assert(false, "SetWorldInteractorCollisionGroup에 실패했습니다. => " .. worldInteractorName)
+                return false
+            end
+            
             worldInteractorTemplateTable[key] = {WorldInteractor = worldInteractor, WorldInteractorGameData = worldInteractorGameData}
         end
     end
