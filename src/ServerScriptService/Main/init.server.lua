@@ -115,6 +115,28 @@ while #game.Players:GetPlayers() < 1 do
 	wait(1)
 end
 
+--[[
+function TestFunction1()
+	print("prewait => 1")
+	wait(5)
+	print("postwait => 1")
+	coroutine.yield(true)
+end
+
+function TestFunction2()
+	print("prewait => 2")
+	wait(5)
+	print("postwait => 2")
+	coroutine.yield(true)
+end
+
+local c1 = coroutine.wrap(TestFunction1)
+local c2 = coroutine.wrap(TestFunction2)
+
+c1()
+c2()
+--]]
+
 wait(3)
 Temp()
 

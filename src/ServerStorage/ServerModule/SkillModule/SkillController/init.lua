@@ -29,8 +29,8 @@ function SkillController:UseSkill(toolOwnerPlayer)
     return false
 end
 
-function SkillController:FindTargetsInRange(toolOwnerPlayer)
-    Debug.Assert(false, "FindTargetsInRange 상위에서 구현해야합니다.")
+function SkillController:FindTargetInRange(toolOwnerPlayer)
+    Debug.Assert(false, "FindTargetInRange 상위에서 구현해야합니다.")
     return nil
 end
 
@@ -174,7 +174,7 @@ function SkillController:SetToolOwnerPlayer(toolOwnerPlayer)
     if self.ToolOwnerPlayer  then
         local playerId = self.ToolOwnerPlayer.UserId
         local playerLastActivationTime = ServerGlobalStorage:GetSkillLastActivationTime(playerId, self.SkillGameDataKey)
-        self.LastActivationTime = playerLastActivationTime 
+        self.LastActivationTime = playerLastActivationTime
     end
 end
 
@@ -197,7 +197,7 @@ function SkillController:SetSkill(tool, skillGameData)
     end
 
     self.UseSkill = targetSkillTemplate:GetSkillImpl(SkillImplType.UseSkill)
-    self.FindTargetsInRange = targetSkillTemplate:GetSkillImpl(SkillImplType.FindTargetsInRange)
+    self.FindTargetInRange = targetSkillTemplate:GetSkillImpl(SkillImplType.FindTargetInRange)
     self.ApplySkillToTarget = targetSkillTemplate:GetSkillImpl(SkillImplType.ApplySkillToTarget)
     self.GetSkillCollisionParameter = targetSkillTemplate:GetSkillImpl(SkillImplType.GetSkillCollisionParameter)
 

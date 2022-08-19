@@ -187,14 +187,16 @@ function SkillTemplate:InitializeAdditionalData(skillName)
         Debug.Assert(false, "비정상입니다.")
         return false
     end
-    
 
+    local skillCollisionSpeed = self:GetSkillDataParameterFromRawSkillData(skillName, SkillDataParameterType.SkillCollisionSpeed)
+    local skillCollisionDirection = self:GetSkillDataParameterFromRawSkillData(skillName, SkillDataParameterType.SkillCollisionDirection)
+    
     self:RegisterSkillImpl(skillName,
         SkillImplType.GetSkillCollisionParameter,
         function(skillController, toolOwnerPlayerCFrame)
             local skillCollisionParameter = {}
 
-            local finalOffsetVector = toolOwnerPlayerCFrame.LookVector * skillCollisionOffset.X 
+            local finalOffsetVector = toolOwnerPlayerCFrame.LookVector * skillCollisionOffset.X
             + toolOwnerPlayerCFrame.RightVector * skillCollisionOffset.Y
             skillCollisionParameter.Size = skillCollisionSize
             skillCollisionParameter.CFrame = toolOwnerPlayerCFrame + finalOffsetVector
@@ -228,11 +230,11 @@ function SkillTemplate:InitializeAllSkillTemplates()
         local currentSkillTemplate = self.SkillImplTemplateTable[skillGameDataKey]
         
         self.SkillImplTemplateTable[skillGameDataKey].GetSkillImpl = function(_, skillImplType) 
-            return currentSkillTemplate[SkillDataType.SkillImpl][skillImplType] 
+            return currentSkillTemplate[SkillDataType.SkillImpl][skillImplType]
         end
 
         self.SkillImplTemplateTable[skillGameDataKey].GetSkillDataParameter = function(_, skillDataParameterType) 
-            return currentSkillTemplate[SkillDataType.SkillDataParameter][skillDataParameterType] 
+            return currentSkillTemplate[SkillDataType.SkillDataParameter][skillDataParameterType]
         end
 
         self.SkillImplTemplateTable[skillGameDataKey].GetSkillGameData = function(_)
@@ -266,7 +268,7 @@ SkillTemplate:RegisterSkillImpl(
 
 SkillTemplate:RegisterSkillImpl(
     "BaseAttack",
-    SkillImplType.FindTargetsInRange,
+    SkillImplType.FindTargetInRange,
     function(skillController, toolOwnerPlayer, filteredTargets)
         Debug.Assert(false, "상위에서 구현해야합니다.")
         return nil
@@ -305,7 +307,7 @@ SkillTemplate:RegisterSkillImpl(
 
 SkillTemplate:RegisterSkillImpl(
     "WhirlwindSlash",
-    SkillImplType.FindTargetsInRange,
+    SkillImplType.FindTargetInRange,
     function(skillController, toolOwnerPlayer, filteredTargets)
         Debug.Assert(false, "상위에서 구현해야합니다.")
         return nil
@@ -345,7 +347,7 @@ SkillTemplate:RegisterSkillImpl(
 
 SkillTemplate:RegisterSkillImpl(
     "TempestSlash",
-    SkillImplType.FindTargetsInRange,
+    SkillImplType.FindTargetInRange,
     function(skillController, toolOwnerPlayer, filteredTargets)
         Debug.Assert(false, "상위에서 구현해야합니다.")
         return nil
@@ -385,7 +387,7 @@ SkillTemplate:RegisterSkillImpl(
 
 SkillTemplate:RegisterSkillImpl(
     "PowerStrike",
-    SkillImplType.FindTargetsInRange,
+    SkillImplType.FindTargetInRange,
     function(skillController, toolOwnerPlayer, filteredTargets)
         Debug.Assert(false, "상위에서 구현해야합니다.")
         return nil
@@ -424,7 +426,7 @@ SkillTemplate:RegisterSkillImpl(
 
 SkillTemplate:RegisterSkillImpl(
     "StormBlade",
-    SkillImplType.FindTargetsInRange,
+    SkillImplType.FindTargetInRange,
     function(skillController, toolOwnerPlayer, filteredTargets)
         Debug.Assert(false, "상위에서 구현해야합니다.")
         return nil

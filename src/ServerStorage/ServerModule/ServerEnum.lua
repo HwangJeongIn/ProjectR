@@ -30,7 +30,7 @@ local ServerEnum = {
 
 	SkillImplType = {
 		UseSkill = 1,
-        FindTargetsInRange = 2,
+        FindTargetInRange = 2,
         ApplySkillToTarget = 3,
 		GetSkillCollisionParameter = 4,
 		Count = 5
@@ -39,9 +39,16 @@ local ServerEnum = {
 	SkillDataParameterType = {
 		SkillCollisionSize = 1,
         SkillCollisionOffset = 2,
-		SkillAnimation = 3,
-		SkillEffect = 4,
-		Count = 5
+		SkillCollisionDirection = 3,
+		SkillCollisionSpeed = 4,
+		SkillCollisionDetailMovementType = 5,
+		SkillAnimation = 6,
+		SkillEffect = 7,
+		Count = 8
+	},
+
+	SkillCollisionDetailMovementType = {
+
 	}
 }
 
@@ -61,7 +68,7 @@ Debug.Assert(ServerEnum.WorldInteractorType.Count == #ServerEnum.WorldInteractor
 
 ServerEnum.SkillImplType.Converter = {
 	[ServerEnum.SkillImplType.UseSkill] = "UseSkill",
-	[ServerEnum.SkillImplType.FindTargetsInRange] = "FindTargetsInRange",
+	[ServerEnum.SkillImplType.FindTargetInRange] = "FindTargetInRange",
 	[ServerEnum.SkillImplType.ApplySkillToTarget] = "ApplySkillToTarget",
 	[ServerEnum.SkillImplType.GetSkillCollisionParameter] = "GetSkillCollisionParameter",
 }
@@ -71,6 +78,9 @@ Debug.Assert(ServerEnum.SkillImplType.Count == #ServerEnum.SkillImplType.Convert
 ServerEnum.SkillDataParameterType.Converter = {
 	[ServerEnum.SkillDataParameterType.SkillCollisionSize] = "SkillCollisionSize",
 	[ServerEnum.SkillDataParameterType.SkillCollisionOffset] = "SkillCollisionOffset",
+	[ServerEnum.SkillDataParameterType.SkillCollisionDirection] = "SkillCollisionDirection",
+	[ServerEnum.SkillDataParameterType.SkillCollisionSpeed] = "SkillCollisionSpeed",
+	[ServerEnum.SkillDataParameterType.SkillCollisionDetailMovementType] = "SkillCollisionDetailMovementType",
 	[ServerEnum.SkillDataParameterType.SkillAnimation] = "SkillAnimation",
 	[ServerEnum.SkillDataParameterType.SkillEffect] = "SkillEffect",
 }
