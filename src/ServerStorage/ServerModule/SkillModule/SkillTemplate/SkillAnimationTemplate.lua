@@ -33,6 +33,20 @@ function SkillAnimationTemplate:ValidateSkillKeyframeSequence(skillKeyframeSeque
     return true
 end
 
+-- 로블록스에서 완전히 애니메이션트랙을 만들어서 완전히 로드하기전까지 길이를 확인할 수 없다.
+-- 직접 트랙을 만들어서 애니메이션을 재생하기보다 키프레임을 확인하면서 가장 마지막에 있는 키프레임을 찾아내는 방식을 사용한다.
+function SkillAnimationTemplate:LoadAnimationLengthFromKeyframes(keyframes)
+    local animationLength = 0
+    local keyFrameCount = #keyframes
+    for i = 1, keyFrameCount do
+        local currentTime = keyframes[i].Time
+        if currentTime > animationLength then
+            animationLength = currentTime
+        end
+    end
+    return animationLength
+end
+
 function SkillAnimationTemplate:InitializeAllSkillAnimation()
     local allSkillAnimations = AnimationsFolder:GetChildren()
     for _, skillAnimation in pairs(allSkillAnimations) do
@@ -43,7 +57,14 @@ function SkillAnimationTemplate:InitializeAllSkillAnimation()
             return false
         end
 
-        self.Value[skillAnimationName] = skillAnimation
+        local tempSequence = KeyframeSequenceProvider:GetKeyframeSequenceAsync(skillAnimation.AnimationId)
+        local keyframes = tempSequence:GetKeyframes()
+        local animationLength = self:LoadAnimationLengthFromKeyframes(keyframes)
+        tempSequence:Destroy()
+
+        self.Value[skillAnimationName] = {}
+        self.Value[skillAnimationName].Animation = skillAnimation
+        self.Value[skillAnimationName].AnimationLength = animationLength
     end
 
     return true
@@ -73,7 +94,12 @@ function SkillAnimationTemplate:InitializeAllSkillKeyframeSequence()
             return false
         end
 
-        self.Value[skillKeyframeSequenceName] = createdAnimation
+        local keyframes = skillKeyframeSequence:GetKeyframes()
+        local animationLength = self:LoadAnimationLengthFromKeyframes(keyframes)
+
+        self.Value[skillKeyframeSequenceName] = {}
+        self.Value[skillKeyframeSequenceName].Animation = createdAnimation
+        self.Value[skillKeyframeSequenceName].AnimationLength = animationLength
     end
 
     return true

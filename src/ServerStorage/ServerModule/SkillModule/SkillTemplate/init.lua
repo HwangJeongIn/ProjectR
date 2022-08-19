@@ -65,6 +65,24 @@ function SkillTemplate:ValidateSkillDataParameter(skillDataParameter)
         return false
     end
 
+    if skillDataParameter[SkillDataParameterType.SkillCollisionDirection] then
+        if not skillDataParameter[SkillDataParameterType.SkillCollisionSpeed] then
+            Debug.Assert(false, "SkillCollisionDirection은 있지만, SkillCollisionSpeed가 없습니다. => " .. skillName)
+            return false
+        end
+    end
+
+    --[[
+    if not skillDataParameter[SkillDataParameterType.SkillCollisionDetailMovementType] then
+        Debug.Assert(false, "SkillCollisionDetailMovementType이 없습니다. => " .. skillName)
+        return false
+    end
+    --]]
+
+    if not skillDataParameter[SkillDataParameterType.SkillCollisionDuration] then
+        skillDataParameter[SkillDataParameterType.SkillCollisionDuration] = 0
+    end
+
     if not skillDataParameter[SkillDataParameterType.SkillAnimation] then
         Debug.Assert(false, "SkillAnimation이 없습니다. => " .. skillName)
         return false
@@ -72,13 +90,11 @@ function SkillTemplate:ValidateSkillDataParameter(skillDataParameter)
 
     --[[
     if not skillDataParameter[SkillDataParameterType.SkillDuration] then
+        Debug.Assert(false, "SkillDuration이 없습니다. => " .. skillName)
+        return false
     end
     --]]
 
-    if not skillDataParameter[SkillDataParameterType.SkillCollisionDuration] then
-        skillDataParameter[SkillDataParameterType.SkillCollisionDuration] = 0
-    end
-    
     if not skillDataParameter[SkillDataParameterType.SkillEffect] then
         Debug.Assert(false, "SkillEffect가 없습니다. => " .. skillName)
         return false
@@ -184,37 +200,6 @@ function SkillTemplate:ValidateSkillTemplate(skillName)
     return true
 end
 
-function SkillTemplate:InitializeAdditionalData(skillName)
-    local skillCollisionSize = self:GetSkillDataParameterFromRawSkillData(skillName, SkillDataParameterType.SkillCollisionSize)
-    if not skillCollisionSize then
-        Debug.Assert(false, "비정상입니다.")
-        return false
-    end
-
-    local skillCollisionOffset = self:GetSkillDataParameterFromRawSkillData(skillName, SkillDataParameterType.SkillCollisionOffset)
-    if not skillCollisionOffset then
-        Debug.Assert(false, "비정상입니다.")
-        return false
-    end
-
-    local skillCollisionSpeed = self:GetSkillDataParameterFromRawSkillData(skillName, SkillDataParameterType.SkillCollisionSpeed)
-    local skillCollisionDirection = self:GetSkillDataParameterFromRawSkillData(skillName, SkillDataParameterType.SkillCollisionDirection)
-    
-    self:RegisterSkillImpl(skillName,
-        SkillImplType.GetSkillCollisionParameter,
-        function(skillController, toolOwnerPlayerCFrame)
-            local skillCollisionParameter = {}
-
-            local finalOffsetVector = toolOwnerPlayerCFrame.LookVector * skillCollisionOffset.X
-            + toolOwnerPlayerCFrame.RightVector * skillCollisionOffset.Y
-            skillCollisionParameter.Size = skillCollisionSize
-            skillCollisionParameter.CFrame = toolOwnerPlayerCFrame + finalOffsetVector
-            return skillCollisionParameter
-        end)
-
-    return true
-end
-
 function SkillTemplate:InitializeAllSkillTemplates()
     local defaultWeaponSkillGameData = ServerGameDataManager[GameDataType.Skill]:Get(DefaultWeaponSkillGameDataKey)
     Debug.Assert(defaultWeaponSkillGameData, "DefaultWeaponSkillGameDataKey에 해당하는 데이터가 없습니다.")
@@ -224,11 +209,6 @@ function SkillTemplate:InitializeAllSkillTemplates()
     for skillGameDataKey, skillGameData in pairs(allData) do
         self.SkillImplTemplateTable[skillGameDataKey] = {}
         local skillName = skillGameData.Name
-
-        if not self:InitializeAdditionalData(skillName) then
-            Debug.Assert(false, "비정상입니다.")
-            return false
-        end
 
         if not self:ValidateSkillTemplate(skillName) then
             Debug.Assert(false, "비정상입니다.")
@@ -262,19 +242,16 @@ SkillTemplate:RegisterSkillDataParameter({
     SkillName = "BaseAttack",
     [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
     [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+    [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
+    [SkillDataParameterType.SkillCollisionSpeed] = 50,
+    --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
+    [SkillDataParameterType.SkillCollisionDuration] = 100,
+    
     [SkillDataParameterType.SkillAnimation] = "LeftSlash",
-    [SkillDataParameterType.SkillDuration] = 0.5,
+    [SkillDataParameterType.SkillDuration] = 10,
     [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
 })
 
-SkillTemplate:RegisterSkillImpl(
-    "BaseAttack",
-    SkillImplType.UseSkill,
-    function(skillController, toolOwnerPlayer)
-        
-        return true
-    end
-)
 
 SkillTemplate:RegisterSkillImpl(
     "BaseAttack",
@@ -302,18 +279,16 @@ SkillTemplate:RegisterSkillDataParameter({
     SkillName = "WhirlwindSlash",
     [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
     [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+    [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
+    [SkillDataParameterType.SkillCollisionSpeed] = 1,
+    --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
+    --[SkillDataParameterType.SkillCollisionDuration] = 0,
+    
     [SkillDataParameterType.SkillAnimation] = "LeftSlash",
+    [SkillDataParameterType.SkillDuration] = 0.5,
     [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
 })
 
-SkillTemplate:RegisterSkillImpl(
-    "WhirlwindSlash",
-    SkillImplType.UseSkill,
-    function(skillController, toolOwnerPlayer)
-        Debug.Assert(false, "상위에서 구현해야합니다.")
-        return false
-    end
-)
 
 SkillTemplate:RegisterSkillImpl(
     "WhirlwindSlash",
@@ -341,19 +316,16 @@ SkillTemplate:RegisterSkillDataParameter({
     SkillName = "TempestSlash",
     [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
     [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+    [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
+    [SkillDataParameterType.SkillCollisionSpeed] = 1,
+    --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
+    --[SkillDataParameterType.SkillCollisionDuration] = 0,
+    
     [SkillDataParameterType.SkillAnimation] = "LeftSlash",
+    [SkillDataParameterType.SkillDuration] = 0.5,
     [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
 })
 
-
-SkillTemplate:RegisterSkillImpl(
-    "TempestSlash",
-    SkillImplType.UseSkill,
-    function(skillController, toolOwnerPlayer)
-        Debug.Assert(false, "상위에서 구현해야합니다.")
-        return false
-    end
-)
 
 SkillTemplate:RegisterSkillImpl(
     "TempestSlash",
@@ -382,18 +354,16 @@ SkillTemplate:RegisterSkillDataParameter({
     SkillName = "PowerStrike",
     [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
     [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+    [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
+    [SkillDataParameterType.SkillCollisionSpeed] = 1,
+    --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
+    --[SkillDataParameterType.SkillCollisionDuration] = 0,
+    
     [SkillDataParameterType.SkillAnimation] = "LeftSlash",
+    [SkillDataParameterType.SkillDuration] = 0.5,
     [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
 })
 
-SkillTemplate:RegisterSkillImpl(
-    "PowerStrike",
-    SkillImplType.UseSkill,
-    function(skillController, toolOwnerPlayer)
-        Debug.Assert(false, "상위에서 구현해야합니다.")
-        return false
-    end
-)
 
 SkillTemplate:RegisterSkillImpl(
     "PowerStrike",
@@ -421,18 +391,16 @@ SkillTemplate:RegisterSkillDataParameter({
     SkillName = "StormBlade",
     [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
     [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+    [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
+    [SkillDataParameterType.SkillCollisionSpeed] = 1,
+    --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
+    --[SkillDataParameterType.SkillCollisionDuration] = 0,
+    
     [SkillDataParameterType.SkillAnimation] = "LeftSlash",
+    [SkillDataParameterType.SkillDuration] = 0.5,
     [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
 })
 
-SkillTemplate:RegisterSkillImpl(
-    "StormBlade",
-    SkillImplType.UseSkill,
-    function(skillController, toolOwnerPlayer)
-        Debug.Assert(false, "상위에서 구현해야합니다.")
-        return false
-    end
-)
 
 SkillTemplate:RegisterSkillImpl(
     "StormBlade",

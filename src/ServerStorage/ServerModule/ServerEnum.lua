@@ -29,11 +29,9 @@ local ServerEnum = {
 	},
 
 	SkillImplType = {
-		UseSkill = 1,
-        FindTargetInRange = 2,
-        ApplySkillToTarget = 3,
-		GetSkillCollisionParameter = 4,
-		Count = 5
+        FindTargetInRange = 1,
+        ApplySkillToTarget = 2,
+		Count = 3
 	},
 
 	SkillDataParameterType = {
@@ -71,10 +69,8 @@ Debug.Assert(ServerEnum.WorldInteractorType.Count == #ServerEnum.WorldInteractor
 
 
 ServerEnum.SkillImplType.Converter = {
-	[ServerEnum.SkillImplType.UseSkill] = "UseSkill",
 	[ServerEnum.SkillImplType.FindTargetInRange] = "FindTargetInRange",
 	[ServerEnum.SkillImplType.ApplySkillToTarget] = "ApplySkillToTarget",
-	[ServerEnum.SkillImplType.GetSkillCollisionParameter] = "GetSkillCollisionParameter",
 }
 Debug.Assert(ServerEnum.SkillImplType.Count == #ServerEnum.SkillImplType.Converter + 1, "비정상입니다.")
 
@@ -89,7 +85,7 @@ ServerEnum.SkillDataParameterType.Converter = {
 
 	[ServerEnum.SkillDataParameterType.SkillAnimation] = "SkillAnimation",
 	[ServerEnum.SkillDataParameterType.SkillDuration] = "SkillDuration",
-	
+
 	[ServerEnum.SkillDataParameterType.SkillEffect] = "SkillEffect",
 }
 Debug.Assert(ServerEnum.SkillDataParameterType.Count == #ServerEnum.SkillDataParameterType.Converter + 1, "비정상입니다.")

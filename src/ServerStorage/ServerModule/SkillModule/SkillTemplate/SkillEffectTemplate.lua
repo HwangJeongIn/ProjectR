@@ -20,7 +20,11 @@ function SkillEffectTemplate:Get(skillEffectName)
 end
 
 function SkillEffectTemplate:ValidateSkillEffect(skillEffect)
-    -- 추가 검증 여기에 작성
+    if skillEffect.Anchored then
+        Debug.Print("Effect의 Anchored가 켜져있습니다. 자동으로 꺼집니다. => " .. skillEffect.Name)
+        skillEffect.Anchored = false
+    end
+    
     return true
 end
 

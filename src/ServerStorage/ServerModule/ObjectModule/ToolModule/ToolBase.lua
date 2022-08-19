@@ -75,7 +75,7 @@ function ToolBase:SetToolOwnerPlayer(toolOwnerPlayer)
 		skillController:SetToolOwnerPlayer(toolOwnerPlayer)
 	end
 
-	if not self.DefaultSkillController then
+	if self.DefaultSkillController then
 		self.DefaultSkillController:SetToolOwnerPlayer(toolOwnerPlayer)
 	end
 end
