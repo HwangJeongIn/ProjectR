@@ -22,6 +22,7 @@ local StatusType = ServerEnum.StatusType
 local ToolType = ServerEnum.ToolType
 local EquipType = ServerEnum.EquipType
 
+
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
 
 -- STC
@@ -48,12 +49,23 @@ function ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, npcSy
 	self.GetWorldInteractorSystem = function() return worldInteractorSystem end
 	self.GetNpcSystem = function() return npcSystem end
 
+	local mapController = require(script:WaitForChild("MapController"))
+	self.MapController = mapController
+
 	local ServerRemoteEventImpl = require(script:WaitForChild("ServerRemoteEventImpl"))
 	ServerRemoteEventImpl:InitializeRemoteEvents(self)
 
 	return true
 end
 
+function ServerGlobalStorage:SelectRandomMapAndEnterMap(playersInGame)
+	local clonedMap = self.MapController:SelectRandomMap()
+	self.MapController:EnterMap(clonedMap, playersInGame)
+end
+
+function ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(playersInGame)
+
+end
 
 function ServerGlobalStorage:OnCreateEmptyPlayerData(playerData)
 	playerData.SkillLastActivationTimeTable = {}

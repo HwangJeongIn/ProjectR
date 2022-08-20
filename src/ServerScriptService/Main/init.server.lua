@@ -17,10 +17,7 @@ local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtili
 local ServerConstant = ServerModuleFacade.ServerConstant
 local IsTestMode = ServerConstant.IsTestMode
 
--- 게임이 생성되기 전에 스크립트가 먼저 실행될 수 있기 때문에
--- 스크립트 실행 시점에 로드되어 있지 않을 수 있다. 
--- 따라서 WaitForChild를 사용하여 로드될 때까지 기다린다.
-local MapsFolder = ServerStorage:WaitForChild("Maps")
+local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
 local RemoteValues = ReplicatedStorage:WaitForChild("RemoteValues")
 
@@ -166,10 +163,12 @@ while false  do
 
 	
 	-- 맵 선택
-	local clonedMap = MapController:SelectRandomMap()
+
+	--ServerGlobalStorage:SelectRandomMapAndEnterMap(playersInGame)
+	ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(playersInGame)
 	
 	-- 플레이어 초기화 : SpawnPoint로 이동, 도구 제공 등
-	Initializer:EnterGame(clonedMap, playersInGame)
+	Initializer:StartGame(playersInGame)
 	
 	-- 맵 선택 메시지, 게임 시작 메시지
 	for i, player in pairs(playersInGame) do

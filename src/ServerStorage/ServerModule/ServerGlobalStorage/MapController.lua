@@ -2,19 +2,29 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonModuleFacade.Debug
 
+local CommonEnum = CommonModuleFacade.CommonEnum
+local GameDataType = CommonEnum.GameDataType
+
 local ServerStorage = game:GetService("ServerStorage")
 local MapsFolder = ServerStorage:WaitForChild("Maps")
-local ToolUtility = CommonModuleFacade.ToolUtility
 
+local ServerModule = ServerStorage:WaitForChild("ServerModule")
+
+local ToolUtility = CommonModuleFacade.ToolUtility
+local NpcUtility = CommonModuleFacade.NpcUtility
+
+local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
+local WorldInteractorUtility = require(ServerObjectUtilityModule:WaitForChild("WorldInteractorUtility"))
+
+
+--[[
 local ToolsFolder = ServerStorage:WaitForChild("Tools")
 local WorldInteractorsFolder = ServerStorage:WaitForChild("WorldInteractors")
 local NpcsFolder = ServerStorage:WaitForChild("Npcs")
+--]]
 
-
-local key = ToolUtility:GetGameDataKey(tool)
 
 --[[
-local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
 
@@ -30,10 +40,75 @@ local ToolType = ServerEnum.ToolType
 local EquipType = ServerEnum.EquipType
 --]]
 
+local MapTemplate = require(script.Parent:WaitForChild("MapTemplate"))
+
 
 local MapController = {
-	MapTable = {}
+	CurrentMap = {
+		Map = nil,
+		Tools = nil,
+		WorldInteractors = nil,
+		Npcs = nil
+	}
 }
+
+function MapController:GetCurrentMap()
+	return self.CurrentMap.Map
+end
+
+function MapController:GetCurrentMapTools()
+	if not self.CurrentMap.Map then
+		return nil
+	end
+
+	return self.CurrentMap.Tools
+end
+
+function MapController:GetCurrentMapWorldInteractors()
+	if not self.CurrentMap.Map then
+		return nil
+	end
+
+	return self.CurrentMap.WorldInteractors
+end
+
+function MapController:GetCurrentMapNpcs()
+	if not self.CurrentMap.Map then
+		return nil
+	end
+
+	return self.CurrentMap.Npcs
+end
+
+function MapController:SetCurrentMapByMapTemplate(mapTemplate)
+	if not mapTemplate then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local map = mapTemplate:GetMap()
+	local mapTools = mapTemplate.GetTools()
+	local mapWorldInteractors = mapTemplate:GetWorldInteractors()
+	local mapNpcs = mapTemplate:GetNpcs()
+
+	self.CurrentMap.Map = map:Clone()
+	if mapTools then
+		self.CurrentMap.Tools = mapTools:Clone()
+		self.CurrentMap.Tools.Parent = self.CurrentMap.Map
+	end
+
+	if mapWorldInteractors then
+		self.CurrentMap.WorldInteractors = mapWorldInteractors:Clone()
+		self.CurrentMap.WorldInteractors.Parent = self.CurrentMap.Map
+	end
+
+	if mapNpcs then
+		self.CurrentMap.Npcs = mapNpcs:Clone()
+		self.CurrentMap.Npcs.Parent = self.CurrentMap.Map
+	end
+
+	return true
+end
 
 function MapController:DivideWithoutRemainder(value, divisor)
 	return (value - (value % divisor)) / divisor
@@ -54,51 +129,6 @@ function MapController:TestSpawnPoints(spawnPoints, centerPosition, mapBase)
 	end
 end
 --]]
-
-function MapController:InitializeAllMaps()
-	local maps = MapsFolder:GetChildren()
-
-	for mapIndex, map in pairs(maps) do 
-		self.MapTable[mapIndex] = {}
-
-		local mapName = map.Name
-
-		local mapObjects = Instance.new("Model")
-		mapObjects.Name = mapName .. "Objects"
-		mapObjects.Parent = MapsFolder
-
-		local mapTools = map:FindFirstChild("Tools")
-		local mapWorldInteractors = map:FindFirstChild("WorldInteractors")
-		local mapNpcs = map:FindFirstChild("Npcs")
-
-		self.MapTable[mapIndex].MapModel = map
-		if mapTools then
-			mapTools.Parent = mapObjects
-			self.MapTable[mapIndex].GetTools = function() return mapTools end
-		end
-		
-		if mapWorldInteractors then
-			mapWorldInteractors.Parent = mapObjects
-			self.MapTable[mapIndex].GetWorldInteractors = function() return mapWorldInteractors end
-		end
-		
-		if mapNpcs then
-			mapNpcs.Parent = mapObjects
-			self.MapTable[mapIndex].GetNpcs = function() return mapNpcs end
-		end
-	end
-
-	return true
-end
-
-function MapController:GetMapWrapper(mapIndex)
-	if not self.MapTable[mapIndex] then
-		Debug.Assert(false, "비정상입니다.")
-		return nil
-	end
-
-	return self.MapTable[mapIndex]
-end
 
 function MapController:CalcSpawnPoints(playerCount, mapBase)
 	--playerCount = 4
@@ -161,7 +191,6 @@ function MapController:TeleportPlayerToSpawnPoint(character, spawnPoint, mapCent
 	humanoidRootPart.CFrame = CFrame.lookAt(finalPosition, mapCenterPosition)
 end
 
-
 function MapController:TeleportPlayerToRespawnLocation(player)
 	if not player then
 		Debug.Assert(false, "플레이어가 없습니다.")
@@ -178,17 +207,6 @@ function MapController:TeleportPlayerToRespawnLocation(player)
 	humanoidRootPart.CFrame = player.RespawnLocation.CFrame
 end
 
-function MapController:CloneSelectedMapAndInitialize(selectedMapIndex)
-	if not selectedMapIndex then
-		Debug.Assert(false, "비정상입니다.")
-		return nil
-	end
-	local clonedMap = selectedMap:Clone()
-	clonedMap.Parent = workspace
-
-	clonedMap:FindFirstChild("T")
-end
-
 function MapController:SelectDesertMapTemp()
 	local desertMap = MapsFolder:FindFirstChild("DesertMap")
 	local maps = MapsFolder:GetChildren()
@@ -199,7 +217,15 @@ function MapController:SelectDesertMapTemp()
 			break
 		end
 	end
-	return self:CloneSelectedMapAndInitialize(desertMapIndex)
+
+	local targetMapTemplate = self:GetMapTemplate(desertMapIndex)
+	Debug.Assert(targetMapTemplate, "비정상입니다.")
+	if not self:SetCurrentMapByMapTemplate(targetMapTemplate) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
 end
 
 function MapController:SelectRandomMap()
@@ -211,16 +237,29 @@ function MapController:SelectRandomMap()
 	end
 	
 	local selectedMapIndex = mapCandidates[math.random(1, #mapCandidates)]
-	return self:CloneSelectedMapAndInitialize(selectedMapIndex)
+
+	local targetMapTemplate = self:GetMapTemplate(selectedMapIndex)
+	Debug.Assert(targetMapTemplate, "비정상입니다.")
+	if not self:SetCurrentMapByMapTemplate(targetMapTemplate) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
 end
 
-function MapController:EnterMap(map, playersInGame)
+function MapController:EnterMap(playersInGame)
+	if not playersInGame then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local map = self:GetCurrentMap()
 
 	local playerCount = #playersInGame
 	local mapBase = map:WaitForChild("Base")
 	local mapCenterPosition = mapBase.Position
 	local spawnPointList = self:CalcSpawnPoints(playerCount, mapBase)
-
 	for i, player in pairs (playersInGame) do
 		if not player then
 			Debug.Log("이미 나간 플레이어입니다. => " .. player.Name)
@@ -238,6 +277,8 @@ function MapController:EnterMap(map, playersInGame)
 		-- 스폰 포인트로 텔레포트
 		self:TeleportPlayerToSpawnPoint(character, spawnPointList[i], mapCenterPosition)
 	end
+
+	return true
 end
 
 MapController:InitializeAllMaps()

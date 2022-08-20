@@ -16,8 +16,6 @@ local ToolType = CommonEnum.ToolType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
 
-local MapController = require(script.Parent:WaitForChild("MapController"))
-
 local Initializer = {}
 
 function Initializer:InitializeGame()
@@ -203,11 +201,6 @@ function Initializer:StartGame(playersInGame)
 			aliveTag.Parent = character
 		end
 	end
-end
-
-function Initializer:EnterGame(map, playersInGame)
-	MapController:EnterMap(map, playersInGame)
-	self:StartGame(playersInGame)
 end
 
 return Initializer
