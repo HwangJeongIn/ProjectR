@@ -39,6 +39,7 @@ local CommonConstant = {
 	ObjectGameDataTypeTable = {
 		[GameDataType.Tool] = true,
 		[GameDataType.WorldInteractor] = true,
+		[GameDataType.Npc] = true,
 	}
 }
 

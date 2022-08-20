@@ -1,3 +1,0 @@
-local MonsterSystem = {}
-
-return MonsterSystem

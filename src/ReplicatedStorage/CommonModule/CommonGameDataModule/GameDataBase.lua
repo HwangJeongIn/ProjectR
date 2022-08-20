@@ -12,7 +12,6 @@ local CommonConstant = require(CommonModule:WaitForChild("CommonConstant"))
 local ObjectGameDataTypeTable = CommonConstant.ObjectGameDataTypeTable
 
 
-
 local GameDataBase = {}
 GameDataBase.__index = Utility.Inheritable__index
 GameDataBase.__newindex = Utility.Immutable__newindex
@@ -159,7 +158,6 @@ function GameDataBase:Get(key)
 end
 
 function GameDataBase:InsertData(key, value)
-	
 	local keyTypeString = type(key)
 	
 	if keyTypeString ~= "number" then

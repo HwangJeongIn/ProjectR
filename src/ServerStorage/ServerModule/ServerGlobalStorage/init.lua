@@ -36,17 +36,17 @@ ServerGlobalStorage.__index = Utility.Inheritable__index
 ServerGlobalStorage.__newindex = Utility.Inheritable__newindex
 --setmetatable(ServerGlobalStorage, CommonGlobalStorage)
 
-function ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, monsterSystem)
-	if not toolSystem or not worldInteractorSystem or not monsterSystem then
+function ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, npcSystem)
+	if not toolSystem or not worldInteractorSystem or not npcSystem then
 		Debug.Assert(toolSystem, "비정상입니다.")
 		Debug.Assert(worldInteractorSystem, "비정상입니다.")
-		Debug.Assert(monsterSystem, "비정상입니다.")
+		Debug.Assert(npcSystem, "비정상입니다.")
 		return false
 	end
 
 	self.GetToolSystem = function() return toolSystem end
 	self.GetWorldInteractorSystem = function() return worldInteractorSystem end
-	self.GetMonsterSystem = function() return monsterSystem end
+	self.GetNpcSystem = function() return npcSystem end
 
 	local ServerRemoteEventImpl = require(script:WaitForChild("ServerRemoteEventImpl"))
 	ServerRemoteEventImpl:InitializeRemoteEvents(self)

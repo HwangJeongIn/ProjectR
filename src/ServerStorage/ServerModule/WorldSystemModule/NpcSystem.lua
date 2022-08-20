@@ -1,0 +1,3 @@
+local NpcSystem = {}
+
+return NpcSystem

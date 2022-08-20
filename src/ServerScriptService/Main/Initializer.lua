@@ -26,9 +26,9 @@ function Initializer:InitializeGame()
 	local WorldSystemModule = ServerModule:WaitForChild("WorldSystemModule")
 	local toolSystem = require(WorldSystemModule:WaitForChild("ToolSystem"))
 	local worldInteractorSystem = require(WorldSystemModule:WaitForChild("WorldInteractorSystem"))
-	local monsterSystem = require(WorldSystemModule:WaitForChild("MonsterSystem"))
+	local npcSystem = require(WorldSystemModule:WaitForChild("NpcSystem"))
 
-	if not ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, monsterSystem) then
+	if not ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, npcSystem) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
