@@ -67,6 +67,8 @@ end
 Initializer:InitializeGame()
 
 function Temp()
+
+
 	local players = game.Players:GetPlayers()
 	for i, player in pairs(players) do
 		Initializer:PushDefaulWeaponTools(player)
@@ -111,40 +113,18 @@ function Temp()
 
 end
 
-while #game.Players:GetPlayers() < 1 do
-	wait(1)
-end
-
---[[
-function TestFunction1()
-	print("prewait => 1")
-	wait(5)
-	print("postwait => 1")
-	coroutine.yield(true)
-end
-
-function TestFunction2()
-	print("prewait => 2")
-	wait(5)
-	print("postwait => 2")
-	coroutine.yield(true)
-end
-
-local c1 = coroutine.wrap(TestFunction1)
-local c2 = coroutine.wrap(TestFunction2)
-
-c1()
-c2()
---]]
-
 wait(3)
 Temp()
 
+while #game.Players:GetPlayers() < 1 do
+	wait(1)
+end
+local clonedMap = MapController:SelectDesertMapTemp()
+Initializer:EnterGame(clonedMap, game.Players:GetPlayers())
+
+
 while false  do
-	
-	
 	-- 다른 플레이어를 기다리는 중
-	
 	if IsTestMode then
 		while #game.Players:GetPlayers() < 1 do
 			wait(1)

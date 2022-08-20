@@ -93,7 +93,7 @@ function WorldInteractorSystem:Initialize()
                 Debug.Assert(false, "SetWorldInteractorCollisionGroup에 실패했습니다. => " .. worldInteractorName)
                 return false
             end
-            
+        
             worldInteractorTemplateTable[key] = {WorldInteractor = worldInteractor, WorldInteractorGameData = worldInteractorGameData}
         end
     end

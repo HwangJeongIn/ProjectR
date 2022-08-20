@@ -1,14 +1,18 @@
 local ServerStorage = game:GetService("ServerStorage")
 local MapsFolder = ServerStorage:WaitForChild("Maps")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
+
 local Debug = ServerModuleFacade.Debug
 
-local MapController = {}
+local MapController = {
+	MapTable = {}
+}
 
 function MapController:DivideWithoutRemainder(value, divisor)
 	return (value - (value % divisor)) / divisor
 end
 
+--[[
 function MapController:TestSpawnPoints(spawnPoints, centerPosition, mapBase)
 	-- 테스트
 	print("Center : ".. tostring(centerPosition))
@@ -22,11 +26,85 @@ function MapController:TestSpawnPoints(spawnPoints, centerPosition, mapBase)
 		print(tostring(i).. " : ".. tostring(pos))
 	end
 end
+--]]
+
+function MapController:InitializeAllMaps()
+	local maps = MapsFolder:GetChildren()
+	for mapIndex, map in pairs(maps) do 
+		self.MapTable[mapIndex] = {}
+
+		local mapName = map.Name
+
+		local mapObjects = Instance.new("Model")
+		mapObjects.Name = mapName .. "Objects"
+		mapObjects.Parent = MapsFolder
+
+		local mapTools = map:FindFirstChild("Tools")
+		local mapWorldInteractors = map:FindFirstChild("WorldInteractors")
+		local mapNpcs = map:FindFirstChild("Npcs")
+
+		self.MapTable[mapIndex].MapModel = map
+		if mapTools then
+			mapTools.Parent = mapObjects
+			self.MapTable[mapIndex].Tools = mapTools
+		end
+		
+		if mapWorldInteractors then
+			mapWorldInteractors.Parent = mapObjects
+			self.MapTable[mapIndex].WorldInteractors = mapWorldInteractors
+		end
+		
+		if mapNpcs then
+			mapNpcs.Parent = mapObjects
+			self.MapTable[mapIndex].Npcs = mapNpcs
+		end
+	end
+
+	return true
+end
+
+
+function MapController:GetMapWrapper(mapIndex)
+	if not self.MapTable[mapIndex] then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return self.MapTable[mapIndex]
+end
+
+function MapController:GetToolsFromMap(mapIndex)
+	local targetMapWrapper = self:GetMapWrapper(mapIndex)
+	if not targetMapWrapper then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return targetMapWrapper.Tools
+end
+
+function MapController:GetWorldInteractorsFromMap(mapIndex)
+	local targetMapWrapper = self:GetMapWrapper(mapIndex)
+	if not targetMapWrapper then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return targetMapWrapper.WorldInteractors
+end
+
+function MapController:GetNpcsFromMap(mapIndex)
+	local targetMapWrapper = self:GetMapWrapper(mapIndex)
+	if not targetMapWrapper then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return targetMapWrapper.Npcs
+end
 
 function MapController:CalcSpawnPoints(playerCount, mapBase)
-
 	--playerCount = 4
-
 	local splitCount = 1
 
 	local splitFactor = MapController:DivideWithoutRemainder(playerCount, 4);
@@ -106,6 +184,18 @@ function MapController:TeleportPlayerToRespawnLocation(player)
 	humanoidRootPart.CFrame = player.RespawnLocation.CFrame
 end
 
+function MapController:CloneSelectedMapAndInitialize(selectedMap)
+	local clonedMap = selectedMap:Clone()
+	clonedMap.Parent = workspace
+
+	clonedMap:FindFirstChild("T")
+end
+
+function MapController:SelectDesertMapTemp()
+	local desertMap = MapsFolder:FindFirstChild("DesertMap")
+	return self:CloneSelectedMapAndInitialize(desertMap)
+end
+
 function MapController:SelectRandomMap()
 	local mapCandidates = MapsFolder:GetChildren()
 	local mapCount = #mapCandidates
@@ -114,11 +204,9 @@ function MapController:SelectRandomMap()
 		return nil
 	end
 	
-	local chosenMap = mapCandidates[math.random(1, #mapCandidates)]
-	local clonedMap = chosenMap:Clone()
-	clonedMap.Parent = workspace
-	
-	return clonedMap
+	local selectedMap = mapCandidates[math.random(1, #mapCandidates)]
+
+	return self:CloneSelectedMapAndInitialize(selectedMap)
 end
 
 function MapController:EnterMap(map, playersInGame)
@@ -147,4 +235,5 @@ function MapController:EnterMap(map, playersInGame)
 	end
 end
 
+MapController:InitializeAllMaps()
 return MapController
