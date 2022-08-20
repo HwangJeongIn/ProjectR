@@ -3,13 +3,19 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonModuleFacade.Debug
 local Utility = CommonModuleFacade.Utility
+
 local ToolUtility = CommonModuleFacade.ToolUtility
+local NpcUtility = CommonModuleFacade.NpcUtility
+
 local CommonGlobalStorage = CommonModuleFacade.CommonGlobalStorage
 
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
+
+local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
+local WorldInteractorUtility = require(ServerObjectUtilityModule:WaitForChild("WorldInteractorUtility"))
 
 local MaxPickupDistance = ServerConstant.MaxPickupDistance
 local MaxDropDistance = ServerConstant.MaxDropDistance
@@ -58,13 +64,122 @@ function ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, npcSy
 	return true
 end
 
+function ServerGlobalStorage:CloneObjectFromDummyObject(gameDataType, dummyObject)
+
+	local dummyObjectName = dummyObject.Name
+	local dummyObjectCFrame = dummyObject.CFrame
+
+	local createdObject = nil
+	if GameDataType.Tool == gameDataType then
+		local objectGameDataKey = ToolUtility:GetGameDataKeyByModelName(dummyObjectName)
+		createdObject = self:CreateToolToWorkspace(objectGameDataKey, dummyObjectCFrame)
+
+	elseif GameDataType.WorldInteractor == gameDataType then
+		local objectGameDataKey = WorldInteractorUtility:GetGameDataKeyByModelName(dummyObjectName)
+		createdObject = self:CreateWorldInteractorToWorkspace(objectGameDataKey, dummyObjectCFrame)
+
+	elseif GameDataType.Npc == gameDataType then
+		local objectGameDataKey = NpcUtility:GetGameDataKeyByModelName(dummyObjectName)
+		createdObject = self:CreateNpcToWorkspace(objectGameDataKey, dummyObjectCFrame)
+
+	else
+		Debug.Assert(false, "비정상입니다. => " .. tostring(gameDataType) .. " : " .. dummyObjectName)
+		return nil
+	end
+
+	if not createdObject then
+		Debug.Assert(false, "비정상입니다. => " .. tostring(gameDataType) .. " : " .. dummyObjectName)
+		return nil
+	end
+	
+	return createdObject
+end
+
+function ServerGlobalStorage:CreateObjectsFromDummyObjects(gameDataType, dummyObjectsFolder)
+	local objectsFolder = Instance.new("Folder")
+	
+	local dummyObjects = dummyObjectsFolder:GetChildren()
+	for _, dummyObject in dummyObjects do
+		local createdObject = self:CloneObjectFromDummyObject(gameDataType, dummyObject)
+		if not createdObject then
+			Debug.Assert(false, "비정상입니다.")
+			return nil
+		end
+
+		createdObject.Parent = objectsFolder
+	end
+
+	return objectsFolder
+end
+
+function ServerGlobalStorage:CreateMapObjectsByMapTemplate(mapTemplate)
+	local mapTools = mapTemplate.GetTools()
+	local mapWorldInteractors = mapTemplate:GetWorldInteractors()
+	local mapNpcs = mapTemplate:GetNpcs()
+
+	if mapTools then
+		local createdObjects = self:CreateObjectsFromDummyObjects(GameDataType.Tool, mapTools)
+		if not createdObjects then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+
+		self.MapController:SetCurrentMapObjects(GameDataType.Tool, createdObjects)
+	end
+
+	if mapWorldInteractors then
+		local createdObjects = self:CreateObjectsFromDummyObjects(GameDataType.WorldInteractor, mapWorldInteractors)
+		if not createdObjects then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+
+		self.MapController:SetCurrentMapObjects(GameDataType.WorldInteractor, createdObjects)
+	end
+
+	if mapNpcs then
+		local createdObjects = self:CreateObjectsFromDummyObjects(GameDataType.Npc, mapNpcs)
+		if not createdObjects then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+
+		self.MapController:SetCurrentMapObjects(GameDataType.Npc, createdObjects)
+	end
+
+	return true
+end
+
 function ServerGlobalStorage:SelectRandomMapAndEnterMap(playersInGame)
-	local clonedMap = self.MapController:SelectRandomMap()
-	self.MapController:EnterMap(clonedMap, playersInGame)
+	local mapTemplate self.MapController:SelectRandomMap()
+	if not mapTemplate then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self:CreateMapObjectsByMapTemplate(mapTemplate) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	self.MapController:EnterMap(playersInGame)
+	return true
 end
 
 function ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(playersInGame)
+	local mapTemplate = self.MapController:SelectDesertMapTemp()
+	if not mapTemplate then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
 
+	if not self:CreateMapObjectsByMapTemplate(mapTemplate) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	self.MapController:EnterMap(playersInGame)
+	return true
 end
 
 function ServerGlobalStorage:OnCreateEmptyPlayerData(playerData)

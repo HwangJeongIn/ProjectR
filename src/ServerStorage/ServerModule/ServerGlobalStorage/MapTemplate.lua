@@ -16,6 +16,9 @@ local NpcUtility = CommonModuleFacade.NpcUtility
 local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
 local WorldInteractorUtility = require(ServerObjectUtilityModule:WaitForChild("WorldInteractorUtility"))
 
+local ToolsFolder = ServerStorage:WaitForChild("Tools")
+local WorldInteractorsFolder = ServerStorage:WaitForChild("WorldInteractors")
+local NpcsFolder = ServerStorage:WaitForChild("Npcs")
 
 local MapTemplate = {
 	MapTable = {}
@@ -34,6 +37,7 @@ function MapTemplate:ValidateMapObjects(gameDataType, objectsFolder)
 
 	else
 		Debug.Assert(false, "비정상입니다. => " .. tostring(gameDataType))
+        return false
 	end
 
 	if not targetObjectUtility then
@@ -72,7 +76,7 @@ function MapTemplate:InitializeAllMaps()
 		self.MapTable[mapIndex].GetMap = function() return map end
 		if mapTools then
 			if not self:ValidateMapObjects(GameDataType.Tool, mapTools) then
-				Debug.Assert(false, "ValidateMapObjects에 실패했습니다.")
+				Debug.Assert(false, "ValidateMapObjects에 실패했습니다. => " .. mapName)
 				return false
 			end
 			mapTools.Parent = mapObjects
@@ -81,7 +85,7 @@ function MapTemplate:InitializeAllMaps()
 		
 		if mapWorldInteractors then
 			if not self:ValidateMapObjects(GameDataType.WorldInteractor, mapWorldInteractors) then
-				Debug.Assert(false, "ValidateMapObjects에 실패했습니다.")
+				Debug.Assert(false, "ValidateMapObjects에 실패했습니다. => " .. mapName)
 				return false
 			end
 			mapWorldInteractors.Parent = mapObjects
@@ -90,7 +94,7 @@ function MapTemplate:InitializeAllMaps()
 		
 		if mapNpcs then
 			if not self:ValidateMapObjects(GameDataType.Npc, mapNpcs) then
-				Debug.Assert(false, "ValidateMapObjects에 실패했습니다.")
+				Debug.Assert(false, "ValidateMapObjects에 실패했습니다. => " .. mapName)
 				return false
 			end
 			mapNpcs.Parent = mapObjects

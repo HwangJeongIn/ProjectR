@@ -191,7 +191,7 @@ function ToolSystem:CreateTool(toolKey)
         return nil
     end
 
-    local createdTool = self:Create(toolKey) 
+    local createdTool = self:Create(toolKey)
     if not createdTool then
         Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolKey))
         return nil

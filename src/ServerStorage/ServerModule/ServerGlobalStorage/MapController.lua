@@ -1,3 +1,4 @@
+local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
 local Debug = CommonModuleFacade.Debug
@@ -52,62 +53,118 @@ local MapController = {
 	}
 }
 
+
+function MapController:Initialize(serverGlobalStorage)
+	self.ServerGlobalStorage = serverGlobalStorage
+end
+
 function MapController:GetCurrentMap()
 	return self.CurrentMap.Map
 end
 
-function MapController:GetCurrentMapTools()
+function MapController:SetCurrentMapTools(gameDataType, objects)
+	if not self.CurrentMap.Map then
+		Debug.Assert(false, "CurrentMap이 없습니다.")
+		return false
+	end
+
+	if GameDataType.Tool == gameDataType then
+		self.CurrentMap.Tools = objects
+		self.CurrentMap.Tools.Parent = self.CurrentMap.Map
+
+	elseif GameDataType.WorldInteractor == gameDataType then
+		self.CurrentMap.WorldInteractors = objects
+		self.CurrentMap.WorldInteractors.Parent = self.CurrentMap.Map
+
+	elseif GameDataType.Npc == gameDataType then
+		self.CurrentMap.Npcs = objects
+		self.CurrentMap.Npcs.Parent = self.CurrentMap.Map
+
+	else
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+	return true
+end
+
+function MapController:GetCurrentMapObjects(gameDataType)
 	if not self.CurrentMap.Map then
 		return nil
 	end
 
-	return self.CurrentMap.Tools
-end
+	if GameDataType.Tool == gameDataType then
+		return self.CurrentMap.Tools
 
-function MapController:GetCurrentMapWorldInteractors()
-	if not self.CurrentMap.Map then
+	elseif GameDataType.WorldInteractor == gameDataType then
+		return self.CurrentMap.WorldInteractors
+
+	elseif GameDataType.Npc == gameDataType then
+		return self.CurrentMap.Npcs
+
+	else
+		Debug.Assert(false, "비정상입니다.")
 		return nil
 	end
-
-	return self.CurrentMap.WorldInteractors
 end
 
-function MapController:GetCurrentMapNpcs()
-	if not self.CurrentMap.Map then
-		return nil
+function MapController:ClearCurrentMap()
+	if self.CurrentMap.Map then
+		Debris:AddItem(self.CurrentMap.Map, 0)
+		self.CurrentMap.Map = nil
 	end
-
-	return self.CurrentMap.Npcs
+	
+	self.CurrentMap.Tools = nil
+	self.CurrentMap.WorldInteractors = nil
+	self.CurrentMap.Npcs = nil
 end
 
-function MapController:SetCurrentMapByMapTemplate(mapTemplate)
-	if not mapTemplate then
+function MapController:SetCurrentMap(map)
+	if not map then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-	local map = mapTemplate:GetMap()
-	local mapTools = mapTemplate.GetTools()
-	local mapWorldInteractors = mapTemplate:GetWorldInteractors()
-	local mapNpcs = mapTemplate:GetNpcs()
-
 	self.CurrentMap.Map = map:Clone()
-	if mapTools then
-		self.CurrentMap.Tools = mapTools:Clone()
-		self.CurrentMap.Tools.Parent = self.CurrentMap.Map
-	end
-
-	if mapWorldInteractors then
-		self.CurrentMap.WorldInteractors = mapWorldInteractors:Clone()
-		self.CurrentMap.WorldInteractors.Parent = self.CurrentMap.Map
-	end
-
-	if mapNpcs then
-		self.CurrentMap.Npcs = mapNpcs:Clone()
-		self.CurrentMap.Npcs.Parent = self.CurrentMap.Map
-	end
-
 	return true
+end
+
+function MapController:SelectDesertMapTemp()
+	local maps = MapsFolder:GetChildren()
+	local desertMapIndex = nil
+	for mapIndex, map in maps do
+		if "DesertMap" == map.Name then
+			desertMapIndex = mapIndex
+			break
+		end
+	end
+
+	local targetMapTemplate = MapTemplate:GetMapTemplate(desertMapIndex)
+	Debug.Assert(targetMapTemplate, "비정상입니다.")
+	if not self:SetCurrentMap(targetMapTemplate:GetMap()) then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return targetMapTemplate
+end
+
+function MapController:SelectRandomMap()
+	local mapCandidates = MapsFolder:GetChildren()
+	local mapCount = #mapCandidates
+	if mapCount == 0 then
+		Debug.Assert(false, "맵이 없습니다.")
+		return nil
+	end
+	
+	local selectedMapIndex = mapCandidates[math.random(1, #mapCandidates)]
+	local targetMapTemplate = MapTemplate:GetMapTemplate(selectedMapIndex)
+	Debug.Assert(targetMapTemplate, "비정상입니다.")
+	if not self:SetCurrentMap(targetMapTemplate:GetMap()) then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return targetMapTemplate
 end
 
 function MapController:DivideWithoutRemainder(value, divisor)
@@ -207,47 +264,6 @@ function MapController:TeleportPlayerToRespawnLocation(player)
 	humanoidRootPart.CFrame = player.RespawnLocation.CFrame
 end
 
-function MapController:SelectDesertMapTemp()
-	local desertMap = MapsFolder:FindFirstChild("DesertMap")
-	local maps = MapsFolder:GetChildren()
-	local desertMapIndex = nil
-	for mapIndex, map in maps do
-		if "DesertMap" == map.Name then
-			desertMapIndex = mapIndex
-			break
-		end
-	end
-
-	local targetMapTemplate = self:GetMapTemplate(desertMapIndex)
-	Debug.Assert(targetMapTemplate, "비정상입니다.")
-	if not self:SetCurrentMapByMapTemplate(targetMapTemplate) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	return true
-end
-
-function MapController:SelectRandomMap()
-	local mapCandidates = MapsFolder:GetChildren()
-	local mapCount = #mapCandidates
-	if mapCount == 0 then
-		Debug.Assert(false, "맵이 없습니다.")
-		return nil
-	end
-	
-	local selectedMapIndex = mapCandidates[math.random(1, #mapCandidates)]
-
-	local targetMapTemplate = self:GetMapTemplate(selectedMapIndex)
-	Debug.Assert(targetMapTemplate, "비정상입니다.")
-	if not self:SetCurrentMapByMapTemplate(targetMapTemplate) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
-	end
-
-	return true
-end
-
 function MapController:EnterMap(playersInGame)
 	if not playersInGame then
 		Debug.Assert(false, "비정상입니다.")
@@ -281,5 +297,4 @@ function MapController:EnterMap(playersInGame)
 	return true
 end
 
-MapController:InitializeAllMaps()
 return MapController

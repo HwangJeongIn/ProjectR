@@ -52,7 +52,6 @@ local MaxPlayerCount = 16
 
 
 local Initializer = require(script:WaitForChild("Initializer"))
-local MapController = require(script:WaitForChild("MapController"))
 
 
 function ClearGui()
@@ -116,9 +115,7 @@ Temp()
 while #game.Players:GetPlayers() < 1 do
 	wait(1)
 end
-local clonedMap = MapController:SelectDesertMapTemp()
-Initializer:EnterGame(clonedMap, game.Players:GetPlayers())
-
+ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
 
 while false  do
 	-- 다른 플레이어를 기다리는 중
@@ -165,9 +162,8 @@ while false  do
 	-- 맵 선택
 
 	--ServerGlobalStorage:SelectRandomMapAndEnterMap(playersInGame)
-	ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(playersInGame)
+	ServerGlobalStorage:SelectRandomMapAndEnterMap(playersInGame)
 	
-	-- 플레이어 초기화 : SpawnPoint로 이동, 도구 제공 등
 	Initializer:StartGame(playersInGame)
 	
 	-- 맵 선택 메시지, 게임 시작 메시지

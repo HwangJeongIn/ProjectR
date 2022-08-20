@@ -88,8 +88,8 @@ NpcGameData:Initialize(GameDataType.Npc)
 
 -- 몬스터 종류
 NpcGameData:InsertData(1, {Name = "WaterNymph"})
-NpcGameData:InsertData(1, {Name = "WaterNymph"})
-NpcGameData:InsertData(1, {Name = "WaterNymph"})
+NpcGameData:InsertData(2, {Name = "WaterNymph"})
+NpcGameData:InsertData(3, {Name = "WaterNymph"})
 
 
 -- 일반 Npc 종류
