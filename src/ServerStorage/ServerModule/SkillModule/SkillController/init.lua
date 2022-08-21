@@ -25,7 +25,7 @@ SkillController.__newindex = Utility.Inheritable__newindex
 
 
 -- pure virtual function
-function SkillController:ValidateTargetInRange(toolOwnerPlayer)
+function SkillController:ValidateTargetInRange(toolOwnerPlayer, target)
     Debug.Assert(false, "ValidateTargetInRange 상위에서 구현해야합니다.")
     return nil
 end
@@ -108,7 +108,6 @@ function SkillController:SimulateSkillCollision(skillCastingTime, humanoidRootPa
     local skillCollisionDetailMovementType = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionDetailMovementType)
     
     local outputFromHandling = {}
-    local skillCollisionConnection = createdSkillCollision.Touched:Connect(function(touchedPart) end)
 
     if not skillCollisionDirection then
         wait(skillCollisionDuration)
@@ -117,7 +116,13 @@ function SkillController:SimulateSkillCollision(skillCastingTime, humanoidRootPa
         local currentTime = prevTime
         local deltaTime = 0
         local remainingSkillCollisionDuration = skillCollisionDuration
-
+        
+        --[[
+        local skillCollisionConnection = createdSkillCollision.Touched:Connect(function(touchedPart) 
+            skillCollisionHandler(createdSkillCollision, touchedPart, outputFromHandling) 
+        end)
+        --]]
+        local skillCollisionConnection = createdSkillCollision.Touched:Connect(function(touchedPart) end)
         while remainingSkillCollisionDuration > 0 and not outputFromHandling.PendingKill do
             prevTime = currentTime
             currentTime = os.clock()
@@ -129,12 +134,11 @@ function SkillController:SimulateSkillCollision(skillCastingTime, humanoidRootPa
             for _, touchingPart in pairs(touchingParts) do
                 skillCollisionHandler(createdSkillCollision, touchingPart, outputFromHandling) 
             end
-            
             wait(0)
         end
+        skillCollisionConnection:Disconnect()
     end
 
-    skillCollisionConnection:Disconnect()
     Debris:AddItem(createdSkillCollision, 0)
 end
 
@@ -173,15 +177,13 @@ function SkillController:ActivateInternally(toolOwnerPlayer)
     end
     
     local skillCollisionHandler = function(skillCollision, touchedPart, outputFromHandling)
-
-        local touchedPartCollisionGroupName = ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(touchedPart)
-    
-        Debug.Print(touchedPart.Name .. tostring(touchedPartCollisionGroupName))
-
         if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
             
-            if self.ValidateTargetInRange(toolOwnerPlayer, touchedPart) then
-                self.ApplySkillToTarget(toolOwnerPlayer, touchedPart, outputFromHandling)
+            local touchedPartCollisionGroupName = ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(touchedPart)
+            Debug.Print(touchedPart.Name .. " : ".. tostring(touchedPartCollisionGroupName))
+
+            if self:ValidateTargetInRange(toolOwnerPlayer, touchedPart) then
+                self:ApplySkillToTarget(toolOwnerPlayer, touchedPart, outputFromHandling)
             end
 
             outputFromHandling.PendingKill = true

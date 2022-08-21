@@ -267,7 +267,7 @@ SkillTemplate:RegisterSkillImpl(
 SkillTemplate:RegisterSkillImpl(
     "BaseAttack",
     SkillImplType.ApplySkillToTarget,
-    function(skillController, toolOwnerPlayer, target)
+    function(skillController, toolOwnerPlayer, target, output)
         local collisionGroupType = ObjectCollisionGroupUtility:GetCollisionGroupTypeByPart(target)
         if CollisionGroupType.Player == collisionGroupType then
             
@@ -309,7 +309,7 @@ SkillTemplate:RegisterSkillImpl(
 SkillTemplate:RegisterSkillImpl(
     "WhirlwindSlash",
     SkillImplType.ApplySkillToTarget,
-    function(skillController, toolOwnerPlayer, target)
+    function(skillController, toolOwnerPlayer, target, output)
         Debug.Assert(false, "상위에서 구현해야합니다.")
         return false
     end
@@ -382,7 +382,7 @@ SkillTemplate:RegisterSkillImpl(
 SkillTemplate:RegisterSkillImpl(
     "PowerStrike",
     SkillImplType.ApplySkillToTarget,
-    function(skillController, toolOwnerPlayer, target)
+    function(skillController, toolOwnerPlayer, target, output)
         Debug.Assert(false, "상위에서 구현해야합니다.")
         return false
     end
@@ -418,7 +418,7 @@ SkillTemplate:RegisterSkillImpl(
 SkillTemplate:RegisterSkillImpl(
     "StormBlade",
     SkillImplType.ApplySkillToTarget,
-    function(skillController, toolOwnerPlayer, target)
+    function(skillController, toolOwnerPlayer, target, output)
         Debug.Assert(false, "상위에서 구현해야합니다.")
         return false
     end
