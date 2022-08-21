@@ -79,4 +79,8 @@ function DamageCalculator:CalculateSkillDamage(skillFactor, attackerRawStatistic
     return finalDamge
 end
 
+function DamageCalculator:CalculateWorldInteractorSkillDamage(skillFactor, attackerRawStatistic)
+    return self:CalculateSkillDamage(skillFactor, attackerRawStatistic, {})
+end
+
 return DamageCalculator

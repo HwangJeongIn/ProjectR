@@ -83,8 +83,8 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
                 local targetHumanoid = targetCharacter.Humanoid
                 if not targetHumanoid then
 
-                    local tempPlayerId
-                    ServerGlobalStorage:GetStat(tempPlayerId, )
+                    --local tempPlayerId
+                    --ServerGlobalStorage:GetStat(tempPlayerId, )
                 end
 
             elseif CollisionGroupType.WorldInteractor == collisionGroupType then

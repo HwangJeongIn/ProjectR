@@ -49,7 +49,7 @@ function PlayerStatistic:ClearData()
     self.Value = self:CreateEmptyStatistic()
 end
 
-function PlayerStatistic:GetRawStatistic()
+function PlayerStatistic:GetPlayerStatisticRaw()
 	return self.Value
 end
 

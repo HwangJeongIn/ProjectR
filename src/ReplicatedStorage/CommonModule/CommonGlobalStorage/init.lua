@@ -122,6 +122,16 @@ function CommonGlobalStorage:GetPlayerStatistic(playerId)
 	return self.PlayerTable[playerId][StatusType.Statistic]:Get()
 end
 
+function CommonGlobalStorage:GetPlayerStatisticRaw(playerId)
+	local targetPlayerStatistic = self:GetPlayerStatistic(playerId)
+	if not targetPlayerStatistic then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return targetPlayerStatistic:GetPlayerStatisticRaw()
+end
+
 -- 각 합산된 능력치
 function CommonGlobalStorage:GetStat(playerId, statType)
 	if not statType then

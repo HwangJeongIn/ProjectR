@@ -90,7 +90,13 @@ local CommonEnum = {
 
 	SkillType = {
 		AttackSkill = 1,
-		
+		Count = 2
+	},
+	
+	SkillFactorType = {
+		AttackRate = 1,
+		DefenseRate = 2,
+		Count = 3
 	}
 }
 

@@ -29,12 +29,16 @@ Utility.__index = Inheritable__index
 Utility.__newindex = Immutable__newindex
 
 
-function Utility:AddClonedObjectModuleScriptToObject(object, objectModuleSript)
-	local clonedObjectModuleScript = objectModuleSript:Clone()
-	clonedObjectModuleScript.Parent = object
-	clonedObjectModuleScript.Name = "RawObjectData"
+function Utility:Split(inputstr, sep)
+	if sep == nil then
+	   sep = "%s"
+	end
 
-	return require(clonedObjectModuleScript)
+	local t={}
+	for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+	   table.insert(t, str)
+	end
+	return t
 end
 
 function Utility:ShallowCopy(original)

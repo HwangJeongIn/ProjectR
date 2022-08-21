@@ -50,11 +50,6 @@ local ServerEnum = {
 
 	},
 
-	SkillFactorType = {
-		AttackRate = 1,
-		DefenseRate = 2,
-		Count = 3
-	}
 }
 
 -- 필요하면 추가
