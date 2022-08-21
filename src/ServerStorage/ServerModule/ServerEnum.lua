@@ -48,6 +48,12 @@ local ServerEnum = {
 
 	SkillCollisionDetailMovementType = {
 
+	},
+
+	SkillFactorType = {
+		AttackRate = 1,
+		DefenseRate = 2,
+		Count = 3
 	}
 }
 

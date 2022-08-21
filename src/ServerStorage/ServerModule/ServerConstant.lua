@@ -25,6 +25,16 @@ local ServerConstant = {
 
 	DefaultWeaponSkillGameDataKey = 1,
 	DefaultArmorSkillGameDataKey = 100,
+
+	
+	DamageCalculationConstant = 100,
+	DefualtAttackRate = 1,
+	DefaultDefenseRate = 1,
+	DefaultAttackSpeedRate = 1,
+	DefaultMoveRate = 1,
+
+	DefaultSTR = 0,
+	DefaultDEF = 0
 }
 
 ServerConstant.__index = Utility.Inheritable__index
