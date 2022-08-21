@@ -30,7 +30,8 @@ local CommonEnum = {
 		WorldInteractor = 4,
 		Npc = 5,
 		Skill = 6,
-		Count = 7
+		Drop = 7,
+		Count = 8
 	},
 	
 	ToolType = {
@@ -101,6 +102,7 @@ CommonEnum.GameDataType.Converter = {
 	[CommonEnum.GameDataType.WorldInteractor] = "WorldInteractor",
 	[CommonEnum.GameDataType.Skill] = "Skill",
 	[CommonEnum.GameDataType.Npc] = "Npc",
+	[CommonEnum.GameDataType.Drop] = "Drop",
 }
 Debug.Assert(CommonEnum.GameDataType.Count == #CommonEnum.GameDataType.Converter + 1, "비정상입니다.")
 

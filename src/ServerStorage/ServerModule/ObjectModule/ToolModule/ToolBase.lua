@@ -1,4 +1,3 @@
--- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
