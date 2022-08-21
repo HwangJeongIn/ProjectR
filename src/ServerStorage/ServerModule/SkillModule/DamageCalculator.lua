@@ -45,8 +45,8 @@ function DamageCalculator:CalculateDamage(attackerSTR, attackeeDEF)
     return finalDamage
 end
 
-function DamageCalculator:CalculateSkillDamage(skillFactor, attackerRawStatistic, attackeeRawStatistic)
-    if not skillFactor or not attackerRawStatistic or not attackeeRawStatistic then
+function DamageCalculator:CalculateSkillDamage(skillFactor, attackerStatisticRaw, attackeeStatisticRaw)
+    if not skillFactor or not attackerStatisticRaw or not attackeeStatisticRaw then
         Debug.Assert(false, "비정상입니다.")
         return 0
     end
@@ -64,14 +64,14 @@ function DamageCalculator:CalculateSkillDamage(skillFactor, attackerRawStatistic
 
     -- AttackerSTR / AttackeeDEF
     local attackerSTR = DefaultSTR
-    if attackerRawStatistic[StatType.STR] then
-        attackerSTR = attackerRawStatistic[StatType.STR]
+    if attackerStatisticRaw[StatType.STR] then
+        attackerSTR = attackerStatisticRaw[StatType.STR]
     end
     attackerSTR = attackRate * attackerSTR
 
     local attackeeDEF = DefaultDEF
-    if attackeeRawStatistic[StatType.DEF] then
-        attackeeDEF = attackeeRawStatistic[StatType.DEF]
+    if attackeeStatisticRaw[StatType.DEF] then
+        attackeeDEF = attackeeStatisticRaw[StatType.DEF]
     end
     attackeeDEF = defenseRate * attackeeDEF
 
@@ -79,8 +79,8 @@ function DamageCalculator:CalculateSkillDamage(skillFactor, attackerRawStatistic
     return finalDamge
 end
 
-function DamageCalculator:CalculateWorldInteractorSkillDamage(skillFactor, attackerRawStatistic)
-    return self:CalculateSkillDamage(skillFactor, attackerRawStatistic, {})
+function DamageCalculator:CalculateWorldInteractorSkillDamage(skillFactor, attackerStatisticRaw)
+    return self:CalculateSkillDamage(skillFactor, attackerStatisticRaw, {})
 end
 
 return DamageCalculator

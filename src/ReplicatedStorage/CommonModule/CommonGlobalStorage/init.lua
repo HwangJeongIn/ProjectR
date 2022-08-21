@@ -119,7 +119,7 @@ function CommonGlobalStorage:GetPlayerStatistic(playerId)
 	end
 
 	--self:CheckAndCalculateStatistic(playerId)
-	return self.PlayerTable[playerId][StatusType.Statistic]:Get()
+	return self.PlayerTable[playerId][StatusType.Statistic]
 end
 
 function CommonGlobalStorage:GetPlayerStatisticRaw(playerId)

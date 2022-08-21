@@ -19,6 +19,7 @@ local ObjectCollisionGroupUtility = {
         [CollisionGroupType.Player] = "PlayerCollision",
         [CollisionGroupType.Skill] = "SkillCollision",
         [CollisionGroupType.WorldInteractor] = "WorldInteractor",
+        [CollisionGroupType.Npc] = "Npc",
         [CollisionGroupType.Wall] = "Wall"
     },
 
@@ -51,6 +52,7 @@ function ObjectCollisionGroupUtility:Initialize()
 
     self:SetEnableCollisionGroup(self.CollisionGroupNameTable[CollisionGroupType.Skill], self.CollisionGroupNameTable[CollisionGroupType.Player], true)
     self:SetEnableCollisionGroup(self.CollisionGroupNameTable[CollisionGroupType.Skill], self.CollisionGroupNameTable[CollisionGroupType.WorldInteractor], true)
+    self:SetEnableCollisionGroup(self.CollisionGroupNameTable[CollisionGroupType.Skill], self.CollisionGroupNameTable[CollisionGroupType.Npc], true)
     self:SetEnableCollisionGroup(self.CollisionGroupNameTable[CollisionGroupType.Skill], self.CollisionGroupNameTable[CollisionGroupType.Wall], true)
 end
 
@@ -191,6 +193,26 @@ function ObjectCollisionGroupUtility:SetWorldInteractorCollisionGroup(worldInter
 
     Debug.Assert(worldInteractor.Trigger, "비정상입니다.")
     if not self:SetCollisionGroup(worldInteractor.Trigger, self.CollisionGroupNameTable[CollisionGroupType.WorldInteractor]) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    return true
+end
+
+function ObjectCollisionGroupUtility:SetNpcCollisionGroup(npc)
+    if not npc then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+	local humanoidRootPart = npc:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    if not self:SetCollisionGroup(humanoidRootPart, self.CollisionGroupNameTable[CollisionGroupType.Npc]) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end

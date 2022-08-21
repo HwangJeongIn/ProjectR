@@ -63,8 +63,6 @@ end
 Initializer:InitializeGame()
 
 function Temp()
-
-
 	local players = game.Players:GetPlayers()
 	for i, player in pairs(players) do
 		Initializer:PushDefaulWeaponTools(player)
@@ -105,12 +103,7 @@ function Temp()
 		local a = 3
 		--]]
 	end
-
-
 end
-
-wait(3)
-Temp()
 
 while #game.Players:GetPlayers() < 1 do
 	wait(1)
@@ -120,7 +113,10 @@ local testPlayer = game.Players:GetPlayers()[1]
 while not testPlayer.Character do
 	wait(1)
 end
-ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
+
+Temp()
+
+--ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
 
 while false  do
 	-- 다른 플레이어를 기다리는 중

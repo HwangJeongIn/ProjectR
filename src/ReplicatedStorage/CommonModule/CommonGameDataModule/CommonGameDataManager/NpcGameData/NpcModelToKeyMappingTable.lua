@@ -1,4 +1,5 @@
 local NpcModelToKeyMappingTable = {
+	n_Dummy = 1, -- Test
 	--[[
 	w_WoodStick = 1,
 	w_Sword = 2,

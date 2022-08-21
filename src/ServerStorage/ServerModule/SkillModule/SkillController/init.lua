@@ -247,6 +247,14 @@ function SkillController:SetSkillAsDefaultWeaponSkill(weaponTool)
     return true
 end
 
+function SkillController:GetSkillGameData()
+    if not self.SkillTemplateData then
+        return nil
+    end
+
+    return self.SkillTemplateData:GetSkillGameData()
+end
+
 function SkillController:SetSkill(tool, skillGameData)
     local skillGameDataKey = skillGameData:GetKey()
     local targetSkillTemplate = SkillTemplate:GetSkillTemplateByKey(skillGameDataKey)
