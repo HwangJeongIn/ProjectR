@@ -20,7 +20,8 @@ local ServerEnum = {
 		Player = 1,
 		Skill = 2,
 		WorldInteractor = 3,
-		Count = 4
+		Wall = 4,
+		Count = 5
 	},
 
 	SkillDataType = {

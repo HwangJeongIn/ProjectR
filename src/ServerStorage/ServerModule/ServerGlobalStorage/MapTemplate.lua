@@ -15,6 +15,7 @@ local NpcUtility = CommonModuleFacade.NpcUtility
 
 local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
 local WorldInteractorUtility = require(ServerObjectUtilityModule:WaitForChild("WorldInteractorUtility"))
+local ObjectCollisionGroupUtility = require(ServerObjectUtilityModule:WaitForChild("ObjectCollisionGroupUtility"))
 
 local ToolsFolder = ServerStorage:WaitForChild("Tools")
 local WorldInteractorsFolder = ServerStorage:WaitForChild("WorldInteractors")
@@ -57,6 +58,20 @@ function MapTemplate:ValidateMapObjects(gameDataType, objectsFolder)
 	return true
 end
 
+function MapTemplate:SetWallCollisionRecursively(mapPart)
+	local mapPartClassName = mapPart.ClassName
+	--Debug.Print(mapPartClassName)
+	
+	if "UnionOperation" == mapPartClassName or "Part" == mapPartClassName then
+		ObjectCollisionGroupUtility:SetWallCollisionGroup(mapPart)
+	end
+
+	local childParts = mapPart:GetChildren()
+	for _, childPart in pairs(childParts) do
+		self:SetWallCollisionRecursively(childPart)
+	end
+end
+
 function MapTemplate:InitializeAllMaps()
 	local maps = MapsFolder:GetChildren()
 
@@ -66,7 +81,7 @@ function MapTemplate:InitializeAllMaps()
 		local mapName = map.Name
 
 		local mapObjects = Instance.new("Model")
-		mapObjects.Name = mapName .. "Objects"
+		mapObjects.Name = mapName .. "_Objects"
 		mapObjects.Parent = MapsFolder
 
 		local mapTools = map:FindFirstChild("Tools")
@@ -100,7 +115,10 @@ function MapTemplate:InitializeAllMaps()
 			mapNpcs.Parent = mapObjects
 		end
 		self.MapTable[mapIndex].GetNpcs = function() return mapNpcs end
+
+		self:SetWallCollisionRecursively(map)
 	end
+
 
 	return true
 end

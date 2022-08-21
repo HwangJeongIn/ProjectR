@@ -18,7 +18,8 @@ local ObjectCollisionGroupUtility = {
     CollisionGroupNameTable = {
         [CollisionGroupType.Player] = "PlayerCollision",
         [CollisionGroupType.Skill] = "SkillCollision",
-        [CollisionGroupType.WorldInteractor] = "WorldInteractor"
+        [CollisionGroupType.WorldInteractor] = "WorldInteractor",
+        [CollisionGroupType.Wall] = "Wall"
     },
 
     CollisionGroupIdTable = {
@@ -47,7 +48,10 @@ function ObjectCollisionGroupUtility:Initialize()
     end
     
     self:SetEnableAllCollisionGroups(self.CollisionGroupNameTable[CollisionGroupType.Skill], false)
+
     self:SetEnableCollisionGroup(self.CollisionGroupNameTable[CollisionGroupType.Skill], self.CollisionGroupNameTable[CollisionGroupType.Player], true)
+    self:SetEnableCollisionGroup(self.CollisionGroupNameTable[CollisionGroupType.Skill], self.CollisionGroupNameTable[CollisionGroupType.WorldInteractor], true)
+    self:SetEnableCollisionGroup(self.CollisionGroupNameTable[CollisionGroupType.Skill], self.CollisionGroupNameTable[CollisionGroupType.Wall], true)
 end
 
 function ObjectCollisionGroupUtility:SetEnableCollisionGroup(collisionGroupName1, collisionGroupName2, isEnable)
@@ -89,6 +93,17 @@ end
 function ObjectCollisionGroupUtility:GetCollisionGroupTypeByPart(part)
     local collisionGroupId = part.CollisionGroupId
     return self:GetCollisionGroupTypeByCollisionGroupId(collisionGroupId)
+end
+
+function ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(part)
+    local collisionGroupId = part.CollisionGroupId
+    local collisionGroupType = self:GetCollisionGroupTypeByCollisionGroupId(collisionGroupId)
+    if not collisionGroupType then
+        Debug.Assert(false, "Part에 CollisionGroupType이 없습니다.")
+        return nil
+    end
+    
+    return self.CollisionGroupNameTable[collisionGroupType]
 end
 
 function ObjectCollisionGroupUtility:IsCollidable(collisionGroupId1, collisionGroupId2)
@@ -147,6 +162,20 @@ function ObjectCollisionGroupUtility:SetSkillCollisionGroup(skillCollision)
     end
 
     if not self:SetCollisionGroup(skillCollision, self.CollisionGroupNameTable[CollisionGroupType.Skill]) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    return true
+end
+
+function ObjectCollisionGroupUtility:SetWallCollisionGroup(wallCollision)
+    if not wallCollision then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    if not self:SetCollisionGroup(wallCollision, self.CollisionGroupNameTable[CollisionGroupType.Wall]) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end

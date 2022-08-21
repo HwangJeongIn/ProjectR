@@ -275,26 +275,26 @@ function ServerGlobalStorage:CreateToolToPlayer(toolKey, player)
 	local createdTool = self:CreateTool(toolKey, player.Backpack, nil)
 	if not createdTool then
 		Debug.Assert(false, "비정상입니다.")
-		return false
+		return nil
 	end
 
 	local toolSystem = self:GetToolSystem()
 	if not toolSystem:SetToolOwnerPlayer(createdTool, player) then
 		Debug.Assert(false, "비정상입니다.")
-		return false
+		return nil
 	end
 	
-	return true
+	return createdTool
 end
 
 function ServerGlobalStorage:CreateToolToWorkspace(toolKey, toolCFrame)
 	local createdTool = self:CreateTool(toolKey, game.workspace, toolCFrame)
 	if not createdTool then
 		Debug.Assert(false, "비정상입니다.")
-		return false
+		return nil
 	end
 	
-	return true
+	return createdTool
 end
 
 function ServerGlobalStorage:DestroyTool(tool)

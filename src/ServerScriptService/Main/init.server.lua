@@ -115,6 +115,11 @@ Temp()
 while #game.Players:GetPlayers() < 1 do
 	wait(1)
 end
+
+local testPlayer = game.Players:GetPlayers()[1]
+while not testPlayer.Character do
+	wait(1)
+end
 ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
 
 while false  do
@@ -174,7 +179,7 @@ while false  do
 			continue
 		end
 
-		ChangeGameStateSTC:FireClient(player, GameStateType.Playing, clonedMap.Name)
+		ChangeGameStateSTC:FireClient(player, GameStateType.Playing, "TempMapName")
 	end
 	
 	local currentGameLength = GameLength

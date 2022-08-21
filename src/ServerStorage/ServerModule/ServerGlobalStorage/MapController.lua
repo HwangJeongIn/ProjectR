@@ -62,7 +62,7 @@ function MapController:GetCurrentMap()
 	return self.CurrentMap.Map
 end
 
-function MapController:SetCurrentMapTools(gameDataType, objects)
+function MapController:SetCurrentMapObjects(gameDataType, objects)
 	if not self.CurrentMap.Map then
 		Debug.Assert(false, "CurrentMap이 없습니다.")
 		return false
@@ -125,6 +125,7 @@ function MapController:SetCurrentMap(map)
 	end
 
 	self.CurrentMap.Map = map:Clone()
+	self.CurrentMap.Map.Parent = workspace
 	return true
 end
 
