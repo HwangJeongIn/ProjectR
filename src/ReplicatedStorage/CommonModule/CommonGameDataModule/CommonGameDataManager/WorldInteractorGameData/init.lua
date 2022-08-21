@@ -1,18 +1,16 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CommonModuleFacade = require(ReplicatedStorage:WaitForChild("CommonModuleFacade"))
+local CommonModule = ReplicatedStorage:WaitForChild("CommonModule")
+local Debug = require(CommonModule:WaitForChild("Debug"))
+local Utility = require(CommonModule:WaitForChild("Utility"))
 
-local Debug = CommonModuleFacade.Debug
-local Utility = CommonModuleFacade.Utility
+local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
+local GameDataType = CommonEnum.GameDataType
+local WorldInteractorTypeSelector = CommonEnum.WorldInteractorType
 
-local CommonGameDataModule = CommonModuleFacade.CommonGameDataModule
+local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local GameDataBase = Utility:DeepCopy(require(CommonGameDataModule:WaitForChild("GameDataBase")))
 
-local ServerStorage = game:GetService("ServerStorage")
-local ServerModule = ServerStorage:WaitForChild("ServerModule")
-local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 
-local GameDataType = ServerEnum.GameDataType
-local WorldInteractorTypeSelector = ServerEnum.WorldInteractorType
 
 local WorldInteractorGameData = {ModelToKeyMappingTable = require(script:WaitForChild("WorldInteractorModelToKeyMappingTable"))}
 

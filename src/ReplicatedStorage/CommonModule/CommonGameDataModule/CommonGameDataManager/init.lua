@@ -82,8 +82,9 @@ end
 
 if not CommonGameDataManager:LoadGameData(script,
 										{GameDataType.Tool,
-										GameDataType.Skill,
-										GameDataType.Npc}) then
+										GameDataType.WorldInteractor,
+										GameDataType.Npc,
+										GameDataType.Skill}) then
 	Debug.Assert(false, "비정상입니다.")
 	return nil
 end

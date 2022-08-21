@@ -5,6 +5,7 @@ local Debug = CommonModuleFacade.Debug
 local Utility = CommonModuleFacade.Utility
 
 local ToolUtility = CommonModuleFacade.ToolUtility
+local WorldInteractorUtility = CommonModuleFacade.WorldInteractorUtility
 local NpcUtility = CommonModuleFacade.NpcUtility
 
 local CommonGlobalStorage = CommonModuleFacade.CommonGlobalStorage
@@ -15,7 +16,6 @@ local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
 
 local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
-local WorldInteractorUtility = require(ServerObjectUtilityModule:WaitForChild("WorldInteractorUtility"))
 
 local MaxPickupDistance = ServerConstant.MaxPickupDistance
 local MaxDropDistance = ServerConstant.MaxDropDistance
@@ -249,6 +249,24 @@ function ServerGlobalStorage:ActivateToolSkill(player, tool, skillIndex)
 	end
 	
 	return true
+end
+
+function ServerGlobalStorage:CreateWorldInteractor(worldInteractorKey, worldInteractorCFrame)
+	if not worldInteractorCFrame then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	local worldInteractorSystem = self:GetToolSystem()
+	local createdWorldInteractor = worldInteractorSystem:CreateWorldInteractor(worldInteractorKey)
+	if not createdWorldInteractor then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	createdWorldInteractor.Parent = workspace
+	createdWorldInteractor.Trigger.CFrame = worldInteractorCFrame
+	return createdWorldInteractor 
 end
 
 function ServerGlobalStorage:CreateTool(toolKey, parent, toolCFrame)

@@ -29,11 +29,7 @@ local GuiObjectName = GuiObjectTooltipWindow:WaitForChild("GuiObjectName")
 
 local Mouse = LocalPlayer:GetMouse()
 
-local GuiWorldInteractionSystem = {
-    SlotControllerCandidate = nil,
-    SlotController = nil,
-    ShadowImage = nil
-}
+local GuiWorldInteractionSystem = {}
 
 function GuiWorldInteractionSystem:GetToolFromTrigger(targetPart)
 	if not targetPart then

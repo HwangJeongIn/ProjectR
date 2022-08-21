@@ -16,7 +16,7 @@ setmetatable(ServerGameDataManager, CommonGameDataManager)
 
 if not ServerGameDataManager:LoadGameData(script,
 										{GameDataType.Character,
-										GameDataType.WorldInteractor}) then
+										}) then
 	Debug.Assert(false, "비정상입니다.")
 	return nil
 end

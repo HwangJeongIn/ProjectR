@@ -10,7 +10,6 @@ local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
 local ObjectTagUtility = require(ServerObjectUtilityModule:WaitForChild("ObjectTagUtility"))
 local ObjectCollisionGroupUtility = require(ServerObjectUtilityModule:WaitForChild("ObjectCollisionGroupUtility"))
-local WorldInteractorUtility = require(ServerObjectUtilityModule:WaitForChild("WorldInteractorUtility"))
 
 local ServerGlobalStorage = require(ServerModule:WaitForChild("ServerGlobalStorage"))
 
@@ -35,7 +34,6 @@ local ServerModuleFacade = {
 	ServerEnum = ServerEnum,
 	ObjectTagUtility = ObjectTagUtility,
 	ObjectCollisionGroupUtility = ObjectCollisionGroupUtility,
-	WorldInteractorUtility = WorldInteractorUtility,
 
 	ServerGlobalStorage = ServerGlobalStorage,
 	ServerGameDataManager = ServerGameDataManager,

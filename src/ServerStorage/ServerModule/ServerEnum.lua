@@ -10,11 +10,6 @@ local ServerEnum = {
 		WorldInteractor = 2,
 		Count = 3
 	},
-	
-	WorldInteractorType = {
-		ItemBox = 1,
-		Count = 2
-	},
 
 	CollisionGroupType = {
 		Player = 1,
@@ -62,12 +57,6 @@ ServerEnum.InteractableObjectType.Converter = {
 	[ServerEnum.InteractableObjectType.WorldInteractor] = "WorldInteractor",
 }
 Debug.Assert(ServerEnum.InteractableObjectType.Count == #ServerEnum.InteractableObjectType.Converter + 1, "비정상입니다.")
-
-
-ServerEnum.WorldInteractorType.Converter = {
-	[ServerEnum.WorldInteractorType.ItemBox] = "ItemBox"
-}
-Debug.Assert(ServerEnum.WorldInteractorType.Count == #ServerEnum.WorldInteractorType.Converter + 1, "비정상입니다.")
 
 
 ServerEnum.SkillImplType.Converter = {

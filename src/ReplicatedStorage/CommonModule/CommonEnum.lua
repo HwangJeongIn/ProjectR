@@ -58,7 +58,12 @@ local CommonEnum = {
 		SkillOwnerToolSlot = 5,
 		Count = 6
 	},
-	
+
+	WorldInteractorType = {
+		ItemBox = 1,
+		Count = 2
+	},
+
 	StatusType = {
 		Statistic = 1,
 		EquipSlots = 2,
@@ -124,6 +129,11 @@ CommonEnum.SlotType.Converter = {
 	[CommonEnum.SlotType.SkillOwnerToolSlot] = "SkillOwnerToolSlot"
 }
 Debug.Assert(CommonEnum.SlotType.Count == #CommonEnum.SlotType.Converter + 1, "비정상입니다.")
+
+CommonEnum.WorldInteractorType.Converter = {
+	[CommonEnum.WorldInteractorType.ItemBox] = "ItemBox"
+}
+Debug.Assert(CommonEnum.WorldInteractorType.Count == #CommonEnum.WorldInteractorType.Converter + 1, "비정상입니다.")
 
 CommonEnum.StatType.Converter = {
 	[CommonEnum.StatType.STR] = "STR",

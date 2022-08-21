@@ -12,14 +12,15 @@ local ServerModule = ServerStorage:WaitForChild("ServerModule")
 
 local ToolUtility = CommonModuleFacade.ToolUtility
 local NpcUtility = CommonModuleFacade.NpcUtility
+local WorldInteractorUtility = CommonModuleFacade.WorldInteractorUtility
 
 local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
-local WorldInteractorUtility = require(ServerObjectUtilityModule:WaitForChild("WorldInteractorUtility"))
 local ObjectCollisionGroupUtility = require(ServerObjectUtilityModule:WaitForChild("ObjectCollisionGroupUtility"))
-
+--[[
 local ToolsFolder = ServerStorage:WaitForChild("Tools")
 local WorldInteractorsFolder = ServerStorage:WaitForChild("WorldInteractors")
 local NpcsFolder = ServerStorage:WaitForChild("Npcs")
+--]]
 
 local MapTemplate = {
 	MapTable = {}

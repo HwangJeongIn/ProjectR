@@ -9,37 +9,14 @@ local GameDataType = CommonEnum.GameDataType
 local ServerStorage = game:GetService("ServerStorage")
 local MapsFolder = ServerStorage:WaitForChild("Maps")
 
-local ServerModule = ServerStorage:WaitForChild("ServerModule")
 
+--[[
 local ToolUtility = CommonModuleFacade.ToolUtility
 local NpcUtility = CommonModuleFacade.NpcUtility
-
-local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
-local WorldInteractorUtility = require(ServerObjectUtilityModule:WaitForChild("WorldInteractorUtility"))
-
-
---[[
-local ToolsFolder = ServerStorage:WaitForChild("Tools")
-local WorldInteractorsFolder = ServerStorage:WaitForChild("WorldInteractors")
-local NpcsFolder = ServerStorage:WaitForChild("Npcs")
+local WorldInteractorUtility = CommonModuleFacade.WorldInteractorUtility
 --]]
 
 
---[[
-local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
-local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
-
-local MaxPickupDistance = ServerConstant.MaxPickupDistance
-local MaxDropDistance = ServerConstant.MaxDropDistance
-local MaxSkillCount = ServerConstant.MaxSkillCount
-
-local EquipTypeToBoneMappingTable = ServerConstant.EquipTypeToBoneMappingTable
-
-local GameDataType = ServerEnum.GameDataType
-local StatusType = ServerEnum.StatusType
-local ToolType = ServerEnum.ToolType
-local EquipType = ServerEnum.EquipType
---]]
 
 local MapTemplate = require(script.Parent:WaitForChild("MapTemplate"))
 
