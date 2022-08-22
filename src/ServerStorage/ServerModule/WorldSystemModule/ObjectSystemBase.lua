@@ -36,6 +36,11 @@ function ObjectSystemBase:FindObjectJoints(object, ...)
     return nil
 end
 
+function ObjectSystemBase:CloneObjectScript(object, ...)
+    Debug.Assert(false, "상위 모듈에서 재정의해야합니다.")
+    return nil
+end
+
 function ObjectSystemBase:CreateImpl(...)
     Debug.Assert(false, "상위 모듈에서 재정의해야합니다.")
     return nil
@@ -75,7 +80,11 @@ function ObjectSystemBase:PostCreate(createdObject, ...)
     end
 
     local objectJoints = self:FindObjectJoints(createdObject)
-    self.Objects[createdObject] = { Value = createdObject, Joints = objectJoints }
+    self.Objects[createdObject].Value = createdObject
+    self.Objects[createdObject].Joints = createdObject
+    
+    local clonedObjectScript = self:CloneObjectScript(createdObject, ...)
+    self.Objects[createdObject].Script = clonedObjectScript -- 없을 수도 있음
 
     if self.PostCreateImpl then
         createdObject = self:PostCreateImpl(createdObject, ...)
@@ -148,23 +157,6 @@ function ObjectSystemBase:IsValid(object)
     return nil ~= self.Objects[object]
 end
 
-function ObjectSystemBase:SetScript(object, inputScript)
-    if not self:IsValid(object) then
-        Debug.Assert(false, "비정상입니다.")
-        return false
-    end
-
-    --[[
-    if not inputScript then
-        Debug.Assert(false, "비정상입니다.")
-        return false
-    end 
-    --]]
-
-    self.Objects[object].Script = inputScript
-    return true
-end
-
 function ObjectSystemBase:GetScript(object)
     if not self:IsValid(object) then
         Debug.Assert(false, "비정상입니다.")
@@ -194,6 +186,7 @@ function ObjectSystemBase:RegisterObject(object)
         return false
     end
 
+    self.Objects[object] = {}
     return true
 end
 

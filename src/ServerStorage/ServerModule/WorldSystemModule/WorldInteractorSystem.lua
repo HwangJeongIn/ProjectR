@@ -94,7 +94,7 @@ function WorldInteractorSystem:Initialize()
                 return false
             end
         
-            worldInteractorTemplateTable[key] = {WorldInteractor = worldInteractor, WorldInteractorGameData = worldInteractorGameData}
+            worldInteractorTemplateTable[key] = {WorldInteractor = worldInteractor}
         end
     end
     
@@ -102,28 +102,13 @@ function WorldInteractorSystem:Initialize()
     return true
 end
 
-function WorldInteractorSystem:GetClonedWorldInteractorScript(worldInteractorType, worldInteractor)
-    if not worldInteractorType or not worldInteractor then
-        Debug.Assert(false, "비정상입니다.")
+function WorldInteractorSystem:CreateWorldInteractor(worldInteractorKey)
+    if not worldInteractorKey then
+        Debug.Assert(false, "WorldInteractor 생성에 실패했습니다. => " .. tostring(worldInteractorKey))
         return nil
     end
 
-    local targetScript = nil
-    if WorldInteractorType.ItemBox == worldInteractorType then
-        --[[
-        targetScript = Utility:DeepCopy(WeaponController)
-        if not targetScript:InitializeWeaponController(GameDataType.WorldInteractor, worldInteractor) then
-            Debug.Assert(false, "비정상입니다.")
-            return nil
-        end
-        --]]
-    end
-
-    return targetScript
-end
-
-function WorldInteractorSystem:CreateWorldInteractor(worldInteractorKey)
-    if not worldInteractorKey then
+    if not self.WorldInteractorTemplateTable[worldInteractorKey] then
         Debug.Assert(false, "WorldInteractor 생성에 실패했습니다. => " .. tostring(worldInteractorKey))
         return nil
     end
@@ -172,6 +157,30 @@ function WorldInteractorSystem:FindObjectJoints(worldInteractor)
     return joints
 end
 
+function WorldInteractorSystem:CloneObjectScript(object, objectKey)
+    local worldInteractorGameData = WorldInteractorUtility:GetGameDataByKey(objectKey)
+    Debug.Assert(worldInteractorGameData, "비정상입니다.")
+
+    local worldInteractorType = worldInteractorGameData.WorldInteractorType
+    if not worldInteractorType or not object then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
+
+    local targetScript = nil
+    if WorldInteractorType.ItemBox == worldInteractorType then
+        --[[
+        targetScript = Utility:DeepCopy(WeaponController)
+        if not targetScript:InitializeWeaponController(worldInteractorType, object) then
+            Debug.Assert(false, "비정상입니다.")
+            return nil
+        end
+        --]]
+    end
+
+    return targetScript
+end
+
 function WorldInteractorSystem:CreateImpl(worldInteractorKey)
     local targetWorldInteractor = self.WorldInteractorTemplateTable[worldInteractorKey]
 
@@ -184,20 +193,6 @@ function WorldInteractorSystem:CreateImpl(worldInteractorKey)
 	clonedTargetWorldInteractor.Parent = nil
 
     return clonedTargetWorldInteractor
-end
-
-function WorldInteractorSystem:PostCreateImpl(createdWorldInteractor, worldInteractorKey)
-    local targetScript = self:GetClonedWorldInteractorScript(self.WorldInteractorTemplateTable[worldInteractorKey].WorldInteractorGameData.WorldInteractorType, createdWorldInteractor)
-
-     -- 없는 것도 존재할 수 있다.
-    if targetScript then
-        if not self:SetScript(createdWorldInteractor, targetScript) then
-            Debug.Assert(false, "비정상입니다.")
-            return nil
-        end
-    end
-
-    return createdWorldInteractor
 end
 
 function WorldInteractorSystem:PreDestroyImpl(WorldInteractor)

@@ -91,7 +91,7 @@ function ToolSystem:InitializeToolTemplate(tool)
 end
 
 function ToolSystem:Initialize()
-    local ToolTemplateTable = {}
+    local toolTemplateTable = {}
 
     local allToolFolders = Tools:GetChildren()
     for _, targetToolFolder in pairs(allToolFolders) do
@@ -106,7 +106,7 @@ function ToolSystem:Initialize()
                 return false
             end
             
-            if ToolTemplateTable[key] then
+            if toolTemplateTable[key] then
                 Debug.Assert(false, "같은 키를 가진 도구가 있습니다. 키를 변경하세요 => " .. tostring(key) .. " => " .. toolName)
                 return false
             end
@@ -118,34 +118,12 @@ function ToolSystem:Initialize()
 
             local toolGameData = ToolUtility:GetGameDataByKey(key)
             ObjectTagUtility:AddTag(tool, ToolTypeConverter[toolGameData.ToolType])
-            ToolTemplateTable[key] = {Tool = tool, ToolGameData = toolGameData}
+            toolTemplateTable[key] = {Tool = tool, ToolGameData = toolGameData}
         end
     end
     
-    self.ToolTemplateTable = ToolTemplateTable
+    self.ToolTemplateTable = toolTemplateTable
     return true
-end
-
-function ToolSystem:GetClonedToolScript(toolType, tool)
-    if not toolType or not tool then
-        Debug.Assert(false, "비정상입니다.")
-        return nil
-    end
-
-    local targetScript = nil
-    if ToolType.Weapon == toolType then
-        targetScript = Utility:DeepCopy(WeaponController)
-        if not targetScript:InitializeWeaponController(GameDataType.Tool, tool) then
-            Debug.Assert(false, "비정상입니다.")
-            return nil
-        end
-    elseif ToolType.Armor == toolType then
-
-    elseif ToolType.Comsumable == toolType then
-        
-    end
-
-    return targetScript
 end
 
 function ToolSystem:SetToolOwnerPlayer(tool, toolOwnerPlayer)
@@ -188,6 +166,11 @@ end
 
 function ToolSystem:CreateTool(toolKey)
     if not toolKey then
+        Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolKey))
+        return nil
+    end
+
+    if not self.ToolTemplateTable[toolKey] then
         Debug.Assert(false, "툴 생성에 실패했습니다. => " .. tostring(toolKey))
         return nil
     end
@@ -238,6 +221,32 @@ function ToolSystem:FindObjectJoints(tool)
     return joints
 end
 
+function ToolSystem:CloneObjectScript(object, objectKey)
+    local toolGameData = ToolUtility:GetGameDataByKey(objectKey)
+    Debug.Assert(toolGameData, "비정상입니다.")
+
+    local toolType = toolGameData.ToolType
+    if not toolType or not object then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
+
+    local targetScript = nil
+    if ToolType.Weapon == toolType then
+        targetScript = Utility:DeepCopy(WeaponController)
+        if not targetScript:InitializeWeaponController(GameDataType.Tool, tool) then
+            Debug.Assert(false, "비정상입니다.")
+            return nil
+        end
+    elseif ToolType.Armor == toolType then
+
+    elseif ToolType.Comsumable == toolType then
+        
+    end
+
+    return targetScript
+end
+
 function ToolSystem:CreateImpl(toolKey)
     local targetTool = self.ToolTemplateTable[toolKey]
 
@@ -250,20 +259,6 @@ function ToolSystem:CreateImpl(toolKey)
 	clonedTargetTool.Parent = nil
 
     return clonedTargetTool
-end
-
-function ToolSystem:PostCreateImpl(createdTool, toolKey)
-    local targetScript = self:GetClonedToolScript(self.ToolTemplateTable[toolKey].ToolGameData.ToolType, createdTool)
-
-     -- 없는 것도 존재할 수 있다.
-    if targetScript then
-        if not self:SetScript(createdTool, targetScript) then
-            Debug.Assert(false, "비정상입니다.")
-            return nil
-        end
-    end
-
-    return createdTool
 end
 
 function ToolSystem:PreDestroyImpl(tool)
