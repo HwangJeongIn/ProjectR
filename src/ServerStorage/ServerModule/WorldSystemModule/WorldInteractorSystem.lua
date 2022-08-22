@@ -20,6 +20,11 @@ local WorldInteractors = ServerStorage:WaitForChild("WorldInteractors")
 local WorldInteractorModule = ServerModuleFacade.WorldInteractorModule
 local ItemBoxController = require(WorldInteractorModule:WaitForChild("ItemBoxController"))
 
+local EffectsFolder = ServerStorage:WaitForChild("Effects")
+local WorldInteractorEffectsFolder = EffectsFolder:WaitForChild("WorldInteractorEffects")
+-- 2개이상 받아오면 새로 파일을 만들어야 한다.
+local ItemBoxEffect = WorldInteractorEffectsFolder:WaitForChild("ItemBoxEffect")
+
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local SystemModule = ServerModule:WaitForChild("WorldSystemModule")
 local ObjectSystemBase = require(SystemModule:WaitForChild("ObjectSystemBase"))
@@ -61,6 +66,34 @@ function WorldInteractorSystem:InitializeWorldInteractorTemplate(worldInteractor
     return true
 end
 
+function WorldInteractorSystem:AttachWorldInteractorEffect(worldInteractor, worldInteractorType)
+    if not worldInteractor or not worldInteractorType then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    local effectCFrame = worldInteractor.Trigger.CFrame
+    local effect = nil
+    if WorldInteractorType.ItemBox == worldInteractorType then
+        effect = ItemBoxEffect:Clone()
+    --elseif WorldInteractorType.TempName == worldInteractorType then
+        
+    end
+
+    if effect then
+        effect.Name = "Effect"
+        effect.Parent = worldInteractor
+        effect.CFrame = effectCFrame
+
+        local tempWeld = Instance.new("WeldConstraint")
+        tempWeld.Name = "TempWeldConstraint"
+        tempWeld.Part0 = effect
+        tempWeld.Part1 = worldInteractor.Trigger
+        tempWeld.Parent = effect
+    end
+    return true
+end
+
 function WorldInteractorSystem:Initialize()
     local worldInteractorTemplateTable = {}
 
@@ -88,9 +121,12 @@ function WorldInteractorSystem:Initialize()
             end
 
             local worldInteractorGameData = WorldInteractorUtility:GetGameDataByKey(key)
-            
-            ObjectTagUtility:AddTag(worldInteractor, WorldInteractorTypeConverter[worldInteractorGameData.WorldInteractorType])
+            if not self:AttachWorldInteractorEffect(worldInteractor, worldInteractorGameData.WorldInteractorType) then
+                Debug.Assert(false, "AttachWorldInteractorEffect에 실패했습니다. => " .. worldInteractorName)
+                return false
+            end
 
+            ObjectTagUtility:AddTag(worldInteractor, WorldInteractorTypeConverter[worldInteractorGameData.WorldInteractorType])
             if not ObjectCollisionGroupUtility:SetWorldInteractorCollisionGroup(worldInteractor) then
                 Debug.Assert(false, "SetWorldInteractorCollisionGroup에 실패했습니다. => " .. worldInteractorName)
                 return false
@@ -233,6 +269,7 @@ end
 
 function WorldInteractorSystem:PreDestroyImpl(worldInteractor)
 	Debris:AddItem(worldInteractor.Trigger, 0)
+	Debris:AddItem(worldInteractor.Effect, 0)
     return true
 end
 

@@ -138,6 +138,17 @@ function SkillTemplate:RegisterSkillDataParameter(skillDataParameter)
     end
     skillDataParameter[SkillDataParameterType.SkillEffect] = skillEffect
 
+    
+    local skillOnDestroyingEffectName = skillDataParameter[SkillDataParameterType.SkillOnDestroyingEffect]
+    if skillOnDestroyingEffectName then
+        local skillOnDestroyingEffect = SkillEffectTemplate:Get(skillOnDestroyingEffectName)
+        if not skillOnDestroyingEffect then
+            Debug.Assert(false, "이름을 가진 이펙트가 존재하지 않습니다. => " .. skillOnDestroyingEffectName)
+            return false
+        end
+        skillDataParameter[SkillDataParameterType.SkillOnDestroyingEffect] = skillOnDestroyingEffect
+    end
+    
     local skillName = skillDataParameter.SkillName
     self.RawSkillData[skillName][SkillDataType.SkillDataParameter] = skillDataParameter
     return true

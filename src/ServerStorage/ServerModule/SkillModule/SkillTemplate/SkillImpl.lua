@@ -138,6 +138,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillAnimation] = "LeftSlash",
         [SkillDataParameterType.SkillDuration] = 1.0,
         [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+        [SkillDataParameterType.SkillOnDestroyingEffect] = "HitEffect",
     })
 
 
@@ -178,6 +179,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillAnimation] = "RightSlash",
         [SkillDataParameterType.SkillDuration] = 1.0,
         [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+        [SkillDataParameterType.SkillOnDestroyingEffect] = "HitEffect",
     })
 
 
@@ -214,6 +216,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillAnimation] = "RightSlash",
         [SkillDataParameterType.SkillDuration] = 1.0,
         [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+        [SkillDataParameterType.SkillOnDestroyingEffect] = "HitEffect",
     })
 
 
@@ -251,6 +254,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillAnimation] = "LeftSlash",
         [SkillDataParameterType.SkillDuration] = 0.5,
         [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+        [SkillDataParameterType.SkillOnDestroyingEffect] = "HitEffect",
     })
 
 
@@ -287,6 +291,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillAnimation] = "MiddleSlash",
         [SkillDataParameterType.SkillDuration] = 1.0,
         [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+        [SkillDataParameterType.SkillOnDestroyingEffect] = "HitEffect",
     })
 
 

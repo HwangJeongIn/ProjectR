@@ -139,6 +139,17 @@ function SkillController:SimulateSkillCollision(skillCastingTime, humanoidRootPa
         skillCollisionConnection:Disconnect()
     end
 
+    -- 소멸 이펙트
+    local skillOnDestroyingEffect = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillOnDestroyingEffect)
+    if skillOnDestroyingEffect then
+        local onDestroyingEffect = skillOnDestroyingEffect:Clone()
+        --onDestroyingEffect.Transparency = 0
+        onDestroyingEffect.Anchored = true
+        onDestroyingEffect.Parent = workspace
+        onDestroyingEffect.CFrame = createdSkillCollision.CFrame
+        Debris:AddItem(onDestroyingEffect, 0.2)
+    end
+
     Debris:AddItem(createdSkillCollision, 0)
 end
 

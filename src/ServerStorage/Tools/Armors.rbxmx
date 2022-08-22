@@ -252,15 +252,6 @@
 					</Item>
 				</Item>
 			</Item>
-			<Item class="IntValue" referent="720">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">Key</string>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<int64 name="Value">104</int64>
-				</Properties>
-			</Item>
 			<Item class="Model" referent="RBXD51B4E3C0A804BA7B636C50DB30684A4">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
@@ -878,15 +869,6 @@
 				<Content name="TextureId"><null></null></Content>
 				<string name="ToolTip"></string>
 			</Properties>
-			<Item class="IntValue" referent="732">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">Key</string>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<int64 name="Value">102</int64>
-				</Properties>
-			</Item>
 			<Item class="Part" referent="733">
 				<Properties>
 					<bool name="Anchored">false</bool>
@@ -1828,15 +1810,6 @@
 				<Content name="TextureId"><null></null></Content>
 				<string name="ToolTip"></string>
 			</Properties>
-			<Item class="IntValue" referent="752">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">Key</string>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<int64 name="Value">101</int64>
-				</Properties>
-			</Item>
 			<Item class="Part" referent="753">
 				<Properties>
 					<bool name="Anchored">false</bool>
@@ -2268,7 +2241,7 @@
 								<R21>0</R21>
 								<R22>1</R22>
 							</CoordinateFrame>
-							<bool name="CanCollide">false</bool>
+							<bool name="CanCollide">true</bool>
 							<bool name="CanQuery">false</bool>
 							<bool name="CanTouch">true</bool>
 							<bool name="CastShadow">true</bool>
@@ -2385,7 +2358,7 @@
 								<R21>0</R21>
 								<R22>1</R22>
 							</CoordinateFrame>
-							<bool name="CanCollide">false</bool>
+							<bool name="CanCollide">true</bool>
 							<bool name="CanQuery">false</bool>
 							<bool name="CanTouch">true</bool>
 							<bool name="CastShadow">true</bool>
@@ -2479,7 +2452,7 @@
 								<R21>0</R21>
 								<R22>1</R22>
 							</CoordinateFrame>
-							<bool name="CanCollide">false</bool>
+							<bool name="CanCollide">true</bool>
 							<bool name="CanQuery">false</bool>
 							<bool name="CanTouch">true</bool>
 							<bool name="CastShadow">true</bool>
@@ -2573,7 +2546,7 @@
 								<R21>0</R21>
 								<R22>1</R22>
 							</CoordinateFrame>
-							<bool name="CanCollide">false</bool>
+							<bool name="CanCollide">true</bool>
 							<bool name="CanQuery">false</bool>
 							<bool name="CanTouch">true</bool>
 							<bool name="CastShadow">true</bool>
@@ -2765,15 +2738,6 @@
 				<Content name="TextureId"><null></null></Content>
 				<string name="ToolTip"></string>
 			</Properties>
-			<Item class="IntValue" referent="771">
-				<Properties>
-					<BinaryString name="AttributesSerialize"></BinaryString>
-					<string name="Name">Key</string>
-					<int64 name="SourceAssetId">-1</int64>
-					<BinaryString name="Tags"></BinaryString>
-					<int64 name="Value">103</int64>
-				</Properties>
-			</Item>
 			<Item class="Part" referent="772">
 				<Properties>
 					<bool name="Anchored">false</bool>

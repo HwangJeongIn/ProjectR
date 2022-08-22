@@ -44,7 +44,8 @@ local ServerEnum = {
 		SkillDuration = 8,
 
 		SkillEffect = 9,
-		Count = 10
+		SkillOnDestroyingEffect = 10,
+		Count = 11
 	},
 
 	SkillCollisionDetailMovementType = {
@@ -80,6 +81,7 @@ ServerEnum.SkillDataParameterType.Converter = {
 	[ServerEnum.SkillDataParameterType.SkillDuration] = "SkillDuration",
 
 	[ServerEnum.SkillDataParameterType.SkillEffect] = "SkillEffect",
+	[ServerEnum.SkillDataParameterType.SkillOnDestroyingEffect] = "SkillOnDestroyingEffect",
 }
 Debug.Assert(ServerEnum.SkillDataParameterType.Count == #ServerEnum.SkillDataParameterType.Converter + 1, "비정상입니다.")
 
