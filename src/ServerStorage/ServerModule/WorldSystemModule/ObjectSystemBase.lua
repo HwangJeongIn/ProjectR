@@ -52,7 +52,7 @@ function ObjectSystemBase:DestroyImpl(...)
 end
 
 -- virtual
---function ObjectSystemBase:PostCreateImpl(..., createdObject) return createdObject end
+--function ObjectSystemBase:PostCreateImpl(..., createdObject) return true end
 --function ObjectSystemBase:PreDestroyImpl(object) return true end
 --function ObjectSystemBase:PostDestroyImpl() return true end
 
@@ -81,14 +81,13 @@ function ObjectSystemBase:PostCreate(createdObject, ...)
 
     local objectJoints = self:FindObjectJoints(createdObject)
     self.Objects[createdObject].Value = createdObject
-    self.Objects[createdObject].Joints = createdObject
+    self.Objects[createdObject].Joints = objectJoints
     
     local clonedObjectScript = self:CloneObjectScript(createdObject, ...)
     self.Objects[createdObject].Script = clonedObjectScript -- 없을 수도 있음
 
     if self.PostCreateImpl then
-        createdObject = self:PostCreateImpl(createdObject, ...)
-        if not createdObject then
+        if not self:PostCreateImpl(createdObject, ...) then
             Debug.Assert(false, "비정상입니다.")
             return nil
         end

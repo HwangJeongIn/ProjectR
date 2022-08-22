@@ -1,3 +1,4 @@
+local Debris = game:GetService("Debris")
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
@@ -7,13 +8,7 @@ local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
 local WorldInteractorUtility = ServerModuleFacade.WorldInteractorUtility
 
 local ServerEnum = ServerModuleFacade.ServerEnum
---[[
-local GameDataType = ServerEnum.GameDataType
-local EquipType = ServerEnum.EquipType
 local WorldInteractorType = ServerEnum.WorldInteractorType
---]]
-local WorldInteractorType = ServerEnum.WorldInteractorType
-
 local ObjectModule = ServerModuleFacade.ObjectModule
 
 local WorldInteractorBase = {}
@@ -35,7 +30,6 @@ function WorldInteractorBase:InitializeWorldInteractor(gameDataType, worldIntera
 	local worldInteractorType = worldInteractorGameData.WorldInteractorType
 	if WorldInteractorType.ItemBox == worldInteractorType then
 		
-		
 	-- elseif WorldInteractorType.TempType == worldInteractorType then
 	else
 		Debug.Assert(false, "비정상입니다.")
@@ -45,12 +39,54 @@ function WorldInteractorBase:InitializeWorldInteractor(gameDataType, worldIntera
 	return true
 end
 
+-- virtual
+function WorldInteractorBase:OnDestroying()
+	return true
+end
 
-function WorldInteractorBase:TakeDamage()
-	self.CurrentHp = self.CurrentHp - 1
+function WorldInteractorBase:SetJoints(joints)
+	if not joints then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
 
-	
+	local maxJointCount = #joints
+	if maxJointCount then
+		self.Joints = joints
+		self.MaxJointCount = maxJointCount
+	end
 
+	return true
+end
+
+function WorldInteractorBase:TakeDamage(damage)
+	if 0 > damage then
+		Debug.Assert(false, "비정상입니다.")
+		return -1
+	end
+
+	self.CurrentHp = self.CurrentHp - damage
+	if 0 >= self.CurrentHp then
+		self.CurrentHp = 0
+		if not self:OnDestroying() then
+			Debug.Assert(false, "OnDestroying에 실패했습니다.")
+		end
+		
+		return 0
+	end
+
+	local currentHpRate = self.CurrentHp / self.MaxHp
+	if self.Joints then
+		local currentJointCount = #self.Joints
+
+		local targetJointCount = math.ceil(self.MaxJointCount * currentHpRate)
+		if targetJointCount < currentJointCount then
+			local jointCountToDelete = currentJointCount - targetJointCount
+			for i = 1, jointCountToDelete do
+				Debris:AddItem(self.Joints[i], 0)
+			end
+		end
+    end
 	return self.CurrentHp
 end
 

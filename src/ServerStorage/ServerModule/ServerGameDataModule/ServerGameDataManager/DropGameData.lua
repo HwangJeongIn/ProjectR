@@ -19,23 +19,25 @@ function DropGameData:LoadAdditionalData(gameData, gameDataManager)
 end
 
 function DropGameData:ValidateData(gameData, gameDataManager)
-    if gameData.ToolGameDataKeySet then
-        local toolGameDataSet = {}
-        for _, toolGameDataKey in pairs(gameData.ToolGameDataKeySet) do
-            local toolGameData = gameDataManager[GameDataType.Tool]:Get(toolGameDataKey)
+    if not gameData.ToolGameDataKeySet then
+        Debug.Assert(false, "DropGameData의 ToolGameDataKeySet이 존재하지 않습니다. => " .. tostring(gameData:GetKey()))
+        return false
+    end 
 
-            if not toolGameData then
-                Debug.Assert(false, "DropGameData의 ToolGameDataKey가 존재하지 않습니다. => " 
-                .. tostring(gameData:GetKey()) .. " : " .. tostring(toolGameDataKey))
-                return false
-            end
+    local toolGameDataSet = {}
+    for _, toolGameDataKey in pairs(gameData.ToolGameDataKeySet) do
+        local toolGameData = gameDataManager[GameDataType.Tool]:Get(toolGameDataKey)
 
-            table.insert(toolGameDataSet, toolGameData)
+        if not toolGameData then
+            Debug.Assert(false, "DropGameData의 ToolGameDataKey가 존재하지 않습니다. => " 
+            .. tostring(gameData:GetKey()) .. " : " .. tostring(toolGameDataKey))
+            return false
         end
 
-        rawset(gameData, "ToolGameDataSet", toolGameDataSet)
+        table.insert(toolGameDataSet, toolGameData)
     end
 
+    rawset(gameData, "ToolGameDataSet", toolGameDataSet)
 	return true
 end
 

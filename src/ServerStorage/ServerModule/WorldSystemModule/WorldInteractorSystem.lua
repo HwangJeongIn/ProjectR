@@ -18,7 +18,7 @@ local WorldInteractorTypeConverter = WorldInteractorType.Converter
 local WorldInteractors = ServerStorage:WaitForChild("WorldInteractors")
 
 local WorldInteractorModule = ServerModuleFacade.WorldInteractorModule
---local ItemBoxController = require(WorldInteractorModule:WaitForChild("ItemBoxController"))
+local ItemBoxController = require(WorldInteractorModule:WaitForChild("ItemBoxController"))
 
 local ServerModule = ServerStorage:WaitForChild("ServerModule")
 local SystemModule = ServerModule:WaitForChild("WorldSystemModule")
@@ -102,6 +102,22 @@ function WorldInteractorSystem:Initialize()
     return true
 end
 
+function WorldInteractorSystem:DamageWorldInteractor(worldInteractor, damage)
+    local objectScript = self:GetScript(worldInteractor)
+    Debug.Assert(objectScript, "WorldInteractor 스크립트가 없습니다. 반드시 존재해야 합니다.")
+
+    local remainingHp = objectScript:TakeDamage(damage)
+    if 0 == remainingHp then
+        if not self:DestroyWorldInteractor(worldInteractor) then
+            Debug.Assert(false, "WorldInteractor 삭제에 실패했습니다.")
+            return false
+        end
+    elseif 0 > remainingHp then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+end
+
 function WorldInteractorSystem:CreateWorldInteractor(worldInteractorKey)
     if not worldInteractorKey then
         Debug.Assert(false, "WorldInteractor 생성에 실패했습니다. => " .. tostring(worldInteractorKey))
@@ -169,13 +185,11 @@ function WorldInteractorSystem:CloneObjectScript(object, objectKey)
 
     local targetScript = nil
     if WorldInteractorType.ItemBox == worldInteractorType then
-        --[[
-        targetScript = Utility:DeepCopy(WeaponController)
-        if not targetScript:InitializeWeaponController(worldInteractorType, object) then
+        targetScript = Utility:DeepCopy(ItemBoxController)
+        if not targetScript:InitializeItemBoxController(worldInteractorType, object) then
             Debug.Assert(false, "비정상입니다.")
             return nil
         end
-        --]]
     end
 
     return targetScript
@@ -195,8 +209,25 @@ function WorldInteractorSystem:CreateImpl(worldInteractorKey)
     return clonedTargetWorldInteractor
 end
 
-function WorldInteractorSystem:PreDestroyImpl(WorldInteractor)
-	Debris:AddItem(WorldInteractor.Trigger, 0)
+function WorldInteractorSystem:PostCreateImpl(createdWorldInteractor, worldInteractorKey)
+    --[[
+    local worldInteractorGameData = WorldInteractorUtility:GetGameDataByKey(worldInteractorKey)
+    Debug.Assert(worldInteractorGameData, "비정상입니다.")
+    local worldInteractorType = worldInteractorGameData.WorldInteractorType
+    --]]
+
+    local objectScript = self:GetScript(createdWorldInteractor)
+    local objectJoints = self:GetJoints(createdWorldInteractor)
+    if not objectScript:SetJoints(objectJoints) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    return true
+end
+
+function WorldInteractorSystem:PreDestroyImpl(worldInteractor)
+	Debris:AddItem(worldInteractor.Trigger, 0)
     return true
 end
 

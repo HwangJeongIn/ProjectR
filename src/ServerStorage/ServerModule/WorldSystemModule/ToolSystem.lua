@@ -118,7 +118,7 @@ function ToolSystem:Initialize()
 
             local toolGameData = ToolUtility:GetGameDataByKey(key)
             ObjectTagUtility:AddTag(tool, ToolTypeConverter[toolGameData.ToolType])
-            toolTemplateTable[key] = {Tool = tool, ToolGameData = toolGameData}
+            toolTemplateTable[key] = {Tool = tool}
         end
     end
     
@@ -127,16 +127,7 @@ function ToolSystem:Initialize()
 end
 
 function ToolSystem:SetToolOwnerPlayer(tool, toolOwnerPlayer)
-    -- 없을 수 있다.
-    --[[
-    if not toolOwnerPlayer then
-        Debug.Assert(false, "비정상입니다.")
-        return false
-    end
-    --]]
-
     local toolScript = self:GetScript(tool)
-    -- 없을 수 있다.
     if toolScript then
         toolScript:SetToolOwnerPlayer(toolOwnerPlayer)
     end
