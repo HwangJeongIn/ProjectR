@@ -29,9 +29,13 @@ function WorldInteractorBase:InitializeWorldInteractor(gameDataType, worldIntera
 		return false
 	end
 
-	self.CurrentHp = worldInteractorGameData.MaxHp
+	self.MaxHp = worldInteractorGameData.MaxHp
+	self.CurrentHp = self.MaxHp
+
 	local worldInteractorType = worldInteractorGameData.WorldInteractorType
 	if WorldInteractorType.ItemBox == worldInteractorType then
+		
+		
 	-- elseif WorldInteractorType.TempType == worldInteractorType then
 	else
 		Debug.Assert(false, "비정상입니다.")
@@ -39,6 +43,15 @@ function WorldInteractorBase:InitializeWorldInteractor(gameDataType, worldIntera
 	end
 
 	return true
+end
+
+
+function WorldInteractorBase:TakeDamage()
+	self.CurrentHp = self.CurrentHp - 1
+
+	
+
+	return self.CurrentHp
 end
 
 return WorldInteractorBase

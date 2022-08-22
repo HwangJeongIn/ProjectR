@@ -63,7 +63,6 @@ function SkillImpl:DamagePlayer(skillFactor, attakerPlayerStatisicRaw, attackee)
     return finalDamage
 end
 
-
 function SkillImpl:DamageNpc(skillFactor, attakerPlayerStatisicRaw, attackee)
     local targetCharacter = attackee.Parent
 
@@ -120,8 +119,6 @@ function SkillImpl:DamageSomething(skillController, attackerPlayer, attackee)
         return 0
     end
 end
-
-
 
 function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
 

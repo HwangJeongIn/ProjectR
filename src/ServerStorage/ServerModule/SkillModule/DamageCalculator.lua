@@ -21,8 +21,9 @@ local SkillFactorType = ServerEnum.SkillFactorType
 
 local DamageCalculator = {}
 
+--[[
 local EmptyStatistic = {
-    --[[
+    
 	[StatType.STR] = 0,
 	[StatType.DEF] = 0,
 	[StatType.Move] = 0,
@@ -35,10 +36,9 @@ local EmptyStatistic = {
 	[StatType.Block] = 0,
 	[StatType.Critical] = 0,
 	[StatType.Sight] = 0
-    --]]
 }
 Debug.Assert(StatType.Count == #EmptyStatistic + 1, "여기도 갱신해야합니다.")
-
+--]]
 
 function DamageCalculator:CalculateDamage(attackerSTR, attackeeDEF)
     local finalDamage = attackerSTR / (attackeeDEF + DamageCalculationConstant / DamageCalculationConstant)
@@ -76,11 +76,14 @@ function DamageCalculator:CalculateSkillDamage(skillFactor, attackerStatisticRaw
     attackeeDEF = defenseRate * attackeeDEF
 
     local finalDamge = self:CalculateDamage(attackerSTR, attackeeDEF)
+    finalDamge = finalDamge / 100
     return finalDamge
 end
 
 function DamageCalculator:CalculateWorldInteractorSkillDamage(skillFactor, attackerStatisticRaw)
-    return self:CalculateSkillDamage(skillFactor, attackerStatisticRaw, {})
+    -- 무기에 상관없이 1고정 데미지
+    return 1
+    --return self:CalculateSkillDamage(skillFactor, attackerStatisticRaw, {})
 end
 
 return DamageCalculator

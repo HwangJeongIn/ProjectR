@@ -143,12 +143,6 @@ function WorldInteractorSystem:DestroyWorldInteractor(worldInteractor)
         return false
     end
 
-    local className = worldInteractor.ClassName
-    if "WorldInteractor" ~= className then
-        Debug.Assert(false, "비정상입니다.")
-        return false
-    end
-
     if not self:Destroy(worldInteractor) then
         Debug.Assert(false, "비정상입니다.")
         return false
@@ -160,9 +154,11 @@ end
 function WorldInteractorSystem:FindObjectJoints(worldInteractor)
     local joints = {}
 
+    -- 따로 삭제해주는 것으로 변경
+    --[[
     local trigger = worldInteractor.Trigger
     table.insert(joints, trigger)
-
+    --]]
     local parts = worldInteractor.Mesh:GetChildren()
     for _, part in pairs(parts) do
         local joint = part:FindFirstChild("Joint")
@@ -202,6 +198,11 @@ function WorldInteractorSystem:PostCreateImpl(createdWorldInteractor, worldInter
     end
 
     return createdWorldInteractor
+end
+
+function WorldInteractorSystem:PreDestroyImpl(WorldInteractor)
+	Debris:AddItem(WorldInteractor.Trigger, 0)
+    return true
 end
 
 function WorldInteractorSystem:DestroyImpl(WorldInteractor)

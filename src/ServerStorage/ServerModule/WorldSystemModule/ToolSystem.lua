@@ -1,3 +1,4 @@
+local Debris = game:GetService("Debris")
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
@@ -223,9 +224,6 @@ end
 function ToolSystem:FindObjectJoints(tool)
     local joints = {}
 
-    local trigger = tool.Trigger
-    table.insert(joints, trigger)
-
     local mesh = tool:FindFirstChild("Mesh")
     local parts = mesh:GetChildren()
     for _, part in pairs(parts) do
@@ -266,6 +264,11 @@ function ToolSystem:PostCreateImpl(createdTool, toolKey)
     end
 
     return createdTool
+end
+
+function ToolSystem:PreDestroyImpl(tool)
+	Debris:AddItem(tool.Trigger, 0)
+    return true
 end
 
 function ToolSystem:DestroyImpl(tool)
