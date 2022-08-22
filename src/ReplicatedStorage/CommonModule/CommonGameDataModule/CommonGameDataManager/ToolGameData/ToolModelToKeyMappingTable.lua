@@ -1,19 +1,19 @@
 local ToolModelToKeyMappingTable = {
-	w_WoodStick = 1,
-	w_Sword = 2,
-	w_Axe = 3,
-	w_RustySword = 4,
-	w_SmallKnife = 5,
-	w_Knife = 6,
-	w_BlueSword = 7,
-	w_FlameSword = 8,
-	w_FrostSword = 9,
-	w_BloodSword = 10,
+	tw_WoodStick = 1,
+	tw_Sword = 2,
+	tw_Axe = 3,
+	tw_RustySword = 4,
+	tw_SmallKnife = 5,
+	tw_Knife = 6,
+	tw_BlueSword = 7,
+	tw_FlameSword = 8,
+	tw_FrostSword = 9,
+	tw_BloodSword = 10,
 
-	a_Helmet = 101,
-	a_Chestplate = 102,
-	a_Leggings = 103,
-	a_Boots = 104,
+	ta_Helmet = 101,
+	ta_Chestplate = 102,
+	ta_Leggings = 103,
+	ta_Boots = 104,
 }
 
 return ToolModelToKeyMappingTable

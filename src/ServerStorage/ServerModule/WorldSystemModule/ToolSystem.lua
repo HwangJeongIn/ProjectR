@@ -225,7 +225,7 @@ function ToolSystem:CloneObjectScript(object, objectKey)
     local targetScript = nil
     if ToolType.Weapon == toolType then
         targetScript = Utility:DeepCopy(WeaponController)
-        if not targetScript:InitializeWeaponController(GameDataType.Tool, tool) then
+        if not targetScript:InitializeWeaponController(GameDataType.Tool, object) then
             Debug.Assert(false, "비정상입니다.")
             return nil
         end

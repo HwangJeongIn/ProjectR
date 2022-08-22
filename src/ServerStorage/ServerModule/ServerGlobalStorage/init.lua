@@ -76,11 +76,11 @@ function ServerGlobalStorage:CloneObjectFromDummyObject(gameDataType, dummyObjec
 
 	elseif GameDataType.WorldInteractor == gameDataType then
 		local objectGameDataKey = WorldInteractorUtility:GetGameDataKeyByModelName(dummyObjectName)
-		createdObject = self:CreateWorldInteractorToWorkspace(objectGameDataKey, dummyObjectCFrame)
+		createdObject = self:CreateWorldInteractor(objectGameDataKey, dummyObjectCFrame)
 
 	elseif GameDataType.Npc == gameDataType then
 		local objectGameDataKey = NpcUtility:GetGameDataKeyByModelName(dummyObjectName)
-		createdObject = self:CreateNpcToWorkspace(objectGameDataKey, dummyObjectCFrame)
+		createdObject = self:CreateNpc(objectGameDataKey, dummyObjectCFrame)
 
 	else
 		Debug.Assert(false, "비정상입니다. => " .. tostring(gameDataType) .. " : " .. dummyObjectName)
@@ -257,7 +257,7 @@ function ServerGlobalStorage:CreateWorldInteractor(worldInteractorKey, worldInte
 		return nil
 	end
 
-	local worldInteractorSystem = self:GetToolSystem()
+	local worldInteractorSystem = self:GetWorldInteractorSystem()
 	local createdWorldInteractor = worldInteractorSystem:CreateWorldInteractor(worldInteractorKey)
 	if not createdWorldInteractor then
 		Debug.Assert(false, "비정상입니다.")
@@ -267,6 +267,36 @@ function ServerGlobalStorage:CreateWorldInteractor(worldInteractorKey, worldInte
 	createdWorldInteractor.Parent = workspace
 	createdWorldInteractor.Trigger.CFrame = worldInteractorCFrame
 	return createdWorldInteractor 
+end
+
+function ServerGlobalStorage:DestroyWorldInteractor(worldInteractor)
+	if not worldInteractor then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local worldInteractorSystem = self:GetWorldInteractorSystem()
+	if not worldInteractorSystem:DestroyWorldInteractor(worldInteractor) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+function ServerGlobalStorage:DamageWorldInteractor(targetWorldInteractor, damage)
+	if not targetWorldInteractor or not damage then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local worldInteractorSystem = self:GetWorldInteractorSystem()
+	if not worldInteractorSystem:DamageWorldInteractor(targetWorldInteractor, damage) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
 end
 
 function ServerGlobalStorage:CreateTool(toolKey, parent, toolCFrame)

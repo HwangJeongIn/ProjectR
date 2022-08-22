@@ -116,7 +116,7 @@ end
 
 Temp()
 
---ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
+ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
 
 while false  do
 	-- 다른 플레이어를 기다리는 중

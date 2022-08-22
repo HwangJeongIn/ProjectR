@@ -48,6 +48,8 @@ function WorldInteractorSystem:InitializeWorldInteractorTemplate(worldInteractor
         return false
     end
 
+    trigger.CanQuery = true
+    trigger.CanTouch = true
     --[[
     if not trigger.CanCollide then
         Debug.Print("Trigger에 CanCollide가 꺼져있습니다. 자동으로 켜집니다. => " .. worldInteractor.Name)
@@ -116,6 +118,8 @@ function WorldInteractorSystem:DamageWorldInteractor(worldInteractor, damage)
         Debug.Assert(false, "비정상입니다.")
         return false
     end
+
+    return true
 end
 
 function WorldInteractorSystem:CreateWorldInteractor(worldInteractorKey)
@@ -160,7 +164,8 @@ function WorldInteractorSystem:FindObjectJoints(worldInteractor)
     local trigger = worldInteractor.Trigger
     table.insert(joints, trigger)
     --]]
-    local parts = worldInteractor.Mesh:GetChildren()
+    local mesh = worldInteractor:FindFirstChild("Mesh")
+    local parts = mesh:GetChildren()
     for _, part in pairs(parts) do
         local joint = part:FindFirstChild("Joint")
         if not joint then

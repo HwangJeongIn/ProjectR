@@ -29,7 +29,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">a_Boots</string>
+				<string name="Name">ta_Boots</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -871,7 +871,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">a_Chestplate</string>
+				<string name="Name">ta_Chestplate</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -1821,7 +1821,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">a_Helmet</string>
+				<string name="Name">ta_Helmet</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -2758,7 +2758,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">a_Leggings</string>
+				<string name="Name">ta_Leggings</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>

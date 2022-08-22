@@ -29,7 +29,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">w_Sword</string>
+				<string name="Name">tw_Sword</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -558,7 +558,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">w_Axe</string>
+				<string name="Name">tw_Axe</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -1178,7 +1178,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">w_RustySword</string>
+				<string name="Name">tw_RustySword</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -1711,7 +1711,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">w_BlueSword</string>
+				<string name="Name">tw_BlueSword</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -2479,7 +2479,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">w_SmallKnife</string>
+				<string name="Name">tw_SmallKnife</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -2998,7 +2998,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">w_Knife</string>
+				<string name="Name">tw_Knife</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -3550,7 +3550,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">w_WoodStick</string>
+				<string name="Name">tw_WoodStick</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -4079,7 +4079,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">w_FrostSword</string>
+				<string name="Name">tw_FrostSword</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -5346,7 +5346,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">w_BloodSword</string>
+				<string name="Name">tw_BloodSword</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
@@ -6041,7 +6041,7 @@
 					<R22>1</R22>
 				</CoordinateFrame>
 				<bool name="ManualActivationOnly">false</bool>
-				<string name="Name">w_FlameSword</string>
+				<string name="Name">tw_FlameSword</string>
 				<bool name="RequiresHandle">true</bool>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>

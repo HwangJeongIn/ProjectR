@@ -44,7 +44,7 @@ function ItemBoxController:OnDestroying()
     end
 
     local worldInteractor = self:Root()
-    local spawnLocation = worldInteractor.Trigger.CFrame + Vector3.new(0, 2, 0)
+    local spawnLocation = worldInteractor.Trigger.CFrame + Vector3.new(0, 5, 0)
     local dropTools = dropGameData.ToolGameDataSet
     for _, dropTool in pairs(dropTools) do
         ServerGlobalStorage:CreateToolToWorkspace(dropTool:GetKey(), spawnLocation)
