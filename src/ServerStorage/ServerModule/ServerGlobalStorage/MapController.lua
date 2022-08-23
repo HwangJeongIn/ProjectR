@@ -222,8 +222,8 @@ function MapController:TeleportPlayerToSpawnPoint(character, spawnPoint, mapCent
 	if raycastResult then
 		finalPosition = raycastResult.Position
 	end
-
-	humanoidRootPart.CFrame = CFrame.lookAt(finalPosition, mapCenterPosition)
+	
+	humanoidRootPart.CFrame = CFrame.lookAt(finalPosition, mapCenterPosition) + Vector3.new(0, 5, 0)
 end
 
 function MapController:TeleportPlayerToRespawnLocation(player)
