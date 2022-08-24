@@ -48,6 +48,10 @@ end
 
 local SkillSequence = {}
 
+function SkillSequence:Initialize(skillName)
+    
+end
+
 function SkillSequence:AddAnimationTrack(animationName)
     -- 애니메이션을 찾는다.
     local targetAnimation
