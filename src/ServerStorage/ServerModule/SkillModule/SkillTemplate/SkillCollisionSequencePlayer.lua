@@ -162,7 +162,6 @@ function SkillCollisionSequencePlayer:CreateSkillCollision(originCFrame)
             tempSkillCollisionEffect.CFrame = self:GetSynchronizedSkillEffectCFrameToOrigin(originCFrame, tempSkillCollision)
         end
         
-
         local tempWeld = Instance.new("WeldConstraint")
         tempWeld.Name = "TempWeldConstraint"
         tempWeld.Part0 = tempSkillCollisionEffect
@@ -173,18 +172,42 @@ function SkillCollisionSequencePlayer:CreateSkillCollision(originCFrame)
     return tempSkillCollision
 end
 
-function SkillCollisionSequencePlayer:Start()
+function SkillCollisionSequencePlayer:Start(skillCollisionHandler)
     local skillCollision = self:CreateSkillCollision(self.OriginCFrame)
     if not skillCollision then
         Debug.Assert(false, "SkillCollision을 만들지 못했습니다.")
         return false
     end
 
+    --[[
+    local skillCollisionHandler = function(skillCollision, touchedPart, outputFromHandling)
+        if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
+            
+            local touchedPartCollisionGroupName = ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(touchedPart)
+            Debug.Print(touchedPart.Name .. " : ".. tostring(touchedPartCollisionGroupName))
+
+            if self:ValidateTargetInRange(toolOwnerPlayer, touchedPart) then
+                self:ApplySkillToTarget(toolOwnerPlayer, touchedPart, outputFromHandling)
+            end
+
+            outputFromHandling.PendingKill = true
+        end
+    end
+    --]]
+
     self.Collision = skillCollision
+    self.CollisionHandler = skillCollisionHandler
+
+
+    -- 현재의 Roblox에서는 Trigger 같은 충돌체의 경우 이벤트를 바인딩해야 충돌관련 처리를 할 수 있다.
+    self.CollisionTouchedConnection = self.Collision.Touched:Connect(function(touchingPart) end)
     self.StartTime = os.clock()
 end
 
 function SkillCollisionSequencePlayer:End()
+    -- 예외처리 해서 여러번 처리되지는 않지만 이벤트 발생을 막기 위해 끊어준다.
+    self.CollisionTouchedConnection:Disconnect()
+
     local skillCollisionOnDestroyingEffect = self.CollisionSequence:GetCollisionData(SkillCollisionParameterType.SkillCollisionOnDestroyingEffect)
     if skillCollisionOnDestroyingEffect then
         local onDestroyingEffect = skillCollisionOnDestroyingEffect:Clone()
@@ -227,6 +250,17 @@ function SkillCollisionSequencePlayer:Update(currentTime)
 
         local deltaVector = direction * speed * simulationTime
         self.Collision.CFrame = self.Collision.CFrame + deltaVector
+    end
+
+    local outputFromHandling = {}
+    local touchingParts = self.Collision:GetTouchingParts()
+    for _, touchingPart in pairs(touchingParts) do
+        self.CollisionHandler(self.Collision, touchingPart, outputFromHandling) 
+    end
+
+    -- 더 좋은 방법을 찾아야 한다.
+    if outputFromHandling.PendingKill then
+        return SkillCollisionSequenceState.Ended
     end
 
     if self.CollisionSequenceTrackCount < self.CurrentTrackIndex then
