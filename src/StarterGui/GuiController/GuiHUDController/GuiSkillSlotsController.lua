@@ -164,16 +164,18 @@ function GuiSkillSlotsController:SetSkillOwnerToolSlot(skillOwnerTool)
     local skillOwnerToolGameData = ToolUtility:GetGameData(skillOwnerTool)
     local skillCount = skillOwnerToolGameData.SkillCount
 
-    for skillIndex = 1, MaxSkillCount do
-        if skillCount >= skillIndex then
-            if not self:SetSkillSlot(skillIndex, skillOwnerTool, skillOwnerToolGameData.SkillGameDataSet[skillIndex]) then
-                Debug.Assert(false, "비정상입니다.")
-                return false
-            end
-        else
-            if not self:ClearSkillSlot(skillIndex) then
-                Debug.Assert(false, "비정상입니다.")
-                return false
+    if skillCount then
+        for skillIndex = 1, MaxSkillCount do
+            if skillCount >= skillIndex then
+                if not self:SetSkillSlot(skillIndex, skillOwnerTool, skillOwnerToolGameData.SkillGameDataSet[skillIndex]) then
+                    Debug.Assert(false, "비정상입니다.")
+                    return false
+                end
+            else
+                if not self:ClearSkillSlot(skillIndex) then
+                    Debug.Assert(false, "비정상입니다.")
+                    return false
+                end
             end
         end
     end

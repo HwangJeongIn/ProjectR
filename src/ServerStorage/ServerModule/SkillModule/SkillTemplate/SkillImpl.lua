@@ -13,6 +13,7 @@ local NpcUtility = ServerModuleFacade.NpcUtility
 local ServerConstant = ServerModuleFacade.ServerConstant
 local DefaultWeaponSkillGameDataKey = ServerConstant.DefaultWeaponSkillGameDataKey
 --local DefaultArmorSkillGameDataKey = ServerConstant.DefaultArmorSkillGameDataKey
+local DefaultSkillCollisionSpeed = ServerConstant.DefaultSkillCollisionSpeed
 
 
 local ServerEnum = ServerModuleFacade.ServerEnum
@@ -129,9 +130,9 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
     SkillTemplate:RegisterSkillDataParameter({
         SkillName = "BaseAttack",
         [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
-        [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+        [SkillDataParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
-        [SkillDataParameterType.SkillCollisionSpeed] = 50,
+        [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
         [SkillDataParameterType.SkillCollisionDuration] = 100,
         
@@ -173,16 +174,16 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         end
     )
 
-
+--[[
     --2, Name = "WhirlwindSlash"
     SkillTemplate:RegisterSkillName("WhirlwindSlash")
 
     SkillTemplate:RegisterSkillDataParameter({
         SkillName = "WhirlwindSlash",
         [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
-        [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+        [SkillDataParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
-        [SkillDataParameterType.SkillCollisionSpeed] = 50,
+        [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
         [SkillDataParameterType.SkillCollisionDuration] = 100,
         
@@ -217,9 +218,9 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
     SkillTemplate:RegisterSkillDataParameter({
         SkillName = "TempestSlash",
         [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
-        [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+        [SkillDataParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
-        [SkillDataParameterType.SkillCollisionSpeed] = 50,
+        [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
         [SkillDataParameterType.SkillCollisionDuration] = 100,
         
@@ -255,9 +256,9 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
     SkillTemplate:RegisterSkillDataParameter({
         SkillName = "PowerStrike",
         [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
-        [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+        [SkillDataParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
-        [SkillDataParameterType.SkillCollisionSpeed] = 1,
+        [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
         --[SkillDataParameterType.SkillCollisionDuration] = 0,
         
@@ -292,9 +293,9 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
     SkillTemplate:RegisterSkillDataParameter({
         SkillName = "StormBlade",
         [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
-        [SkillDataParameterType.SkillCollisionOffset] = Vector2.new(5, 0),
+        [SkillDataParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
-        [SkillDataParameterType.SkillCollisionSpeed] = 50,
+        [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
         [SkillDataParameterType.SkillCollisionDuration] = 100,
         
@@ -322,7 +323,45 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         end
     )
 
+    
+    --6, Name = "Meteor"
+    SkillTemplate:RegisterSkillName("Meteor")
+
+    SkillTemplate:RegisterSkillDataParameter({
+        SkillName = "Meteor",
+        [SkillDataParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
+        [SkillDataParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
+        [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
+        [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
+        --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
+        [SkillDataParameterType.SkillCollisionDuration] = 100,
+        
+        [SkillDataParameterType.SkillAnimation] = "MiddleSlash",
+        [SkillDataParameterType.SkillDuration] = 1.0,
+        [SkillDataParameterType.SkillEffect] = "SwordSlashEffect",
+        [SkillDataParameterType.SkillOnDestroyingEffect] = "HitEffect",
+    })
+
+    SkillTemplate:RegisterSkillImpl(
+        "Meteor",
+        SkillImplType.ValidateTargetInRange,
+        function(skillController, toolOwnerPlayer, target)
+            return true
+        end
+    )
+
+    SkillTemplate:RegisterSkillImpl(
+        "Meteor",
+        SkillImplType.ApplySkillToTarget,
+        function(skillController, toolOwnerPlayer, target, output)
+            Debug.Assert(false, "상위에서 구현해야합니다.")
+            return false
+        end
+    )
+
+    --]]
 end
+
 
 
 return SkillImpl

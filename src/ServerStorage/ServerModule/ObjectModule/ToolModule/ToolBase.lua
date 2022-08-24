@@ -34,15 +34,18 @@ function ToolBase:InitializeTool(gameDataType, tool)
 
 	self.SkillCount = toolGameData.SkillCount
 	self.SkillControllers = {}
-	for skillIndex = 1, self.SkillCount do
-		local skillGameData = toolGameData.SkillGameDataSet[skillIndex]
-		local skillController = Utility:DeepCopy(SkillController)
-		if not skillController:SetSkill(tool, skillGameData) then
-			Debug.Assert(false, "비정상입니다.")
-			return false
-		end
 
-		self.SkillControllers[skillIndex] = skillController
+	if self.SkillCount then
+		for skillIndex = 1, self.SkillCount do
+			local skillGameData = toolGameData.SkillGameDataSet[skillIndex]
+			local skillController = Utility:DeepCopy(SkillController)
+			if not skillController:SetSkill(tool, skillGameData) then
+				Debug.Assert(false, "비정상입니다.")
+				return false
+			end
+	
+			self.SkillControllers[skillIndex] = skillController
+		end
 	end
 
 	local toolType = toolGameData.ToolType

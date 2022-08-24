@@ -41,6 +41,7 @@ function SkillController:CreateSkillCollision(originCFrame)
     local skillCollisionOffset = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionOffset)
     local finalOffsetVector = originCFrame.LookVector * skillCollisionOffset.X
                             + originCFrame.RightVector * skillCollisionOffset.Y
+                            + originCFrame.UpVector * skillCollisionOffset.Z
 
     local skillCollisionCFrame = originCFrame + finalOffsetVector
 
