@@ -20,7 +20,8 @@ function GuiFacade:Initialize()
     local GuiGameStateWindow = GuiHUDTopWindow:WaitForChild("GuiGameStateWindow")
     local GuiBoardWindow = GuiGameStateWindow:WaitForChild("GuiBoardWindow")
     local GuiBarsWindow = GuiGameStateWindow:WaitForChild("GuiBarsWindow")
-    local GuiHpBar = GuiBarsWindow:WaitForChild("GuiHpBar")
+    local GuiHpBarBackground = GuiBarsWindow:WaitForChild("GuiHpBarBackground")
+    local GuiHpBar = GuiHpBarBackground:WaitForChild("GuiHpBar")
 
     local GuiMinimap = GuiHUDTopWindow:WaitForChild("GuiMinimap")
     

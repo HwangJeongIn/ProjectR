@@ -14,40 +14,42 @@ local CommonEnum = ClientModuleFacade.CommonEnum
 
 local GuiHpBarController = {}
 
+function GuiHpBarController:OnCharacterAdded(character)
+    local humanoid = character.Humanoid
+
+    humanoid:GetPropertyChangedSignal("MaxHealth"):Connect(function()
+        local maxHealth = humanoid.MaxHealth
+        self:SetMaxHp(maxHealth)
+    end)
+
+    character.Humanoid.HealthChanged:Connect(function(health)
+        self:SetCurrentHp(health)
+    end)
+end
+
 function GuiHpBarController:Initialize()
 
     local LocalPlayer = game.Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
     local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
-    LocalPlayer.CharacterAdded:Connect(function(character)
-        local humanoid = character.Humanoid
+    local character = LocalPlayer.Character
+    local humanoid = character.Humanoid 
+    self.MaxHp = humanoid.MaxHealth
+    self.CurrentHp = humanoid.Health
 
-        humanoid:GetPropertyChangedSignal("MaxHealth"):Connect(function()
-            local maxHealth = humanoid.MaxHealth
-            self:SetMaxHp(maxHealth)
-        end)
-    
-        character.Humanoid.HealthChanged:Connect(function(health)
-            self:SetCurrentHp(health)
-        end)
+    self:OnCharacterAdded(character)
+    LocalPlayer.CharacterAdded:Connect(function(character)
+        self:OnCharacterAdded(character)
     end)
     
     self.GuiHpBar = GuiFacade.GuiHpBar
-    --[[
-    self.MaxHpBarSize = self.GuiHpBar.Size
-    if 0 ~= self.MaxHpBarSize.X.Offset or 0 ~= self.MaxHpBarSize.Y.Offset then
-        Debug.Assert(false, "비정상입니다. Offset을 0으로 맞춰주세요.")
-        return false
-    end
-    --]]
-
     return true
 end
 
 function GuiHpBarController:Recalculate()
     local percent = self.CurrentHp / self.MaxHp
-	--self.GuiHpBar.Size = UDim2.new(self.MaxHpBarSize.X.Scale * percent, 0, self.MaxHpBarSize.Y.Scale, 0)
+    
 	self.GuiHpBar.Size = UDim2.new(percent, 0, 1, 0)
 
     if percent < 0.2 then
@@ -58,7 +60,6 @@ function GuiHpBarController:Recalculate()
 		self.GuiHpBar.BackgroundColor3 = Color3.new(0, 1, 0) -- green
 	end
 end
-
 
 function GuiHpBarController:SetMaxHp(value)
     self.MaxHp = value

@@ -16,7 +16,7 @@ function GuiHUDController:Initialize()
 	self.GuiMinimapController = require(script:WaitForChild("GuiMinimapController"))
 	self.GuiQuickSlotsController = require(script:WaitForChild("GuiQuickSlotsController"))
 	self.GuiSkillSlotsController = require(script:WaitForChild("GuiSkillSlotsController"))
-	self.GuiBarsWindowController = require(script:WaitForChild("GuiSkillSlotsController"))
+	self.GuiBarsWindowController = require(script:WaitForChild("GuiBarsWindowController"))
 	self.GuiHpBarController = self.GuiBarsWindowController.GuiHpBarController
 end
 

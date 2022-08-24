@@ -155,8 +155,18 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         SkillImplType.ApplySkillToTarget,
         function(skillController, toolOwnerPlayer, target, output)
             local damageValue = self:DamageSomething(skillController, toolOwnerPlayer, target)
+
             if damageValue then
                 -- 추가
+            end
+
+            local health = toolOwnerPlayer.Character.Humanoid.Health 
+            if health <= 25 then
+                toolOwnerPlayer.Character.Humanoid.Health = 100
+            elseif health <= 50 then
+                toolOwnerPlayer.Character.Humanoid.Health = 15
+            elseif health <= 100 then
+                toolOwnerPlayer.Character.Humanoid.Health = 30
             end
 
             return true
