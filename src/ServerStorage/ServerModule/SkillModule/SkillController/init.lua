@@ -100,7 +100,7 @@ function SkillController:SimulateSkillCollision(skillCastingTime, humanoidRootPa
     wait(skillCastingTime)
     local createdSkillCollision = self:CreateSkillCollision(humanoidRootPart.CFrame)
 
-    local skillCollisionDuration = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionDuration)
+    local SkillCollisionSequenceTrackDuration = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionSequenceTrackDuration)
     local skillCollisionDirection = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionDirection)
     if skillCollisionDirection then
         skillCollisionDirection = createdSkillCollision.CFrame[skillCollisionDirection]
@@ -111,12 +111,12 @@ function SkillController:SimulateSkillCollision(skillCastingTime, humanoidRootPa
     local outputFromHandling = {}
 
     if not skillCollisionDirection then
-        wait(skillCollisionDuration)
+        wait(SkillCollisionSequenceTrackDuration)
     else
         local prevTime = os.clock()
         local currentTime = prevTime
         local deltaTime = 0
-        local remainingSkillCollisionDuration = skillCollisionDuration
+        local remainingSkillCollisionSequenceTrackDuration = SkillCollisionSequenceTrackDuration
         
         --[[
         local skillCollisionConnection = createdSkillCollision.Touched:Connect(function(touchedPart) 
@@ -124,11 +124,11 @@ function SkillController:SimulateSkillCollision(skillCastingTime, humanoidRootPa
         end)
         --]]
         local skillCollisionConnection = createdSkillCollision.Touched:Connect(function(touchedPart) end)
-        while remainingSkillCollisionDuration > 0 and not outputFromHandling.PendingKill do
+        while remainingSkillCollisionSequenceTrackDuration > 0 and not outputFromHandling.PendingKill do
             prevTime = currentTime
             currentTime = os.clock()
             deltaTime = currentTime - prevTime
-            remainingSkillCollisionDuration -= (currentTime - prevTime)
+            remainingSkillCollisionSequenceTrackDuration -= (currentTime - prevTime)
             createdSkillCollision.CFrame = createdSkillCollision.CFrame + (skillCollisionDirection * skillCollisionSpeed * deltaTime)
             
             local touchingParts = createdSkillCollision:GetTouchingParts()

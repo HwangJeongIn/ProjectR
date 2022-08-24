@@ -134,7 +134,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
         [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
-        [SkillDataParameterType.SkillCollisionDuration] = 100,
+        [SkillDataParameterType.SkillCollisionSequenceTrackDuration] = 100,
         
         [SkillDataParameterType.SkillAnimation] = "LeftSlash",
         [SkillDataParameterType.SkillDuration] = 1.0,
@@ -185,7 +185,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
         [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
-        [SkillDataParameterType.SkillCollisionDuration] = 100,
+        [SkillDataParameterType.SkillCollisionSequenceTrackDuration] = 100,
         
         [SkillDataParameterType.SkillAnimation] = "RightSlash",
         [SkillDataParameterType.SkillDuration] = 1.0,
@@ -222,7 +222,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
         [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
-        [SkillDataParameterType.SkillCollisionDuration] = 100,
+        [SkillDataParameterType.SkillCollisionSequenceTrackDuration] = 100,
         
         [SkillDataParameterType.SkillAnimation] = "RightSlash",
         [SkillDataParameterType.SkillDuration] = 1.0,
@@ -260,7 +260,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
         [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
-        --[SkillDataParameterType.SkillCollisionDuration] = 0,
+        --[SkillDataParameterType.SkillCollisionSequenceTrackDuration] = 0,
         
         [SkillDataParameterType.SkillAnimation] = "LeftSlash",
         [SkillDataParameterType.SkillDuration] = 0.5,
@@ -297,7 +297,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
         [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
-        [SkillDataParameterType.SkillCollisionDuration] = 100,
+        [SkillDataParameterType.SkillCollisionSequenceTrackDuration] = 100,
         
         [SkillDataParameterType.SkillAnimation] = "MiddleSlash",
         [SkillDataParameterType.SkillDuration] = 1.0,
@@ -334,7 +334,7 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillDataParameterType.SkillCollisionDirection] = "LookVector",
         [SkillDataParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         --[SkillDataParameterType.SkillCollisionDetailMovementType] = ...,
-        [SkillDataParameterType.SkillCollisionDuration] = 100,
+        [SkillDataParameterType.SkillCollisionSequenceTrackDuration] = 100,
         
         [SkillDataParameterType.SkillAnimation] = "MiddleSlash",
         [SkillDataParameterType.SkillDuration] = 1.0,

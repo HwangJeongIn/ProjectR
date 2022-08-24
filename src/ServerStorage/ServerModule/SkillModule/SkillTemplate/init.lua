@@ -27,7 +27,7 @@ local SkillAnimationTemplate = require(script:WaitForChild("SkillAnimationTempla
 local SkillEffectTemplate = require(script:WaitForChild("SkillEffectTemplate"))
 local SkillImpl = require(script:WaitForChild("SkillImpl"))
 
-local SkillTemplate = { 
+local SkillTemplate = {
     SkillImplTemplateTable = {},
     RawSkillData = {}
 }
@@ -78,8 +78,8 @@ function SkillTemplate:ValidateSkillDataParameter(skillDataParameter)
     end
     --]]
 
-    if not skillDataParameter[SkillDataParameterType.SkillCollisionDuration] then
-        skillDataParameter[SkillDataParameterType.SkillCollisionDuration] = 0
+    if not skillDataParameter[SkillDataParameterType.SkillCollisionSequenceTrackDuration] then
+        skillDataParameter[SkillDataParameterType.SkillCollisionSequenceTrackDuration] = 0
     end
 
     if not skillDataParameter[SkillDataParameterType.SkillAnimation] then
