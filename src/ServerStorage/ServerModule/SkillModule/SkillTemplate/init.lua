@@ -44,114 +44,21 @@ end
 function SkillTemplate:RegisterSkillName(skillName)
     self.RawSkillData[skillName] = {}
     self.RawSkillData[skillName][SkillDataType.SkillImpl] = {}
-    self.RawSkillData[skillName][SkillDataType.SkillDataParameter] = {}
+    self.RawSkillData[skillName][SkillDataType.SkillSequence] = nil
 end
 
-function SkillTemplate:ValidateSkillDataParameter(skillDataParameter)
-    local skillName = skillDataParameter.SkillName
-    if not skillDataParameter.SkillName then
-        Debug.Assert(false, "SkillName이 없습니다.")
-        return false
-    end
-
-    if not skillDataParameter[SkillDataParameterType.SkillCollisionSize] then
-        Debug.Assert(false, "SkillCollisionSize가 없습니다. => " .. skillName)
-        return false
-    end
-
-    if not skillDataParameter[SkillDataParameterType.SkillCollisionOffset] then
-        Debug.Assert(false, "SkillCollisionOffset이 없습니다. => " .. skillName)
-        return false
-    end
-
-    if skillDataParameter[SkillDataParameterType.SkillCollisionDirection] then
-        if not skillDataParameter[SkillDataParameterType.SkillCollisionSpeed] then
-            Debug.Assert(false, "SkillCollisionDirection은 있지만, SkillCollisionSpeed가 없습니다. => " .. skillName)
-            return false
-        end
-    end
-
-    --[[
-    if not skillDataParameter[SkillDataParameterType.SkillCollisionDetailMovementType] then
-        Debug.Assert(false, "SkillCollisionDetailMovementType이 없습니다. => " .. skillName)
-        return false
-    end
-    --]]
-
-    if not skillDataParameter[SkillDataParameterType.SkillCollisionSequenceTrackDuration] then
-        skillDataParameter[SkillDataParameterType.SkillCollisionSequenceTrackDuration] = 0
-    end
-
-    if not skillDataParameter[SkillDataParameterType.SkillAnimation] then
-        Debug.Assert(false, "SkillAnimation이 없습니다. => " .. skillName)
-        return false
-    end
-
-    --[[
-    if not skillDataParameter[SkillDataParameterType.SkillDuration] then
-        Debug.Assert(false, "SkillDuration이 없습니다. => " .. skillName)
-        return false
-    end
-    --]]
-
-    if not skillDataParameter[SkillDataParameterType.SkillEffect] then
-        Debug.Assert(false, "SkillEffect가 없습니다. => " .. skillName)
-        return false
-    end
-
-    return true
-end
-
-function SkillTemplate:GetSkillDataParameterFromRawSkillData(skillName, SkillDataParameterType)
-    if not skillName or not SkillDataParameterType then
+function SkillTemplate:GetSkillSequenceFromRawSkillData(skillName)
+    if not skillName then
         Debug.Assert(false, "비정상입니다.")
         return nil
     end
     
-    if not self.RawSkillData[skillName][SkillDataType.SkillDataParameter] then
+    if not self.RawSkillData[skillName][SkillDataType.SkillSequence] then
         Debug.Assert(false, "비정상입니다.")
         return nil
     end
 
-    return self.RawSkillData[skillName][SkillDataType.SkillDataParameter][SkillDataParameterType]
-end
-
-function SkillTemplate:RegisterSkillDataParameter(skillDataParameter)
-    if not self:ValidateSkillDataParameter(skillDataParameter) then
-        Debug.Assert(false, "비정상입니다.")
-        return false
-    end
-
-    local skillAnimationName = skillDataParameter[SkillDataParameterType.SkillAnimation]
-    local skillAnimation = SkillAnimationTemplate:Get(skillAnimationName)
-    if not skillAnimation then
-        Debug.Assert(false, "이름을 가진 애니메이션이 존재하지 않습니다. => " .. skillAnimationName)
-        return false
-    end
-    skillDataParameter[SkillDataParameterType.SkillAnimation] = skillAnimation
-
-    local skillEffectName = skillDataParameter[SkillDataParameterType.SkillEffect]
-    local skillEffect = SkillEffectTemplate:Get(skillEffectName)
-    if not skillEffect then
-        Debug.Assert(false, "이름을 가진 이펙트가 존재하지 않습니다. => " .. skillEffectName)
-        return false
-    end
-    skillDataParameter[SkillDataParameterType.SkillEffect] = skillEffect
-
-    
-    local skillOnDestroyingEffectName = skillDataParameter[SkillDataParameterType.SkillOnDestroyingEffect]
-    if skillOnDestroyingEffectName then
-        local skillOnDestroyingEffect = SkillEffectTemplate:Get(skillOnDestroyingEffectName)
-        if not skillOnDestroyingEffect then
-            Debug.Assert(false, "이름을 가진 이펙트가 존재하지 않습니다. => " .. skillOnDestroyingEffectName)
-            return false
-        end
-        skillDataParameter[SkillDataParameterType.SkillOnDestroyingEffect] = skillOnDestroyingEffect
-    end
-    
-    local skillName = skillDataParameter.SkillName
-    self.RawSkillData[skillName][SkillDataType.SkillDataParameter] = skillDataParameter
-    return true
+    return self.RawSkillData[skillName][SkillDataType.SkillSequence] 
 end
 
 function SkillTemplate:GetSkillImplFromRawSkillData(skillName, skillImplType)
@@ -194,6 +101,47 @@ function SkillTemplate:RegisterSkillImpl(skillName, skillImplType, inputFunction
     return true
 end
 
+function SkillTemplate:RegisterSkillDataParameter(skillName, skillSequence)
+    --[[
+    if not self:ValidateSkillDataParameter(skillDataParameter) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    local skillAnimationName = skillDataParameter[SkillDataParameterType.SkillAnimation]
+    local skillAnimation = SkillAnimationTemplate:Get(skillAnimationName)
+    if not skillAnimation then
+        Debug.Assert(false, "이름을 가진 애니메이션이 존재하지 않습니다. => " .. skillAnimationName)
+        return false
+    end
+    skillDataParameter[SkillDataParameterType.SkillAnimation] = skillAnimation
+
+    local skillEffectName = skillDataParameter[SkillDataParameterType.SkillEffect]
+    local skillEffect = SkillEffectTemplate:Get(skillEffectName)
+    if not skillEffect then
+        Debug.Assert(false, "이름을 가진 이펙트가 존재하지 않습니다. => " .. skillEffectName)
+        return false
+    end
+    skillDataParameter[SkillDataParameterType.SkillEffect] = skillEffect
+
+    
+    local skillOnDestroyingEffectName = skillDataParameter[SkillDataParameterType.SkillOnDestroyingEffect]
+    if skillOnDestroyingEffectName then
+        local skillOnDestroyingEffect = SkillEffectTemplate:Get(skillOnDestroyingEffectName)
+        if not skillOnDestroyingEffect then
+            Debug.Assert(false, "이름을 가진 이펙트가 존재하지 않습니다. => " .. skillOnDestroyingEffectName)
+            return false
+        end
+        skillDataParameter[SkillDataParameterType.SkillOnDestroyingEffect] = skillOnDestroyingEffect
+    end
+    local skillName = skillDataParameter.SkillName
+    --]]
+
+    self.RawSkillData[skillName][SkillDataType.SkillSequence] = skillSequence
+    return true
+end
+
+
 function SkillTemplate:ValidateSkillTemplate(skillName)
     local lastSkillImplIndex = (SkillImplType.Count - 1)
     for skillImplIndex = 1, lastSkillImplIndex do
@@ -234,8 +182,8 @@ function SkillTemplate:InitializeAllSkillTemplates()
             return currentSkillTemplate[SkillDataType.SkillImpl][skillImplType]
         end
 
-        self.SkillImplTemplateTable[skillGameDataKey].GetSkillDataParameter = function(_, skillDataParameterType) 
-            return currentSkillTemplate[SkillDataType.SkillDataParameter][skillDataParameterType]
+        self.SkillImplTemplateTable[skillGameDataKey].GetSkillSequence = function(_) 
+            return currentSkillTemplate[SkillDataType.SkillSequence]
         end
 
         self.SkillImplTemplateTable[skillGameDataKey].GetSkillGameData = function(_)

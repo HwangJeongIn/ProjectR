@@ -9,8 +9,8 @@ local Utility = ServerModuleFacade.Utility
 local SkillSequenceAnimationTrack = {
     SkillSequenceAnimationWrapper = nil,
     SkillSequenceAnimationDuration = nil,
-    SkillCollisionSequenceWrappers = {},
-    SkillCollisionSequenceCount = 0,
+    SkillCollisionSequenceWrappers = nil,
+    SkillCollisionSequenceCount = nil,
 }
 
 function SkillSequenceAnimationTrack:Initialize(skillSequenceAnimationWrapper, skillSequenceAnimationDuration)
@@ -22,10 +22,20 @@ function SkillSequenceAnimationTrack:Initialize(skillSequenceAnimationWrapper, s
     self.SkillSequenceAnimationWrapper = skillSequenceAnimationWrapper
     self.SkillSequenceAnimationDuration = skillSequenceAnimationDuration
 
+    local animationLength = skillSequenceAnimationWrapper.AnimationLength
+    self.SkillSequenceAnimationSpeed =  animationLength / self.SkillSequenceAnimationDuration
+
+    self.SkillCollisionSequenceWrappers = {}
+    self.SkillCollisionSequenceCount = 0
     return true
 end
 
-function SkillSequenceAnimationTrack:GetSSkillSequenceAnimationWrapper()
+function SkillSequenceAnimationTrack:GetSkillSequenceAnimationSpeed()
+    Debug.Assert(self.SkillSequenceAnimationSpeed, "비정상입니다.")
+    return self.SkillSequenceAnimationSpeed
+end
+
+function SkillSequenceAnimationTrack:GetSkillSequenceAnimationWrapper()
     Debug.Assert(self.SkillSequenceAnimationWrapper, "비정상입니다.")
     return self.SkillSequenceAnimationWrapper
 end
@@ -35,8 +45,8 @@ function SkillSequenceAnimationTrack:GetSkillSequenceAnimationDuration()
     return self.SkillSequenceAnimationDuration
 end
 
-function SkillSequenceAnimationTrack:AddSkillCollisionSequence(skillCollisionFireTimeRate, skillCollisionSequence)
-    if not skillCollisionFireTimeRate or not skillCollisionSequence then
+function SkillSequenceAnimationTrack:AddSkillCollisionSequence(skillCollisionSequence, skillCollisionFireTimeRate)
+    if not skillCollisionSequence or not skillCollisionFireTimeRate then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
@@ -48,7 +58,7 @@ function SkillSequenceAnimationTrack:AddSkillCollisionSequence(skillCollisionFir
 
     local lastSkillCollisionFireTimeRate = self:GetLastSkillCollisionFireTimeRate()
     if lastSkillCollisionFireTimeRate < skillCollisionFireTimeRate then
-        Debug.Assert(false, "비정상입니다.")
+        Debug.Assert(false, "비정상입니다. 순차적으로 삽입해주세요.")
         return false
     end
 

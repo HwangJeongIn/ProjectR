@@ -46,7 +46,7 @@ local SkillSequence = {
     SkillSequenceAnimationTrackCount = 0
 }
 
-function SkillSequence:InitializeSkillSequence(skillName)
+function SkillSequence:InitializeSkillSequence()
     --[[
     SkillCollisionSequence:InitializeSkillCollision({
         [SkillCollisionParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
@@ -73,21 +73,21 @@ function SkillSequence:GetSkillSequenceAnimationTrack(skillSequenceAnimationTrac
     return self.SkillSequenceAnimationTracks[skillSequenceAnimationTrackIndex]
 end
 
-function SkillSequence:AddSkillSequenceAnimationTrack(skillSequenceAnimation, skillSequenceAnimationDuration)
-    if not skillSequenceAnimation or not skillSequenceAnimationDuration then
+function SkillSequence:AddSkillSequenceAnimationTrack(skillSequenceAnimationName, skillSequenceAnimationDuration)
+    if not skillSequenceAnimationName or not skillSequenceAnimationDuration then
         Debug.Assert(false, "비정상입니다.")
         return 0
     end
 
-    local skillAnimationWrapper = SkillAnimationTemplate:Get(skillSequenceAnimation)
-    if not skillAnimationWrapper then
-        Debug.Assert(false, "애니메이션이 존재하지 않습니다. => " .. skillSequenceAnimation)
+    local skillSequenceAnimationWrapper = SkillAnimationTemplate:Get(skillSequenceAnimationName)
+    if not skillSequenceAnimationWrapper then
+        Debug.Assert(false, "애니메이션이 존재하지 않습니다. => " .. skillSequenceAnimationName)
         return 0
     end
 
     self.SkillSequenceAnimationTrackCount += 1
     local skillSequenceAnimationTrack = Utility:DeepCopy(SkillSequenceAnimationTrack)
-    skillSequenceAnimationTrack:Initialize(skillAnimationWrapper, skillSequenceAnimationDuration)
+    skillSequenceAnimationTrack:Initialize(skillSequenceAnimationWrapper, skillSequenceAnimationDuration)
     table.insert(self.SkillSequenceAnimationTracks, skillSequenceAnimationTrack)
     return self.SkillSequenceAnimationTrackCount
 end

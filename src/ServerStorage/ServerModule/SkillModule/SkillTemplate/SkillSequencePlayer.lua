@@ -1,4 +1,3 @@
--- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
@@ -17,6 +16,9 @@ local DefaultSkillCollisionSpeed = ServerConstant.DefaultSkillCollisionSpeed
 
 
 local ServerEnum = ServerModuleFacade.ServerEnum
+local SkillSequenceAnimationTrackStateType = ServerEnum.SkillSequenceAnimationTrackStateType
+local SkillCollisionSequenceStateType = ServerEnum.SkillCollisionSequenceStateType
+
 --[[
 local GameDataType = ServerEnum.GameDataType
 local CollisionGroupType = ServerEnum.CollisionGroupType
@@ -39,191 +41,125 @@ local DamageCalculator = require(SkillModule:WaitForChild("DamageCalculator"))
 local SkillAnimationTemplate = require(script.Parent:WaitForChild("SkillAnimationTemplate"))
 local SkillEffectTemplate = require(script.Parent:WaitForChild("SkillEffectTemplate"))
 local SkillSequenceAnimationTrack = require(script.Parent:WaitForChild("SkillSequenceAnimationTrack"))
+local SkillSequenceAnimationTrackPlayer = require(script.Parent:WaitForChild("SkillSequenceAnimationTrackPlayer"))
 local skillCollisionSequencePlayer = require(script.Parent:WaitForChild("SkillCollisionSequencePlayer"))
-
 
 local SkillSequencePlayer = {
     SkillOwner = nil,
 
     SkillSequence = nil,
     SkillSequenceAnimationTrackCount = nil,
-
-    PrevTime = nil,
-    CurrentSkillSequenceAnimationTrackIndex = nil,
-    CurrentSkillSequenceAnimationTrackPosition = nil,
-
-    --[[
-    SkillCollision = nil,
-    SkillCollisionSize = nil,
-
-    SkillCollisionEffect = nil,
-    SkillCollisionSequence = nil,
-    SkillCollisionSequenceTrackCount = nil,
-
-    PrevTime = nil,
-    CurrentSkillCollisionSizeFactor = Vector3.new(1, 1, 1),
-    CurrentTrackIndex = nil,
-    CurrentTrackPosition = nil,
-
-    ConvertedTrackDirections = nil,
-    LookVector = nil,
-    RightVector = nil,
-    UpVector = nil
-    --]]
 }
 
 
---function
-function SkillSequencePlayer:Simulate(skillCastingTime, humanoidRootPart, skillCollisionHandler)
+function SkillSequencePlayer:StartSkillSequenceAnimationTrackPlayer(animationTrackPlayerIndex)
+    local animationTrackPlayer = self.SkillSequenceAnimationTrackPlayers[animationTrackPlayerIndex]
+    if not animationTrackPlayer:Initialize(self.SkillOwner, self.SkillSequence:GetSkillSequenceAnimationTrack(animationTrackPlayerIndex)) then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
 
+    if not animationTrackPlayer:Start() then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
+
+    return animationTrackPlayer
+end
+
+function SkillSequencePlayer:Simulate(skillCollisionHandler)
     local prevTime = os.clock()
     local currentTime = prevTime
     local deltaTime = 0
-    local remainingSkillCollisionSequenceTrackDuration = SkillCollisionSequenceTrackDuration
     
-
-    local skillCollisionConnection = createdSkillCollision.Touched:Connect(function(touchedPart) end)
-    while remainingSkillCollisionSequenceTrackDuration > 0 and not outputFromHandling.PendingKill do
-        prevTime = currentTime
-        currentTime = os.clock()
-        deltaTime = currentTime - prevTime
-        remainingSkillCollisionSequenceTrackDuration -= (currentTime - prevTime)
-        createdSkillCollision.CFrame = createdSkillCollision.CFrame + (skillCollisionDirection * skillCollisionSpeed * deltaTime)
-        
-        local touchingParts = createdSkillCollision:GetTouchingParts()
-        for _, touchingPart in pairs(touchingParts) do
-            skillCollisionHandler(createdSkillCollision, touchingPart, outputFromHandling) 
-        end
-        wait(0)
-    end
-    skillCollisionConnection:Disconnect()
-
-
-
-
-    --[[
-
-    wait(skillCastingTime)
-    local createdSkillCollision = self:CreateSkillCollision(humanoidRootPart.CFrame)
-
-    local SkillCollisionSequenceTrackDuration = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionSequenceTrackDuration)
-    local skillCollisionDirection = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionDirection)
-    if skillCollisionDirection then
-        skillCollisionDirection = createdSkillCollision.CFrame[skillCollisionDirection]
-    end
-    local skillCollisionSpeed = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionSpeed)
-    local outputFromHandling = {}
-
-    if not skillCollisionDirection then
-        wait(SkillCollisionSequenceTrackDuration)
-    else
-        local prevTime = os.clock()
-        local currentTime = prevTime
-        local deltaTime = 0
-        local remainingSkillCollisionSequenceTrackDuration = SkillCollisionSequenceTrackDuration
-        
-        local skillCollisionConnection = createdSkillCollision.Touched:Connect(function(touchedPart) end)
-        while remainingSkillCollisionSequenceTrackDuration > 0 and not outputFromHandling.PendingKill do
-            prevTime = currentTime
-            currentTime = os.clock()
-            deltaTime = currentTime - prevTime
-            remainingSkillCollisionSequenceTrackDuration -= (currentTime - prevTime)
-            createdSkillCollision.CFrame = createdSkillCollision.CFrame + (skillCollisionDirection * skillCollisionSpeed * deltaTime)
-            
-            local touchingParts = createdSkillCollision:GetTouchingParts()
-            for _, touchingPart in pairs(touchingParts) do
-                skillCollisionHandler(createdSkillCollision, touchingPart, outputFromHandling) 
-            end
-            wait(0)
-        end
-        skillCollisionConnection:Disconnect()
-    end
-
-    -- 소멸 이펙트
-    local skillOnDestroyingEffect = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillOnDestroyingEffect)
-    if skillOnDestroyingEffect then
-        local onDestroyingEffect = skillOnDestroyingEffect:Clone()
-        --onDestroyingEffect.Transparency = 0
-        onDestroyingEffect.Anchored = true
-        onDestroyingEffect.Parent = workspace
-        onDestroyingEffect.CFrame = createdSkillCollision.CFrame
-        Debris:AddItem(onDestroyingEffect, 0.2)
-    end
-
-    Debris:AddItem(createdSkillCollision, 0)
-    --]]
-end
-
-
-function SkillSequencePlayer:Start(skillSequence, player)
-    local ownerPlayerCharacter = player.character
-    if not ownerPlayerCharacter then
-        Debug.Assert(false, "캐릭터가 없습니다.")
+    local currentAnimationTrackIndex = 1
+    local currentSkillSequenceAnimationTrackPlayer = self:StartSkillSequenceAnimationTrackPlayer(currentAnimationTrackIndex)
+    if not currentSkillSequenceAnimationTrackPlayer then
+        Debug.Assert(false, "비정상입니다.")
         return false
     end
 
-    local humanoid = ownerPlayerCharacter:FindFirstChild("Humanoid")
-    Debug.Assert(humanoid, "비정상입니다.")
-
-	local humanoidRootPart = ownerPlayerCharacter:FindFirstChild("HumanoidRootPart")
-    Debug.Assert(humanoidRootPart, "비정상입니다.")
-
-    local skillAnimationWrapper = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillAnimation)
-    local skillCastingTime = 0
-
-    if skillAnimationWrapper then
-        local skillAnimation = skillAnimationWrapper.Animation
-        local skillAnimationLength = skillAnimationWrapper.AnimationLength
-
-	    local skillAnimationTrack = humanoid:LoadAnimation(skillAnimation)
-
-        local skillDuration = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillDuration)
-        local skillAnimationSpeed = 1
-        if skillDuration then
-            skillCastingTime = skillDuration / 2
-            skillAnimationSpeed = skillAnimationLength / skillDuration
-        else
-            skillCastingTime = skillAnimationLength / 2
-        end
-
-        skillAnimationTrack:Play(0.1, 1, skillAnimationSpeed)
-    end
+    local currentAnimationTrackStateType = nil
+    local currentCollisionSequenceStateType = nil
+    local returnedCollisionSequencePlayers = nil
     
-    local skillCollisionHandler = function(skillCollision, touchedPart, outputFromHandling)
-        if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
-            
-            local touchedPartCollisionGroupName = ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(touchedPart)
-            Debug.Print(touchedPart.Name .. " : ".. tostring(touchedPartCollisionGroupName))
+    while currentAnimationTrackIndex <= self.SkillSequenceAnimationTrackPlayerCount 
+    or 0 < self.SkillSequenceCollisionPlayerCount do
+        currentTime = os.clock()
+        deltaTime = currentTime - prevTime
+        prevTime = currentTime
 
-            if self:ValidateTargetInRange(toolOwnerPlayer, touchedPart) then
-                self:ApplySkillToTarget(toolOwnerPlayer, touchedPart, outputFromHandling)
+        if currentAnimationTrackIndex <= self.SkillSequenceAnimationTrackPlayerCount then
+            currentAnimationTrackStateType, returnedCollisionSequencePlayers = currentSkillSequenceAnimationTrackPlayer:Update(currentTime)
+        
+            if SkillSequenceAnimationTrackStateType.Ended == currentAnimationTrackStateType then
+                currentAnimationTrackIndex += 1
+                if currentAnimationTrackIndex <= self.SkillSequenceAnimationTrackPlayerCount then
+                    local currentSkillSequenceAnimationTrackPlayer = self:StartSkillSequenceAnimationTrackPlayer(currentAnimationTrackIndex)
+                    if not currentSkillSequenceAnimationTrackPlayer then
+                        Debug.Assert(false, "비정상입니다.")
+                        return false
+                    end
+                end
             end
 
-            outputFromHandling.PendingKill = true
+            if returnedCollisionSequencePlayers then
+                for _, collisionSequencePlayer in pairs(returnedCollisionSequencePlayers) do
+                    collisionSequencePlayer:Start(skillCollisionHandler)
+                    self.SkillSequenceCollisionPlayerCount += 1
+                    table.insert(self.SkillSequenceCollisionPlayers, collisionSequencePlayer)
+                end
+            end
         end
+
+        for collisionSequencePlayerIndex, collisionSequencePlayer in pairs(self.SkillSequenceCollisionPlayers) do
+            currentCollisionSequenceStateType = collisionSequencePlayer:Update(currentTime)
+            if SkillCollisionSequenceStateType.Ended == currentCollisionSequenceStateType then
+                collisionSequencePlayer:End()
+                table.remove(self.SkillSequenceCollisionPlayers, collisionSequencePlayerIndex)
+            end 
+        end
+
+        wait(0)
     end
+end
 
+
+function SkillSequencePlayer:Start()
     local simulateCoroutine = coroutine.wrap(self.Simulate)
-    simulateCoroutine(self, skillCastingTime, humanoidRootPart, skillCollisionHandler)
-
-    self.PrevTime = os.clock()
+    simulateCoroutine(self, )
     return true
 end
 
-function SkillSequencePlayer:InitializeSkillSequencePlayer(player, skillSequence)
+function SkillSequencePlayer:Initialize(player, skillSequence)
     self.SkillOwner = player
     self.SkillSequence = skillSequence
-    self.SkillSequenceAnimationTrackCount = skillSequence:GetSkillSequenceAnimationTrackCount()
+    self.SkillSequenceAnimationTrackPlayerCount = self.SkillSequence:GetSkillSequenceAnimationTrackCount()
+    self.CurrentSkillSequenceAnimationTrackPlayerIndex = 1
 
-    self.SkillSequenceAnimationTrackPlayer = 
-    --[[
-    SkillCollisionSequence:InitializeSkillCollision({
-        [SkillCollisionParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
-        [SkillCollisionParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
-        [SkillCollisionParameterType.SkillCollisionEffect] = "SwordSlashEffect",
-        [SkillCollisionParameterType.SkillCollisionOnDestroyingEffect] = "HitEffect"
-    })
-    --]]
+    if not self.SkillSequenceAnimationTrackPlayerCount then
+        Debug.Assert(false, "SkillSequence에 AnimationTrack이 하나도 없습니다. 동작하지 않습니다. 수정해주세요.")
+        return false
+    end
+
+    self.SkillSequenceAnimationTrackPlayers = {}
+    for skillSequenceAnimationTrackIndex = 1, self.SkillSequenceAnimationTrackPlayerCount do
+        local skillSequenceAnimationTrack = self.SkillSequence:GetSkillSequenceAnimationTrack(skillSequenceAnimationTrackIndex)
+        Debug.Assert(skillSequenceAnimationTrack, "비정상입니다.")
+
+        local skillSequenceAnimationTrackPlayer = Utility:DeepCopy(SkillSequenceAnimationTrackPlayer)
+        --[[
+        if not skillSequenceAnimationTrackPlayer:Initialize(player, skillSequenceAnimationTrack) then
+            Debug.Assert(false, "비정상입니다.")
+            return false
+        end
+        --]]
+        table.insert(self.SkillSequenceAnimationTrackPlayers, skillSequenceAnimationTrackPlayer)
+    end
+
+    self.SkillSequenceCollisionPlayers = {}
+    self.SkillSequenceCollisionPlayerCount = 0
+    
 end
 
 

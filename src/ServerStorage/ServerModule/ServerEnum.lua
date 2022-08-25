@@ -22,7 +22,7 @@ local ServerEnum = {
 
 	SkillDataType = {
 		SkillImpl = 1,
-        SkillDataParameter = 2,
+        SkillSequence = 2,
 		Count = 3
 	},
 
@@ -30,22 +30,6 @@ local ServerEnum = {
         ValidateTargetInRange = 1,
         ApplySkillToTarget = 2,
 		Count = 3
-	},
-
-	SkillDataParameterType = {
-		SkillCollisionSize = 1,
-        SkillCollisionOffset = 2,
-		SkillCollisionDirection = 3,
-		SkillCollisionSpeed = 4,
-		SkillCollisionDetailMovementType = 5,
-		SkillCollisionSequenceTrackDuration = 6,
-
-		SkillAnimation = 7,
-		SkillDuration = 8,
-
-		SkillEffect = 9,
-		SkillOnDestroyingEffect = 10,
-		Count = 11
 	},
 
 	SkillCollisionParameterType = {
@@ -91,23 +75,6 @@ ServerEnum.SkillImplType.Converter = {
 	[ServerEnum.SkillImplType.ApplySkillToTarget] = "ApplySkillToTarget",
 }
 Debug.Assert(ServerEnum.SkillImplType.Count == #ServerEnum.SkillImplType.Converter + 1, "비정상입니다.")
-
-
-ServerEnum.SkillDataParameterType.Converter = {
-	[ServerEnum.SkillDataParameterType.SkillCollisionSize] = "SkillCollisionSize",
-	[ServerEnum.SkillDataParameterType.SkillCollisionOffset] = "SkillCollisionOffset",
-	[ServerEnum.SkillDataParameterType.SkillCollisionDirection] = "SkillCollisionDirection",
-	[ServerEnum.SkillDataParameterType.SkillCollisionSpeed] = "SkillCollisionSpeed",
-	[ServerEnum.SkillDataParameterType.SkillCollisionDetailMovementType] = "SkillCollisionDetailMovementType",
-	[ServerEnum.SkillDataParameterType.SkillCollisionSequenceTrackDuration] = "SkillCollisionSequenceTrackDuration",
-
-	[ServerEnum.SkillDataParameterType.SkillAnimation] = "SkillAnimation",
-	[ServerEnum.SkillDataParameterType.SkillDuration] = "SkillDuration",
-
-	[ServerEnum.SkillDataParameterType.SkillEffect] = "SkillEffect",
-	[ServerEnum.SkillDataParameterType.SkillOnDestroyingEffect] = "SkillOnDestroyingEffect",
-}
-Debug.Assert(ServerEnum.SkillDataParameterType.Count == #ServerEnum.SkillDataParameterType.Converter + 1, "비정상입니다.")
 
 
 ServerEnum.SkillCollisionParameterType.Converter = {
