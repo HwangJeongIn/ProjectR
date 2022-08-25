@@ -21,7 +21,7 @@ local SkillImplTypeConverter = SkillImplType.Converter
 
 local SkillCollisionParameterType = ServerEnum.SkillCollisionParameterType
 local SkillCollisionSequenceTrackParameterType = ServerEnum.SkillCollisionSequenceTrackParameterType
-local SkillCollisionSequenceState = ServerEnum.SkillCollisionSequenceState
+local SkillCollisionSequenceStateType = ServerEnum.SkillCollisionSequenceStateType
 
 local ServerGameDataManager = ServerModuleFacade.ServerGameDataManager
 
@@ -31,11 +31,15 @@ local SkillImpl = require(script:WaitForChild("SkillImpl"))
 
 
 local SkillCollisionSequencePlayer = {
-    Collision = nil,
-    CollisionSequence = nil,
-    CollisionSequenceTrackCount = nil,
+    SkillCollision = nil,
+    SkillCollisionSize = nil,
 
-    StartTime = nil,
+    SkillCollisionEffect = nil,
+    SkillCollisionSequence = nil,
+    SkillCollisionSequenceTrackCount = nil,
+
+    PrevTime = nil,
+    CurrentSkillCollisionSizeFactor = Vector3.new(1, 1, 1),
     CurrentTrackIndex = nil,
     CurrentTrackPosition = nil,
 
@@ -61,19 +65,19 @@ function SkillCollisionSequencePlayer:InitializeAllSkillCollisionSequenceTrackDi
     local rightVector = originCFrame.RightVector
     local upVector = originCFrame.UpVector
 
-    local trackCount = collisionSequence:GetTrackCount()
+    local trackCount = collisionSequence:GetSkillCollisionSequenceTrackCount()
     self.ConvertedTrackDirections = {}
 
     for trackIndex = 1, trackCount do
-        local currentTrack = collisionSequence:GetTrack(trackIndex)
+        local currentTrack = collisionSequence:GetSkillCollisionSequenceTrack(trackIndex)
         
-        local relativeDirection = currentTrack:GetTrackData(SkillCollisionSequenceTrackParameterType.SkillCollisionDirection)
+        local relativeDirection = currentTrack:GetData(SkillCollisionSequenceTrackParameterType.SkillCollisionDirection)
         local convertedTrackDirection = lookVector * relativeDirection.X
                                       + rightVector * relativeDirection.Y
                                       + upVector * relativeDirection.Z
 
         convertedTrackDirection = convertedTrackDirection.Unit
-        table.insert(self.ConvertedTrackDirections, convertedTrackDirection)
+        self.ConvertedTrackDirections[trackIndex] = convertedTrackDirection
     end
 
     return true
@@ -91,8 +95,8 @@ function SkillCollisionSequencePlayer:Initialize(collisionSequence, originCFrame
     end
 
     self.OriginCFrame = originCFrame
-    self.CollisionSequence = collisionSequence
-    self.CollisionSequenceTrackCount = collisionSequence:GetTrackCount()
+    self.SkillCollisionSequence = collisionSequence
+    self.SkillCollisionSequenceTrackCount = collisionSequence:GetSkillCollisionSequenceTrackCount()
 
     self.CurrentTrackIndex = 1
     self.CurrentTrackPosition = 0.0
@@ -120,14 +124,22 @@ function SkillCollisionSequencePlayer:GetSynchronizedSkillEffectCFrameToOrigin(o
     return (targetRotation + skillCollision.CFrame.Position)
 end
 
-function SkillCollisionSequencePlayer:CreateSkillCollision(originCFrame)
+function SkillCollisionSequencePlayer:CalculateSizeBySizeFactor(size, sizeFactor)
+    return Vector3.new(size.X * sizeFactor.X, size.Y * sizeFactor.Y, size.Z * sizeFactor.Z)
+end
+
+function SkillCollisionSequencePlayer:CalculateSkillCollisionSizeBySizeFactor(sizeFactor)
+    return self:CalculateSizeBySizeFactor(self.SkillCollisionSize, sizeFactor)
+end
+
+function SkillCollisionSequencePlayer:InitializeSkillCollision(originCFrame)
     if not originCFrame then
         Debug.Assert(false, "비정상입니다.")
-        return nil
+        return false
     end
 
-    local skillCollisionSize = self.CollisionSequence:GetCollisionData(SkillCollisionParameterType.SkillCollisionSize)
-    local skillCollisionOffset = self.CollisionSequence:GetCollisionData(SkillCollisionParameterType.SkillCollisionOffset)
+    local skillCollisionSize = self.SkillCollisionSequence:GetSkillCollisionData(SkillCollisionParameterType.SkillCollisionSize)
+    local skillCollisionOffset = self.SkillCollisionSequence:GetSkillCollisionData(SkillCollisionParameterType.SkillCollisionOffset)
     local finalOffsetVector = originCFrame.LookVector * skillCollisionOffset.X
                             + originCFrame.RightVector * skillCollisionOffset.Y
                             + originCFrame.UpVector * skillCollisionOffset.Z
@@ -149,36 +161,47 @@ function SkillCollisionSequencePlayer:CreateSkillCollision(originCFrame)
     tempSkillCollision.Size =  skillCollisionSize
     tempSkillCollision.CFrame = skillCollisionCFrame
 
+    self.SkillCollision = tempSkillCollision
+    self.SkillCollisionSize = skillCollisionSize
 
-    local skillCollisionEffect = self.CollisionSequence:GetCollisionData(SkillCollisionParameterType.SkillCollisionEffect)
+    local skillCollisionEffect = self.SkillCollisionSequence:GetSkillCollisionData(SkillCollisionParameterType.SkillCollisionEffect)
     if skillCollisionEffect then
         local tempSkillCollisionEffect = skillCollisionEffect:Clone()
         tempSkillCollisionEffect.Parent = tempSkillCollision
 
+        tempSkillCollisionEffect.Size = skillCollisionSize
         -- 방향 동기화하는 것은 스킬에 따라 결정할 수 있도록 해줘야 한다.
         if true then
             tempSkillCollisionEffect.CFrame = skillCollisionCFrame
         else
             tempSkillCollisionEffect.CFrame = self:GetSynchronizedSkillEffectCFrameToOrigin(originCFrame, tempSkillCollision)
         end
-        
+
         local tempWeld = Instance.new("WeldConstraint")
         tempWeld.Name = "TempWeldConstraint"
         tempWeld.Part0 = tempSkillCollisionEffect
         tempWeld.Part1 = tempSkillCollision
         tempWeld.Parent = tempSkillCollisionEffect
+
+        self.SkillCollisionEffect = tempSkillCollisionEffect
     end
 
-    return tempSkillCollision
+    return true
 end
 
 function SkillCollisionSequencePlayer:Start(skillCollisionHandler)
-    local skillCollision = self:CreateSkillCollision(self.OriginCFrame)
-    if not skillCollision then
-        Debug.Assert(false, "SkillCollision을 만들지 못했습니다.")
+    if not self:InitializeSkillCollision(self.OriginCFrame) then
+        Debug.Assert(false, "InitializeSkillCollisio에 실패했습니다.")
         return false
     end
 
+    self.SkillCollisionHandler = skillCollisionHandler
+    -- 현재의 Roblox에서는 Trigger 같은 충돌체의 경우 이벤트를 바인딩해야 충돌관련 처리를 할 수 있다.
+    self.SkillCollisionTouchedConnection = self.SkillCollision.Touched:Connect(function(touchingPart) end)
+    self.PrevTime = os.clock()
+
+    return true
+    
     --[[
     local skillCollisionHandler = function(skillCollision, touchedPart, outputFromHandling)
         if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
@@ -194,79 +217,89 @@ function SkillCollisionSequencePlayer:Start(skillCollisionHandler)
         end
     end
     --]]
-
-    self.Collision = skillCollision
-    self.CollisionHandler = skillCollisionHandler
-
-
-    -- 현재의 Roblox에서는 Trigger 같은 충돌체의 경우 이벤트를 바인딩해야 충돌관련 처리를 할 수 있다.
-    self.CollisionTouchedConnection = self.Collision.Touched:Connect(function(touchingPart) end)
-    self.StartTime = os.clock()
 end
 
 function SkillCollisionSequencePlayer:End()
     -- 예외처리 해서 여러번 처리되지는 않지만 이벤트 발생을 막기 위해 끊어준다.
-    self.CollisionTouchedConnection:Disconnect()
+    self.SkillCollisionTouchedConnection:Disconnect()
 
-    local skillCollisionOnDestroyingEffect = self.CollisionSequence:GetCollisionData(SkillCollisionParameterType.SkillCollisionOnDestroyingEffect)
+    local skillCollisionOnDestroyingEffect = self.SkillCollisionSequence:GetSkillCollisionData(SkillCollisionParameterType.SkillCollisionOnDestroyingEffect)
     if skillCollisionOnDestroyingEffect then
         local onDestroyingEffect = skillCollisionOnDestroyingEffect:Clone()
         --onDestroyingEffect.Transparency = 0
         onDestroyingEffect.Anchored = true
         onDestroyingEffect.Parent = workspace
-        onDestroyingEffect.CFrame = self.Collision.CFrame
+        onDestroyingEffect.CFrame = self.SkillCollision.CFrame
         Debris:AddItem(onDestroyingEffect, 0.2)
     end
 
-    Debris:AddItem(self.Collision, 0)
+    Debris:AddItem(self.SkillCollision, 0)
 end
 
 function SkillCollisionSequencePlayer:Update(currentTime)
-    local remainingTime = currentTime - self.StartTime
+    local deltaTime = currentTime - self.PrevTime
+    self.PrevTime = currentTime
 
     local currentTrack = nil
     local direction = nil
     local speed = nil
     local duration = nil
+    local toSize = nil
 
-    while 0 < remainingTime and self.CollisionSequenceTrackCount >= self.CurrentTrackIndex do
-        currentTrack = self.CollisionSequence:GetTrack(self.CurrentTrackIndex)
+    local finalCFrame = self.SkillCollision.CFrame
+    while 0 < deltaTime and self.SkillCollisionSequenceTrackCount >= self.CurrentTrackIndex do
+        currentTrack = self.SkillCollisionSequence:GetSkillCollisionSequenceTrack(self.CurrentTrackIndex)
         direction = self.ConvertedTrackDirections[self.CurrentTrackIndex]
         speed = currentTrack:GetData(SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed)
         duration = currentTrack:GetData(SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration)
+        toSize = currentTrack:GetData(SkillCollisionSequenceTrackParameterType.SkillCollisionSize)
 
         local remainingTrackTime = self.CurrentTrackPosition - duration
-        local simulationTime = remainingTrackTime
-        self.CurrentTrackPosition = 0
-
-        remainingTime -= remainingTrackTime
-        if 0 > remainingTime then
-            simulationTime = remainingTime
+        
+        deltaTime -= remainingTrackTime
+        local simulationTime = nil
+        if 0 > deltaTime then
+            simulationTime = deltaTime
             self.CurrentTrackPosition += simulationTime
+
+            if toSize then
+                local factor = deltaTime / remainingTrackTime
+                -- linear interpolation
+                self.CurrentSkillCollisionSizeFactor = factor * toSize + (1 - factor) * self.CurrentSkillCollisionSizeFactor
+            end
         else
             self.CurrentTrackPosition = 0
             self.CurrentTrackIndex += 1
+
+            if toSize then
+                self.CurrentSkillCollisionSizeFactor = toSize
+            end
         end
 
-        local deltaVector = direction * speed * simulationTime
-        self.Collision.CFrame = self.Collision.CFrame + deltaVector
+        finalCFrame = finalCFrame + (direction * speed * simulationTime)
     end
 
+    self.SkillCollision.CFrame = finalCFrame
+    local finalSize = self:CalculateSkillCollisionSizeBySizeFactor(self.CurrentSkillCollisionSizeFactor)
+    self.SkillCollision.Size = finalSize
+    self.SkillCollisionEffect.Size = finalSize
+    --if toSize then end
+    
     local outputFromHandling = {}
-    local touchingParts = self.Collision:GetTouchingParts()
+    local touchingParts = self.SkillCollision:GetTouchingParts()
     for _, touchingPart in pairs(touchingParts) do
-        self.CollisionHandler(self.Collision, touchingPart, outputFromHandling) 
+        self.SkillCollisionHandler(self.SkillCollision, touchingPart, outputFromHandling) 
     end
 
     -- 더 좋은 방법을 찾아야 한다.
     if outputFromHandling.PendingKill then
-        return SkillCollisionSequenceState.Ended
+        return SkillCollisionSequenceStateType.Ended
     end
 
-    if self.CollisionSequenceTrackCount < self.CurrentTrackIndex then
-        return SkillCollisionSequenceState.Ended
+    if self.SkillCollisionSequenceTrackCount < self.CurrentTrackIndex then
+        return SkillCollisionSequenceStateType.Ended
     else
-        return SkillCollisionSequenceState.Playing
+        return SkillCollisionSequenceStateType.Playing
     end
 end
 

@@ -2,8 +2,8 @@ local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Debug = ServerModuleFacade.Debug
---[[
 local Utility = ServerModuleFacade.Utility
+--[[
 local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
 local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility 
 --]]
@@ -32,10 +32,12 @@ local SkillAnimationTemplate = require(script:WaitForChild("SkillAnimationTempla
 local SkillEffectTemplate = require(script:WaitForChild("SkillEffectTemplate"))
 local SkillImpl = require(script:WaitForChild("SkillImpl"))
 
+local SkillCollisionSequenceTrack = require(script.Parent:WaitForChild("SkillCollisionSequenceTrack"))
+
 local SkillCollisionSequence = {
-    Collision = {},
-    CollisionSequenceTracks = {},
-    CollisionSequenceTrackCount = 0
+    SkillCollisionData = {},
+    SkillCollisionSequenceTracks = {},
+    SkillCollisionSequenceTrackCount = 0
 }
 
 function SkillCollisionSequence:ValidateSkillCollisionParameter(skillCollisionParameter)
@@ -62,9 +64,9 @@ function SkillCollisionSequence:ValidateSkillCollisionParameter(skillCollisionPa
     return true
 end
 
-function SkillCollisionSequence:InitializeSkillCollision(skillCollisionParameter)
+function SkillCollisionSequence:InitializeSkillCollisionData(skillCollisionParameter)
     --[[ 예시
-    SkillCollisionSequence:InitializeSkillCollision({
+    SkillCollisionSequence:InitializeSkillCollisionData({
         [SkillCollisionParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
         [SkillCollisionParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
         [SkillCollisionParameterType.SkillCollisionEffect] = "SwordSlashEffect",
@@ -93,76 +95,49 @@ function SkillCollisionSequence:InitializeSkillCollision(skillCollisionParameter
     end
     skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnDestroyingEffect] = skillCollisionOnDestroyingEffect
 
-    self.Collision = skillCollisionParameter
+    self.SkillCollisionData = skillCollisionParameter
     return true
 end
 
-function SkillCollisionSequence:ValidateSkillCollisionSequenceTrackParameter(skillCollisionSequenceTrackParameter)
-    if not skillCollisionSequenceTrackParameter[SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] then
-        Debug.Assert(false, "SkillCollisionDirection 가 없습니다.")
-        return false
-    end
 
-    if not skillCollisionSequenceTrackParameter[SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed] then
-        Debug.Assert(false, "SkillCollisionSpeed 가 없습니다.")
-        return false
-    end
-    
-    local skillCollisionSequenceTrackDuration = skillCollisionSequenceTrackParameter[SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration]
-    if not skillCollisionSequenceTrackDuration then
-        Debug.Assert(false, "SkillCollisionSequenceTrackDuration 가 없습니다.")
-        return false
-    end
-
-    if 0 >= skillCollisionSequenceTrackDuration then
-        Debug.Assert(false, "SkillCollisionSequenceTrackDuration 이 0보다 작거나 같습니다.")
-        return false
-    end
-
-    return true
-end
-
-function SkillCollisionSequence:AddTrack(skillCollisionSequenceTrackParameter)
+function SkillCollisionSequence:AddSkillCollisionSequenceTrack(skillCollisionSequenceTrackParameter)
     --[[ 예시
-    SkillCollisionSequence:AddTrack({
+    SkillCollisionSequence:AddSkillCollisionSequenceTrack({
         [skillCollisionSequenceTrackParameter.SkillCollisionDirection] = Vector3.new(1, 0, 0), -- look, right, up
         [skillCollisionSequenceTrackParameter.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         [skillCollisionSequenceTrackParameter.SkillCollisionSequenceTrackDuration] = 1,
     })
     --]]
 
-    if not self:ValidateSkillCollisionSequenceTrackParameter(skillCollisionSequenceTrackParameter) then
+    local skillCollisionSequenceTrack = Utility:DeepCopy(SkillCollisionSequenceTrack)
+    if not skillCollisionSequenceTrack:Initialize(skillCollisionSequenceTrackParameter) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
 
-    skillCollisionSequenceTrackParameter.GetData = function(collisionSequenceTrack, skillCollisionSequenceTrackParameterType)
-        return collisionSequenceTrack[skillCollisionSequenceTrackParameterType]
-    end
-
-    table.insert(self.CollisionSequenceTracks, skillCollisionSequenceTrackParameter)
-    self.CollisionSequenceTrackCount += 1
+    table.insert(self.SkillCollisionSequenceTracks, skillCollisionSequenceTrack)
+    self.SkillCollisionSequenceTrackCount += 1
     return true
 end
 
 function SkillCollisionSequence:IsValid()
-    return 0 ~= self.CollisionSequenceTrackCount
+    return 0 ~= self.SkillCollisionSequenceTrackCount
 end
 
-function SkillCollisionSequence:GetTrackCount()
-    return self.CollisionSequenceTrackCount
+function SkillCollisionSequence:GetSkillCollisionSequenceTrackCount()
+    return self.SkillCollisionSequenceTrackCount
 end
 
-function SkillCollisionSequence:GetTrack(trackIndex)
-    if 0 >= trackIndex or self.CollisionSequenceTrackCount < trackIndex then
+function SkillCollisionSequence:GetSkillCollisionSequenceTrack(trackIndex)
+    if 0 >= trackIndex or self.SkillCollisionSequenceTrackCount < trackIndex then
         Debug.Assert(false, "트랙인덱스가 비정상입니다.")
         return nil
     end
 
-    return self.CollisionSequenceTracks[trackIndex]
+    return self.SkillCollisionSequenceTracks[trackIndex]
 end
 
-function SkillCollisionSequence:GetTrackData(trackIndex, skillCollisionSequenceTrackParameterType)
+function SkillCollisionSequence:GetSkillCollisionSequenceTrackData(trackIndex, skillCollisionSequenceTrackParameterType)
     if not SkillCollisionSequenceTrackParameterTypeConverter[skillCollisionSequenceTrackParameterType] then
         Debug.Assert(false, "비정상입니다.")
         return nil
@@ -174,16 +149,16 @@ function SkillCollisionSequence:GetTrackData(trackIndex, skillCollisionSequenceT
         return nil
     end
 
-    return targetTrack[skillCollisionSequenceTrackParameterType]
+    return targetTrack:GetData(skillCollisionSequenceTrackParameterType)
 end
 
-function SkillCollisionSequence:GetCollisionData(skillCollisionParameterType)
+function SkillCollisionSequence:GetSkillCollisionData(skillCollisionParameterType)
     if not SkillCollisionParameterTypeConverter[skillCollisionParameterType] then
         Debug.Assert(false, "비정상입니다.")
         return nil
     end
 
-    return self.Collision[skillCollisionParameterType]
+    return self.SkillCollisionData[skillCollisionParameterType]
 end
 
 

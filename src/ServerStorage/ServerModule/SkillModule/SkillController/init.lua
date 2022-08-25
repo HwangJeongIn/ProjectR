@@ -106,8 +106,6 @@ function SkillController:SimulateSkillCollision(skillCastingTime, humanoidRootPa
         skillCollisionDirection = createdSkillCollision.CFrame[skillCollisionDirection]
     end
     local skillCollisionSpeed = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionSpeed)
-    local skillCollisionDetailMovementType = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionDetailMovementType)
-    
     local outputFromHandling = {}
 
     if not skillCollisionDirection then

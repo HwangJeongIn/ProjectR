@@ -59,11 +59,18 @@ local ServerEnum = {
 	SkillCollisionSequenceTrackParameterType = {
 		SkillCollisionDirection = 1,
 		SkillCollisionSpeed = 2,
-		SkillCollisionSequenceTrackDuration = 3,
-		Count = 4
+		SkillCollisionSize = 3,
+		SkillCollisionSequenceTrackDuration = 4,
+		Count = 5
 	},
 
-	SkillCollisionSequenceState = {
+	SkillCollisionSequenceStateType = {
+		Playing = 1,
+		Ended = 2,
+		Count = 3
+	},
+
+	SkillSequenceAnimationTrackStateType = {
 		Playing = 1,
 		Ended = 2,
 		Count = 3
