@@ -26,6 +26,7 @@ local VehicleModule = ObjectModule:WaitForChild("VehicleModule")
 local WorldInteractorModule = ObjectModule:WaitForChild("WorldInteractorModule")
 
 local SkillModule = ServerModule:WaitForChild("SkillModule")
+local ResourceTemplateModule = ServerModule:WaitForChild("ResourceTemplateModule")
 
 
 local ServerModuleFacade = {
@@ -42,7 +43,8 @@ local ServerModuleFacade = {
 	ToolModule = ToolModule,
 	VehicleModule = VehicleModule,
 	WorldInteractorModule = WorldInteractorModule,
-	SkillModule = SkillModule
+	SkillModule = SkillModule,
+	ResourceTemplateModule = ResourceTemplateModule
 }
 
 setmetatable(ServerModuleFacade, CommonModuleFacade)

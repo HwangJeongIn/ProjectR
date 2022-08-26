@@ -3,31 +3,12 @@ local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Debug = ServerModuleFacade.Debug
-local Utility = ServerModuleFacade.Utility
-local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
 local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility 
 
-local ServerConstant = ServerModuleFacade.ServerConstant
-local DefaultWeaponSkillGameDataKey = ServerConstant.DefaultWeaponSkillGameDataKey
---local DefaultArmorSkillGameDataKey = ServerConstant.DefaultArmorSkillGameDataKey
-
 local ServerEnum = ServerModuleFacade.ServerEnum
-local GameDataType = ServerEnum.GameDataType
-
-local SkillDataType = ServerEnum.SkillDataType
-local SkillImplType = ServerEnum.SkillImplType
-local SkillImplTypeConverter = SkillImplType.Converter
-
-
 local SkillCollisionParameterType = ServerEnum.SkillCollisionParameterType
 local SkillCollisionSequenceTrackParameterType = ServerEnum.SkillCollisionSequenceTrackParameterType
 local SkillCollisionSequenceStateType = ServerEnum.SkillCollisionSequenceStateType
-
-local ServerGameDataManager = ServerModuleFacade.ServerGameDataManager
-
-local SkillAnimationTemplate = require(script:WaitForChild("SkillAnimationTemplate"))
-local SkillEffectTemplate = require(script:WaitForChild("SkillEffectTemplate"))
-local SkillImpl = require(script:WaitForChild("SkillImpl"))
 
 
 local SkillCollisionSequencePlayer = {

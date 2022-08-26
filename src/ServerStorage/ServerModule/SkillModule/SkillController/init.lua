@@ -17,7 +17,11 @@ local SkillImplType = ServerEnum.SkillImplType
 local SkillDataParameterType = ServerEnum.SkillDataParameterType
 
 local SkillModule = ServerModuleFacade.SkillModule
-local SkillTemplate = require(SkillModule:WaitForChild("SkillTemplate"))
+local SkillTemplateFolder = SkillModule:WaitForChild("SkillTemplate")
+local SkillTemplate = require(SkillTemplateFolder)
+
+local SkillSequencePlayer = require(SkillTemplateFolder:WaitForChild("SkillSequencePlayer"))
+
 
 local SkillController = {}
 SkillController.__index = Utility.Inheritable__index
@@ -35,173 +39,16 @@ function SkillController:ApplySkillToTarget(toolOwnerPlayer, target, outputFromH
     return false
 end
 
--- function
-function SkillController:CreateSkillCollision(originCFrame)
-    local skillCollisionSize = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionSize)
-    local skillCollisionOffset = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionOffset)
-    local finalOffsetVector = originCFrame.LookVector * skillCollisionOffset.X
-                            + originCFrame.RightVector * skillCollisionOffset.Y
-                            + originCFrame.UpVector * skillCollisionOffset.Z
 
-    local skillCollisionCFrame = originCFrame + finalOffsetVector
-
-    local tempSkillCollision = Instance.new("Part")
-    ObjectCollisionGroupUtility:SetSkillCollisionGroup(tempSkillCollision)
-
-    tempSkillCollision.Anchored = true
-    tempSkillCollision.Transparency = 1
-
-    --tempPart.CanTouch = false
-    tempSkillCollision.CanCollide = false
-    tempSkillCollision.CanQuery = true
-
-    tempSkillCollision.Parent = game.workspace
-    tempSkillCollision.Size =  skillCollisionSize
-    tempSkillCollision.CFrame = skillCollisionCFrame
-
-    local skillEffect = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillEffect)
-
-
-    if skillEffect then
-        local tempSkillEffect = skillEffect:Clone()
-        tempSkillEffect.Parent = tempSkillCollision
-
-        local targetRotation = self.Tool.Handle.CFrame.Rotation
-        local skillCollisionRotation = tempSkillCollision.CFrame.Rotation
-
-        local dotResult = targetRotation.LookVector:Dot(skillCollisionRotation.LookVector)
-        if 0 > dotResult then
-            local rightVector = -targetRotation.RightVector
-            local upVector = targetRotation.UpVector
-            local lookVector = targetRotation.LookVector
-
-            targetRotation = CFrame.new(
-                0, 0, 0, 
-              --RightVector | UpVector | –LookVector
-              rightVector.X, upVector.X, lookVector.X,
-              rightVector.Y, upVector.Y, lookVector.Y, 
-              rightVector.Z, upVector.Z, lookVector.Z) 
-
-        end
-
-        tempSkillEffect.CFrame = targetRotation + tempSkillCollision.CFrame.Position
-
-        local tempWeld = Instance.new("WeldConstraint")
-        tempWeld.Name = "TempWeldConstraint"
-        tempWeld.Part0 = tempSkillEffect
-        tempWeld.Part1 = tempSkillCollision
-        tempWeld.Parent = tempSkillEffect
-    end
-
-    return tempSkillCollision
-end
-
-function SkillController:SimulateSkillCollision(skillCastingTime, humanoidRootPart, skillCollisionHandler)
-    wait(skillCastingTime)
-    local createdSkillCollision = self:CreateSkillCollision(humanoidRootPart.CFrame)
-
-    local SkillCollisionSequenceTrackDuration = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionSequenceTrackDuration)
-    local skillCollisionDirection = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionDirection)
-    if skillCollisionDirection then
-        skillCollisionDirection = createdSkillCollision.CFrame[skillCollisionDirection]
-    end
-    local skillCollisionSpeed = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillCollisionSpeed)
-    local outputFromHandling = {}
-
-    if not skillCollisionDirection then
-        wait(SkillCollisionSequenceTrackDuration)
-    else
-        local prevTime = os.clock()
-        local currentTime = prevTime
-        local deltaTime = 0
-        local remainingSkillCollisionSequenceTrackDuration = SkillCollisionSequenceTrackDuration
-        
-        --[[
-        local skillCollisionConnection = createdSkillCollision.Touched:Connect(function(touchedPart) 
-            skillCollisionHandler(createdSkillCollision, touchedPart, outputFromHandling) 
-        end)
-        --]]
-        local skillCollisionConnection = createdSkillCollision.Touched:Connect(function(touchedPart) end)
-        while remainingSkillCollisionSequenceTrackDuration > 0 and not outputFromHandling.PendingKill do
-            prevTime = currentTime
-            currentTime = os.clock()
-            deltaTime = currentTime - prevTime
-            remainingSkillCollisionSequenceTrackDuration -= (currentTime - prevTime)
-            createdSkillCollision.CFrame = createdSkillCollision.CFrame + (skillCollisionDirection * skillCollisionSpeed * deltaTime)
-            
-            local touchingParts = createdSkillCollision:GetTouchingParts()
-            for _, touchingPart in pairs(touchingParts) do
-                skillCollisionHandler(createdSkillCollision, touchingPart, outputFromHandling) 
-            end
-            wait(0)
-        end
-        skillCollisionConnection:Disconnect()
-    end
-
-    -- 소멸 이펙트
-    local skillOnDestroyingEffect = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillOnDestroyingEffect)
-    if skillOnDestroyingEffect then
-        local onDestroyingEffect = skillOnDestroyingEffect:Clone()
-        --onDestroyingEffect.Transparency = 0
-        onDestroyingEffect.Anchored = true
-        onDestroyingEffect.Parent = workspace
-        onDestroyingEffect.CFrame = createdSkillCollision.CFrame
-        Debris:AddItem(onDestroyingEffect, 0.2)
-    end
-
-    Debris:AddItem(createdSkillCollision, 0)
-end
 
 function SkillController:ActivateInternally(toolOwnerPlayer)
-    local toolOwnerPlayerCharacter = toolOwnerPlayer.character
-    if not toolOwnerPlayerCharacter then
-        Debug.Assert(false, "캐릭터가 없습니다.")
+    local skillSequencePlayer = Utility:DeepCopy(SkillSequencePlayer)
+    if not skillSequencePlayer:Initialize(toolOwnerPlayer, self.SkillSequence, self.SkillCollisionHandler) then
+        Debug.Assert(false, "비정상입니다.")
         return false
     end
 
-    local humanoid = toolOwnerPlayerCharacter:FindFirstChild("Humanoid")
-    Debug.Assert(humanoid, "비정상입니다.")
-
-	local humanoidRootPart = toolOwnerPlayerCharacter:FindFirstChild("HumanoidRootPart")
-    Debug.Assert(humanoidRootPart, "비정상입니다.")
-
-    local skillAnimationWrapper = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillAnimation)
-    local skillCastingTime = 0
-
-    if skillAnimationWrapper then
-        local skillAnimation = skillAnimationWrapper.Animation
-        local skillAnimationLength = skillAnimationWrapper.AnimationLength
-
-	    local skillAnimationTrack = humanoid:LoadAnimation(skillAnimation)
-
-        local skillDuration = self.SkillTemplateData:GetSkillDataParameter(SkillDataParameterType.SkillDuration)
-        local skillAnimationSpeed = 1
-        if skillDuration then
-            skillCastingTime = skillDuration / 2
-            skillAnimationSpeed = skillAnimationLength / skillDuration
-        else
-            skillCastingTime = skillAnimationLength / 2
-        end
-
-        skillAnimationTrack:Play(0.1, 1, skillAnimationSpeed)
-    end
-    
-    local skillCollisionHandler = function(skillCollision, touchedPart, outputFromHandling)
-        if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
-            
-            local touchedPartCollisionGroupName = ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(touchedPart)
-            Debug.Print(touchedPart.Name .. " : ".. tostring(touchedPartCollisionGroupName))
-
-            if self:ValidateTargetInRange(toolOwnerPlayer, touchedPart) then
-                self:ApplySkillToTarget(toolOwnerPlayer, touchedPart, outputFromHandling)
-            end
-
-            outputFromHandling.PendingKill = true
-        end
-    end
-
-    local simulateSkillCollisionCoroutine = coroutine.wrap(self.SimulateSkillCollision)
-    simulateSkillCollisionCoroutine(self, skillCastingTime, humanoidRootPart, skillCollisionHandler)
+    skillSequencePlayer:Start()
     return true
 end
 
@@ -275,6 +122,9 @@ function SkillController:SetSkill(tool, skillGameData)
 
     self.ValidateTargetInRange = targetSkillTemplate:GetSkillImpl(SkillImplType.ValidateTargetInRange)
     self.ApplySkillToTarget = targetSkillTemplate:GetSkillImpl(SkillImplType.ApplySkillToTarget)
+    
+    self.SkillSequence = targetSkillTemplate:GetSkillSequence()
+
     self.SkillTemplateData = targetSkillTemplate
 
     self.Tool = tool
@@ -283,6 +133,33 @@ function SkillController:SetSkill(tool, skillGameData)
     self.Cooldown = skillGameData.Cooldown
 
     self.LastActivationTime = nil
+
+
+    self.MultipleProcessingSkillCollisionHandler = function(skillCollision, touchedPart, outputFromHandling)
+        if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
+            local touchedPartCollisionGroupName = ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(touchedPart)
+            Debug.Print(touchedPart.Name .. " : ".. tostring(touchedPartCollisionGroupName))
+
+            if self:ValidateTargetInRange(self.ToolOwnerPlayer, touchedPart) then
+                self:ApplySkillToTarget(self.ToolOwnerPlayer, touchedPart, outputFromHandling)
+            end
+        end
+    end
+
+    self.SkillCollisionHandler = function(skillCollision, touchedPart, outputFromHandling)
+        if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
+            local touchedPartCollisionGroupName = ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(touchedPart)
+            Debug.Print(touchedPart.Name .. " : ".. tostring(touchedPartCollisionGroupName))
+
+            if self:ValidateTargetInRange(self.ToolOwnerPlayer, touchedPart) then
+                self:ApplySkillToTarget(self.ToolOwnerPlayer, touchedPart, outputFromHandling)
+            end
+
+            outputFromHandling.PendingKill = true
+        end
+    end
+
+
     return true
 end
 

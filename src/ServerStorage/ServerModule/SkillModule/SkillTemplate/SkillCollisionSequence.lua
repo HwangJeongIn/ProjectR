@@ -3,22 +3,8 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 
 local Debug = ServerModuleFacade.Debug
 local Utility = ServerModuleFacade.Utility
---[[
-local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
-local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility 
---]]
-
-local ServerConstant = ServerModuleFacade.ServerConstant
-local DefaultWeaponSkillGameDataKey = ServerConstant.DefaultWeaponSkillGameDataKey
---local DefaultArmorSkillGameDataKey = ServerConstant.DefaultArmorSkillGameDataKey
 
 local ServerEnum = ServerModuleFacade.ServerEnum
-local GameDataType = ServerEnum.GameDataType
-
-local SkillDataType = ServerEnum.SkillDataType
-local SkillImplType = ServerEnum.SkillImplType
-local SkillImplTypeConverter = SkillImplType.Converter
-
 
 local SkillCollisionParameterType = ServerEnum.SkillCollisionParameterType
 local SkillCollisionParameterTypeConverter = SkillCollisionParameterType.Converter
@@ -26,12 +12,7 @@ local SkillCollisionSequenceTrackParameterType = ServerEnum.SkillCollisionSequen
 local SkillCollisionSequenceTrackParameterTypeConverter = SkillCollisionSequenceTrackParameterType.Converter
 
 
-local ServerGameDataManager = ServerModuleFacade.ServerGameDataManager
-
-local SkillAnimationTemplate = require(script:WaitForChild("SkillAnimationTemplate"))
-local SkillEffectTemplate = require(script:WaitForChild("SkillEffectTemplate"))
-local SkillImpl = require(script:WaitForChild("SkillImpl"))
-
+local SkillEffectTemplate = require(script.Parent:WaitForChild("SkillEffectTemplate"))
 local SkillCollisionSequenceTrack = require(script.Parent:WaitForChild("SkillCollisionSequenceTrack"))
 
 local SkillCollisionSequence = {
@@ -39,6 +20,7 @@ local SkillCollisionSequence = {
     SkillCollisionSequenceTracks = {},
     SkillCollisionSequenceTrackCount = 0
 }
+
 
 function SkillCollisionSequence:ValidateSkillCollisionParameter(skillCollisionParameter)
     if not skillCollisionParameter[SkillCollisionParameterType.SkillCollisionSize] then

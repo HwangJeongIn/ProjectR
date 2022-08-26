@@ -3,7 +3,6 @@ local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Debug = ServerModuleFacade.Debug
-local Utility = ServerModuleFacade.Utility
 
 
 local SkillSequenceAnimationTrack = {

@@ -17,29 +17,22 @@ local DefaultSkillCollisionSpeed = ServerConstant.DefaultSkillCollisionSpeed
 
 
 local ServerEnum = ServerModuleFacade.ServerEnum
-local GameDataType = ServerEnum.GameDataType
 local CollisionGroupType = ServerEnum.CollisionGroupType
 
-local SkillDataType = ServerEnum.SkillDataType
-local EquipType = ServerEnum.EquipType
-local WorldInteractorType = ServerEnum.WorldInteractorType
 local SkillImplType = ServerEnum.SkillImplType
-local SkillImplTypeConverter = SkillImplType.Converter
-local SkillDataParameterType = ServerEnum.SkillDataParameterType
-local SkillDataParameterTypeConverter = SkillDataParameterType.Converter
 
 local SkillCollisionParameterType = ServerEnum.SkillCollisionParameterType
 local SkillCollisionSequenceTrackParameterType = ServerEnum.SkillCollisionSequenceTrackParameterType
 
 local ServerGlobalStorage = ServerModuleFacade.ServerGlobalStorage
-local ServerGameDataManager = ServerModuleFacade.ServerGameDataManager
 
 local SkillModule = ServerModuleFacade.SkillModule
 local DamageCalculator = require(SkillModule:WaitForChild("DamageCalculator"))
 
 local SkillSequence = require(script.Parent:WaitForChild("SkillSequence"))
-local SkillSequenceAnimationTrack = require(script.Parent:WaitForChild("SkillSequenceAnimationTrack"))
+--local SkillSequenceAnimationTrack = require(script.Parent:WaitForChild("SkillSequenceAnimationTrack"))
 local SkillCollisionSequence = require(script.Parent:WaitForChild("SkillCollisionSequence"))
+
 
 local SkillImpl = {}
 
@@ -129,17 +122,10 @@ function SkillImpl:DamageSomething(skillController, attackerPlayer, attackee)
 end
 
 function SkillImpl:RegisterBaseAttack(SkillTemplate)
-
-end
-
-function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
-
-    --1, Name = "BaseAttack"
     SkillTemplate:RegisterSkillName("BaseAttack")
 
     local skillSequence = Utility:DeepCopy(SkillSequence)
     local leftSlash1Index = SkillSequence:AddSkillSequenceAnimationTrack("LeftSlash", 1.0)
-
 
     local leftSlash1_skillCollisionSequence1 = Utility:DeepCopy(SkillCollisionSequence)
     leftSlash1_skillCollisionSequence1:InitializeSkillCollisionData({
@@ -148,7 +134,6 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
         [SkillCollisionParameterType.SkillCollisionEffect] = "SwordSlashEffect",
         [SkillCollisionParameterType.SkillCollisionOnDestroyingEffect] = "HitEffect"
     })
-
     
     leftSlash1_skillCollisionSequence1:AddSkillCollisionSequenceTrack({
         [SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(1, 0, 0), -- look, right, up
@@ -191,6 +176,13 @@ function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
             return true
         end
     )
+end
+
+function SkillImpl:RegisterAllSkillImpls(SkillTemplate)
+
+    --1, Name = "BaseAttack"
+    self:RegisterBaseAttack(SkillTemplate)
+
 
 --[[
     --2, Name = "WhirlwindSlash"

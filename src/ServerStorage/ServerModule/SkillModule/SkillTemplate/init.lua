@@ -1,17 +1,10 @@
--- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
 local ServerStorage = game:GetService("ServerStorage")
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
 
 local Debug = ServerModuleFacade.Debug
---[[
-local Utility = ServerModuleFacade.Utility
-local ObjectTagUtility = ServerModuleFacade.ObjectTagUtility
-local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility 
---]]
 
 local ServerConstant = ServerModuleFacade.ServerConstant
 local DefaultWeaponSkillGameDataKey = ServerConstant.DefaultWeaponSkillGameDataKey
---local DefaultArmorSkillGameDataKey = ServerConstant.DefaultArmorSkillGameDataKey
 
 local ServerEnum = ServerModuleFacade.ServerEnum
 local GameDataType = ServerEnum.GameDataType
@@ -19,13 +12,10 @@ local GameDataType = ServerEnum.GameDataType
 local SkillDataType = ServerEnum.SkillDataType
 local SkillImplType = ServerEnum.SkillImplType
 local SkillImplTypeConverter = SkillImplType.Converter
-local SkillDataParameterType = ServerEnum.SkillDataParameterType
 
 local ServerGameDataManager = ServerModuleFacade.ServerGameDataManager
-
-local SkillAnimationTemplate = require(script:WaitForChild("SkillAnimationTemplate"))
-local SkillEffectTemplate = require(script:WaitForChild("SkillEffectTemplate"))
 local SkillImpl = require(script:WaitForChild("SkillImpl"))
+
 
 local SkillTemplate = {
     SkillImplTemplateTable = {},
@@ -102,45 +92,9 @@ function SkillTemplate:RegisterSkillImpl(skillName, skillImplType, inputFunction
 end
 
 function SkillTemplate:RegisterSkillDataParameter(skillName, skillSequence)
-    --[[
-    if not self:ValidateSkillDataParameter(skillDataParameter) then
-        Debug.Assert(false, "비정상입니다.")
-        return false
-    end
-
-    local skillAnimationName = skillDataParameter[SkillDataParameterType.SkillAnimation]
-    local skillAnimation = SkillAnimationTemplate:Get(skillAnimationName)
-    if not skillAnimation then
-        Debug.Assert(false, "이름을 가진 애니메이션이 존재하지 않습니다. => " .. skillAnimationName)
-        return false
-    end
-    skillDataParameter[SkillDataParameterType.SkillAnimation] = skillAnimation
-
-    local skillEffectName = skillDataParameter[SkillDataParameterType.SkillEffect]
-    local skillEffect = SkillEffectTemplate:Get(skillEffectName)
-    if not skillEffect then
-        Debug.Assert(false, "이름을 가진 이펙트가 존재하지 않습니다. => " .. skillEffectName)
-        return false
-    end
-    skillDataParameter[SkillDataParameterType.SkillEffect] = skillEffect
-
-    
-    local skillOnDestroyingEffectName = skillDataParameter[SkillDataParameterType.SkillOnDestroyingEffect]
-    if skillOnDestroyingEffectName then
-        local skillOnDestroyingEffect = SkillEffectTemplate:Get(skillOnDestroyingEffectName)
-        if not skillOnDestroyingEffect then
-            Debug.Assert(false, "이름을 가진 이펙트가 존재하지 않습니다. => " .. skillOnDestroyingEffectName)
-            return false
-        end
-        skillDataParameter[SkillDataParameterType.SkillOnDestroyingEffect] = skillOnDestroyingEffect
-    end
-    local skillName = skillDataParameter.SkillName
-    --]]
-
     self.RawSkillData[skillName][SkillDataType.SkillSequence] = skillSequence
     return true
 end
-
 
 function SkillTemplate:ValidateSkillTemplate(skillName)
     local lastSkillImplIndex = (SkillImplType.Count - 1)
