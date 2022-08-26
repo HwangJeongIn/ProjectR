@@ -44,7 +44,7 @@ function SkillSequenceAnimationTrack:GetSkillSequenceAnimationDuration()
     return self.SkillSequenceAnimationDuration
 end
 
-function SkillSequenceAnimationTrack:AddSkillCollisionSequence(skillCollisionSequence, skillCollisionFireTimeRate)
+function SkillSequenceAnimationTrack:AddSkillCollisionSequence(skillCollisionFireTimeRate, skillCollisionSequence)
     if not skillCollisionSequence or not skillCollisionFireTimeRate then
         Debug.Assert(false, "비정상입니다.")
         return false
@@ -56,7 +56,7 @@ function SkillSequenceAnimationTrack:AddSkillCollisionSequence(skillCollisionSeq
     end
 
     local lastSkillCollisionFireTimeRate = self:GetLastSkillCollisionFireTimeRate()
-    if lastSkillCollisionFireTimeRate < skillCollisionFireTimeRate then
+    if lastSkillCollisionFireTimeRate > skillCollisionFireTimeRate then
         Debug.Assert(false, "비정상입니다. 순차적으로 삽입해주세요.")
         return false
     end
@@ -66,6 +66,7 @@ function SkillSequenceAnimationTrack:AddSkillCollisionSequence(skillCollisionSeq
         SkillCollisionSequence = skillCollisionSequence
     }
 
+    self.SkillCollisionSequenceCount += 1
     table.insert(self.SkillCollisionSequenceWrappers, skillCollisionSequenceWrapper)
     return true
 end

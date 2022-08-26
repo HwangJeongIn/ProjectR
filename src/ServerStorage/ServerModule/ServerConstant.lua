@@ -33,6 +33,8 @@ local ServerConstant = {
 	DefaultAttackSpeedRate = 1,
 	DefaultMoveRate = 1,
 
+	SkillCollisionInVisible = false,
+
 	-- skill
 	DefaultSkillCollisionSpeed = 100,
 

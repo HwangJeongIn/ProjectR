@@ -125,7 +125,7 @@ function SkillImpl:RegisterBaseAttack(SkillTemplate)
     SkillTemplate:RegisterSkillName("BaseAttack")
 
     local skillSequence = Utility:DeepCopy(SkillSequence)
-    local leftSlash1Index = SkillSequence:AddSkillSequenceAnimationTrack("LeftSlash", 1.0)
+    local leftSlash1Index = skillSequence:AddSkillSequenceAnimationTrack("LeftSlash", 1.0)
 
     local leftSlash1_skillCollisionSequence1 = Utility:DeepCopy(SkillCollisionSequence)
     leftSlash1_skillCollisionSequence1:InitializeSkillCollisionData({
@@ -139,12 +139,14 @@ function SkillImpl:RegisterBaseAttack(SkillTemplate)
         [SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(1, 0, 0), -- look, right, up
         [SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed,
         [SkillCollisionSequenceTrackParameterType.SkillCollisionSize] = Vector3.new(10,10,10),
-        [SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration] = 1,
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration] = 100,
     })
 
     
     skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlash1Index, 0.1, leftSlash1_skillCollisionSequence1)
     skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlash1Index, 0.9, leftSlash1_skillCollisionSequence1)
+
+    SkillTemplate:RegisterSkillSequence("BaseAttack", skillSequence)
 
     SkillTemplate:RegisterSkillImpl(
         "BaseAttack",

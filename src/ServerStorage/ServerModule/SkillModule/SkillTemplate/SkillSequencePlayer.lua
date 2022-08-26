@@ -69,22 +69,24 @@ function SkillSequencePlayer:Simulate(skillCollisionHandler)
                     end
                 end
             end
-
-            if returnedCollisionSequencePlayers then
-                for _, collisionSequencePlayer in pairs(returnedCollisionSequencePlayers) do
-                    collisionSequencePlayer:Start(skillCollisionHandler)
-                    self.SkillSequenceCollisionPlayerCount += 1
-                    table.insert(self.SkillSequenceCollisionPlayers, collisionSequencePlayer)
-                end
-            end
         end
 
+        -- 스킬 콜리전 업데이트
         for collisionSequencePlayerIndex, collisionSequencePlayer in pairs(self.SkillSequenceCollisionPlayers) do
             currentCollisionSequenceStateType = collisionSequencePlayer:Update(currentTime)
             if SkillCollisionSequenceStateType.Ended == currentCollisionSequenceStateType then
                 collisionSequencePlayer:End()
                 table.remove(self.SkillSequenceCollisionPlayers, collisionSequencePlayerIndex)
             end 
+        end
+
+        -- 추가되는 프레임에서는 업데이트를 따로 하지 않는다.
+        if returnedCollisionSequencePlayers then
+            for _, collisionSequencePlayer in pairs(returnedCollisionSequencePlayers) do
+                collisionSequencePlayer:Start(skillCollisionHandler)
+                self.SkillSequenceCollisionPlayerCount += 1
+                table.insert(self.SkillSequenceCollisionPlayers, collisionSequencePlayer)
+            end
         end
 
         wait(0)
@@ -127,6 +129,7 @@ function SkillSequencePlayer:Initialize(player, skillSequence, skillCollisionHan
     self.SkillSequenceCollisionPlayers = {}
     self.SkillSequenceCollisionPlayerCount = 0
     
+    return true
 end
 
 

@@ -91,7 +91,12 @@ function SkillTemplate:RegisterSkillImpl(skillName, skillImplType, inputFunction
     return true
 end
 
-function SkillTemplate:RegisterSkillDataParameter(skillName, skillSequence)
+function SkillTemplate:RegisterSkillSequence(skillName, skillSequence)
+    if not skillName or not skillSequence then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
     self.RawSkillData[skillName][SkillDataType.SkillSequence] = skillSequence
     return true
 end
@@ -107,6 +112,11 @@ function SkillTemplate:ValidateSkillTemplate(skillName)
             Debug.Assert(false, tempSkillImplFunctionName .. "가 정의되어 있지 않습니다.")
             return false
         end
+    end
+
+    if not self:GetSkillSequenceFromRawSkillData(skillName) then
+        Debug.Assert(false, "SkillSequence를 등록하세요. => " .. skillName)
+        return false
     end
 
     return true

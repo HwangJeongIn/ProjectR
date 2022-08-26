@@ -43,11 +43,19 @@ end
 
 function SkillController:ActivateInternally(toolOwnerPlayer)
     local skillSequencePlayer = Utility:DeepCopy(SkillSequencePlayer)
-    if not skillSequencePlayer:Initialize(toolOwnerPlayer, self.SkillSequence, self.SkillCollisionHandler) then
+
+    if not skillSequencePlayer:Initialize(toolOwnerPlayer, self.SkillSequence, self.MultipleProcessingSkillCollisionHandler) then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
 
+    --[[
+    if not skillSequencePlayer:Initialize(toolOwnerPlayer, self.SkillSequence, self.SkillCollisionHandler) then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+    --]]
+    
     skillSequencePlayer:Start()
     return true
 end
