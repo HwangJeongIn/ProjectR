@@ -19,13 +19,10 @@ end
 function SkillCollisionSequenceTrack:ValidateSkillCollisionSequenceTrackParameter(skillCollisionSequenceTrackParameter)
     -- 없을 수 있다. 없으면 자자리에 위치한다.
     -- 다만 모두 존재하거나 존재하지 않아야 한다.
-    if not skillCollisionSequenceTrackParameter[SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] then
-        Debug.Assert(false, "SkillCollisionDirection 가 없습니다.")
-        return false
-    end
-
-    if not skillCollisionSequenceTrackParameter[SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed] then
-        Debug.Assert(false, "SkillCollisionSpeed 가 없습니다.")
+    local directionEnabled = not skillCollisionSequenceTrackParameter[SkillCollisionSequenceTrackParameterType.SkillCollisionDirection]
+    local speedEnabled = not skillCollisionSequenceTrackParameter[SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed]
+    if directionEnabled ~= speedEnabled then
+        Debug.Assert(false, "SkillCollisionDirection, SkillCollisionSpeed 의 존재 여부가 동일해야합니다.")
         return false
     end
 

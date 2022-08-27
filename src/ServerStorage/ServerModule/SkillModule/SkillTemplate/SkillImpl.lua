@@ -124,7 +124,7 @@ function SkillImpl:RegisterBaseAttack1(SkillTemplate)
     SkillTemplate:RegisterSkillName("BaseAttack")
 
     local skillSequence = Utility:DeepCopy(SkillSequence)
-    local leftSlash1Index = skillSequence:AddSkillSequenceAnimationTrack("LeftSlash", 1.0)
+    local leftSlashIndex = skillSequence:AddSkillSequenceAnimationTrack("LeftSlash", 1.0)
 
     local leftSlash1_skillCollisionSequence1 = Utility:DeepCopy(SkillCollisionSequence)
     leftSlash1_skillCollisionSequence1:InitializeSkillCollisionData({
@@ -148,8 +148,8 @@ function SkillImpl:RegisterBaseAttack1(SkillTemplate)
     })
 
     
-    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlash1Index, 0.5, leftSlash1_skillCollisionSequence1)
-    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlash1Index, 0.6, leftSlash1_skillCollisionSequence1)
+    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.5, leftSlash1_skillCollisionSequence1)
+    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.6, leftSlash1_skillCollisionSequence1)
 
     SkillTemplate:RegisterSkillSequence("BaseAttack", skillSequence)
 
@@ -186,11 +186,11 @@ function SkillImpl:RegisterBaseAttack1(SkillTemplate)
 end
 
 
-function SkillImpl:RegisterBaseAttack(SkillTemplate) -- 파이어볼
+function SkillImpl:RegisterBaseAttack(SkillTemplate) -- FlameBlade
     SkillTemplate:RegisterSkillName("BaseAttack")
 
     local skillSequence = Utility:DeepCopy(SkillSequence)
-    local leftSlash1Index = skillSequence:AddSkillSequenceAnimationTrack("LeftSlash", 1.0)
+    local leftSlashIndex = skillSequence:AddSkillSequenceAnimationTrack("LeftSlash", 1.0)
 
     local fireBallCollisionTrack1 = {
         [SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(0, 0, 1), -- look, right, up
@@ -215,8 +215,8 @@ function SkillImpl:RegisterBaseAttack(SkillTemplate) -- 파이어볼
     }
 
 
-    local skillCollisionSequence1 = Utility:DeepCopy(SkillCollisionSequence)
-    skillCollisionSequence1:InitializeSkillCollisionData({
+    local fireBallSkillCollisionSequence1 = Utility:DeepCopy(SkillCollisionSequence)
+    fireBallSkillCollisionSequence1:InitializeSkillCollisionData({
         [SkillCollisionParameterType.SkillCollisionSize] = Vector3.new(1, 1, 1),
         [SkillCollisionParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
         [SkillCollisionParameterType.SkillCollisionEffect] = "FireballEffect",
@@ -228,8 +228,8 @@ function SkillImpl:RegisterBaseAttack(SkillTemplate) -- 파이어볼
         --[SkillCollisionParameterType.SkillCollisionOnDestroySound] = "Disappear_ThunderSound",
     })
     
-    local skillCollisionSequence2 = Utility:DeepCopy(SkillCollisionSequence)
-    skillCollisionSequence2:InitializeSkillCollisionData({
+    local fireBallSkillCollisionSequence2 = Utility:DeepCopy(SkillCollisionSequence)
+    fireBallSkillCollisionSequence2:InitializeSkillCollisionData({
         [SkillCollisionParameterType.SkillCollisionSize] = Vector3.new(1, 1, 1),
         [SkillCollisionParameterType.SkillCollisionOffset] = Vector3.new(5, 7, 0), -- look, right, up
         [SkillCollisionParameterType.SkillCollisionEffect] = "FireballEffect",
@@ -241,8 +241,8 @@ function SkillImpl:RegisterBaseAttack(SkillTemplate) -- 파이어볼
         --[SkillCollisionParameterType.SkillCollisionOnDestroySound] = "Disappear_ThunderSound",
     })
 
-    local skillCollisionSequence3 = Utility:DeepCopy(SkillCollisionSequence)
-    skillCollisionSequence3:InitializeSkillCollisionData({
+    local fireBallSkillCollisionSequence3 = Utility:DeepCopy(SkillCollisionSequence)
+    fireBallSkillCollisionSequence3:InitializeSkillCollisionData({
         [SkillCollisionParameterType.SkillCollisionSize] = Vector3.new(1, 1, 1),
         [SkillCollisionParameterType.SkillCollisionOffset] = Vector3.new(5, -7, 0), -- look, right, up
         [SkillCollisionParameterType.SkillCollisionEffect] = "FireballEffect",
@@ -254,22 +254,67 @@ function SkillImpl:RegisterBaseAttack(SkillTemplate) -- 파이어볼
         --[SkillCollisionParameterType.SkillCollisionOnDestroySound] = "Disappear_ThunderSound",
     })
 
-    skillCollisionSequence1:AddSkillCollisionSequenceTrack(fireBallCollisionTrack1)
-    skillCollisionSequence1:AddSkillCollisionSequenceTrack(fireBallCollisionTrack2)
-    skillCollisionSequence1:AddSkillCollisionSequenceTrack(fireBallCollisionTrack3)
+    fireBallSkillCollisionSequence1:AddSkillCollisionSequenceTrack(fireBallCollisionTrack1)
+    fireBallSkillCollisionSequence1:AddSkillCollisionSequenceTrack(fireBallCollisionTrack2)
+    fireBallSkillCollisionSequence1:AddSkillCollisionSequenceTrack(fireBallCollisionTrack3)
     
-    skillCollisionSequence2:AddSkillCollisionSequenceTrack(fireBallCollisionTrack1)
-    skillCollisionSequence2:AddSkillCollisionSequenceTrack(fireBallCollisionTrack2)
-    skillCollisionSequence2:AddSkillCollisionSequenceTrack(fireBallCollisionTrack3)
+    fireBallSkillCollisionSequence2:AddSkillCollisionSequenceTrack(fireBallCollisionTrack1)
+    fireBallSkillCollisionSequence2:AddSkillCollisionSequenceTrack(fireBallCollisionTrack2)
+    fireBallSkillCollisionSequence2:AddSkillCollisionSequenceTrack(fireBallCollisionTrack3)
 
-    skillCollisionSequence3:AddSkillCollisionSequenceTrack(fireBallCollisionTrack1)
-    skillCollisionSequence3:AddSkillCollisionSequenceTrack(fireBallCollisionTrack2)
-    skillCollisionSequence3:AddSkillCollisionSequenceTrack(fireBallCollisionTrack3)
+    fireBallSkillCollisionSequence3:AddSkillCollisionSequenceTrack(fireBallCollisionTrack1)
+    fireBallSkillCollisionSequence3:AddSkillCollisionSequenceTrack(fireBallCollisionTrack2)
+    fireBallSkillCollisionSequence3:AddSkillCollisionSequenceTrack(fireBallCollisionTrack3)
 
-    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlash1Index, 0.25, skillCollisionSequence1)
-    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlash1Index, 0.5, skillCollisionSequence2)
-    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlash1Index, 0.75, skillCollisionSequence3)
-    --skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlash1Index, 0.6, leftSlash1_skillCollisionSequence1)
+    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.25, fireBallSkillCollisionSequence1)
+    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.5, fireBallSkillCollisionSequence2)
+    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.75, fireBallSkillCollisionSequence3)
+    --skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.6, leftSlash1_skillCollisionSequence1)
+
+    ---------------------------------------------------------------------------------------------------------------------
+
+    local singleMagicCastingIndex = skillSequence:AddSkillSequenceAnimationTrack("MiddleSlash", 2.0)
+
+    local fireArrowCollisionTrack1 = {
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(1, 0, 0), -- look, right, up
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed * 0.01,
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionSize] = Vector3.new(0.1,0.1,10),
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration] = 1,
+	    [SkillCollisionSequenceTrackParameterType.ListenSkillCollisionEvent] = false,
+    }
+    
+    local fireArrowCollisionTrack2 = {
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration] = 1,
+	    [SkillCollisionSequenceTrackParameterType.ListenSkillCollisionEvent] = false,
+    }
+
+    local fireArrowCollisionTrack3 = {
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(1, 0, 0), -- look, right, up
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed * 1,
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration] = 2,
+	    [SkillCollisionSequenceTrackParameterType.ListenSkillCollisionEvent] = true,
+    }
+
+    local fireArrowSkillCollisionSequence1 = Utility:DeepCopy(SkillCollisionSequence)
+    fireArrowSkillCollisionSequence1:InitializeSkillCollisionData({
+        [SkillCollisionParameterType.SkillCollisionSize] = Vector3.new(1, 1, 1),
+        [SkillCollisionParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
+        [SkillCollisionParameterType.SkillCollisionEffect] = "FireballEffect",
+        [SkillCollisionParameterType.SkillCollisionOnDestroyEffect] = "HitEffect",
+
+        [SkillCollisionParameterType.SkillCollisionOnCreateSound] = "Fire_FlameSound",
+        [SkillCollisionParameterType.SkillCollisionOnUpdateSound] = "Emit_FlameSound",
+        [SkillCollisionParameterType.SkillCollisionOnHitSound] = "Fire_SomethingSharpSound",
+        --[SkillCollisionParameterType.SkillCollisionOnDestroySound] = "Disappear_ThunderSound",
+    })
+    
+    
+    fireArrowSkillCollisionSequence1:AddSkillCollisionSequenceTrack(fireArrowCollisionTrack1)
+    fireArrowSkillCollisionSequence1:AddSkillCollisionSequenceTrack(fireArrowCollisionTrack2)
+    fireArrowSkillCollisionSequence1:AddSkillCollisionSequenceTrack(fireArrowCollisionTrack3)
+
+    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(singleMagicCastingIndex, 0.1, fireArrowSkillCollisionSequence1)
+    
 
     SkillTemplate:RegisterSkillSequence("BaseAttack", skillSequence)
 

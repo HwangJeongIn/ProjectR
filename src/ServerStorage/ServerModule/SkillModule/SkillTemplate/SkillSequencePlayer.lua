@@ -62,7 +62,7 @@ function SkillSequencePlayer:Simulate(skillCollisionHandler)
             if SkillSequenceAnimationTrackStateType.Ended == currentAnimationTrackStateType then
                 currentAnimationTrackIndex += 1
                 if currentAnimationTrackIndex <= self.SkillSequenceAnimationTrackPlayerCount then
-                    local currentSkillSequenceAnimationTrackPlayer = self:StartSkillSequenceAnimationTrackPlayer(currentAnimationTrackIndex)
+                    currentSkillSequenceAnimationTrackPlayer = self:StartSkillSequenceAnimationTrackPlayer(currentAnimationTrackIndex)
                     if not currentSkillSequenceAnimationTrackPlayer then
                         Debug.Assert(false, "비정상입니다.")
                         return false
