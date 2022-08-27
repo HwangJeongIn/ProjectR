@@ -68,7 +68,7 @@ SkillGameData:Initialize(GameDataType.Skill)
 
 
 
---[[ 메테오			--]] --SkillGameData:InsertData(6, {Name = "Meteor", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 5, AttackRate = 700, Description = "Call a meteor from the sky that deals a large amount of damage upon landing, inflicting <AttackRate>% Damage"})
+--[[ 메테오			--]] --SkillGameData:InsertData(6, {Name = "FlameBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 5, AttackRate = 700, Description = "Call a flame balls and arrow from the sky that deals a large amount of damage upon landing, inflicting <AttackRate>% Damage"})
 
 
 return setmetatable({}, SkillGameData)

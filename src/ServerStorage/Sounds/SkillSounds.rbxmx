@@ -2,21 +2,21 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="Folder" referent="RBX6BB2E04084CE4AC0BA51D57F1267B1FE">
+	<Item class="Folder" referent="RBX0C2474D714194421A0CFD4446DC9F08B">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<string name="Name">SkillSounds</string>
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
-		<Item class="Folder" referent="RBXB63E8AD3AC1948BFAEC084081D8B4370">
+		<Item class="Folder" referent="RBX83C71696ECD04C3E9516D2BA663D7BEB">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">Hit</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="Sound" referent="RBXE4CBDD5B86C04888ACC7CB0293CD9419">
+			<Item class="Sound" referent="RBXCA934CF255024FC79F5E7520363089CE">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -35,7 +35,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXD0EE1CE54261407285841D1A10223F60">
+			<Item class="Sound" referent="RBX816089E76AD548B9A1AA464EC6D12E74">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -54,7 +54,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX86724E48146749C791C70AB8F18ACD06">
+			<Item class="Sound" referent="RBX40B10BC9DDCA4F618BC96AB15DD09BD5">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -73,7 +73,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX9934D329E10E4AAF81A2E807518D1851">
+			<Item class="Sound" referent="RBX2054F1616DB6482AB16E714E62BDD552">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -93,14 +93,14 @@
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Folder" referent="RBX655CF442A62D4B8C9B40821ADCB39D27">
+		<Item class="Folder" referent="RBX6286856A92FA404DBC6ADD9D908208E5">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">Fire</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="Sound" referent="RBXBCC7E91673FA441BAEB5D4448ADC8AF0">
+			<Item class="Sound" referent="RBX96E03CF0902643D482261DCFCC74E5E2">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -119,7 +119,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXC9FD29A8C8004BFA9F3E5E0A7AF1BC75">
+			<Item class="Sound" referent="RBX259BA698C67D42418D43D09D2D8D8AD1">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -138,7 +138,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX5BB35301F821430E8165855698E61311">
+			<Item class="Sound" referent="RBX8C878A0340A340B0B9A8C57E30FBFDE4">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -157,7 +157,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXF59DE1A943B84BA5A9328FCDD1A28851">
+			<Item class="Sound" referent="RBX63C53D951E7E4D329CF83BE25B20687E">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -176,7 +176,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXC4F26345406C4A11863BE15C2CC0C827">
+			<Item class="Sound" referent="RBX0B20C8EB0F0B4B76BB788816CBB28CDB">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -195,7 +195,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXBB08699041104FEAAE95F1F9783EB0E8">
+			<Item class="Sound" referent="RBXCD53AAF0619543CCBA28969EA53856FA">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -214,7 +214,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXAAA7C91772384104B3FF61C9C00C8E61">
+			<Item class="Sound" referent="RBX0E1C3874E0CC4275BFB6B25080DC274E">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -233,7 +233,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX356773F536364D039CA87C4DBD1CA8F0">
+			<Item class="Sound" referent="RBX6193221F217043B893D378CC8CDABDBC">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -252,7 +252,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXEA4838CD86134485A9BAA419CAFAA1B1">
+			<Item class="Sound" referent="RBXB663D08718254343BDA041161D185088">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -271,7 +271,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXAA997DC025D44D2E89B3C1B5AC4177D2">
+			<Item class="Sound" referent="RBXDEDE5C7766F246188E7B68C7B1DA4340">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -290,7 +290,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX412EB0EF8E764DD0A36E40497AD25A83">
+			<Item class="Sound" referent="RBX004D0FE6C62940E381D9924C4D990E39">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -309,7 +309,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX935FF4103D6D442BB5223B6DF82243C1">
+			<Item class="Sound" referent="RBXDD2FFDA9E8CB423F9F8551B3F0E69048">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -329,14 +329,14 @@
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Folder" referent="RBX611CFA93396640AFAD923BFC622CD694">
+		<Item class="Folder" referent="RBXCC88B89CE76D4C6F92ADEA3B97D473E9">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">SpecialSound</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="Sound" referent="RBX2F537F47F0AF460BB256FCEDAB4064EB">
+			<Item class="Sound" referent="RBXD5B37D2DE3F147BB88831AF560377D8E">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -355,7 +355,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX1028EA0062734563B9B22E19A82AB4E3">
+			<Item class="Sound" referent="RBX6CD48819D6CB4DE1BDD684F5A69324E6">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -374,7 +374,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX9BF2B20C426D4AD4A1072D17E7125141">
+			<Item class="Sound" referent="RBXED6C8E086A8243F69F4E5CACB68BF2A7">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -393,7 +393,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBXAB5C756252F449EFAF6F8377B85520A4">
+			<Item class="Sound" referent="RBXDF506123CDF5424C83A6D3E021E8CE19">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -413,7 +413,7 @@
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Sound" referent="RBX9589506B14444439B71860BFB374FEEF">
+		<Item class="Sound" referent="RBX8F10F1CF8D9A488D82B33E7AD6111757">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<float name="EmitterSize">10</float>
@@ -432,7 +432,7 @@
 				<float name="xmlRead_MaxDistance_3">10000</float>
 			</Properties>
 		</Item>
-		<Item class="Sound" referent="RBXA6AA8E53A1C8491EABDD8113BC895CED">
+		<Item class="Sound" referent="RBXDE8FC869F52A455988BA6D98A966D0FF">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<float name="EmitterSize">10</float>
@@ -451,14 +451,14 @@
 				<float name="xmlRead_MaxDistance_3">10000</float>
 			</Properties>
 		</Item>
-		<Item class="Folder" referent="RBXBDDD85119BD4437F89E6433FA519C2B1">
+		<Item class="Folder" referent="RBX2F56C5D05C794D66A7D05FDAC2D232A1">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">Emit</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="Sound" referent="RBX32405444DB934ED482F6B82935AEF8D5">
+			<Item class="Sound" referent="RBX4AE37AACC4624FB68B856A8A1CE0F19E">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -477,7 +477,7 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
-			<Item class="Sound" referent="RBX69460338B4D34DBE8F6189EC81E09E4C">
+			<Item class="Sound" referent="RBX135343E26A784A42BEA65BC2547A5340">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
@@ -496,15 +496,34 @@
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
+			<Item class="Sound" referent="RBX8213CFEA7D6949D99CE9AE905F0B2DF8">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="EmitterSize">10</float>
+					<bool name="Looped">true</bool>
+					<string name="Name">Emit_AirSound</string>
+					<bool name="PlayOnRemove">false</bool>
+					<float name="PlaybackSpeed">3</float>
+					<bool name="Playing">false</bool>
+					<token name="RollOffMode">0</token>
+					<Ref name="SoundGroup">null</Ref>
+					<Content name="SoundId"><url>rbxassetid://9125356690</url></Content>
+					<int64 name="SourceAssetId">9125356690</int64>
+					<BinaryString name="Tags"></BinaryString>
+					<double name="TimePosition">0</double>
+					<float name="Volume">0.5</float>
+					<float name="xmlRead_MaxDistance_3">10000</float>
+				</Properties>
+			</Item>
 		</Item>
-		<Item class="Folder" referent="RBXA9427B9123B54A5182A345402DD242B3">
+		<Item class="Folder" referent="RBX80E5A85EA5C246FD8EAC98C5EAE813A6">
 			<Properties>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<string name="Name">Disappear</string>
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="Sound" referent="RBX801926E1B7834594B9ED5828B291653F">
+			<Item class="Sound" referent="RBXC9AA6399A2554147BEA578D3F43D96DD">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<float name="EmitterSize">10</float>
