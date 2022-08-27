@@ -25924,6 +25924,1321 @@ AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAA=]]></BinaryString>
 					</Properties>
 				</Item>
 			</Item>
+			<Item class="KeyframeSequence" referent="RBX16C5830E7AF14C83A9AD705605BBBCC7">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<float name="AuthoredHipHeight">2</float>
+					<bool name="Loop">true</bool>
+					<string name="Name">SingleMagicCasting</string>
+					<token name="Priority">1000</token>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags">MTY1OTQ1ODA4MQ==</BinaryString>
+				</Properties>
+				<Item class="Keyframe" referent="RBX920046557EAF4E7EB34A60CD1E391581">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Keyframe</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<float name="Time">0</float>
+					</Properties>
+					<Item class="Pose" referent="RBX8BD718E14F224C7AA3E791EFF3CB5825">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<CoordinateFrame name="CFrame">
+								<X>0</X>
+								<Y>0</Y>
+								<Z>0</Z>
+								<R00>1</R00>
+								<R01>0</R01>
+								<R02>0</R02>
+								<R10>0</R10>
+								<R11>1</R11>
+								<R12>0</R12>
+								<R20>0</R20>
+								<R21>0</R21>
+								<R22>1</R22>
+							</CoordinateFrame>
+							<token name="EasingDirection">0</token>
+							<token name="EasingStyle">0</token>
+							<string name="Name">HumanoidRootPart</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<float name="Weight">0</float>
+						</Properties>
+						<Item class="Pose" referent="RBX5CA483AF71C1479C9BCEC56B1BBFCB08">
+							<Properties>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<CoordinateFrame name="CFrame">
+									<X>-0.0383148193</X>
+									<Y>1.77970695</Y>
+									<Z>0.0217437744</Z>
+									<R00>0.374606639</R00>
+									<R01>0</R01>
+									<R02>-0.927183867</R02>
+									<R10>0</R10>
+									<R11>1</R11>
+									<R12>0</R12>
+									<R20>0.927183867</R20>
+									<R21>0</R21>
+									<R22>0.374606639</R22>
+								</CoordinateFrame>
+								<token name="EasingDirection">0</token>
+								<token name="EasingStyle">0</token>
+								<string name="Name">LowerTorso</string>
+								<int64 name="SourceAssetId">-1</int64>
+								<BinaryString name="Tags"></BinaryString>
+								<float name="Weight">1</float>
+							</Properties>
+							<Item class="Pose" referent="RBXF3175F12CA0E458095329C2EAA289F38">
+								<Properties>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<CoordinateFrame name="CFrame">
+										<X>1.14440918e-05</X>
+										<Y>0.0186252594</Y>
+										<Z>0.00016784668</Z>
+										<R00>0.99984771</R00>
+										<R01>0</R01>
+										<R02>0.0174549818</R02>
+										<R10>0</R10>
+										<R11>1</R11>
+										<R12>0</R12>
+										<R20>-0.0174549818</R20>
+										<R21>0</R21>
+										<R22>0.99984771</R22>
+									</CoordinateFrame>
+									<token name="EasingDirection">0</token>
+									<token name="EasingStyle">0</token>
+									<string name="Name">UpperTorso</string>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<float name="Weight">1</float>
+								</Properties>
+								<Item class="Pose" referent="RBX9B62946661B04BD3A1319F53F994832A">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.0756568909</X>
+											<Y>-0.771770477</Y>
+											<Z>0.0170593262</Z>
+											<R00>0.0523280427</R00>
+											<R01>0.998477459</R01>
+											<R02>0.0174550116</R02>
+											<R10>-0.99862951</R10>
+											<R11>0.0523360148</R11>
+											<R12>-6.79865479e-08</R12>
+											<R20>-0.000913592055</R20>
+											<R21>-0.0174310207</R21>
+											<R22>0.999847591</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">LeftUpperArm</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBXCE064C3FE0E24E27A9F2F2E21379185D">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>0.00312042236</X>
+												<Y>-0.0344200134</Y>
+												<Z>-0.0103759766</Z>
+												<R00>0.999870718</R00>
+												<R01>0.00297609344</R01>
+												<R02>0.0158019252</R02>
+												<R10>-0.00158819929</R10>
+												<R11>0.996196091</R11>
+												<R12>-0.0871264935</R12>
+												<R20>-0.0160011016</R20>
+												<R21>0.0870901644</R21>
+												<R22>0.996071815</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">LeftLowerArm</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+										<Item class="Pose" referent="RBXFFC54DF2DB854A308D540DEF63D55108">
+											<Properties>
+												<BinaryString name="AttributesSerialize"></BinaryString>
+												<CoordinateFrame name="CFrame">
+													<X>-0.0069694519</X>
+													<Y>0.00178527832</Y>
+													<Z>0.0158233643</Z>
+													<R00>0.99969542</R00>
+													<R01>0.017449474</R01>
+													<R02>0.0174531154</R02>
+													<R10>-0.0174414534</R10>
+													<R11>0.999847829</R11>
+													<R12>-0.000610798597</R12>
+													<R20>-0.0174611099</R20>
+													<R21>0.000306248665</R21>
+													<R22>0.999847472</R22>
+												</CoordinateFrame>
+												<token name="EasingDirection">0</token>
+												<token name="EasingStyle">0</token>
+												<string name="Name">LeftHand</string>
+												<int64 name="SourceAssetId">-1</int64>
+												<BinaryString name="Tags"></BinaryString>
+												<float name="Weight">1</float>
+											</Properties>
+										</Item>
+									</Item>
+								</Item>
+								<Item class="Pose" referent="RBX06FD572FE7AB429886836525E407D87B">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.000213623047</X>
+											<Y>-0.0168914795</Y>
+											<Z>-0.00177001953</Z>
+											<R00>0.484807342</R00>
+											<R01>0</R01>
+											<R02>0.874621034</R02>
+											<R10>0</R10>
+											<R11>1</R11>
+											<R12>0</R12>
+											<R20>-0.874621034</R20>
+											<R21>0</R21>
+											<R22>0.484807342</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">Head</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+								</Item>
+								<Item class="Pose" referent="RBX1D719477EBAF4855A1525751E625C639">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.000339508057</X>
+											<Y>-0.0168914795</Y>
+											<Z>-0.0192108154</Z>
+											<R00>0.999847651</R00>
+											<R01>-0.00333055109</R01>
+											<R02>0.0171342492</R02>
+											<R10>-5.70435077e-09</R10>
+											<R11>0.981627285</R11>
+											<R12>0.190808624</R12>
+											<R20>-0.0174550116</R20>
+											<R21>-0.190779582</R21>
+											<R22>0.981477737</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">RightUpperArm</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBX89BB8FE86BC441B295EB6B909A4DAE60">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>0.000587463379</X>
+												<Y>0.00225830078</Y>
+												<Z>-0.00212097168</Z>
+												<R00>0.999824047</R00>
+												<R01>0.0096209459</R01>
+												<R02>0.0161028504</R02>
+												<R10>-0.00481122732</R10>
+												<R11>0.961262047</R11>
+												<R12>-0.275594234</R12>
+												<R20>-0.0181306303</R20>
+												<R21>0.27546829</R21>
+												<R22>0.961139202</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">RightLowerArm</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+										<Item class="Pose" referent="RBXDFD842A84FCB47BEA0E2CE043320E1B0">
+											<Properties>
+												<BinaryString name="AttributesSerialize"></BinaryString>
+												<CoordinateFrame name="CFrame">
+													<X>-0.000232696533</X>
+													<Y>-0.0175607204</Y>
+													<Z>-0.0269622803</Z>
+													<R00>0.999847829</R00>
+													<R01>0.00030452013</R01>
+													<R02>0.0174467862</R02>
+													<R10>-8.56816769e-08</R10>
+													<R11>0.999847829</R11>
+													<R12>-0.0174473356</R12>
+													<R20>-0.0174495578</R20>
+													<R21>0.0174447242</R21>
+													<R22>0.999695539</R22>
+												</CoordinateFrame>
+												<token name="EasingDirection">0</token>
+												<token name="EasingStyle">0</token>
+												<string name="Name">RightHand</string>
+												<int64 name="SourceAssetId">-1</int64>
+												<BinaryString name="Tags"></BinaryString>
+												<float name="Weight">1</float>
+											</Properties>
+										</Item>
+									</Item>
+								</Item>
+							</Item>
+							<Item class="Pose" referent="RBX70AC325D36394002A3FBF9DBD953370B">
+								<Properties>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<CoordinateFrame name="CFrame">
+										<X>-4.57763672e-05</X>
+										<Y>0.0186233521</Y>
+										<Z>-0.00860595703</Z>
+										<R00>0.999847651</R00>
+										<R01>0.00653864443</R01>
+										<R02>0.0161837041</R02>
+										<R10>4.65661287e-09</R10>
+										<R11>0.927183568</R11>
+										<R12>-0.374607325</R12>
+										<R20>-0.0174546838</R20>
+										<R21>0.374550283</R21>
+										<R22>0.927042365</R22>
+									</CoordinateFrame>
+									<token name="EasingDirection">0</token>
+									<token name="EasingStyle">0</token>
+									<string name="Name">RightUpperLeg</string>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<float name="Weight">1</float>
+								</Properties>
+								<Item class="Pose" referent="RBXE61A90811F314E0696B5E330B6424FF0">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.000305175781</X>
+											<Y>-0.0163116455</Y>
+											<Z>-0.00399780273</Z>
+											<R00>0.99984771</R00>
+											<R01>-0.00182453543</R01>
+											<R02>0.0173593462</R02>
+											<R10>-1.49011612e-08</R10>
+											<R11>0.994521976</R11>
+											<R12>0.104528308</R12>
+											<R20>-0.0174549818</R20>
+											<R21>-0.104512289</R21>
+											<R22>0.994370461</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">RightLowerLeg</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBX9DF07F8D02E44D1C9FD8C5727AEE331D">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>-0.000396728516</X>
+												<Y>-0.0163421631</Y>
+												<Z>0.0104675293</Z>
+												<R00>0.99984777</R00>
+												<R01>-2.23517418e-08</R01>
+												<R02>0.0174528658</R02>
+												<R10>-0.000304587185</R10>
+												<R11>0.999847651</R11>
+												<R12>0.0174495243</R12>
+												<R20>-0.0174503028</R20>
+												<R21>-0.0174520649</R21>
+												<R22>0.999695539</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">RightFoot</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+									</Item>
+								</Item>
+							</Item>
+							<Item class="Pose" referent="RBXF8A44B8BDECD463594E507DC036315B2">
+								<Properties>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<CoordinateFrame name="CFrame">
+										<X>-0.00141143799</X>
+										<Y>0.0510730743</Y>
+										<Z>-0.0778503418</Z>
+										<R00>0.99984771</R00>
+										<R01>-0.004517667</R01>
+										<R02>0.0168602169</R02>
+										<R10>1.16415322e-09</R10>
+										<R11>0.965925932</R11>
+										<R12>0.258818567</R12>
+										<R20>-0.0174549818</R20>
+										<R21>-0.258779109</R21>
+										<R22>0.965778828</R22>
+									</CoordinateFrame>
+									<token name="EasingDirection">0</token>
+									<token name="EasingStyle">0</token>
+									<string name="Name">LeftUpperLeg</string>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<float name="Weight">1</float>
+								</Properties>
+								<Item class="Pose" referent="RBX00FB52E0F758415B8EA85B903C547AF7">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.000129699707</X>
+											<Y>-0.0158462524</Y>
+											<Z>0.00262451172</Z>
+											<R00>0.999847651</R00>
+											<R01>-0.00846233964</R01>
+											<R02>0.0152665377</R02>
+											<R10>-2.98023224e-08</R10>
+											<R11>0.874619484</R11>
+											<R12>0.484809846</R12>
+											<R20>-0.0174550414</R20>
+											<R21>-0.484735996</R21>
+											<R22>0.874486387</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">LeftLowerLeg</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBX87BB0E992CA1480FBA3A8FAD708C82DD">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>-3.43322754e-05</X>
+												<Y>-0.010269165</Y>
+												<Z>0.0119171143</Z>
+												<R00>0.999847651</R00>
+												<R01>2.98023224e-08</R01>
+												<R02>0.0174567103</R02>
+												<R10>-0.000304669142</R10>
+												<R11>0.999847651</R11>
+												<R12>0.0174511895</R12>
+												<R20>-0.0174540877</R20>
+												<R21>-0.0174539015</R21>
+												<R22>0.999695361</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">LeftFoot</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+									</Item>
+								</Item>
+							</Item>
+						</Item>
+					</Item>
+				</Item>
+				<Item class="Keyframe" referent="RBX76486797C8684F0FB93BA7D25AEF9ACF">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Keyframe</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<float name="Time">0.533333361</float>
+					</Properties>
+					<Item class="Pose" referent="RBX1BECACE0940F46AD86D12D6CED285B9E">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<CoordinateFrame name="CFrame">
+								<X>0</X>
+								<Y>0</Y>
+								<Z>0</Z>
+								<R00>1</R00>
+								<R01>0</R01>
+								<R02>0</R02>
+								<R10>0</R10>
+								<R11>1</R11>
+								<R12>0</R12>
+								<R20>0</R20>
+								<R21>0</R21>
+								<R22>1</R22>
+							</CoordinateFrame>
+							<token name="EasingDirection">0</token>
+							<token name="EasingStyle">0</token>
+							<string name="Name">HumanoidRootPart</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<float name="Weight">0</float>
+						</Properties>
+						<Item class="Pose" referent="RBX70698723651A42B7B4FEAF3BE0E53DDB">
+							<Properties>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<CoordinateFrame name="CFrame">
+									<X>-0.018157959</X>
+									<Y>1.5598526</Y>
+									<Z>0.0103034973</Z>
+									<R00>0.374606639</R00>
+									<R01>0</R01>
+									<R02>-0.927183867</R02>
+									<R10>0</R10>
+									<R11>1</R11>
+									<R12>0</R12>
+									<R20>0.927183867</R20>
+									<R21>0</R21>
+									<R22>0.374606639</R22>
+								</CoordinateFrame>
+								<token name="EasingDirection">0</token>
+								<token name="EasingStyle">0</token>
+								<string name="Name">LowerTorso</string>
+								<int64 name="SourceAssetId">-1</int64>
+								<BinaryString name="Tags"></BinaryString>
+								<float name="Weight">1</float>
+							</Properties>
+							<Item class="Pose" referent="RBX6138289A25EF4B08AC8E446D2785915F">
+								<Properties>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<CoordinateFrame name="CFrame">
+										<X>0.00032043457</X>
+										<Y>0.0395793915</Y>
+										<Z>0.00231933594</Z>
+										<R00>0.99984771</R00>
+										<R01>0</R01>
+										<R02>0.0174549818</R02>
+										<R10>0</R10>
+										<R11>1</R11>
+										<R12>0</R12>
+										<R20>-0.0174549818</R20>
+										<R21>0</R21>
+										<R22>0.99984771</R22>
+									</CoordinateFrame>
+									<token name="EasingDirection">0</token>
+									<token name="EasingStyle">0</token>
+									<string name="Name">UpperTorso</string>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<float name="Weight">1</float>
+								</Properties>
+								<Item class="Pose" referent="RBXB9D813B589BA41BA959086095C9AE5C7">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.0751838684</X>
+											<Y>-0.733699799</Y>
+											<Z>0.0209960938</Z>
+											<R00>0.0523280427</R00>
+											<R01>0.998477459</R01>
+											<R02>0.0174550116</R02>
+											<R10>-0.99862951</R10>
+											<R11>0.0523360148</R11>
+											<R12>-6.79865479e-08</R12>
+											<R20>-0.000913592055</R20>
+											<R21>-0.0174310207</R21>
+											<R22>0.999847591</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">LeftUpperArm</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBXCFDAB4F4D7874D799B68534FF9F6511A">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>0.00479888916</X>
+												<Y>-0.0308647156</Y>
+												<Z>-0.00537109375</Z>
+												<R00>0.999870718</R00>
+												<R01>0.00297608972</R01>
+												<R02>0.0158019196</R02>
+												<R10>-0.00158820301</R10>
+												<R11>0.996196091</R11>
+												<R12>-0.0871264935</R12>
+												<R20>-0.0160010979</R20>
+												<R21>0.0870901644</R21>
+												<R22>0.996071815</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">LeftLowerArm</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+										<Item class="Pose" referent="RBX9EC89612F87A47CBA0E6B125FFA87E70">
+											<Properties>
+												<BinaryString name="AttributesSerialize"></BinaryString>
+												<CoordinateFrame name="CFrame">
+													<X>0.0167961121</X>
+													<Y>0.00645828247</Y>
+													<Z>0.0217437744</Z>
+													<R00>0.99969542</R00>
+													<R01>0.0174494646</R01>
+													<R02>0.0174531117</R02>
+													<R10>-0.0174414571</R10>
+													<R11>0.999847829</R11>
+													<R12>-0.0006108284</R12>
+													<R20>-0.0174611062</R20>
+													<R21>0.000306248665</R21>
+													<R22>0.999847412</R22>
+												</CoordinateFrame>
+												<token name="EasingDirection">0</token>
+												<token name="EasingStyle">0</token>
+												<string name="Name">LeftHand</string>
+												<int64 name="SourceAssetId">-1</int64>
+												<BinaryString name="Tags"></BinaryString>
+												<float name="Weight">1</float>
+											</Properties>
+										</Item>
+									</Item>
+								</Item>
+								<Item class="Pose" referent="RBXF649F8D5232645BF8B0EAC97126870EA">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>0.000255584717</X>
+											<Y>0.0211791992</Y>
+											<Z>0.00218200684</Z>
+											<R00>0.484807342</R00>
+											<R01>0</R01>
+											<R02>0.874621034</R02>
+											<R10>0</R10>
+											<R11>1</R11>
+											<R12>0</R12>
+											<R20>-0.874621034</R20>
+											<R21>0</R21>
+											<R22>0.484807342</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">Head</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+								</Item>
+								<Item class="Pose" referent="RBXD946B8B7DF1244C59969668774D3CFF3">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>0.000133514404</X>
+											<Y>0.0211791992</Y>
+											<Z>-0.0152740479</Z>
+											<R00>0.999847651</R00>
+											<R01>-0.00333055109</R01>
+											<R02>0.0171342492</R02>
+											<R10>-5.70435077e-09</R10>
+											<R11>0.981627285</R11>
+											<R12>0.190808624</R12>
+											<R20>-0.0174550116</R20>
+											<R21>-0.190779582</R21>
+											<R22>0.981477737</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">RightUpperArm</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBXAD75C0E41C8D4683A16446C3605E17B7">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>0.00120544434</X>
+												<Y>0.0578384399</Y>
+												<Z>0.0147857666</Z>
+												<R00>0.999824047</R00>
+												<R01>0.0096209459</R01>
+												<R02>0.0161028504</R02>
+												<R10>-0.00481122732</R10>
+												<R11>0.961262047</R11>
+												<R12>-0.275594234</R12>
+												<R20>-0.0181306303</R20>
+												<R21>0.27546829</R21>
+												<R22>0.961139202</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">RightLowerArm</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+										<Item class="Pose" referent="RBX6AEEB6BAC3F247AFBCAD3E0A89B82E5D">
+											<Properties>
+												<BinaryString name="AttributesSerialize"></BinaryString>
+												<CoordinateFrame name="CFrame">
+													<X>-0.00020980835</X>
+													<Y>0.00339102745</Y>
+													<Z>-0.0266876221</Z>
+													<R00>0.99984777</R00>
+													<R01>0.00030452013</R01>
+													<R02>0.0174468458</R02>
+													<R10>-8.94069672e-08</R10>
+													<R11>0.999847889</R11>
+													<R12>-0.017447371</R12>
+													<R20>-0.0174496174</R20>
+													<R21>0.0174447596</R21>
+													<R22>0.999695539</R22>
+												</CoordinateFrame>
+												<token name="EasingDirection">0</token>
+												<token name="EasingStyle">0</token>
+												<string name="Name">RightHand</string>
+												<int64 name="SourceAssetId">-1</int64>
+												<BinaryString name="Tags"></BinaryString>
+												<float name="Weight">1</float>
+											</Properties>
+										</Item>
+									</Item>
+								</Item>
+							</Item>
+							<Item class="Pose" referent="RBXEC0BD82FCFED42D186FAB95A3A3B4F3B">
+								<Properties>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<CoordinateFrame name="CFrame">
+										<X>0.00025177002</X>
+										<Y>0.0395774841</Y>
+										<Z>-0.00643920898</Z>
+										<R00>0.999847651</R00>
+										<R01>0.00653864443</R01>
+										<R02>0.0161837041</R02>
+										<R10>4.65661287e-09</R10>
+										<R11>0.927183568</R11>
+										<R12>-0.374607325</R12>
+										<R20>-0.0174546838</R20>
+										<R21>0.374550283</R21>
+										<R22>0.927042365</R22>
+									</CoordinateFrame>
+									<token name="EasingDirection">0</token>
+									<token name="EasingStyle">0</token>
+									<string name="Name">RightUpperLeg</string>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<float name="Weight">1</float>
+								</Properties>
+								<Item class="Pose" referent="RBX2F42A60E8DFE440AB39B525F2362EA6F">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>0.000175476074</X>
+											<Y>0.0204658508</Y>
+											<Z>-0.0146026611</Z>
+											<R00>0.99984771</R00>
+											<R01>-0.00182453543</R01>
+											<R02>0.0173593462</R02>
+											<R10>-1.49011612e-08</R10>
+											<R11>0.994521976</R11>
+											<R12>0.104528308</R12>
+											<R20>-0.0174549818</R20>
+											<R21>-0.104512289</R21>
+											<R22>0.994370461</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">RightLowerLeg</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBXE593B419B4C2457A982C77B45824E291">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>0.000598907471</X>
+												<Y>0.0408477783</Y>
+												<Z>0.000305175781</Z>
+												<R00>0.99984777</R00>
+												<R01>-2.23517418e-08</R01>
+												<R02>0.0174528658</R02>
+												<R10>-0.000304587185</R10>
+												<R11>0.999847651</R11>
+												<R12>0.0174495243</R12>
+												<R20>-0.0174503028</R20>
+												<R21>-0.0174520649</R21>
+												<R22>0.999695539</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">RightFoot</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+									</Item>
+								</Item>
+							</Item>
+							<Item class="Pose" referent="RBXF9F7121EA3024ACDA82C0CF3497CD4C9">
+								<Properties>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<CoordinateFrame name="CFrame">
+										<X>-0.0011138916</X>
+										<Y>0.0720272064</Y>
+										<Z>-0.0756530762</Z>
+										<R00>0.99984771</R00>
+										<R01>-0.004517667</R01>
+										<R02>0.0168602169</R02>
+										<R10>1.16415322e-09</R10>
+										<R11>0.965925932</R11>
+										<R12>0.258818567</R12>
+										<R20>-0.0174549818</R20>
+										<R21>-0.258779109</R21>
+										<R22>0.965778828</R22>
+									</CoordinateFrame>
+									<token name="EasingDirection">0</token>
+									<token name="EasingStyle">0</token>
+									<string name="Name">LeftUpperLeg</string>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<float name="Weight">1</float>
+								</Properties>
+								<Item class="Pose" referent="RBX9444199B412A413EB6E1546E3536080E">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>0.000339508057</X>
+											<Y>0.0199050903</Y>
+											<Z>0.0163421631</Z>
+											<R00>0.999847651</R00>
+											<R01>-0.00846233964</R01>
+											<R02>0.0152665377</R02>
+											<R10>-2.98023224e-08</R10>
+											<R11>0.874619484</R11>
+											<R12>0.484809846</R12>
+											<R20>-0.0174550414</R20>
+											<R21>-0.484735996</R21>
+											<R22>0.874486387</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">LeftLowerLeg</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBXD386CFA54A154C1B8129829B3426DEB7">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>0.000312805176</X>
+												<Y>0.0270843506</Y>
+												<Z>0.0563964844</Z>
+												<R00>0.999847651</R00>
+												<R01>2.98023224e-08</R01>
+												<R02>0.0174567103</R02>
+												<R10>-0.000304669142</R10>
+												<R11>0.999847651</R11>
+												<R12>0.0174511895</R12>
+												<R20>-0.0174540877</R20>
+												<R21>-0.0174539015</R21>
+												<R22>0.999695361</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">LeftFoot</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+									</Item>
+								</Item>
+							</Item>
+						</Item>
+					</Item>
+				</Item>
+				<Item class="Keyframe" referent="RBX9FE6F02108A34F0A95D6218CD5BB7C30">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">Keyframe</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<float name="Time">1</float>
+					</Properties>
+					<Item class="Pose" referent="RBXA062677F4487429493CB26DD84989E5F">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<CoordinateFrame name="CFrame">
+								<X>0</X>
+								<Y>0</Y>
+								<Z>0</Z>
+								<R00>1</R00>
+								<R01>0</R01>
+								<R02>0</R02>
+								<R10>0</R10>
+								<R11>1</R11>
+								<R12>0</R12>
+								<R20>0</R20>
+								<R21>0</R21>
+								<R22>1</R22>
+							</CoordinateFrame>
+							<token name="EasingDirection">0</token>
+							<token name="EasingStyle">0</token>
+							<string name="Name">HumanoidRootPart</string>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+							<float name="Weight">0</float>
+						</Properties>
+						<Item class="Pose" referent="RBX90346371791E4A13B2A12E8A0DC0EDB7">
+							<Properties>
+								<BinaryString name="AttributesSerialize"></BinaryString>
+								<CoordinateFrame name="CFrame">
+									<X>-0.0383148193</X>
+									<Y>1.77970695</Y>
+									<Z>0.0217437744</Z>
+									<R00>0.374606639</R00>
+									<R01>0</R01>
+									<R02>-0.927183867</R02>
+									<R10>0</R10>
+									<R11>1</R11>
+									<R12>0</R12>
+									<R20>0.927183867</R20>
+									<R21>0</R21>
+									<R22>0.374606639</R22>
+								</CoordinateFrame>
+								<token name="EasingDirection">0</token>
+								<token name="EasingStyle">0</token>
+								<string name="Name">LowerTorso</string>
+								<int64 name="SourceAssetId">-1</int64>
+								<BinaryString name="Tags"></BinaryString>
+								<float name="Weight">1</float>
+							</Properties>
+							<Item class="Pose" referent="RBXC2C4D5949B484DC0A7FE15C160BAD81A">
+								<Properties>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<CoordinateFrame name="CFrame">
+										<X>1.14440918e-05</X>
+										<Y>0.0186252594</Y>
+										<Z>0.00016784668</Z>
+										<R00>0.99984771</R00>
+										<R01>0</R01>
+										<R02>0.0174549818</R02>
+										<R10>0</R10>
+										<R11>1</R11>
+										<R12>0</R12>
+										<R20>-0.0174549818</R20>
+										<R21>0</R21>
+										<R22>0.99984771</R22>
+									</CoordinateFrame>
+									<token name="EasingDirection">0</token>
+									<token name="EasingStyle">0</token>
+									<string name="Name">UpperTorso</string>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<float name="Weight">1</float>
+								</Properties>
+								<Item class="Pose" referent="RBX002A7224502048B48800854FA6ECDB54">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.0756568909</X>
+											<Y>-0.771770477</Y>
+											<Z>0.0170593262</Z>
+											<R00>0.0523280427</R00>
+											<R01>0.998477459</R01>
+											<R02>0.0174550116</R02>
+											<R10>-0.99862951</R10>
+											<R11>0.0523360148</R11>
+											<R12>-6.79865479e-08</R12>
+											<R20>-0.000913592055</R20>
+											<R21>-0.0174310207</R21>
+											<R22>0.999847591</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">LeftUpperArm</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBX44117292A9314DA7BF37912E464F7073">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>0.00312042236</X>
+												<Y>-0.0344200134</Y>
+												<Z>-0.0103759766</Z>
+												<R00>0.999870718</R00>
+												<R01>0.00297609344</R01>
+												<R02>0.0158019252</R02>
+												<R10>-0.00158819929</R10>
+												<R11>0.996196091</R11>
+												<R12>-0.0871264935</R12>
+												<R20>-0.0160011016</R20>
+												<R21>0.0870901644</R21>
+												<R22>0.996071815</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">LeftLowerArm</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+										<Item class="Pose" referent="RBX4D7C2E73B0594C27A7957B8E603C005C">
+											<Properties>
+												<BinaryString name="AttributesSerialize"></BinaryString>
+												<CoordinateFrame name="CFrame">
+													<X>-0.0069694519</X>
+													<Y>0.00178527832</Y>
+													<Z>0.0158233643</Z>
+													<R00>0.99969542</R00>
+													<R01>0.017449474</R01>
+													<R02>0.0174531154</R02>
+													<R10>-0.0174414534</R10>
+													<R11>0.999847829</R11>
+													<R12>-0.000610798597</R12>
+													<R20>-0.0174611099</R20>
+													<R21>0.000306248665</R21>
+													<R22>0.999847472</R22>
+												</CoordinateFrame>
+												<token name="EasingDirection">0</token>
+												<token name="EasingStyle">0</token>
+												<string name="Name">LeftHand</string>
+												<int64 name="SourceAssetId">-1</int64>
+												<BinaryString name="Tags"></BinaryString>
+												<float name="Weight">1</float>
+											</Properties>
+										</Item>
+									</Item>
+								</Item>
+								<Item class="Pose" referent="RBX5B8279FEE85A4ADEB04482825247A273">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.000213623047</X>
+											<Y>-0.0168914795</Y>
+											<Z>-0.00177001953</Z>
+											<R00>0.484807342</R00>
+											<R01>0</R01>
+											<R02>0.874621034</R02>
+											<R10>0</R10>
+											<R11>1</R11>
+											<R12>0</R12>
+											<R20>-0.874621034</R20>
+											<R21>0</R21>
+											<R22>0.484807342</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">Head</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+								</Item>
+								<Item class="Pose" referent="RBX98A778C27DC84DA7B0C1DC9D5987FF36">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.000339508057</X>
+											<Y>-0.0168914795</Y>
+											<Z>-0.0192108154</Z>
+											<R00>0.999847651</R00>
+											<R01>-0.00333055109</R01>
+											<R02>0.0171342492</R02>
+											<R10>-5.70435077e-09</R10>
+											<R11>0.981627285</R11>
+											<R12>0.190808624</R12>
+											<R20>-0.0174550116</R20>
+											<R21>-0.190779582</R21>
+											<R22>0.981477737</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">RightUpperArm</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBX8030CED2B37747E0A32547198F29FEB6">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>0.000587463379</X>
+												<Y>0.00225830078</Y>
+												<Z>-0.00212097168</Z>
+												<R00>0.999824047</R00>
+												<R01>0.0096209459</R01>
+												<R02>0.0161028504</R02>
+												<R10>-0.00481122732</R10>
+												<R11>0.961262047</R11>
+												<R12>-0.275594234</R12>
+												<R20>-0.0181306303</R20>
+												<R21>0.27546829</R21>
+												<R22>0.961139202</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">RightLowerArm</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+										<Item class="Pose" referent="RBXDA46D581C9A143E2AB4351F3C52CB997">
+											<Properties>
+												<BinaryString name="AttributesSerialize"></BinaryString>
+												<CoordinateFrame name="CFrame">
+													<X>-0.000232696533</X>
+													<Y>-0.0175607204</Y>
+													<Z>-0.0269622803</Z>
+													<R00>0.999847829</R00>
+													<R01>0.00030452013</R01>
+													<R02>0.0174467862</R02>
+													<R10>-8.56816769e-08</R10>
+													<R11>0.999847829</R11>
+													<R12>-0.0174473356</R12>
+													<R20>-0.0174495578</R20>
+													<R21>0.0174447242</R21>
+													<R22>0.999695539</R22>
+												</CoordinateFrame>
+												<token name="EasingDirection">0</token>
+												<token name="EasingStyle">0</token>
+												<string name="Name">RightHand</string>
+												<int64 name="SourceAssetId">-1</int64>
+												<BinaryString name="Tags"></BinaryString>
+												<float name="Weight">1</float>
+											</Properties>
+										</Item>
+									</Item>
+								</Item>
+							</Item>
+							<Item class="Pose" referent="RBXA0D9C0EAC1594F6A98990A4C6F0FBB67">
+								<Properties>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<CoordinateFrame name="CFrame">
+										<X>-4.57763672e-05</X>
+										<Y>0.0186233521</Y>
+										<Z>-0.00860595703</Z>
+										<R00>0.999847651</R00>
+										<R01>0.00653864443</R01>
+										<R02>0.0161837041</R02>
+										<R10>4.65661287e-09</R10>
+										<R11>0.927183568</R11>
+										<R12>-0.374607325</R12>
+										<R20>-0.0174546838</R20>
+										<R21>0.374550283</R21>
+										<R22>0.927042365</R22>
+									</CoordinateFrame>
+									<token name="EasingDirection">0</token>
+									<token name="EasingStyle">0</token>
+									<string name="Name">RightUpperLeg</string>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<float name="Weight">1</float>
+								</Properties>
+								<Item class="Pose" referent="RBXDA3AA29EBE56467189BD93076951B1CD">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.000305175781</X>
+											<Y>-0.0163116455</Y>
+											<Z>-0.00399780273</Z>
+											<R00>0.99984771</R00>
+											<R01>-0.00182453543</R01>
+											<R02>0.0173593462</R02>
+											<R10>-1.49011612e-08</R10>
+											<R11>0.994521976</R11>
+											<R12>0.104528308</R12>
+											<R20>-0.0174549818</R20>
+											<R21>-0.104512289</R21>
+											<R22>0.994370461</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">RightLowerLeg</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBXB0808DD2ADC143EEB090F4A33224CB83">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>-0.000396728516</X>
+												<Y>-0.0163421631</Y>
+												<Z>0.0104675293</Z>
+												<R00>0.99984777</R00>
+												<R01>-2.23517418e-08</R01>
+												<R02>0.0174528658</R02>
+												<R10>-0.000304587185</R10>
+												<R11>0.999847651</R11>
+												<R12>0.0174495243</R12>
+												<R20>-0.0174503028</R20>
+												<R21>-0.0174520649</R21>
+												<R22>0.999695539</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">RightFoot</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+									</Item>
+								</Item>
+							</Item>
+							<Item class="Pose" referent="RBX6DA389B79C30459A9CDDC5BC665BB650">
+								<Properties>
+									<BinaryString name="AttributesSerialize"></BinaryString>
+									<CoordinateFrame name="CFrame">
+										<X>-0.00141143799</X>
+										<Y>0.0510730743</Y>
+										<Z>-0.0778503418</Z>
+										<R00>0.99984771</R00>
+										<R01>-0.004517667</R01>
+										<R02>0.0168602169</R02>
+										<R10>1.16415322e-09</R10>
+										<R11>0.965925932</R11>
+										<R12>0.258818567</R12>
+										<R20>-0.0174549818</R20>
+										<R21>-0.258779109</R21>
+										<R22>0.965778828</R22>
+									</CoordinateFrame>
+									<token name="EasingDirection">0</token>
+									<token name="EasingStyle">0</token>
+									<string name="Name">LeftUpperLeg</string>
+									<int64 name="SourceAssetId">-1</int64>
+									<BinaryString name="Tags"></BinaryString>
+									<float name="Weight">1</float>
+								</Properties>
+								<Item class="Pose" referent="RBX5328185680A84174B8482C7B299F937C">
+									<Properties>
+										<BinaryString name="AttributesSerialize"></BinaryString>
+										<CoordinateFrame name="CFrame">
+											<X>-0.000129699707</X>
+											<Y>-0.0158462524</Y>
+											<Z>0.00262451172</Z>
+											<R00>0.999847651</R00>
+											<R01>-0.00846233964</R01>
+											<R02>0.0152665377</R02>
+											<R10>-2.98023224e-08</R10>
+											<R11>0.874619484</R11>
+											<R12>0.484809846</R12>
+											<R20>-0.0174550414</R20>
+											<R21>-0.484735996</R21>
+											<R22>0.874486387</R22>
+										</CoordinateFrame>
+										<token name="EasingDirection">0</token>
+										<token name="EasingStyle">0</token>
+										<string name="Name">LeftLowerLeg</string>
+										<int64 name="SourceAssetId">-1</int64>
+										<BinaryString name="Tags"></BinaryString>
+										<float name="Weight">1</float>
+									</Properties>
+									<Item class="Pose" referent="RBX211752F41A22438FA755F636796DFABD">
+										<Properties>
+											<BinaryString name="AttributesSerialize"></BinaryString>
+											<CoordinateFrame name="CFrame">
+												<X>-3.43322754e-05</X>
+												<Y>-0.010269165</Y>
+												<Z>0.0119171143</Z>
+												<R00>0.999847651</R00>
+												<R01>2.98023224e-08</R01>
+												<R02>0.0174567103</R02>
+												<R10>-0.000304669142</R10>
+												<R11>0.999847651</R11>
+												<R12>0.0174511895</R12>
+												<R20>-0.0174540877</R20>
+												<R21>-0.0174539015</R21>
+												<R22>0.999695361</R22>
+											</CoordinateFrame>
+											<token name="EasingDirection">0</token>
+											<token name="EasingStyle">0</token>
+											<string name="Name">LeftFoot</string>
+											<int64 name="SourceAssetId">-1</int64>
+											<BinaryString name="Tags"></BinaryString>
+											<float name="Weight">1</float>
+										</Properties>
+									</Item>
+								</Item>
+							</Item>
+						</Item>
+					</Item>
+				</Item>
+				<Item class="AnimationRigData" referent="RBX18B6D7E041B14E63BF5FA667452FAAFB">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<string name="Name">DummyAnimationRigData</string>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+						<BinaryString name="articulatedJoint">AQAAAAAAAAA=</BinaryString>
+						<BinaryString name="endEffectorRotationConstraint">AQAAAAAAAAA=</BinaryString>
+						<BinaryString name="endEffectorTranslationConstraint">AQAAAAAAAAA=</BinaryString>
+						<BinaryString name="facsControl">AQAAAAAAAAA=</BinaryString>
+						<BinaryString name="label"><![CDATA[AQAAABUAAAAAAAAAAgAAAAMAAAAEAAAABQAAAAYAAAAHAAAACAAAAAkAAAAKAAAACwAAABQA
+AAAVAAAADAAAAA0AAAAOAAAADwAAABAAAAARAAAAEgAAABMAAAA=]]></BinaryString>
+						<BinaryString name="name"><![CDATA[AQAAABUAAAAAAAAABQAAAAQAAAAFAAAABgAAAAUAAAAEAAAABQAAAAYAAAAFAAAABQAAAAQA
+AAAEAAAACQAAAAYAAAAGAAAABQAAAAkAAAAGAAAABgAAAAUAAAB0b3Jzb2xoaXBsa25lZWxh
+bmtsZWxzb2xlcmhpcHJrbmVlcmFua2xlcnNvbGV3YWlzdG5lY2toZWFkbHNob3VsZGVybGVs
+Ym93bHdyaXN0bHBhbG1yc2hvdWxkZXJyZWxib3dyd3Jpc3RycGFsbQ==]]></BinaryString>
+						<BinaryString name="parent">AQAAABUAAAAAAAEAAgADAAQABQACAAcACAAJAAIACwAMAAsADgAPABAACwASABMAFAA=</BinaryString>
+						<BinaryString name="postTransform"><![CDATA[AQAAABUAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAA
+AAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAA0h8VMPgAAAAAAAIA/
+AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAICzxHDXvgAAMDQAAIA/AAAAAAAA
+AAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAACztg7Cvga5LDQAAIA/AAAAAAAAAAAAAAAA
+AACAPwAAAAAAAAAAAAAAAAAAgD8AAEA0wsXQvQIp5zUAAIA/AAAAAAAAAAAAAAAAAACAPwAA
+AAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAA
+AAAAAAAAgD8AAAAAxnDXvm7xizgAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAA
+gD8AAAAAIiPCvvRb1rcAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA
+sMXQvZlSoLgAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAA
+AAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAIAz3ctMPwAAALQAAIA/
+AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAgAAPwC8jjkAAIA/AAAAAAAA
+AAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAA
+AACAPwAAAAAAAAAAAAAAAAAAgD8GAAC/MOXJvgAAwLMAAIA/AAAAAAAAAAAAAAAAAACAPwAA
+AAAAAAAAAAAAAAAAgD8A8Pq5yHKEvu2AtJ8AAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAA
+AAAAAAAAgD8AIPu55wsAvgAAgLMAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAA
+gD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8MAAA/
+MOXJvgAAwLMAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAC0iGSEvu2A
+tJ8AAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAMC05wsAvgAAgLMAAIA/
+AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAA=]]></BinaryString>
+						<BinaryString name="preTransform"><![CDATA[AQAAABUAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAQBAQAAA
+AAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAACAvwAAAAAAAIA/
+AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8CAAC/h8VMvgAAAIAAAIA/AAAAAAAA
+AAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAMAzTF3NvoNc5rQAAIA/AAAAAAAAAAAAAAAA
+AACAPwAAAAAAAAAAAAAAAAAAgD8AAAC0fxIMv4GUFLYAAIA/AAAAAAAAAAAAAAAAAACAPwAA
+AAAAAAAAAAAAAAAAgD8AAAAAoZkZvgAAgL4AAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAA
+AAAAAAAAgD/8//8+h8VMvrploLcAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAA
+gD8AAACA3EjNvgyEt7cAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAACA
+fhIMv5nynzgAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAoJkZvgAA
+gL4AAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAC0VdNMPu2AtB8AAIA/
+AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAICz7M1MPwAAADQAAIA/AAAAAAAA
+AAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAPwAAAAAAAIA/AAAAAAAAAAAAAAAA
+AACAPwAAAAAAAAAAAAAAAAAAgD8AAIC/5CEQPwAAADQAAIA/AAAAAAAAAAAAAAAAAACAPwAA
+AAAAAAAAAAAAAAAAgD8AQPs5cAmrvgAAwDMAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAA
+AAAAAAAAgD8A8Po53TwAv+2AtB8AAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAA
+gD91oha6Vp0Zvg6PmbMAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD///38/
+5CEQPwAAADQAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AACC1sBervgAA
+wDMAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAA03TwAv/wt/aIAAIA/
+AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8DV+a0n50ZvlePmbM=]]></BinaryString>
+						<BinaryString name="transform"><![CDATA[AQAAABUAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAA
+AAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/
+AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAA
+AAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAA
+AACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAA
+AAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAA
+AAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAA
+gD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAA
+AAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAA
+AAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/
+AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAA
+AAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAABqyRA/aR9TPwAAAABpH1O/
+askQPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAABtH1M/bMkQP+Rkhp9syRC/bR9TP+/3
+w58AAAAA45/tHwAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAA
+AAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAA
+gD8AAAAAAAAAAAAAAADQ3RA/ahFTvwAAAABqEVM/0N0QPwAAAAAAAAAAAAAAAAAAgD8AAAAA
+AAAAAAAAAABoEVM/1N0Qv8OivKLU3RA/aBFTP25rCSMAAIAXZawmowAAgD8AAAAAAAAAAAAA
+AAAAAIA/AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAAAAIA/
+AAAAAAAAAAAAAAAAAACAPwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAAAA=]]></BinaryString>
+						<BinaryString name="weight">AQAAAAAAAAA=</BinaryString>
+					</Properties>
+				</Item>
+			</Item>
 		</Item>
 		<Item class="Folder" referent="RBX6E053A91093E482589E3097620E29810">
 			<Properties>

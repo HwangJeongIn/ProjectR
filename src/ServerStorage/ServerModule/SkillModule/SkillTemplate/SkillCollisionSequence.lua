@@ -13,6 +13,7 @@ local SkillCollisionSequenceTrackParameterTypeConverter = SkillCollisionSequence
 
 
 local SkillEffectTemplate = require(script.Parent:WaitForChild("SkillEffectTemplate"))
+local SkillSoundTemplate = require(script.Parent:WaitForChild("SkillSoundTemplate"))
 local SkillCollisionSequenceTrack = require(script.Parent:WaitForChild("SkillCollisionSequenceTrack"))
 
 local SkillCollisionSequence = {
@@ -38,10 +39,32 @@ function SkillCollisionSequence:ValidateSkillCollisionParameter(skillCollisionPa
         return false
     end
     
-    if not skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnDestroyingEffect] then
-        Debug.Assert(false, "SkillCollisionOnDestroyingEffect 가 없습니다.")
+    if not skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnDestroyEffect] then
+        Debug.Assert(false, "SkillCollisionOnDestroyEffect 가 없습니다.")
         return false
     end
+    
+    --[[
+    if not skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnCreateSound] then
+        Debug.Assert(false, "SkillCollisionOnCreateSound 가 없습니다.")
+        return false
+    end
+    
+    if not skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnUpdateSound] then
+        Debug.Assert(false, "SkillCollisionOnUpdateSound 가 없습니다.")
+        return false
+    end
+    
+    if not skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnHitSound] then
+        Debug.Assert(false, "SkillCollisionOnHitSound 가 없습니다.")
+        return false
+    end
+    
+    if not skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnDestroySound] then
+        Debug.Assert(false, "SkillCollisionOnDestroySound 가 없습니다.")
+        return false
+    end
+    --]]
 
     return true
 end
@@ -52,7 +75,7 @@ function SkillCollisionSequence:InitializeSkillCollisionData(skillCollisionParam
         [SkillCollisionParameterType.SkillCollisionSize] = Vector3.new(2, 2, 2),
         [SkillCollisionParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
         [SkillCollisionParameterType.SkillCollisionEffect] = "SwordSlashEffect",
-        [SkillCollisionParameterType.SkillCollisionOnDestroyingEffect] = "HitEffect"
+        [SkillCollisionParameterType.SkillCollisionOnDestroyEffect] = "HitEffect"
     })
     --]]
 
@@ -61,6 +84,7 @@ function SkillCollisionSequence:InitializeSkillCollisionData(skillCollisionParam
         return false
     end
 
+    -- Effect
     local skillCollisionEffectName = skillCollisionParameter[SkillCollisionParameterType.SkillCollisionEffect]
     local skillCollisionEffect = SkillEffectTemplate:Get(skillCollisionEffectName)
     if not skillCollisionEffect then
@@ -69,13 +93,84 @@ function SkillCollisionSequence:InitializeSkillCollisionData(skillCollisionParam
     end
     skillCollisionParameter[SkillCollisionParameterType.SkillCollisionEffect] = skillCollisionEffect
 
-    local skillCollisionOnDestroyingEffectName = skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnDestroyingEffect]
-    local skillCollisionOnDestroyingEffect = SkillEffectTemplate:Get(skillCollisionOnDestroyingEffectName)
-    if not skillCollisionOnDestroyingEffect then
-        Debug.Assert(false, "해당 이름을 가진 이펙트가 존재하지 않습니다. => " .. skillCollisionOnDestroyingEffect)
+    local skillCollisionOnDestroyEffectName = skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnDestroyEffect]
+    local skillCollisionOnDestroyEffect = SkillEffectTemplate:Get(skillCollisionOnDestroyEffectName)
+    if not skillCollisionOnDestroyEffect then
+        Debug.Assert(false, "해당 이름을 가진 이펙트가 존재하지 않습니다. => " .. skillCollisionOnDestroyEffect)
         return false
     end
-    skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnDestroyingEffect] = skillCollisionOnDestroyingEffect
+    skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnDestroyEffect] = skillCollisionOnDestroyEffect
+
+
+    -- Sound
+
+    -- OnCreate
+    local skillCollisionOnCreateSoundName = skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnCreateSound]
+    if skillCollisionOnCreateSoundName then
+        local skillCollisionOnCreateSound = SkillSoundTemplate:Get(skillCollisionOnCreateSoundName)
+        if not skillCollisionOnCreateSound then
+            Debug.Assert(false, "해당 이름을 가진 사운드가 존재하지 않습니다. => " .. skillCollisionOnCreateSoundName)
+            return false
+        end
+
+        if skillCollisionOnCreateSound.Looped then
+            Debug.Print(false, "OnCreateSound 에 Looped를 사용하면 안됩니다. => " .. skillCollisionOnCreateSound.Name)
+            skillCollisionOnCreateSound.Looped = false
+        end
+
+        skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnCreateSound] = skillCollisionOnCreateSound
+    end
+    
+    -- OnUpdate
+    local skillCollisionOnUpdateSoundName = skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnUpdateSound]
+    if skillCollisionOnUpdateSoundName then
+        local skillCollisionOnUpdateSound = SkillSoundTemplate:Get(skillCollisionOnUpdateSoundName)
+        if not skillCollisionOnUpdateSound then
+            Debug.Assert(false, "해당 이름을 가진 사운드가 존재하지 않습니다. => " .. skillCollisionOnUpdateSoundName)
+            return false
+        end
+
+        if not skillCollisionOnUpdateSound.Looped then
+            Debug.Print("OnUpdateSound 에는 Looped를 사용해야합니다. => " .. skillCollisionOnUpdateSound.Name)
+            skillCollisionOnUpdateSound.Looped = true
+        end
+
+        skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnUpdateSound] = skillCollisionOnUpdateSound
+    end
+
+    -- OnHit
+    local skillCollisionOnHitSoundName = skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnHitSound]
+    if skillCollisionOnHitSoundName then
+        local skillCollisionOnHitSound = SkillSoundTemplate:Get(skillCollisionOnHitSoundName)
+        if not skillCollisionOnHitSound then
+            Debug.Assert(false, "해당 이름을 가진 사운드가 존재하지 않습니다. => " .. skillCollisionOnHitSoundName)
+            return false
+        end
+
+        if skillCollisionOnHitSound.Looped then
+            Debug.Print("OnHitSound 에 Looped를 사용하면 안됩니다. => " .. skillCollisionOnHitSound.Name)
+            skillCollisionOnHitSound.Looped = false
+        end
+
+        skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnHitSound] = skillCollisionOnHitSound
+    end
+
+    -- OnDestroy
+    local skillCollisionOnDestroySoundName = skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnDestroySound]
+    if skillCollisionOnDestroySoundName then
+        local skillCollisionOnDestroySound = SkillSoundTemplate:Get(skillCollisionOnDestroySoundName)
+        if not skillCollisionOnDestroySound then
+            Debug.Assert(false, "해당 이름을 가진 사운드가 존재하지 않습니다. => " .. skillCollisionOnDestroySoundName)
+            return false
+        end
+
+        if skillCollisionOnDestroySound.Looped then
+            Debug.Print("OnDestroySound 에 Looped를 사용하면 안됩니다. => " .. skillCollisionOnDestroySound.Name)
+            skillCollisionOnDestroySound.Looped = false
+        end
+
+        skillCollisionParameter[SkillCollisionParameterType.SkillCollisionOnDestroySound] = skillCollisionOnDestroySound
+    end
 
     self.SkillCollisionData = skillCollisionParameter
     return true

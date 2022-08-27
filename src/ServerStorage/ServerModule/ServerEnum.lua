@@ -32,12 +32,28 @@ local ServerEnum = {
 		Count = 3
 	},
 
+	--[[
+	SkillSoundType = {
+		OnCreate = 1,
+		OnUpdate = 2,
+		OnHit = 3,
+		OnDestroy = 4,
+		Count = 5
+	},
+	--]]
+
 	SkillCollisionParameterType = {
 		SkillCollisionSize = 1,
         SkillCollisionOffset = 2,
 		SkillCollisionEffect = 3,
-		SkillCollisionOnDestroyingEffect = 4,
-		Count = 5
+		SkillCollisionOnDestroyEffect = 4,
+
+		SkillCollisionOnCreateSound = 5,
+		SkillCollisionOnUpdateSound = 6,
+		SkillCollisionOnHitSound = 7,
+		SkillCollisionOnDestroySound = 8,
+		
+		Count = 9
 	},
 
 	SkillCollisionSequenceTrackParameterType = {
@@ -45,7 +61,8 @@ local ServerEnum = {
 		SkillCollisionSpeed = 2,
 		SkillCollisionSize = 3,
 		SkillCollisionSequenceTrackDuration = 4,
-		Count = 5
+		ListenSkillCollisionEvent = 5,
+		Count = 6
 	},
 
 	SkillCollisionSequenceStateType = {
@@ -59,7 +76,6 @@ local ServerEnum = {
 		Ended = 2,
 		Count = 3
 	},
-
 }
 
 -- 필요하면 추가
@@ -81,7 +97,13 @@ ServerEnum.SkillCollisionParameterType.Converter = {
 	[ServerEnum.SkillCollisionParameterType.SkillCollisionSize] = "SkillCollisionSize",
 	[ServerEnum.SkillCollisionParameterType.SkillCollisionOffset] = "SkillCollisionOffset",
 	[ServerEnum.SkillCollisionParameterType.SkillCollisionEffect] = "SkillCollisionEffect",
-	[ServerEnum.SkillCollisionParameterType.SkillCollisionOnDestroyingEffect] = "SkillCollisionOnDestroyingEffect",
+	[ServerEnum.SkillCollisionParameterType.SkillCollisionOnDestroyEffect] = "SkillCollisionOnDestroyEffect",
+
+	
+	[ServerEnum.SkillCollisionParameterType.SkillCollisionOnCreateSound] = "SkillCollisionOnCreateSound",
+	[ServerEnum.SkillCollisionParameterType.SkillCollisionOnUpdateSound] = "SkillCollisionOnUpdateSound",
+	[ServerEnum.SkillCollisionParameterType.SkillCollisionOnHitSound] = "SkillCollisionOnHitSound",
+	[ServerEnum.SkillCollisionParameterType.SkillCollisionOnDestroySound] = "SkillCollisionOnDestroySound",
 }
 Debug.Assert(ServerEnum.SkillCollisionParameterType.Count == #ServerEnum.SkillCollisionParameterType.Converter + 1, "비정상입니다.")
 
@@ -89,7 +111,9 @@ Debug.Assert(ServerEnum.SkillCollisionParameterType.Count == #ServerEnum.SkillCo
 ServerEnum.SkillCollisionSequenceTrackParameterType.Converter = {
 	[ServerEnum.SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = "SkillCollisionDirection",
 	[ServerEnum.SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed] = "SkillCollisionSpeed",
-	[ServerEnum.SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration] = "SkillCollisionSequenceTrackDuration"
+	[ServerEnum.SkillCollisionSequenceTrackParameterType.SkillCollisionSize] = "SkillCollisionSize",
+	[ServerEnum.SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration] = "SkillCollisionSequenceTrackDuration",
+	[ServerEnum.SkillCollisionSequenceTrackParameterType.ListenSkillCollisionEvent] = "ListenSkillCollisionEvent",
 }
 Debug.Assert(ServerEnum.SkillCollisionSequenceTrackParameterType.Count == #ServerEnum.SkillCollisionSequenceTrackParameterType.Converter + 1, "비정상입니다.")
 

@@ -142,7 +142,11 @@ end
 
 function WorldInteractorSystem:DamageWorldInteractor(worldInteractor, damage)
     local objectScript = self:GetScript(worldInteractor)
-    Debug.Assert(objectScript, "WorldInteractor 스크립트가 없습니다. 반드시 존재해야 합니다.")
+
+    if not objectScript then
+        Debug.Assert(false, "WorldInteractor 스크립트가 없습니다.")
+        return false
+    end
 
     local remainingHp = objectScript:TakeDamage(damage)
     if 0 == remainingHp then

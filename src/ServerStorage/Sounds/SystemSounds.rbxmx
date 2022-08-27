@@ -1,0 +1,184 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Folder" referent="RBX2B303A272CA44A81B8F0850ADF08417C">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<string name="Name">SystemSounds</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+		<Item class="Sound" referent="RBXC463C14E1AF74AFEBFF677185B0CF4CA">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">false</bool>
+				<string name="Name">Message2Sound</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://7263133710</url></Content>
+				<int64 name="SourceAssetId">7263133710</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">0.5</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+		<Item class="Sound" referent="RBXD4E1542E22F84F2BB74B794917F4F611">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">false</bool>
+				<string name="Name">Message3Sound</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://6568398699</url></Content>
+				<int64 name="SourceAssetId">6568398699</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">0.5</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+		<Item class="Sound" referent="RBX803ACD14CE254BDDB7C80E9CAFA5A521">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">false</bool>
+				<string name="Name">Message4Sound</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://6176999962</url></Content>
+				<int64 name="SourceAssetId">6176999962</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">0.5</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+		<Item class="Sound" referent="RBXE3A54CDF8E5844D88CDE201EB554BC2B">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">false</bool>
+				<string name="Name">Message5Sound</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://1842295941</url></Content>
+				<int64 name="SourceAssetId">1842295941</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">0.5</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+		<Item class="Sound" referent="RBX8A03A84E9B62487095FD05E1542F6675">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">false</bool>
+				<string name="Name">Message6Sound</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1.60000002</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://5741806645</url></Content>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">1</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+		<Item class="Sound" referent="RBXE8F7FFDCB69C41C9B1902A38C872F27D">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">false</bool>
+				<string name="Name">Message1Sound</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://6177000613</url></Content>
+				<int64 name="SourceAssetId">6177000613</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">0.5</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+		<Item class="Sound" referent="RBXB3752EFDB3BA4294848C82E7415E6017">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">false</bool>
+				<string name="Name">WinnerSound</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://1842368549</url></Content>
+				<int64 name="SourceAssetId">1842368549</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">0.5</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+		<Item class="Sound" referent="RBX1D520844FED44AFC8C1B434C3A84E06B">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">false</bool>
+				<string name="Name">SwordEquipSound</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://130785405</url></Content>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">2</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+		<Item class="Sound" referent="RBXFC67E89B8FD1465CBE3FDFE8119D55B2">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">false</bool>
+				<string name="Name">StatusWindowOpenSound</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://6913190265</url></Content>
+				<int64 name="SourceAssetId">6913190265</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">0.5</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>

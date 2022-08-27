@@ -17,6 +17,8 @@ function SkillCollisionSequenceTrack:GetData(skillCollisionSequenceTrackParamete
 end
 
 function SkillCollisionSequenceTrack:ValidateSkillCollisionSequenceTrackParameter(skillCollisionSequenceTrackParameter)
+    -- 없을 수 있다. 없으면 자자리에 위치한다.
+    -- 다만 모두 존재하거나 존재하지 않아야 한다.
     if not skillCollisionSequenceTrackParameter[SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] then
         Debug.Assert(false, "SkillCollisionDirection 가 없습니다.")
         return false
@@ -34,6 +36,12 @@ function SkillCollisionSequenceTrack:ValidateSkillCollisionSequenceTrackParamete
         return false
     end
     --]]
+
+    local listenSkillCollisionEvent = skillCollisionSequenceTrackParameter[SkillCollisionSequenceTrackParameterType.ListenSkillCollisionEvent]
+    if nil == listenSkillCollisionEvent then
+        Debug.Assert(false, "ListenSkillCollisionEvent 가 없습니다.")
+        return false
+    end
 
     local skillCollisionSequenceTrackDuration = skillCollisionSequenceTrackParameter[SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration]
     if not skillCollisionSequenceTrackDuration then

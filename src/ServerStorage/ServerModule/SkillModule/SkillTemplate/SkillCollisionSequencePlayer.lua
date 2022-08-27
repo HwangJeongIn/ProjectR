@@ -56,9 +56,16 @@ function SkillCollisionSequencePlayer:InitializeAllSkillCollisionSequenceTrackDi
         local currentTrack = collisionSequence:GetSkillCollisionSequenceTrack(trackIndex)
         
         local relativeDirection = currentTrack:GetData(SkillCollisionSequenceTrackParameterType.SkillCollisionDirection)
-        local convertedTrackDirection = lookVector * relativeDirection.X
-                                      + rightVector * relativeDirection.Y
-                                      + upVector * relativeDirection.Z
+
+        local convertedTrackDirection = nil
+        if not relativeDirection then
+            convertedTrackDirection = Vector3.new(0,0,0)
+        else
+            convertedTrackDirection = lookVector * relativeDirection.X
+                                    + rightVector * relativeDirection.Y
+                                    + upVector * relativeDirection.Z
+        end
+
 
         convertedTrackDirection = convertedTrackDirection.Unit
         self.ConvertedTrackDirections[trackIndex] = convertedTrackDirection
@@ -168,6 +175,31 @@ function SkillCollisionSequencePlayer:InitializeSkillCollision(originCFrame)
         self.SkillCollisionEffect = tempSkillCollisionEffect
     end
 
+    self.SkillCollisionOnCreateSound =  self.SkillCollisionSequence:GetSkillCollisionData(SkillCollisionParameterType.SkillCollisionOnCreateSound)
+    self.SkillCollisionOnUpdateSound =  self.SkillCollisionSequence:GetSkillCollisionData(SkillCollisionParameterType.SkillCollisionOnUpdateSound)
+    self.SkillCollisionOnHitSound =  self.SkillCollisionSequence:GetSkillCollisionData(SkillCollisionParameterType.SkillCollisionOnHitSound)
+    self.SkillCollisionOnDestroySound =  self.SkillCollisionSequence:GetSkillCollisionData(SkillCollisionParameterType.SkillCollisionOnDestroySound)
+
+    if self.SkillCollisionOnCreateSound then
+		self.SkillCollisionOnCreateSound = self.SkillCollisionOnCreateSound:Clone()
+		self.SkillCollisionOnCreateSound.Parent = workspace
+    end
+
+    if self.SkillCollisionOnUpdateSound then
+		self.SkillCollisionOnUpdateSound = self.SkillCollisionOnUpdateSound:Clone()
+		self.SkillCollisionOnUpdateSound.Parent = workspace
+    end
+
+    if self.SkillCollisionOnHitSound then
+		self.SkillCollisionOnHitSound = self.SkillCollisionOnHitSound:Clone()
+		self.SkillCollisionOnHitSound.Parent = workspace
+    end
+
+    if self.SkillCollisionOnDestroySound then
+		self.SkillCollisionOnDestroySound = self.SkillCollisionOnDestroySound:Clone()
+		self.SkillCollisionOnDestroySound.Parent = workspace
+    end
+
     return true
 end
 
@@ -178,6 +210,13 @@ function SkillCollisionSequencePlayer:Start(skillCollisionHandler)
     end
 
     self.SkillCollisionHandler = skillCollisionHandler
+
+    if self.SkillCollisionOnCreateSound then
+        --Debug.Print("SkillCollisionOnCreateSound")
+        self.SkillCollisionOnCreateSound:Play()
+        Debris:AddItem(self.SkillCollisionOnCreateSound, self.SkillCollisionOnCreateSound.TimeLength)
+    end
+
     -- 현재의 Roblox에서는 Trigger 같은 충돌체의 경우 이벤트를 바인딩해야 충돌관련 처리를 할 수 있다.
     self.SkillCollisionTouchedConnection = self.SkillCollision.Touched:Connect(function(touchingPart) end)
     self.PrevTime = os.clock()
@@ -205,14 +244,32 @@ function SkillCollisionSequencePlayer:End()
     -- 예외처리 해서 여러번 처리되지는 않지만 이벤트 발생을 막기 위해 끊어준다.
     self.SkillCollisionTouchedConnection:Disconnect()
 
-    local skillCollisionOnDestroyingEffect = self.SkillCollisionSequence:GetSkillCollisionData(SkillCollisionParameterType.SkillCollisionOnDestroyingEffect)
-    if skillCollisionOnDestroyingEffect then
-        local onDestroyingEffect = skillCollisionOnDestroyingEffect:Clone()
+    local skillCollisionOnDestroyEffect = self.SkillCollisionSequence:GetSkillCollisionData(SkillCollisionParameterType.SkillCollisionOnDestroyEffect)
+    if skillCollisionOnDestroyEffect then
+        local onDestroyingEffect = skillCollisionOnDestroyEffect:Clone()
         --onDestroyingEffect.Transparency = 0
         onDestroyingEffect.Anchored = true
         onDestroyingEffect.Parent = workspace
         onDestroyingEffect.CFrame = self.SkillCollision.CFrame
         Debris:AddItem(onDestroyingEffect, 0.2)
+    end
+
+    if self.SkillCollisionOnUpdateSound then
+        if self.SkillCollisionOnUpdateSound.IsPlaying then
+            self.SkillCollisionOnUpdateSound:Stop()
+        end
+        
+        Debris:AddItem(self.SkillCollisionOnUpdateSound, 0)
+    end
+
+    if self.SkillCollisionOnHitSound then
+        Debris:AddItem(self.SkillCollisionOnHitSound, self.SkillCollisionOnHitSound.TimeLength)
+    end
+
+    if self.SkillCollisionOnDestroySound then
+        --Debug.Print("SkillCollisionOnDestroySound")
+        self.SkillCollisionOnDestroySound:Play()
+        Debris:AddItem(self.SkillCollisionOnDestroySound, self.SkillCollisionOnDestroySound.TimeLength)
     end
 
     Debris:AddItem(self.SkillCollision, 0)
@@ -227,6 +284,7 @@ function SkillCollisionSequencePlayer:Update(currentTime)
     local speed = nil
     local duration = nil
     local toSize = nil
+    local listenEvent = nil
 
     local finalCFrame = self.SkillCollision.CFrame
     while 0 < deltaTime and self.SkillCollisionSequenceTrackCount >= self.CurrentTrackIndex do
@@ -235,8 +293,9 @@ function SkillCollisionSequencePlayer:Update(currentTime)
         speed = currentTrack:GetData(SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed)
         duration = currentTrack:GetData(SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration)
         toSize = currentTrack:GetData(SkillCollisionSequenceTrackParameterType.SkillCollisionSize)
+        listenEvent = currentTrack:GetData(SkillCollisionSequenceTrackParameterType.ListenSkillCollisionEvent)
 
-        local remainingTrackTime = self.CurrentTrackPosition - duration
+        local remainingTrackTime = duration - self.CurrentTrackPosition
         
         local simulationTime = nil
         if 0 > (deltaTime - remainingTrackTime) then
@@ -259,25 +318,45 @@ function SkillCollisionSequencePlayer:Update(currentTime)
         end
         deltaTime -= remainingTrackTime
 
-        finalCFrame = finalCFrame + (direction * speed * simulationTime)
+        if speed then
+            finalCFrame = finalCFrame + (direction * speed * simulationTime)
+        end
     end
 
-    self.SkillCollision.CFrame = finalCFrame
+    if speed then
+        self.SkillCollision.CFrame = CFrame.new(Vector3.zero, direction) + finalCFrame.Position
+    end
 
     local finalSize = self:CalculateSizeBySizeFactor(self.InitialSkillCollisionSize, self.CurrentSkillCollisionSizeFactor)
     self.SkillCollision.Size = finalSize
     self.SkillCollisionEffect.Size = finalSize
     --if toSize then end
-    
-    local outputFromHandling = {}
-    local touchingParts = self.SkillCollision:GetTouchingParts()
-    for _, touchingPart in pairs(touchingParts) do
-        self.SkillCollisionHandler(self.SkillCollision, touchingPart, outputFromHandling) 
-    end
 
-    -- 더 좋은 방법을 찾아야 한다.
-    if outputFromHandling.PendingKill then
-        return SkillCollisionSequenceStateType.Ended
+    if self.SkillCollisionOnUpdateSound then
+        if not self.SkillCollisionOnUpdateSound.IsPlaying then
+            --Debug.Print("SkillCollisionOnUpdateSound")
+            self.SkillCollisionOnUpdateSound:Play()
+        end
+    end
+    
+    if listenEvent then
+        local outputFromHandling = {}
+        local touchingParts = self.SkillCollision:GetTouchingParts()
+        for _, touchingPart in pairs(touchingParts) do
+            self.SkillCollisionHandler(self.SkillCollision, touchingPart, outputFromHandling)
+        end
+
+        if outputFromHandling.Hit then
+            if self.SkillCollisionOnHitSound then
+                --Debug.Print("SkillCollisionOnHitSound")
+                self.SkillCollisionOnHitSound:Play()
+            end
+        end
+    
+        -- 더 좋은 방법을 찾아야 한다.
+        if outputFromHandling.PendingKill then
+            return SkillCollisionSequenceStateType.Ended
+        end
     end
 
     if self.SkillCollisionSequenceTrackCount < self.CurrentTrackIndex then
