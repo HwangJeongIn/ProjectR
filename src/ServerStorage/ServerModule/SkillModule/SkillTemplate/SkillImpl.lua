@@ -121,7 +121,9 @@ function SkillImpl:DamageSomething(skillController, attackerPlayer, attackee)
 end
 
 function SkillImpl:RegisterBaseAttack1(SkillTemplate)
-    SkillTemplate:RegisterSkillName("BaseAttack")
+    local skillName = "BaseName"
+
+    SkillTemplate:RegisterSkillName(skillName)
 
     local skillSequence = Utility:DeepCopy(SkillSequence)
     local leftSlashIndex = skillSequence:AddSkillSequenceAnimationTrack("LeftSlash", 1.0)
@@ -151,10 +153,10 @@ function SkillImpl:RegisterBaseAttack1(SkillTemplate)
     skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.5, leftSlash1_skillCollisionSequence1)
     skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.6, leftSlash1_skillCollisionSequence1)
 
-    SkillTemplate:RegisterSkillSequence("BaseAttack", skillSequence)
+    SkillTemplate:RegisterSkillSequence(skillName, skillSequence)
 
     SkillTemplate:RegisterSkillImpl(
-        "BaseAttack",
+        skillName,
         SkillImplType.ValidateTargetInRange,
         function(skillController, toolOwnerPlayer, target)
             return true
@@ -162,7 +164,7 @@ function SkillImpl:RegisterBaseAttack1(SkillTemplate)
     )
 
     SkillTemplate:RegisterSkillImpl(
-        "BaseAttack",
+        skillName,
         SkillImplType.ApplySkillToTarget,
         function(skillController, toolOwnerPlayer, target, output)
             local damageValue = self:DamageSomething(skillController, toolOwnerPlayer, target)
@@ -185,9 +187,10 @@ function SkillImpl:RegisterBaseAttack1(SkillTemplate)
     )
 end
 
-
 function SkillImpl:RegisterFlameBlade(SkillTemplate) -- Flame Blade
-    SkillTemplate:RegisterSkillName("FlameBlade")
+    local skillName = "FlameBlade"
+
+    SkillTemplate:RegisterSkillName(skillName)
 
     local skillSequence = Utility:DeepCopy(SkillSequence)
     local leftSlashIndex = skillSequence:AddSkillSequenceAnimationTrack("LeftSlash", 1.0)
@@ -316,10 +319,10 @@ function SkillImpl:RegisterFlameBlade(SkillTemplate) -- Flame Blade
     skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(singleMagicCastingIndex, 0.1, fireArrowSkillCollisionSequence1)
     
 
-    SkillTemplate:RegisterSkillSequence("FlameBlade", skillSequence)
+    SkillTemplate:RegisterSkillSequence(skillName, skillSequence)
 
     SkillTemplate:RegisterSkillImpl(
-        "FlameBlade",
+        skillName,
         SkillImplType.ValidateTargetInRange,
         function(skillController, toolOwnerPlayer, target)
             return true
@@ -327,7 +330,7 @@ function SkillImpl:RegisterFlameBlade(SkillTemplate) -- Flame Blade
     )
 
     SkillTemplate:RegisterSkillImpl(
-        "FlameBlade",
+        skillName,
         SkillImplType.ApplySkillToTarget,
         function(skillController, toolOwnerPlayer, target, output)
             local damageValue = self:DamageSomething(skillController, toolOwnerPlayer, target)
@@ -340,33 +343,35 @@ function SkillImpl:RegisterFlameBlade(SkillTemplate) -- Flame Blade
 end
 
 function SkillImpl:RegisterBaseAttack(SkillTemplate) -- Storm Blade
-    SkillTemplate:RegisterSkillName("BaseAttack")
+    local skillName = "BaseAttack"
+
+    SkillTemplate:RegisterSkillName(skillName)
 
     local skillSequence = Utility:DeepCopy(SkillSequence)
-    local leftSlashIndex = skillSequence:AddSkillSequenceAnimationTrack("LeftSlash", 1.0)
+    local middleSlashIndex = skillSequence:AddSkillSequenceAnimationTrack("LeftDownSlash", 0.5)
 
     local airBladeCollisionTrack = {
-        [SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed * 0.05,
-        [SkillCollisionSequenceTrackParameterType.SkillCollisionSize] = Vector3.new(1,7,4),
-        [SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration] = 3,
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionSpeed] = DefaultSkillCollisionSpeed * .3,
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionSize] = Vector3.new(2.5, 1.5, 2.5),
+        [SkillCollisionSequenceTrackParameterType.SkillCollisionSequenceTrackDuration] = 1,
 	    [SkillCollisionSequenceTrackParameterType.ListenSkillCollisionEvent] = true,
     }
 
     
     local airBladeCollisionTrack1_1 = Utility:DeepCopy(airBladeCollisionTrack)
-    airBladeCollisionTrack1_1[SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(1, 0, 0) -- look, right, up
+    airBladeCollisionTrack1_1[SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(2, 1, 0) -- look, right, up
 
     local airBladeCollisionTrack1_2 = Utility:DeepCopy(airBladeCollisionTrack)
-    airBladeCollisionTrack1_2[SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(1, 1, 0) -- look, right, up
+    airBladeCollisionTrack1_2[SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(1, 0, 0) -- look, right, up
 
     local airBladeCollisionTrack1_3 = Utility:DeepCopy(airBladeCollisionTrack)
-    airBladeCollisionTrack1_3[SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(1, -1, 0) -- look, right, up
+    airBladeCollisionTrack1_3[SkillCollisionSequenceTrackParameterType.SkillCollisionDirection] = Vector3.new(2, -1, 0) -- look, right, up
 
 
     local airBladeSkillCollisionSequence1 = Utility:DeepCopy(SkillCollisionSequence)
     airBladeSkillCollisionSequence1:InitializeSkillCollisionData({
-        [SkillCollisionParameterType.SkillCollisionSize] = Vector3.new(1, 1, 1),
-        [SkillCollisionParameterType.SkillCollisionOffset] = Vector3.new(5, 0, 0), -- look, right, up
+        [SkillCollisionParameterType.SkillCollisionSize] = Vector3.new(.5, 3.5, 2),
+        [SkillCollisionParameterType.SkillCollisionOffset] = Vector3.new(3.5, 0, 0), -- look, right, up
         [SkillCollisionParameterType.SkillCollisionEffect] = "SwordSlashEffect",
         [SkillCollisionParameterType.SkillCollisionOnDestroyEffect] = "HitEffect",
 
@@ -384,15 +389,15 @@ function SkillImpl:RegisterBaseAttack(SkillTemplate) -- Storm Blade
     airBladeSkillCollisionSequence2:AddSkillCollisionSequenceTrack(airBladeCollisionTrack1_2)
     airBladeSkillCollisionSequence3:AddSkillCollisionSequenceTrack(airBladeCollisionTrack1_3)
     
-
-    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.5, airBladeSkillCollisionSequence1)
-    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.6, airBladeSkillCollisionSequence2)
-    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(leftSlashIndex, 0.7, airBladeSkillCollisionSequence2)
-
-    SkillTemplate:RegisterSkillSequence("BaseAttack", skillSequence)
+    -- 오른쪽 중앙 왼쪽
+    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(middleSlashIndex, 0.1, airBladeSkillCollisionSequence3)
+    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(middleSlashIndex, 0.3, airBladeSkillCollisionSequence2)
+    skillSequence:AddSkillCollisionSequenceToSkillSequenceAnimationTrack(middleSlashIndex, 0.5, airBladeSkillCollisionSequence1)
+    
+    SkillTemplate:RegisterSkillSequence(skillName, skillSequence)
 
     SkillTemplate:RegisterSkillImpl(
-        "BaseAttack",
+        skillName,
         SkillImplType.ValidateTargetInRange,
         function(skillController, toolOwnerPlayer, target)
             return true
@@ -400,7 +405,7 @@ function SkillImpl:RegisterBaseAttack(SkillTemplate) -- Storm Blade
     )
 
     SkillTemplate:RegisterSkillImpl(
-        "BaseAttack",
+        skillName,
         SkillImplType.ApplySkillToTarget,
         function(skillController, toolOwnerPlayer, target, output)
             local damageValue = self:DamageSomething(skillController, toolOwnerPlayer, target)

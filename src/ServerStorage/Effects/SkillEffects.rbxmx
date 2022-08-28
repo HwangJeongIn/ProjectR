@@ -1301,9 +1301,9 @@
 				<token name="BottomSurface">0</token>
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
-					<X>-113.468147</X>
-					<Y>3.54999995</Y>
-					<Z>-606.570007</Z>
+					<X>-109.849976</X>
+					<Y>3.5</Y>
+					<Z>-625.199951</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -1390,9 +1390,9 @@
 					<Z>0</Z>
 				</Vector3>
 				<Vector3 name="size">
-					<X>0.536266029</X>
-					<Y>7.0999999</Y>
-					<Z>4.25999975</Z>
+					<X>1</X>
+					<Y>7</Y>
+					<Z>4</Z>
 				</Vector3>
 			</Properties>
 			<Item class="Attachment" referent="RBXF4C9125941B04419BE0CB092DF3319AE">
@@ -1400,8 +1400,8 @@
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<CoordinateFrame name="CFrame">
 						<X>0</X>
-						<Y>-2</Y>
-						<Z>-2</Z>
+						<Y>-1</Y>
+						<Z>-1</Z>
 						<R00>1</R00>
 						<R01>0</R01>
 						<R02>0</R02>
@@ -1423,8 +1423,8 @@
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<CoordinateFrame name="CFrame">
 						<X>0</X>
-						<Y>2</Y>
-						<Z>-2</Z>
+						<Y>1</Y>
+						<Z>-1</Z>
 						<R00>1</R00>
 						<R01>0</R01>
 						<R02>0</R02>

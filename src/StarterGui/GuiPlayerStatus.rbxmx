@@ -2,7 +2,7 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="ScreenGui" referent="766">
+	<Item class="ScreenGui" referent="878">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<bool name="AutoLocalize">true</bool>
@@ -21,7 +21,7 @@
 			<BinaryString name="Tags"></BinaryString>
 			<token name="ZIndexBehavior">1</token>
 		</Properties>
-		<Item class="Frame" referent="767">
+		<Item class="Frame" referent="879">
 			<Properties>
 				<bool name="Active">false</bool>
 				<Vector2 name="AnchorPoint">
@@ -69,9 +69,9 @@
 				<Ref name="SelectionImageObject">null</Ref>
 				<int name="SelectionOrder">0</int>
 				<UDim2 name="Size">
-					<XS>0.800000012</XS>
+					<XS>0.699999988</XS>
 					<XO>0</XO>
-					<YS>0.75</YS>
+					<YS>0.600000024</YS>
 					<YO>0</YO>
 				</UDim2>
 				<token name="SizeConstraint">0</token>
@@ -81,7 +81,7 @@
 				<bool name="Visible">true</bool>
 				<int name="ZIndex">1</int>
 			</Properties>
-			<Item class="Frame" referent="768">
+			<Item class="Frame" referent="880">
 				<Properties>
 					<bool name="Active">false</bool>
 					<Vector2 name="AnchorPoint">
@@ -142,7 +142,7 @@
 					<int name="ZIndex">1</int>
 				</Properties>
 			</Item>
-			<Item class="ScrollingFrame" referent="769">
+			<Item class="ScrollingFrame" referent="881">
 				<Properties>
 					<bool name="Active">true</bool>
 					<Vector2 name="AnchorPoint">

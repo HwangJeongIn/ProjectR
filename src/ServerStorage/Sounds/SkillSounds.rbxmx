@@ -503,7 +503,7 @@
 					<bool name="Looped">true</bool>
 					<string name="Name">Emit_AirSound</string>
 					<bool name="PlayOnRemove">false</bool>
-					<float name="PlaybackSpeed">3</float>
+					<float name="PlaybackSpeed">6</float>
 					<bool name="Playing">false</bool>
 					<token name="RollOffMode">0</token>
 					<Ref name="SoundGroup">null</Ref>
@@ -511,7 +511,7 @@
 					<int64 name="SourceAssetId">9125356690</int64>
 					<BinaryString name="Tags"></BinaryString>
 					<double name="TimePosition">0</double>
-					<float name="Volume">0.5</float>
+					<float name="Volume">5</float>
 					<float name="xmlRead_MaxDistance_3">10000</float>
 				</Properties>
 			</Item>
