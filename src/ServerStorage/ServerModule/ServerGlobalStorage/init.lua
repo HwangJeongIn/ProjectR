@@ -564,6 +564,7 @@ function ServerGlobalStorage:SetArmorHandleEnabled(armor, enabled)
 	
 	local weldContraints = binder:GetChildren()
 	for _, weldConstraint in weldContraints do
+		weldConstraint.Name = "Test"
 		weldConstraint.Enabled = enabled
 	end
 
@@ -652,12 +653,12 @@ function ServerGlobalStorage:DetachArmorFromPlayer(player, armor)
 		return false
 	end
 	
-	armor.Parent = player.Backpack
-
 	if not self:SetArmorHandleEnabled(armor, true) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
+
+	armor.Parent = player.Backpack
 
 	local attachments = {}
 	if not self:FindAllAttachmentsOfArmor(armor, attachments) then
@@ -711,12 +712,12 @@ function ServerGlobalStorage:AttachArmorToPlayer(player, armor)
 		return false
 	end
 	
+	armor.Parent = characterArmorsFolder
+
 	if not self:SetArmorHandleEnabled(armor, false) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
-
-	armor.Parent = characterArmorsFolder
 
 	local targetBones = self:GetBonesByEquipType(character, equipType)
 	if not targetBones then
