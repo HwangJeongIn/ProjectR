@@ -16,6 +16,8 @@ local SlotType = CommonEnum.SlotType
 local KeyBinder = ClientModuleFacade.KeyBinder
 
 local player = game.Players.LocalPlayer
+local playerId = player.UserId
+
 local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiTemplate = PlayerGui:WaitForChild("GuiTemplate")
 local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
@@ -23,6 +25,7 @@ local GuiSlot = GuiTemplate:WaitForChild("GuiSlot")
 local GuiPopupWindowControllers = PlayerGui:WaitForChild("GuiPopupWindowControllers")
 local GuiTooltipController = require(GuiPopupWindowControllers:WaitForChild("GuiTooltipController"))
 
+local RunService = game:GetService("RunService")
 
 local GuiSlotController = Utility:DeepCopy(require(script.Parent:WaitForChild("GuiSlotController")))
 
@@ -75,10 +78,35 @@ function GuiSkillSlotController:ClearSkillData()
 	self.SkillOwnerTool = nil
 	self.SkillGameData = nil
 
+	self.SkillLastActivationTime = nil
+	self.RemainingCooldownTime = nil
+
+	self:ClearCalculateCooldownConnection()
 	self:SetVisible(false)
 end
 
+function GuiSkillSlotController:ClearCalculateCooldownConnection()
+	if self.CalculateCooldownConnection then
+		self.CalculateCooldownConnection:Disconnect()
+		self.CalculateCooldownConnection = nil
+	end
+end
+
+function GuiSkillSlotController:IsValid()
+	return nil ~= self.SkillOwnerTool
+end
+
 function GuiSkillSlotController:ActivateSkill()
+	-- 비활성화된 스킬 컨트롤러인지 검증
+	if not self:IsValid() then
+		return true
+	end
+
+	if 0 < self.RemainingCooldownTime then
+		Debug.Print(tostring("스킬 쿨타임이 " .. self.RemainingCooldownTime) .. " 초 남았습니다.")
+		return true
+	end
+
 	local skillIndex = self:GetSlotIndex()
 	if not skillIndex then
 		Debug.Assert(false, "비정상입니다.")
@@ -98,6 +126,15 @@ function GuiSkillSlotController:ActivateSkill()
 	return true
 end
 
+function GuiSkillSlotController:GetSkillGameDataKey()
+	if not self.SkillGameData then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return self.SkillGameData:GetKey()
+end
+
 function GuiSkillSlotController:SetSkill(skillOwnerTool, skillGameData)
 	if not skillOwnerTool then
 		self:ClearSkillData()
@@ -110,21 +147,65 @@ function GuiSkillSlotController:SetSkill(skillOwnerTool, skillGameData)
 		return false
 	end
 
-	if not skillGameData then
-		Debug.Assert(false, "스킬 정보 초기화에 실패했습니다.")
+	if self:IsValid() then
 		self:ClearSkillData()
-		return false
 	end
+
+	self.SkillOwnerTool = skillOwnerTool
+	self.SkillGameData = skillGameData
 
 	self:SetImage(skillGameData.Image)
 	self:SetName(skillGameData.Name)
 	self:SetNumber(self.SkillKeyName)
 
-	self.SkillOwnerTool = skillOwnerTool
-	self.SkillGameData = skillGameData
+	self.SkillLastActivationTime = ClientGlobalStorage:GetSkillLastActivationTime(playerId, skillGameData:GetKey())
+	if not self.SkillLastActivationTime then
+		self.RemainingCooldownTime = 0
+	else
+		if not self:RefreshByLastActivationTime(self.SkillLastActivationTime) then
+			Debug.Assert(false, "비정상입니다.")
+			return false
+		end
+	end
 
 	self:SetVisible(true)
 	return true
 end
+
+function GuiSkillSlotController:CalculateCooldown(deltaTime)
+	self.RemainingCooldownTime -= deltaTime
+
+	if 0 >= self.RemainingCooldownTime then
+		self:ClearCalculateCooldownConnection()
+		Debug.Print("Disconnected")
+	end
+end
+
+function GuiSkillSlotController:RefreshByLastActivationTime(lastActivationTime)
+	if not self:IsValid() then
+		Debug.Assert(false, "원인을 파악해야 합니다. 코드 버그일 가능성이 높습니다.")
+		return false
+	end
+
+	self.SkillLastActivationTime = lastActivationTime
+	if not self.SkillLastActivationTime then
+		self.RemainingCooldownTime = 0
+	else
+		local elapsedTime = os.clock() - self.SkillLastActivationTime
+		self.RemainingCooldownTime = self.SkillGameData.Cooldown - elapsedTime
+		self.RemainingCooldownTime = math.max(0, self.RemainingCooldownTime)
+	end
+
+	if 0 < self.RemainingCooldownTime then
+		-- Heartbeat 델리게이트에 바인딩하여 타이머 실행
+		self:ClearCalculateCooldownConnection()
+		self.CalculateCooldownConnection = RunService.Heartbeat:Connect(function(deltaTime)
+			self:CalculateCooldown(deltaTime)
+		end)
+	end
+
+	return true
+end
+
 
 return GuiSkillSlotController

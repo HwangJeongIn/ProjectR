@@ -29,7 +29,9 @@ local GuiSkillOwnerToolSlotController = GuiFacade.GuiTemplateController.GuiSkill
 local GuiSkillSlotsRaw = Utility:DeepCopy(ClientModuleFacade.TArray)
 GuiSkillSlotsRaw:Initialize(MaxSkillCount)
 local GuiSkillSlotsController = {
-	GuiSkillSlotsRaw = GuiSkillSlotsRaw
+	GuiSkillSlotsRaw = GuiSkillSlotsRaw,
+    SkillOwnerTool = nil,
+    SkillOwnerToolGameData = nil
 }
 
 function GetPositionOnCircleByAngle(radius, angle, offsetX, offsetY)
@@ -128,10 +130,23 @@ function GuiSkillSlotsController:ClearData()
             Debug.Assert(false, "비정상입니다.")
         end
     end
+
+    self.SkillOwnerTool = nil
+    self.SkillOwnerToolGameData = nil
+end
+
+function GuiSkillSlotsController:GetSkillSlot(skillIndex)
+    local targetGuiSkillSlotController = self.GuiSkillSlotsRaw:Get(skillIndex)
+    if not targetGuiSkillSlotController then
+        Debug.Assert(false, "비정상입니다.")
+        return nil
+    end
+
+    return targetGuiSkillSlotController
 end
 
 function GuiSkillSlotsController:SetSkillSlot(skillIndex, skillOwnerTool, skillGameData)
-	local targetGuiSkillSlotController = self.GuiSkillSlotsRaw:Get(skillIndex)
+	local targetGuiSkillSlotController = self:GetSkillSlot(skillIndex)
     if not targetGuiSkillSlotController then
         Debug.Assert(false, "비정상입니다.")
         return false
@@ -179,9 +194,38 @@ function GuiSkillSlotsController:SetSkillOwnerToolSlot(skillOwnerTool)
             end
         end
     end
+        
+    self.SkillOwnerTool = skillOwnerTool
+    self.SkillOwnerToolGameData = skillOwnerToolGameData
     
 	return true
 end
+
+function GuiSkillSlotsController:RefreshSkillByLastActivationTime(skillGameDataKey, lastActivationTime)
+    if not self.SkillOwnerToolGameData then
+        Debug.Assert(false, "비정상입니다.")
+        return false
+    end
+
+    local skillCount = self.SkillOwnerToolGameData.SkillCount
+    if skillCount then
+        for skillIndex = 1, skillCount do
+            local targetSkillSlotController = self:GetSkillSlot(skillIndex)
+            if not targetSkillSlotController then
+                Debug.Assert(false, "비정상입니다. 코드 버그일 가능성이 매우 높습니다.")
+                return false
+            end
+
+            local targetSkillGameDataKey = targetSkillSlotController:GetSkillGameDataKey()
+            if targetSkillGameDataKey == skillGameDataKey then
+                targetSkillSlotController:RefreshByLastActivationTime(lastActivationTime)
+            end
+        end
+    end
+
+    return true
+end
+
 
 GuiSkillSlotsController:Initialize()
 return GuiSkillSlotsController

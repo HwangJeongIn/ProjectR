@@ -21,6 +21,7 @@ local ToolUtility = require(CommonObjectUtilityModule:WaitForChild("ToolUtility"
 local Inventory = require(script:WaitForChild("Inventory"))
 local EquipSlots = require(script:WaitForChild("EquipSlots"))
 local PlayerStatistic = require(script:WaitForChild("PlayerStatistic"))
+local Actions = require(script:WaitForChild("Actions"))
 
 local CommonGlobalStorage = {
 	IsClient = false,
@@ -50,7 +51,8 @@ function CommonGlobalStorage:CreateEmptyPlayerData()
 	local playerData = {
 		[StatusType.Statistic] = Utility:DeepCopy(PlayerStatistic),
 		[StatusType.EquipSlots] = Utility:DeepCopy(EquipSlots),
-		[StatusType.Inventory] = Utility:DeepCopy(Inventory)
+		[StatusType.Inventory] = Utility:DeepCopy(Inventory),
+		[StatusType.Actions] = Utility:DeepCopy(Actions)
 	}
 
 	if self.OnCreateEmptyPlayerData then
@@ -110,6 +112,72 @@ function CommonGlobalStorage:ClearPlayer(player)
 
 	self.PlayerTable[playerId] = self:CreateEmptyPlayerData()
 	return true
+end
+
+-------------------------------------------------------------------------------------------------------
+
+function CommonGlobalStorage:SetRecentAttacker(playerId, attacker)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return false
+	end
+	
+	local actions = self.PlayerTable[playerId][StatusType.Actions]
+	if not actions:SetRecentAttacker(attacker) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+function CommonGlobalStorage:GetRecentAttacker(playerId)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return nil
+	end
+
+	local actions = self.PlayerTable[playerId][StatusType.Actions]
+	local attacker = actions:GetRecentAttacker()
+	if not attacker then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+
+	return attacker
+end
+
+function CommonGlobalStorage:SetSkillLastActivationTime(playerId, skillGameDataKey, lastActivationTime)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return false
+	end
+	
+	local actions = self.PlayerTable[playerId][StatusType.Actions]
+	if not actions:SetSkillLastActivationTime(skillGameDataKey, lastActivationTime) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
+function CommonGlobalStorage:GetSkillLastActivationTime(playerId, skillGameDataKey)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return nil
+	end
+
+	local actions = self.PlayerTable[playerId][StatusType.Actions]
+	local lastActivationTime = actions:GetSkillLastActivationTime(skillGameDataKey)
+	--[[
+	-- 그냥 조회용으로 사용할 수 있다.
+	if not lastActivationTime then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+	--]]
+	return lastActivationTime
 end
 
 function CommonGlobalStorage:GetPlayerStatistic(playerId)

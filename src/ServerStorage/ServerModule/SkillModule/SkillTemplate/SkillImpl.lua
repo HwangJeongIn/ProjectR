@@ -42,7 +42,11 @@ function SkillImpl:IsWall(target)
     return CollisionGroupType.Wall ~= collisionGroupType
 end
 
-function SkillImpl:DamagePlayer(skillFactor, attakerPlayerStatisicRaw, attackee)
+function SkillImpl:DamagePlayer(skillFactor, attackerPlayer, attackee)
+
+    local attackerPlayerStatisticRaw = ServerGlobalStorage:GetPlayerStatisticRaw(attackerPlayer.UserId)
+    Debug.Assert(attackerPlayerStatisticRaw, "비정상입니다.")
+
     local targetCharacter = attackee.Parent
 
     local targetHumanoid = targetCharacter.Humanoid
@@ -58,13 +62,19 @@ function SkillImpl:DamagePlayer(skillFactor, attakerPlayerStatisicRaw, attackee)
     end
 
     local targetStatisticRaw = ServerGlobalStorage:GetPlayerStatisticRaw(targetPlayer.UserId)
-    local finalDamage = DamageCalculator:CalculateSkillDamage(skillFactor, attakerPlayerStatisicRaw, targetStatisticRaw)
+    local finalDamage = DamageCalculator:CalculateSkillDamage(skillFactor, attackerPlayerStatisticRaw, targetStatisticRaw)
     targetHumanoid:TakeDamage(finalDamage)
+
+    ServerGlobalStorage:SetRecentAttacker(attackerPlayer)
 
     return finalDamage
 end
 
-function SkillImpl:DamageNpc(skillFactor, attakerPlayerStatisicRaw, attackee)
+function SkillImpl:DamageNpc(skillFactor, attackerPlayer, attackee)
+
+    local attackerPlayerStatisticRaw = ServerGlobalStorage:GetPlayerStatisticRaw(attackerPlayer.UserId)
+    Debug.Assert(attackerPlayerStatisticRaw, "비정상입니다.")
+
     local targetCharacter = attackee.Parent
 
     local targetHumanoid = targetCharacter.Humanoid
@@ -76,14 +86,19 @@ function SkillImpl:DamageNpc(skillFactor, attakerPlayerStatisicRaw, attackee)
     local npcGameData = NpcUtility:GetGameDataByModelName(targetCharacter.Name)
     local targetStatisticRaw = npcGameData.StatisticRaw
 
-    local finalDamage = DamageCalculator:CalculateSkillDamage(skillFactor, attakerPlayerStatisicRaw, targetStatisticRaw)
+    local finalDamage = DamageCalculator:CalculateSkillDamage(skillFactor, attackerPlayerStatisticRaw, targetStatisticRaw)
     targetHumanoid:TakeDamage(finalDamage)
 
     return finalDamage
 end
 
-function SkillImpl:DamageWorldInteractor(skillFactor, attackerPlayerStatisticRaw, attackee)
+function SkillImpl:DamageWorldInteractor(skillFactor, attackerPlayer, attackee)
+    
+    local attackerPlayerStatisticRaw = ServerGlobalStorage:GetPlayerStatisticRaw(attackerPlayer.UserId)
+    Debug.Assert(attackerPlayerStatisticRaw, "비정상입니다.")
+
     local targetWorldInteractor = attackee.Parent
+
     local finalDamage = DamageCalculator:CalculateWorldInteractorSkillDamage(skillFactor, attackerPlayerStatisticRaw)
     if not ServerGlobalStorage:DamageWorldInteractor(targetWorldInteractor, finalDamage) then
         Debug.Assert(false, "비정상입니다.")
@@ -99,21 +114,18 @@ function SkillImpl:DamageSomething(skillController, attackerPlayer, attackee)
         return 0
     end
 
-    local attackerPlayerStatisticRaw = ServerGlobalStorage:GetPlayerStatisticRaw(attackerPlayer.UserId)
-    Debug.Assert(attackerPlayerStatisticRaw, "비정상입니다.")
-
     local skillGameData = skillController:GetSkillGameData()
     Debug.Assert(skillGameData, "비정상입니다.")
 
     local collisionGroupType = ObjectCollisionGroupUtility:GetCollisionGroupTypeByPart(attackee)
     if CollisionGroupType.Player == collisionGroupType then
-        return self:DamagePlayer(skillGameData.SkillFactor, attackerPlayerStatisticRaw, attackee)
+        return self:DamagePlayer(skillGameData.SkillFactor, attackerPlayer, attackee)
 
     elseif CollisionGroupType.Npc == collisionGroupType then
-        return self:DamageNpc(skillGameData.SkillFactor, attackerPlayerStatisticRaw, attackee)
+        return self:DamageNpc(skillGameData.SkillFactor, attackerPlayer, attackee)
 
     elseif CollisionGroupType.WorldInteractor == collisionGroupType then
-        return self:DamageWorldInteractor(skillGameData.SkillFactor, attackerPlayerStatisticRaw, attackee)
+        return self:DamageWorldInteractor(skillGameData.SkillFactor, attackerPlayer, attackee)
     else
         --Debug.Assert(false, "피해를 입힐 수 없는 대상입니다. 비정상입니다.")
         return 0

@@ -293,6 +293,19 @@ function GuiController:SetQuickToolSlot(slotIndex, tool)
 	return true
 end
 
+function GuiController:RefreshSkillByLastActivationTime(skillGameDataKey, lastActivationTime)
+	if not skillGameDataKey or not lastActivationTime then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self.GuiSkillSlotsController:RefreshSkillByLastActivationTime(skillGameDataKey, lastActivationTime) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
 
 GuiController:Initialize()
 return GuiController

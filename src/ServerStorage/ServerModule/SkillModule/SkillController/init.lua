@@ -74,6 +74,8 @@ function SkillController:Activate(player)
     end
 
     self.LastActivationTime = currentTime
+    ServerGlobalStorage:SetSkillLastActivationTimeAndNotify(self.ToolOwnerPlayer.UserId, self.SkillGameDataKey, self.LastActivationTime)
+
     if not self:ActivateInternally(player) then
         Debug.Print(self.Name .. "에 실패했습니다.")
         return false
@@ -86,7 +88,7 @@ function SkillController:SetToolOwnerPlayer(toolOwnerPlayer)
     if self.ToolOwnerPlayer then
         local prevPlayerId = self.ToolOwnerPlayer.UserId 
         if self.LastActivationTime then
-             ServerGlobalStorage:SetSkillLastActivationTime(prevPlayerId, self.SkillGameDataKey, self.LastActivationTime)
+            ServerGlobalStorage:SetSkillLastActivationTimeAndNotify(prevPlayerId, self.SkillGameDataKey, self.LastActivationTime)
         end
         
         self.LastActivationTime = nil

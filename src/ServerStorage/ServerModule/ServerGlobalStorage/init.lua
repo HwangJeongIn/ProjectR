@@ -36,6 +36,8 @@ local AddToolSTC = RemoteEvents:WaitForChild("AddToolSTC")
 local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
 local EquipToolSTC = RemoteEvents:WaitForChild("EquipToolSTC")
 local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
+local SetRecentAttackerSTC = RemoteEvents:WaitForChild("SetRecentAttackerSTC")
+local SetSkillLastActivationTimeSTC = RemoteEvents:WaitForChild("SetSkillLastActivationTimeSTC")
 
 
 local ServerGlobalStorage = CommonGlobalStorage
@@ -183,24 +185,32 @@ function ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(playersInGame)
 end
 
 function ServerGlobalStorage:OnCreateEmptyPlayerData(playerData)
-	playerData.SkillLastActivationTimeTable = {}
+
 end
 
-function ServerGlobalStorage:SetSkillLastActivationTime(playerId, skillGameDataKey, lastActivationTime)
-	if not self:CheckPlayer(playerId) then
-		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
-		return false
-	end
-
-	if not skillGameDataKey then
+function ServerGlobalStorage:SetRecentAttackerAndNotify(playerId, attacker)
+	if self:SetRecentAttacker(playerId, attacker) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-	self.PlayerTable[playerId].SkillLastActivationTimeTable[skillGameDataKey] = lastActivationTime
+	local player = game.Players:GetPlayerByUserId(playerId)
+	SetRecentAttackerSTC:FireClient(player, attacker)
 	return true
 end
 
+function ServerGlobalStorage:SetSkillLastActivationTimeAndNotify(playerId, skillGameDataKey, lastActivationTime)
+	if not self:SetSkillLastActivationTime(playerId, skillGameDataKey, lastActivationTime) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local player = game.Players:GetPlayerByUserId(playerId)
+	SetSkillLastActivationTimeSTC:FireClient(player, skillGameDataKey, lastActivationTime)
+	return true
+end
+
+--[[
 function ServerGlobalStorage:GetSkillLastActivationTime(playerId, skillGameDataKey)
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
@@ -214,7 +224,7 @@ function ServerGlobalStorage:GetSkillLastActivationTime(playerId, skillGameDataK
 
 	return self.PlayerTable[playerId].SkillLastActivationTimeTable[skillGameDataKey]
 end
-
+--]]
 function ServerGlobalStorage:ActivateToolSkill(player, tool, skillIndex)
 	if not tool or not skillIndex then
 		Debug.Assert(false, "비정상입니다.")

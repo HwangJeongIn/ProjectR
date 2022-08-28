@@ -69,7 +69,8 @@ local CommonEnum = {
 		Statistic = 1,
 		EquipSlots = 2,
 		Inventory = 3,
-		Count = 4
+		Actions = 4,
+		Count = 5
 	},
 	
 	StatType = {

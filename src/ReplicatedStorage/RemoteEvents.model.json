@@ -3,6 +3,14 @@
   "Children": [
 
     {
+      "Name": "SetRecentAttackerSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
+      "Name": "SetSkillLastActivationTimeSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
       "Name": "SwapInventorySlotSTC",
       "ClassName": "RemoteEvent"
     },

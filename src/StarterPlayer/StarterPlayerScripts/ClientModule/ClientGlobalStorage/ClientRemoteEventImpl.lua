@@ -24,11 +24,45 @@ local RemoveToolSTC = RemoteEvents:WaitForChild("RemoveToolSTC")
 local EquipToolSTC = RemoteEvents:WaitForChild("EquipToolSTC")
 local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
 local SwapInventorySlotSTC = RemoteEvents:WaitForChild("SwapInventorySlotSTC")
+local SetRecentAttackerSTC = RemoteEvents:WaitForChild("SetRecentAttackerSTC")
+local SetSkillLastActivationTimeSTC = RemoteEvents:WaitForChild("SetSkillLastActivationTimeSTC")
+
 
 
 function ClientRemoteEventImpl:InitializeRemoteEvents(ClientGlobalStorage, GuiController)
 	ClientGlobalStorage.GuiController = GuiController
 	-- STC
+	SetRecentAttackerSTC.OnClientEvent:Connect(function(attacker)
+		Debug.Assert(attacker, "attacker 비정상")
+		
+		if ClientGlobalStorage:SetRecentAttacker(PlayerId, attacker) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+		
+		--[[
+		if not GuiController:SetRecentAttacker(attacker) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+		--]]
+	end)
+
+	SetSkillLastActivationTimeSTC.OnClientEvent:Connect(function(skillGameDataKey, lastActivationTime)
+		Debug.Assert(skillGameDataKey, "skillGameDataKey 비정상")
+		Debug.Assert(lastActivationTime, "lastActivationTime 비정상")
+		
+		if not ClientGlobalStorage:SetSkillLastActivationTime(PlayerId, skillGameDataKey, lastActivationTime) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+
+		if not GuiController:RefreshSkillByLastActivationTime(skillGameDataKey, lastActivationTime) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+	end)
+
 	SwapInventorySlotSTC.OnClientEvent:Connect(function(slotIndex1, slotIndex2)
 		Debug.Assert(slotIndex1, "장착 슬롯 비정상")
 		Debug.Assert(slotIndex2, "도구 비정상")
