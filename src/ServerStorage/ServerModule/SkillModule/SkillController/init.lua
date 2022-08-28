@@ -156,12 +156,18 @@ function SkillController:SetSkill(tool, skillGameData)
                 end
             end
         end
+        
+        return false
     end
 
     self.SkillCollisionHandler = function(skillCollision, touchedPart, outputFromHandling)
+        if outputFromHandling.Hit or outputFromHandling.PendingKill then
+            return true
+        end
+
         if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
             if touchedPart.Parent == self.ToolOwnerPlayer.Character then
-                return
+                return false
             end
 
             --local touchedPartCollisionGroupName = ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(touchedPart)
@@ -173,7 +179,10 @@ function SkillController:SetSkill(tool, skillGameData)
 
             outputFromHandling.Hit = true
             outputFromHandling.PendingKill = true
+            return true
         end
+
+        return false
     end
 
 

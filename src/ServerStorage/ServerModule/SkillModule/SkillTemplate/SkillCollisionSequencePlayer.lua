@@ -343,7 +343,9 @@ function SkillCollisionSequencePlayer:Update(currentTime)
         local outputFromHandling = {}
         local touchingParts = self.SkillCollision:GetTouchingParts()
         for _, touchingPart in pairs(touchingParts) do
-            self.SkillCollisionHandler(self.SkillCollision, touchingPart, outputFromHandling)
+            if self.SkillCollisionHandler(self.SkillCollision, touchingPart, outputFromHandling) then
+                break
+            end
         end
 
         if outputFromHandling.Hit then
