@@ -26,6 +26,12 @@ local CurrentGameLength = RemoteValues:WaitForChild("CurrentGameLength")
 local PlayerCount = RemoteValues:WaitForChild("PlayerCount")
 local PlayersLeftCount = RemoteValues:WaitForChild("PlayersLeftCount")
 
+local ServerConstant = ServerModuleFacade.ServerConstant
+local DefaultReward = ServerConstant.DefaultReward
+local DefaultGameLength = ServerConstant.DefaultGameLength
+local MinPlayerCount = 1
+local MaxPlayerCount = 16
+
 
 -- 공통 저장소관련
 local GameStateType = ServerModuleFacade.CommonEnum.GameStateType
@@ -44,11 +50,6 @@ ChangeGameDataCTS.OnServerEvent:Connect(function(player, arg1)
 	print(MainMessage.Value)
 end)
 
-
-local DefaultReward = 100
-local GameLength = 50
-local MinPlayerCount = 1
-local MaxPlayerCount = 16
 
 
 local Initializer = require(script:WaitForChild("Initializer"))
@@ -105,6 +106,7 @@ function Temp()
 	end
 end
 
+--[[
 while #game.Players:GetPlayers() < 1 do
 	wait(1)
 end
@@ -117,8 +119,10 @@ end
 Temp()
 
 ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
+--]]
 
-while false  do
+
+while true  do
 	-- 다른 플레이어를 기다리는 중
 	if IsTestMode then
 		while #game.Players:GetPlayers() < 1 do
@@ -163,7 +167,7 @@ while false  do
 	-- 맵 선택
 
 	--ServerGlobalStorage:SelectRandomMapAndEnterMap(playersInGame)
-	ServerGlobalStorage:SelectRandomMapAndEnterMap(playersInGame)
+	ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(playersInGame)
 	
 	Initializer:StartGame(playersInGame)
 	
@@ -178,7 +182,7 @@ while false  do
 		ChangeGameStateSTC:FireClient(player, GameStateType.Playing, "TempMapName")
 	end
 	
-	local currentGameLength = GameLength
+	local currentGameLength = DefaultGameLength
 	
 	local prevTime = 0
 	local elapsedTime = 0
@@ -247,7 +251,7 @@ while false  do
 		end
 	end
 
-	wait(3)
+	wait(8)
 	if winnerType == WinnerType.Player then
 		NotifyWinnerSTC:FireAllClients(winnerType, winnerName, winnerReward)
 	else
@@ -260,9 +264,9 @@ while false  do
 	
 	-- 맵 정리
 	
+	
 	Initializer:ClearPlayers(playersInGame)
 	ClearGui()
-	Debris:AddItem(clonedMap, 0)
 	
 	wait(5)
 end

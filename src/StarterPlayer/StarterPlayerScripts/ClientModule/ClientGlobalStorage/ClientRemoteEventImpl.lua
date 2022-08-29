@@ -26,16 +26,31 @@ local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
 local SwapInventorySlotSTC = RemoteEvents:WaitForChild("SwapInventorySlotSTC")
 local SetRecentAttackerSTC = RemoteEvents:WaitForChild("SetRecentAttackerSTC")
 local SetSkillLastActivationTimeSTC = RemoteEvents:WaitForChild("SetSkillLastActivationTimeSTC")
-
+local SetKillCountSTC = RemoteEvents:WaitForChild("SetKillCountSTC")
 
 
 function ClientRemoteEventImpl:InitializeRemoteEvents(ClientGlobalStorage, GuiController)
 	ClientGlobalStorage.GuiController = GuiController
 	-- STC
+
+	SetKillCountSTC.OnClientEvent:Connect(function(currentKillCount)
+		Debug.Assert(currentKillCount, "currentKillCount 비정상")
+		
+		if not ClientGlobalStorage:SetKillCount(PlayerId, currentKillCount) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+		
+		if not GuiController:SetKillCount(currentKillCount) then
+			Debug.Assert(false, "비정상입니다.")
+			return
+		end
+	end)
+
 	SetRecentAttackerSTC.OnClientEvent:Connect(function(attacker)
 		Debug.Assert(attacker, "attacker 비정상")
 		
-		if ClientGlobalStorage:SetRecentAttacker(PlayerId, attacker) then
+		if not ClientGlobalStorage:SetRecentAttacker(PlayerId, attacker) then
 			Debug.Assert(false, "비정상입니다.")
 			return
 		end
@@ -180,7 +195,7 @@ function ClientRemoteEventImpl:InitializeRemoteEvents(ClientGlobalStorage, GuiCo
 	end)
 
 	ChangeGameStateSTC.OnClientEvent:Connect(function(gameState, ...)
-		GuiController:ChangeGameState(gameState, {...})
+		GuiController:ChangeGameState(gameState, ...)
 	end)
 
 end

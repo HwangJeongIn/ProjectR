@@ -29,7 +29,7 @@
 			<float name="MaxDistance">200</float>
 			<string name="Name">GuiObjectTooltip</string>
 			<Ref name="PlayerToHideFrom">null</Ref>
-			<bool name="ResetOnSpawn">true</bool>
+			<bool name="ResetOnSpawn">false</bool>
 			<Ref name="RootLocalizationTable">null</Ref>
 			<token name="SelectionBehaviorDown">0</token>
 			<token name="SelectionBehaviorLeft">0</token>

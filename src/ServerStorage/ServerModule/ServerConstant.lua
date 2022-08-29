@@ -14,7 +14,12 @@ local ServerEnum = require(ServerModule:WaitForChild("ServerEnum"))
 local ServerConstant = {
 	DefaultAttackPoint = 10,
 	DefaultSTRFactor = 1.2,
-	IsTestMode = true,
+	IsTestMode = false,
+	DefaultReward = 100,
+	DefaultGameLength = 500,
+
+	DefaultCharacterWalkSpeed = 100,
+	
 
 	EquipTypeToBoneMappingTable = {
 		[EquipType.Helmet] = {[1] = "Head"},

@@ -116,6 +116,31 @@ end
 
 -------------------------------------------------------------------------------------------------------
 
+function CommonGlobalStorage:GetKillCount(playerId)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return nil
+	end
+	
+	local actions = self.PlayerTable[playerId][StatusType.Actions]
+	return actions:GetKillCount()
+end
+
+function CommonGlobalStorage:SetKillCount(playerId, killCount)
+	if not self:CheckPlayer(playerId) then
+		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
+		return false
+	end
+	
+	local actions = self.PlayerTable[playerId][StatusType.Actions]
+	if not actions:SetKillCount(killCount) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	return true
+end
+
 function CommonGlobalStorage:SetRecentAttacker(playerId, attacker)
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
@@ -138,13 +163,7 @@ function CommonGlobalStorage:GetRecentAttacker(playerId)
 	end
 
 	local actions = self.PlayerTable[playerId][StatusType.Actions]
-	local attacker = actions:GetRecentAttacker()
-	if not attacker then
-		Debug.Assert(false, "비정상입니다.")
-		return nil
-	end
-
-	return attacker
+	return actions:GetRecentAttacker()
 end
 
 function CommonGlobalStorage:SetSkillLastActivationTime(playerId, skillGameDataKey, lastActivationTime)

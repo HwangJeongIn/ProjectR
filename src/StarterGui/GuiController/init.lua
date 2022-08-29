@@ -19,15 +19,12 @@ local RemoteValues = ReplicatedStorage:WaitForChild("RemoteValues")
 local PlayersLeftCount = RemoteValues:WaitForChild("PlayersLeftCount")
 local CurrentGameLength = RemoteValues:WaitForChild("CurrentGameLength")
 
-
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
-
 local GuiController = {}
 
--- 함수 정의 ------------------------------------------------------------------------------------------------------
 
 function GuiController:BindGuiKeys()
 
@@ -192,7 +189,7 @@ function GuiController:SetGuiEventMessage(inputText)
 	end
 end
 
-function GuiController:ProcessWaiting(arguments)
+function GuiController:ProcessWaiting()
 	print("GameStateType.Waiting in client")
 	self:SetGuiMainMessage("Waiting ... ")
 
@@ -200,22 +197,20 @@ function GuiController:ProcessWaiting(arguments)
 	
 end
 
-function GuiController:ProcessStarting(arguments)
+function GuiController:ProcessStarting()
 	print("GameStateType.Starting in client")
-	for i = 5, 1, -1 do
+	for i = 3, 1, -1 do
 		self:SetGuiMainMessage(tostring(i))
 		wait(1)
 	end
 end
 
-function GuiController:ProcessPlaying(arguments)
-	local mapName = arguments[1]
+function GuiController:ProcessPlaying(mapName)
 	self:SetGuiMainMessage(mapName .. " is selected")
 	
 	wait(2)
 	
 	self:SetGuiMainMessage("Get ready to play")
-
 	self:ToggleInGameGui(true)
 
 	wait(2)
@@ -223,20 +218,22 @@ function GuiController:ProcessPlaying(arguments)
 	self:SetGuiMainMessage("")
 end
 
-function GuiController:ProcessDead(arguments)
-	self:SetGuiMainMessage("You Died")
+function GuiController:ProcessDead(attacker)
+	if attacker then
+		self:SetGuiMainMessage("You are eliminated by " .. tostring(attacker))
+	else
+		self:SetGuiMainMessage("You are eliminated")
+	end
 end
 
-function GuiController:ProcessWaitingForFinishing(arguments)
+function GuiController:ProcessWaitingForFinishing()
 	self:ProcessWaiting()
 end
 
-
-function GuiController:ChangeGameState(gameState, arguments)
+function GuiController:ChangeGameState(gameState, ...)
 	--print("GameStateType : " .. gameState)
-	self.GameStateProcessSelector[gameState](self, arguments)
+	self.GameStateProcessSelector[gameState](self, ...)
 end
-
 
 function GuiController:SetWinnerMessage(winnerType, winnerName, winnerReward)
 	local winnerMessageString = self.WinnerProcessSelector[winnerType]
@@ -245,7 +242,7 @@ function GuiController:SetWinnerMessage(winnerType, winnerName, winnerReward)
 	if winnerName ~= nil then
 		winnerMessageString = winnerMessageString .. winnerName
 		if winnerReward ~= nil then
-			rewardMessageString = winnerName .. " got " .. tostring(winnerReward) .. " coins"
+			rewardMessageString = winnerName .. " got " .. tostring(winnerReward) .. " points"
 		end
 	end
 	
@@ -320,7 +317,17 @@ function GuiController:RefreshSkillByLastActivationTime(skillGameDataKey, lastAc
 	return true
 end
 
+function GuiController:SetKillCount(currentKillCount)
+	if not currentKillCount then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	Debug.Print("TEST => " .. tostring(currentKillCount))
+	self.GuiKilledCountText.Text = tostring(currentKillCount)
+	return true
+end
+
+
 GuiController:Initialize()
 return GuiController
-
--- 실행 코드 ------------------------------------------------------------------------------------------------------

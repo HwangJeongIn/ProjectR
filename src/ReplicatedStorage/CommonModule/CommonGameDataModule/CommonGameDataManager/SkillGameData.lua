@@ -58,7 +58,7 @@ end
 setmetatable(SkillGameData, GameDataBase)
 SkillGameData:Initialize(GameDataType.Skill)
 
---[[ 기본 공격 		--]] SkillGameData:InsertData(1, {Name = "BaseAttack", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 5, AttackRate = 100, Description = "Inflicting <AttackRate>% Damage."})
+--[[ 기본 공격 		--]] SkillGameData:InsertData(1, {Name = "BaseAttack", SkillType = SkillTypeSelector.AttackSkill, Cooldown = .2, AttackRate = 1000, Description = "Inflicting <AttackRate>% Damage."})
 
 --[[ 휠윈드			--]] --SkillGameData:InsertData(2, {Name = "WhirlwindSlash", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, AttackRate = 300, Description = "Spin around, inflicting <AttackRate>% Damage."})
 --[[ 템페스트 슬래시--]] --SkillGameData:InsertData(3, {Name = "TempestSlash", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, AttackRate = 210, Description = "Charge and slash, inflicting <AttackRate>% Damage."})

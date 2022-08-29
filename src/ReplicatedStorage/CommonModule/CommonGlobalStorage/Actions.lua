@@ -9,8 +9,24 @@ local CommonEnum = require(CommonModule:WaitForChild("CommonEnum"))
 
 local Actions = {
 	SkillLastActivationTimeTable = {},
-	RecentAttacker = nil
+	RecentAttacker = nil,
+	KillCount = 0,
 }
+
+
+function Actions:GetKillCount()
+	return self.KillCount
+end
+
+function Actions:SetKillCount(killCount)
+	if not killCount then
+		Debug.Assert(killCount, "비정상입니다.")
+		return false
+	end
+
+	self.KillCount = killCount
+	return true
+end
 
 function Actions:SetRecentAttacker(attacker)
 	if not attacker then

@@ -2,7 +2,7 @@
 	<Meta name="ExplicitAutoJoints">true</Meta>
 	<External>null</External>
 	<External>nil</External>
-	<Item class="ScreenGui" referent="RBX8FD137D777E644869BAEF99FD0741D36">
+	<Item class="ScreenGui" referent="892">
 		<Properties>
 			<BinaryString name="AttributesSerialize"></BinaryString>
 			<bool name="AutoLocalize">true</bool>
@@ -10,7 +10,7 @@
 			<bool name="Enabled">false</bool>
 			<bool name="IgnoreGuiInset">false</bool>
 			<string name="Name">GuiTemplate1</string>
-			<bool name="ResetOnSpawn">true</bool>
+			<bool name="ResetOnSpawn">false</bool>
 			<Ref name="RootLocalizationTable">null</Ref>
 			<token name="SelectionBehaviorDown">0</token>
 			<token name="SelectionBehaviorLeft">0</token>
@@ -21,7 +21,7 @@
 			<BinaryString name="Tags"></BinaryString>
 			<token name="ZIndexBehavior">1</token>
 		</Properties>
-		<Item class="ImageButton" referent="RBX3192B7965D664650ACB3064D94C45DAA">
+		<Item class="ImageButton" referent="893">
 			<Properties>
 				<bool name="Active">true</bool>
 				<Vector2 name="AnchorPoint">
@@ -120,7 +120,7 @@
 				<bool name="Visible">true</bool>
 				<int name="ZIndex">1</int>
 			</Properties>
-			<Item class="ImageLabel" referent="RBX58ADF6FDE74B458485AE4779AFEF2A68">
+			<Item class="ImageLabel" referent="894">
 				<Properties>
 					<bool name="Active">false</bool>
 					<Vector2 name="AnchorPoint">
@@ -213,7 +213,7 @@
 					<bool name="Visible">true</bool>
 					<int name="ZIndex">1</int>
 				</Properties>
-				<Item class="TextLabel" referent="RBXAE7AC3FCDEA4460FA5F6D9B0F9CAD1EC">
+				<Item class="TextLabel" referent="895">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -302,7 +302,7 @@
 						<int name="ZIndex">1</int>
 					</Properties>
 				</Item>
-				<Item class="TextLabel" referent="RBXD28FCAB5E43640D890DB8DB242943F82">
+				<Item class="TextLabel" referent="896">
 					<Properties>
 						<bool name="Active">false</bool>
 						<Vector2 name="AnchorPoint">
@@ -392,7 +392,7 @@
 					</Properties>
 				</Item>
 			</Item>
-			<Item class="Decal" referent="RBXF598B6E33A67433BB0AE00A0D4EFD311">
+			<Item class="Decal" referent="897">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Color3 name="Color3">
@@ -409,7 +409,7 @@
 					<int name="ZIndex">1</int>
 				</Properties>
 			</Item>
-			<Item class="Decal" referent="RBXF7E989E5AB5347F3B2A3F400A3379827">
+			<Item class="Decal" referent="898">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Color3 name="Color3">
@@ -426,7 +426,7 @@
 					<int name="ZIndex">1</int>
 				</Properties>
 			</Item>
-			<Item class="Decal" referent="RBX550F449C4B7647BF919CF6A057F34649">
+			<Item class="Decal" referent="899">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Color3 name="Color3">
@@ -443,7 +443,7 @@
 					<int name="ZIndex">1</int>
 				</Properties>
 			</Item>
-			<Item class="Decal" referent="RBX5CF5E228A9614A0DABC8425CEA609A2B">
+			<Item class="Decal" referent="900">
 				<Properties>
 					<BinaryString name="AttributesSerialize"></BinaryString>
 					<Color3 name="Color3">

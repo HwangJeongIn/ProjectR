@@ -3,6 +3,10 @@
   "Children": [
 
     {
+      "Name": "SetKillCountSTC",
+      "ClassName": "RemoteEvent"
+    },
+    {
       "Name": "SetRecentAttackerSTC",
       "ClassName": "RemoteEvent"
     },
@@ -42,11 +46,6 @@
       "Name": "NotifyWinnerSTC",
       "ClassName": "RemoteEvent"
     },
-    {
-      "Name": "UpdateKillCountSTC",
-      "ClassName": "RemoteEvent"
-    },
-
     
     {
       "Name": "ActivateToolSkillCTS",

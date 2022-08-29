@@ -43,11 +43,14 @@ function SkillImpl:IsWall(target)
 end
 
 function SkillImpl:DamagePlayer(skillFactor, attackerPlayer, attackee)
-
     local attackerPlayerStatisticRaw = ServerGlobalStorage:GetPlayerStatisticRaw(attackerPlayer.UserId)
     Debug.Assert(attackerPlayerStatisticRaw, "비정상입니다.")
 
     local targetCharacter = attackee.Parent
+    if not targetCharacter then
+        Debug.Assert(false, "비정상입니다.")
+        return 0
+    end
 
     local targetHumanoid = targetCharacter.Humanoid
     if not targetHumanoid then
@@ -65,7 +68,9 @@ function SkillImpl:DamagePlayer(skillFactor, attackerPlayer, attackee)
     local finalDamage = DamageCalculator:CalculateSkillDamage(skillFactor, attackerPlayerStatisticRaw, targetStatisticRaw)
     targetHumanoid:TakeDamage(finalDamage)
 
-    ServerGlobalStorage:SetRecentAttacker(attackerPlayer)
+    if not ServerGlobalStorage:SetRecentAttackerAndNotify(targetPlayer.UserId, attackerPlayer.Character) then
+        Debug.Assert(false, "비정상입니다.")
+    end
 
     return finalDamage
 end

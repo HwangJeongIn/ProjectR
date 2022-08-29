@@ -38,7 +38,7 @@ local EquipToolSTC = RemoteEvents:WaitForChild("EquipToolSTC")
 local UnequipToolSTC = RemoteEvents:WaitForChild("UnequipToolSTC")
 local SetRecentAttackerSTC = RemoteEvents:WaitForChild("SetRecentAttackerSTC")
 local SetSkillLastActivationTimeSTC = RemoteEvents:WaitForChild("SetSkillLastActivationTimeSTC")
-
+local SetKillCountSTC = RemoteEvents:WaitForChild("SetKillCountSTC")
 
 local ServerGlobalStorage = CommonGlobalStorage
 ServerGlobalStorage.__index = Utility.Inheritable__index
@@ -188,14 +188,36 @@ function ServerGlobalStorage:OnCreateEmptyPlayerData(playerData)
 
 end
 
+function ServerGlobalStorage:AddKillCountAndNotify(playerId)
+	local currentKillCount = self:GetKillCount(playerId)
+	if nil == currentKillCount then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	currentKillCount += 1
+	if not self:SetKillCount(playerId, currentKillCount) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local player = game.Players:GetPlayerByUserId(playerId)
+	SetKillCountSTC:FireClient(player, currentKillCount)
+
+	Debug.Print("AddKillCountAndNotify : " .. player.Name .. " => " .. tostring(currentKillCount))
+	return true
+end
+
 function ServerGlobalStorage:SetRecentAttackerAndNotify(playerId, attacker)
-	if self:SetRecentAttacker(playerId, attacker) then
+	if not self:SetRecentAttacker(playerId, attacker) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
 	local player = game.Players:GetPlayerByUserId(playerId)
 	SetRecentAttackerSTC:FireClient(player, attacker)
+	
+	Debug.Print("SetRecentAttackerAndNotify : Attacker : " .. attacker.Name .. " | Attackee : " .. player.Name)
 	return true
 end
 

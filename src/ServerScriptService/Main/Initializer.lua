@@ -10,6 +10,10 @@ local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacad
 
 local Debug = ServerModuleFacade.Debug
 local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility
+
+local ServerConstant = ServerModuleFacade.ServerConstant
+local DefaultCharacterWalkSpeed = ServerConstant.DefaultCharacterWalkSpeed
+
 local CommonEnum = ServerModuleFacade.CommonEnum
 local GameStateType = CommonEnum.GameStateType
 local ToolType = CommonEnum.ToolType
@@ -95,12 +99,31 @@ function OnCharacterAdded(player, character)
 		Debug.Assert(false, "비정상입니다.")
 	end
 	
+	character.Humanoid.WalkSpeed = DefaultCharacterWalkSpeed
 	character.Humanoid.Died:Connect(function()
+		local playerId = player.UserId
+		local attacker = ServerGlobalStorage:GetRecentAttacker(playerId)
+		if attacker then
+			ChangeGameStateSTC:FireClient(player, GameStateType.Dead, attacker.Name)
+
+			local attackerPlayer = game.Players:GetPlayerFromCharacter(attacker)
+			if attackerPlayer then
+				local attackerPlayerId = attackerPlayer.UserId
+				if not ServerGlobalStorage:AddKillCountAndNotify(attackerPlayerId) then
+					Debug.Assert(false, "AddKillCountAndNotify에 실패했습니다.")
+				end
+			end
+		else
+			ChangeGameStateSTC:FireClient(player, GameStateType.Dead)
+		end
+		
+
 		-- 죽었을 때
 		if character:FindFirstChild("AliveTag")  then
 			Debris:AddItem(character.AliveTag, 0)
 		end
-		ChangeGameStateSTC:FireClient(player, GameStateType.Dead)
+
+		wait(3)
 		--player:LoadCharacterBlocking()
 		ChangeGameStateSTC:FireClient(player, GameStateType.WaitingForFinishing)
 	end)
