@@ -74,13 +74,15 @@ function ServerGlobalStorage:CloneObjectFromDummyObject(gameDataType, dummyObjec
 	local createdObject = nil
 	if GameDataType.Tool == gameDataType then
 		local objectGameDataKey = ToolUtility:GetGameDataKeyByModelName(dummyObjectName)
-		createdObject = self:CreateToolToWorkspace(objectGameDataKey, dummyObjectCFrame)
+		createdObject = self:CreateToolToCurrentMap(objectGameDataKey, dummyObjectCFrame)
 
 	elseif GameDataType.WorldInteractor == gameDataType then
 		local objectGameDataKey = WorldInteractorUtility:GetGameDataKeyByModelName(dummyObjectName)
 		createdObject = self:CreateWorldInteractor(objectGameDataKey, dummyObjectCFrame)
 
 	elseif GameDataType.Npc == gameDataType then
+		-- Npc 생성
+		-- TODO : Npc 시스템 추가되면 생성 코드 정리
 		local objectGameDataKey = NpcUtility:GetGameDataKeyByModelName(dummyObjectName)
 		createdObject = self:CreateNpc(objectGameDataKey, dummyObjectCFrame)
 
@@ -98,20 +100,18 @@ function ServerGlobalStorage:CloneObjectFromDummyObject(gameDataType, dummyObjec
 end
 
 function ServerGlobalStorage:CreateObjectsFromDummyObjects(gameDataType, dummyObjectsFolder)
-	local objectsFolder = Instance.new("Folder")
-	
 	local dummyObjects = dummyObjectsFolder:GetChildren()
 	for _, dummyObject in dummyObjects do
 		local createdObject = self:CloneObjectFromDummyObject(gameDataType, dummyObject)
 		if not createdObject then
 			Debug.Assert(false, "비정상입니다.")
-			return nil
+			return false
 		end
 
-		createdObject.Parent = objectsFolder
+		self.MapController:AddObjectToCurrentMap(gameDataType, createdObject)
 	end
 
-	return objectsFolder
+	return true
 end
 
 function ServerGlobalStorage:CreateMapObjectsByMapTemplate(mapTemplate)
@@ -120,33 +120,24 @@ function ServerGlobalStorage:CreateMapObjectsByMapTemplate(mapTemplate)
 	local mapNpcs = mapTemplate:GetNpcs()
 
 	if mapTools then
-		local createdObjects = self:CreateObjectsFromDummyObjects(GameDataType.Tool, mapTools)
-		if not createdObjects then
+		if not self:CreateObjectsFromDummyObjects(GameDataType.Tool, mapTools) then
 			Debug.Assert(false, "비정상입니다.")
 			return false
 		end
-
-		self.MapController:SetCurrentMapObjects(GameDataType.Tool, createdObjects)
 	end
 
 	if mapWorldInteractors then
-		local createdObjects = self:CreateObjectsFromDummyObjects(GameDataType.WorldInteractor, mapWorldInteractors)
-		if not createdObjects then
+		if not self:CreateObjectsFromDummyObjects(GameDataType.WorldInteractor, mapWorldInteractors) then
 			Debug.Assert(false, "비정상입니다.")
 			return false
 		end
-
-		self.MapController:SetCurrentMapObjects(GameDataType.WorldInteractor, createdObjects)
 	end
 
 	if mapNpcs then
-		local createdObjects = self:CreateObjectsFromDummyObjects(GameDataType.Npc, mapNpcs)
-		if not createdObjects then
+		if not self:CreateObjectsFromDummyObjects(GameDataType.Npc, mapNpcs) then
 			Debug.Assert(false, "비정상입니다.")
 			return false
 		end
-
-		self.MapController:SetCurrentMapObjects(GameDataType.Npc, createdObjects)
 	end
 
 	return true
@@ -182,6 +173,39 @@ function ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(playersInGame)
 
 	self.MapController:EnterMap(playersInGame)
 	return true
+end
+
+
+function ServerGlobalStorage:ClearCurrentMap()
+	-- Tool 정리
+	local tools = self.MapController:GetCurrentMapObjects(GameDataType.Tool)
+	if tools then
+		local toolsToDelete = tools:GetChildren()
+		for _, toolToDelete in pairs(toolsToDelete) do
+			if not self:DestroyTool(toolToDelete) then
+				Debug.Assert(false, "비정상입니다.")
+				return false
+			end
+		end
+	end
+
+	-- WorldInteractor 정리
+	local worldInteractors = self.MapController:GetCurrentMapObjects(GameDataType.WorldInteractor)
+	if worldInteractors then
+		local worldInteractorsToDelete = worldInteractors:GetChildren()
+		for _, worldInteractorToDelete in pairs(worldInteractorsToDelete) do
+			if not self:DestroyWorldInteractor(worldInteractorToDelete) then
+				Debug.Assert(false, "비정상입니다.")
+				return false
+			end
+		end
+	end
+
+
+	-- Npc 정리
+	-- TODO : Npc 시스템 추가되면 정리 코드도 추가
+
+	self.MapController:ClearCurrentMap()
 end
 
 function ServerGlobalStorage:OnCreateEmptyPlayerData(playerData)
@@ -296,7 +320,11 @@ function ServerGlobalStorage:CreateWorldInteractor(worldInteractorKey, worldInte
 		return nil
 	end
 
-	createdWorldInteractor.Parent = workspace
+	if not self.MapController:AddObjectToCurrentMap(GameDataType.WorldInteractor, createdWorldInteractor) then
+		Debug.Assert(false, "맵이 없습니다.")
+		return nil
+	end
+
 	createdWorldInteractor.Trigger.CFrame = worldInteractorCFrame
 	return createdWorldInteractor 
 end
@@ -367,8 +395,14 @@ function ServerGlobalStorage:CreateToolToPlayer(toolKey, player)
 	return createdTool
 end
 
-function ServerGlobalStorage:CreateToolToWorkspace(toolKey, toolCFrame)
-	local createdTool = self:CreateTool(toolKey, game.workspace, toolCFrame)
+function ServerGlobalStorage:CreateToolToCurrentMap(toolKey, toolCFrame)
+	local currentMapTools = self.MapController:GetCurrentMapObjects(GameDataType.Tool)
+	if not currentMapTools then
+		Debug.Assert(false, "맵이 없습니다.")
+		return nil
+	end
+
+	local createdTool = self:CreateTool(toolKey, currentMapTools, toolCFrame)
 	if not createdTool then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
@@ -391,6 +425,7 @@ function ServerGlobalStorage:DestroyTool(tool)
 
 	return true
 end
+
 
 function ServerGlobalStorage:DropToolRaw(character, tool)
 	
@@ -424,7 +459,13 @@ function ServerGlobalStorage:DropToolRaw(character, tool)
 
 	local targetCFrame = characterCFrame + characterCFrame.LookVector * 3
 	
-	tool.Parent = game.workspace
+	local currentMapTools = self.MapController:GetCurrentMapObjects(GameDataType.Tool)
+	if currentMapTools then
+		tool.Parent = currentMapTools
+	else
+		tool.Parent = game.workspace
+	end
+	
 	tool.Handle.CFrame = targetCFrame
 	return true
 end

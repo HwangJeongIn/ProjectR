@@ -39,28 +39,24 @@ function MapController:GetCurrentMap()
 	return self.CurrentMap.Map
 end
 
-function MapController:SetCurrentMapObjects(gameDataType, objects)
+
+function MapController:AddObjectToCurrentMap(gameDataType, object)
 	if not self.CurrentMap.Map then
 		Debug.Assert(false, "CurrentMap이 없습니다.")
 		return false
 	end
 
 	if GameDataType.Tool == gameDataType then
-		self.CurrentMap.Tools = objects
-		self.CurrentMap.Tools.Parent = self.CurrentMap.Map
-
+		object.Parent = self.CurrentMap.Tools
 	elseif GameDataType.WorldInteractor == gameDataType then
-		self.CurrentMap.WorldInteractors = objects
-		self.CurrentMap.WorldInteractors.Parent = self.CurrentMap.Map
-
+		object.Parent = self.CurrentMap.WorldInteractors
 	elseif GameDataType.Npc == gameDataType then
-		self.CurrentMap.Npcs = objects
-		self.CurrentMap.Npcs.Parent = self.CurrentMap.Map
-
+		object.Parent = self.CurrentMap.Npcs
 	else
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
+
 	return true
 end
 
@@ -103,6 +99,25 @@ function MapController:SetCurrentMap(map)
 
 	self.CurrentMap.Map = map:Clone()
 	self.CurrentMap.Map.Parent = workspace
+
+	-- Tools
+	local tools = Instance.new("Folder")
+	tools.Name = "Tools"
+	tools.Parent = self.CurrentMap.Map
+	self.CurrentMap.Tools = tools
+
+	-- WorldInteractors
+	local worldInteractors = Instance.new("Folder")
+	worldInteractors.Name = "WorldInteractors"
+	worldInteractors.Parent = self.CurrentMap.Map
+	self.CurrentMap.WorldInteractors = worldInteractors
+
+	-- Npcs
+	local npcs = Instance.new("Folder")
+	npcs.Name = "Npcs"
+	npcs.Parent = self.CurrentMap.Map
+	self.CurrentMap.Npcs = npcs
+
 	return true
 end
 

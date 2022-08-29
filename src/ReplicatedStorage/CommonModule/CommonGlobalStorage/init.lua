@@ -11,6 +11,7 @@ local GameDataType = CommonEnum.GameDataType
 local StatusType = CommonEnum.StatusType
 local ToolType = CommonEnum.ToolType
 local EquipType = CommonEnum.EquipType
+local StatType = CommonEnum.StatType
 
 local CommonGameDataModule = CommonModule:WaitForChild("CommonGameDataModule")
 local CommonGameDataManager = require(CommonGameDataModule:WaitForChild("CommonGameDataManager"))
@@ -252,6 +253,9 @@ function CommonGlobalStorage:UpdateRemovedToolGameData(playerId, toolGameData)
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
+
+	-- 바로 적용해야하는 스탯은 바로 적용한다. (이동속도 등)
+	playerStatistic:GetStat(StatType.Move)
 
 	return true
 end

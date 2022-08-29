@@ -106,7 +106,6 @@ function Temp()
 	end
 end
 
---[[
 while #game.Players:GetPlayers() < 1 do
 	wait(1)
 end
@@ -119,10 +118,12 @@ end
 Temp()
 
 ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
---]]
+
+--wait(30)
+--ServerGlobalStorage:ClearCurrentMap()
 
 
-while true  do
+while false  do
 	-- 다른 플레이어를 기다리는 중
 	if IsTestMode then
 		while #game.Players:GetPlayers() < 1 do
@@ -267,6 +268,7 @@ while true  do
 	
 	Initializer:ClearPlayers(playersInGame)
 	ClearGui()
+	ServerGlobalStorage:ClearCurrentMap()
 	
 	wait(5)
 end
