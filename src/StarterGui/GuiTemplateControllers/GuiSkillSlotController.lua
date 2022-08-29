@@ -42,9 +42,21 @@ function GuiSkillSlotController:new(slotIndex, newGuiSlot)
 		newGuiSkillSlotController.GuiSlot.ImageTransparency = 0
 	end)
 
+	-- 추가 쿨타임 표시 텍스트
+	local skillCooldownTimeText = Instance.new("TextLabel")
+    skillCooldownTimeText.AnchorPoint = Vector2.new(0.5, 0.5)
+	skillCooldownTimeText.Position = UDim2.new(0.5, 0, 0.5, 0)
+	skillCooldownTimeText.Size = UDim2.new(0.6, 0, 0.6, 0)
+	skillCooldownTimeText.TextScaled = true
+	skillCooldownTimeText.TextColor3 = Color3.new(1, 0.1, 0.1) 
+	skillCooldownTimeText.BackgroundTransparency = 1
+	skillCooldownTimeText.Visible = false
+	skillCooldownTimeText.Parent = newGuiSkillSlotController.GuiSlot.GuiImage
+	newGuiSkillSlotController.GuiSkillCooldown = skillCooldownTimeText
+
+	-- 기존 StackCount로 사용하던 Number 위치 변경(바인딩된 키를 보여주도록 설정)
 	newGuiSkillSlotController.GuiSlot.GuiImage.GuiNumber.Size =  UDim2.new(0.3, 0, 0.3, 0)
 	newGuiSkillSlotController.GuiSlot.GuiImage.GuiNumber.Position =  UDim2.new(0, 0, 0, 0)
-
 
 	local targetSlotIndexEnum = ToolUtility.SkillSlotIndexToKeyCodeTable[newGuiSkillSlotController.SlotIndex]
 	if not targetSlotIndexEnum then
@@ -79,7 +91,7 @@ function GuiSkillSlotController:ClearSkillData()
 	self.SkillGameData = nil
 
 	self.SkillLastActivationTime = nil
-	self.RemainingCooldownTime = nil
+	self.RemainingSkillCooldown = nil
 
 	self:ClearCalculateCooldownConnection()
 	self:SetVisible(false)
@@ -89,6 +101,7 @@ function GuiSkillSlotController:ClearCalculateCooldownConnection()
 	if self.CalculateCooldownConnection then
 		self.CalculateCooldownConnection:Disconnect()
 		self.CalculateCooldownConnection = nil
+		self.GuiSkillCooldown.Visible = false
 	end
 end
 
@@ -102,8 +115,8 @@ function GuiSkillSlotController:ActivateSkill()
 		return true
 	end
 
-	if 0 < self.RemainingCooldownTime then
-		Debug.Print(tostring("스킬 쿨타임이 " .. self.RemainingCooldownTime) .. " 초 남았습니다.")
+	if 0 < self.RemainingSkillCooldown then
+		Debug.Print(tostring("스킬 쿨타임이 " .. self.RemainingSkillCooldown) .. " 초 남았습니다.")
 		return true
 	end
 
@@ -160,7 +173,7 @@ function GuiSkillSlotController:SetSkill(skillOwnerTool, skillGameData)
 
 	self.SkillLastActivationTime = ClientGlobalStorage:GetSkillLastActivationTime(playerId, skillGameData:GetKey())
 	if not self.SkillLastActivationTime then
-		self.RemainingCooldownTime = 0
+		self.RemainingSkillCooldown = 0
 	else
 		if not self:RefreshByLastActivationTime(self.SkillLastActivationTime) then
 			Debug.Assert(false, "비정상입니다.")
@@ -173,9 +186,11 @@ function GuiSkillSlotController:SetSkill(skillOwnerTool, skillGameData)
 end
 
 function GuiSkillSlotController:CalculateCooldown(deltaTime)
-	self.RemainingCooldownTime -= deltaTime
+	self.RemainingSkillCooldown -= deltaTime
 
-	if 0 >= self.RemainingCooldownTime then
+	local cooldownText = tostring(math.floor(self.RemainingSkillCooldown))
+	self.GuiSkillCooldown.Text = cooldownText
+	if 0 >= self.RemainingSkillCooldown then
 		self:ClearCalculateCooldownConnection()
 		Debug.Print("Disconnected")
 	end
@@ -189,16 +204,18 @@ function GuiSkillSlotController:RefreshByLastActivationTime(lastActivationTime)
 
 	self.SkillLastActivationTime = lastActivationTime
 	if not self.SkillLastActivationTime then
-		self.RemainingCooldownTime = 0
+		self.RemainingSkillCooldown = 0
 	else
 		local elapsedTime = os.clock() - self.SkillLastActivationTime
-		self.RemainingCooldownTime = self.SkillGameData.Cooldown - elapsedTime
-		self.RemainingCooldownTime = math.max(0, self.RemainingCooldownTime)
+		self.RemainingSkillCooldown = self.SkillGameData.Cooldown - elapsedTime
+		self.RemainingSkillCooldown = math.max(0, self.RemainingSkillCooldown)
 	end
 
-	if 0 < self.RemainingCooldownTime then
+	if 0 < self.RemainingSkillCooldown then
 		-- Heartbeat 델리게이트에 바인딩하여 타이머 실행
 		self:ClearCalculateCooldownConnection()
+
+		self.GuiSkillCooldown.Visible = true
 		self.CalculateCooldownConnection = RunService.Heartbeat:Connect(function(deltaTime)
 			self:CalculateCooldown(deltaTime)
 		end)

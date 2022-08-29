@@ -59,7 +59,6 @@ function GuiSkillSlotsController:Initialize()
     end
     
     --local GuiSkillSlotsSize = GuiSkillSlotsWidth
-
     local mainToolSlotRatio = 0.5
     local mainToolSlotPositionRatioX = 0.5 +  mainToolSlotRatio / 2
     local mainToolSlotPositionRatioY = 0.5 +  mainToolSlotRatio / 2

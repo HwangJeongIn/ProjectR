@@ -24,10 +24,10 @@ function GuiFacade:Initialize()
     local GuiHpBar = GuiHpBarBackground:WaitForChild("GuiHpBar")
 
     local GuiMinimap = GuiHUDTopWindow:WaitForChild("GuiMinimap")
-    
+
     self.GuiHUD = GuiHUD
     self.GuiHUDTop = GuiHUDTop
-    --self.GuiHUDTopWindow = GuiHUDTopWindow
+    self.GuiHUDTopWindow = GuiHUDTopWindow
     self.GuiGameStateWindow = GuiGameStateWindow
     self.GuiBoardWindow = GuiBoardWindow
     self.GuiBarsWindow = GuiBarsWindow
@@ -41,7 +41,7 @@ function GuiFacade:Initialize()
     local GuiSkillSlots = GuiHUDBottomWindow:WaitForChild("GuiSkillSlots")
 
     self.GuiHUDBottom = GuiHUDBottom
-    --self.GuiHUDBottomWindow = GuiHUDBottomWindow
+    self.GuiHUDBottomWindow = GuiHUDBottomWindow
     self.GuiQuickSlots = GuiQuickSlots
     self.GuiSkillSlots = GuiSkillSlots
 

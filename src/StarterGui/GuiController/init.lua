@@ -89,6 +89,16 @@ function GuiController:InitializeTopbar()
 	GuiTopbar.Parent = PlayerGui
 end
 
+function GuiController:TestCode()
+	GuiFacade.GuiHUDBottomWindow.BackgroundTransparency = 1
+	GuiFacade.GuiSkillSlots.BackgroundTransparency = 1
+	GuiFacade.GuiHUDTopWindow.BackgroundTransparency = 1
+	GuiFacade.GuiGameStateWindow.BackgroundTransparency = 1
+	GuiFacade.GuiBoardWindow.BackgroundTransparency = 1
+	GuiFacade.GuiBarsWindow.BackgroundTransparency = 1
+	GuiFacade.GuiMinimap.BackgroundTransparency = 1
+end
+
 function GuiController:Initialize()
 	self.GuiInventoryController = require(script:WaitForChild("GuiInventoryController"))
 	self.GuiEquipSlotsController = require(script:WaitForChild("GuiEquipSlotsController"))
@@ -136,6 +146,9 @@ function GuiController:Initialize()
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
+
+	-- 테스트를 쉽게 하기 위한 임시코드
+	self:TestCode()
 
 	return true
 end
