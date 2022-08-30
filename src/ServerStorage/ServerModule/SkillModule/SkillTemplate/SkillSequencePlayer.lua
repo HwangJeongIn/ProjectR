@@ -38,6 +38,18 @@ function SkillSequencePlayer:Simulate(skillCollisionHandler)
     local prevTime = os.clock()
     local currentTime = prevTime
     local deltaTime = 0
+
+    local playerCharacter = self.SkillOwner.character
+    if not playerCharacter then
+        Debug.Assert(false, "캐릭터가 없습니다.")
+        return false
+    end
+
+    local humanoidRootPart = playerCharacter:FindFirstChild("HumanoidRootPart")
+    if not humanoidRootPart then
+        Debug.Assert(false, "HumanoidRootPart가 없습니다.")
+        return false
+    end
     
     local currentAnimationTrackIndex = 1
     local currentSkillSequenceAnimationTrackPlayer = self:StartSkillSequenceAnimationTrackPlayer(currentAnimationTrackIndex)
@@ -83,7 +95,7 @@ function SkillSequencePlayer:Simulate(skillCollisionHandler)
         -- 추가되는 프레임에서는 업데이트를 따로 하지 않는다.
         if returnedCollisionSequencePlayers then
             for _, collisionSequencePlayer in pairs(returnedCollisionSequencePlayers) do
-                collisionSequencePlayer:Start(skillCollisionHandler)
+                collisionSequencePlayer:Start(humanoidRootPart.CFrame, skillCollisionHandler)
                 self.SkillSequenceCollisionPlayerCount += 1
                 table.insert(self.SkillSequenceCollisionPlayers, collisionSequencePlayer)
             end

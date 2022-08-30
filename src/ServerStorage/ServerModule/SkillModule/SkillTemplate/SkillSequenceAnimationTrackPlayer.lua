@@ -56,7 +56,7 @@ function SkillSequenceAnimationTrackPlayer:Initialize(player, skillSequenceAnima
         local currentSkillCollisionSequenceWrapper = self.SkillSequenceAnimationTrack:GetSkillCollisionSequenceWrapper(skillCollisionSequenceIndex)
         
         local skillCollisionSequencePlayer = Utility:DeepCopy(SkillCollisionSequencePlayer)
-        if not skillCollisionSequencePlayer:Initialize(currentSkillCollisionSequenceWrapper.SkillCollisionSequence, humanoidRootPart.CFrame) then
+        if not skillCollisionSequencePlayer:Initialize(currentSkillCollisionSequenceWrapper.SkillCollisionSequence) then
             Debug.Assert(false, "SkillCollisionSequencePlayer 초기화에 싪했습니다.")
             return false
         end
@@ -80,7 +80,7 @@ function SkillSequenceAnimationTrackPlayer:Initialize(player, skillSequenceAnima
         local animationLength = skillSequenceAnimationWrapper.AnimationLength
 
         self.PlayableSkillSequenceAnimationTrack = humanoid:LoadAnimation(animation)
-        self.SkillSequenceAnimationSpeed =   self.SkillSequenceAnimationTrack:GetSkillSequenceAnimationSpeed()
+        self.SkillSequenceAnimationSpeed = self.SkillSequenceAnimationTrack:GetSkillSequenceAnimationSpeed()
         -- animationLength / self.SkillSequenceAnimationDuration
     end
 

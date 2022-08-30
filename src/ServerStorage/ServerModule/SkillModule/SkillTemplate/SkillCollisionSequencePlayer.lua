@@ -74,18 +74,12 @@ function SkillCollisionSequencePlayer:InitializeAllSkillCollisionSequenceTrackDi
     return true
 end
 
-function SkillCollisionSequencePlayer:Initialize(collisionSequence, originCFrame)
-    if not collisionSequence or not originCFrame then
+function SkillCollisionSequencePlayer:Initialize(collisionSequence)
+    if not collisionSequence then
         Debug.Assert(false, "비정상입니다.")
         return false
     end
 
-    if not self:InitializeAllSkillCollisionSequenceTrackDirections(collisionSequence, originCFrame) then
-        Debug.Assert(false, "InitializeAllSkillCollisionSequenceTrackDirections에 실패했습니다.")
-        return false
-    end
-
-    self.OriginCFrame = originCFrame
     self.SkillCollisionSequence = collisionSequence
     self.SkillCollisionSequenceTrackCount = collisionSequence:GetSkillCollisionSequenceTrackCount()
 
@@ -203,8 +197,13 @@ function SkillCollisionSequencePlayer:InitializeSkillCollision(originCFrame)
     return true
 end
 
-function SkillCollisionSequencePlayer:Start(skillCollisionHandler)
-    if not self:InitializeSkillCollision(self.OriginCFrame) then
+function SkillCollisionSequencePlayer:Start(originCFrame, skillCollisionHandler)
+    if not self:InitializeAllSkillCollisionSequenceTrackDirections(self.SkillCollisionSequence, originCFrame) then
+        Debug.Assert(false, "InitializeAllSkillCollisionSequenceTrackDirections에 실패했습니다.")
+        return false
+    end
+
+    if not self:InitializeSkillCollision(originCFrame) then
         Debug.Assert(false, "InitializeSkillCollisio에 실패했습니다.")
         return false
     end
