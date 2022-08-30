@@ -18,7 +18,10 @@ local ServerConstant = {
 	DefaultReward = 100,
 	DefaultGameLength = 500,
 
-	DefaultCharacterWalkSpeed = 100,
+	DefaultPlayerWalkSpeed = 20, -- 16 : 기본 로블록스 값
+	DefaultPlayerMaxHealth = 100, -- 100 : 기본 로블록스 값
+	DefaultPlayerJumpHeight = 8, -- 7.2 : 기본 로블록스 값
+	DefaultPlayerJumpPower = 50, -- 50 : 기본 로블록스 값
 	
 
 	EquipTypeToBoneMappingTable = {

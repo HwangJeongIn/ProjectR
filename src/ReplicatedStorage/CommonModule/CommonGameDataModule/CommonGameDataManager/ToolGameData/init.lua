@@ -129,9 +129,9 @@ ToolGameData:InsertData(10, {Name = "BloodSword", ToolType = ToolTypeSelector.We
 
 -- 방어구 종류
 ToolGameData:InsertData(101, {Name = "Helmet", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Helmet, DEF = 15})
-ToolGameData:InsertData(102, {Name = "Chestplate", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 30, Move = -5})
-ToolGameData:InsertData(103, {Name = "Leggings", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 20, Move = 5})
-ToolGameData:InsertData(104, {Name = "Boots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 10})
+ToolGameData:InsertData(102, {Name = "Chestplate", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 40, Move = -8})
+ToolGameData:InsertData(103, {Name = "Leggings", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 20})
+ToolGameData:InsertData(104, {Name = "Boots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 10, Jump = 5})
 
 
 

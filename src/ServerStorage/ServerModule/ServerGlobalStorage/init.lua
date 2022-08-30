@@ -17,6 +17,11 @@ local ServerConstant = require(ServerModule:WaitForChild("ServerConstant"))
 
 local ServerObjectUtilityModule = ServerModule:WaitForChild("ServerObjectUtilityModule")
 
+local DefaultPlayerWalkSpeed = ServerConstant.DefaultPlayerWalkSpeed
+local DefaultPlayerMaxHealth = ServerConstant.DefaultPlayerMaxHealth
+local DefaultPlayerJumpHeight = ServerConstant.DefaultPlayerJumpHeight
+local DefaultPlayerJumpPower = ServerConstant.DefaultPlayerJumpPower
+
 local MaxPickupDistance = ServerConstant.MaxPickupDistance
 local MaxDropDistance = ServerConstant.MaxDropDistance
 local MaxSkillCount = ServerConstant.MaxSkillCount
@@ -27,6 +32,7 @@ local GameDataType = ServerEnum.GameDataType
 local StatusType = ServerEnum.StatusType
 local ToolType = ServerEnum.ToolType
 local EquipType = ServerEnum.EquipType
+local StatType = ServerEnum.StatType
 
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
@@ -210,6 +216,47 @@ end
 
 function ServerGlobalStorage:OnCreateEmptyPlayerData(playerData)
 
+end
+
+function ServerGlobalStorage:ApplyStatToHumanoid(playerId, playerStatistic)
+	if not playerId or not playerStatistic then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	local player = game.Players:GetPlayerByUserId(playerId)
+	local character = player.Character
+	if not character then
+		Debug.Assert(false, "캐릭터가 없습니다.")
+		return false
+	end
+
+	local humanoid = character.Humanoid
+	if not humanoid then
+		Debug.Assert(false, "Humanoid가 없습니다.")
+		return false
+	end
+
+	local hp = playerStatistic:GetStat(StatType.Hp)
+	humanoid.MaxHealth = DefaultPlayerMaxHealth + hp
+	humanoid.Health = humanoid.Health + hp
+
+	local move = playerStatistic:GetStat(StatType.Move)
+	humanoid.WalkSpeed = DefaultPlayerWalkSpeed + move
+
+	local jump = playerStatistic:GetStat(StatType.Jump)
+	humanoid.JumpHeight = DefaultPlayerJumpHeight + jump
+	humanoid.JumpPower = DefaultPlayerJumpPower + jump
+	
+	return true
+end
+
+function ServerGlobalStorage:PostUpdateRemovedToolGameData(playerId, playerStatistic)
+	return self:ApplyStatToHumanoid(playerId, playerStatistic)
+end
+
+function ServerGlobalStorage:PostUpdateAddedToolGameData(playerId, playerStatistic)
+	return self:ApplyStatToHumanoid(playerId, playerStatistic)
 end
 
 function ServerGlobalStorage:AddKillCountAndNotify(playerId)

@@ -242,6 +242,14 @@ function CommonGlobalStorage:GetStat(playerId, statType)
 	return targetStat
 end
 
+function CommonGlobalStorage:PostUpdateRemovedToolGameData(playerId, playerStatistic)
+	return true
+end
+
+function CommonGlobalStorage:PostUpdateAddedToolGameData(playerId, playerStatistic)
+	return true
+end
+
 function CommonGlobalStorage:UpdateRemovedToolGameData(playerId, toolGameData)
 	if not self:CheckPlayer(playerId) then
 		Debug.Assert(false, "플레이어가 존재하지 않습니다.")
@@ -254,8 +262,10 @@ function CommonGlobalStorage:UpdateRemovedToolGameData(playerId, toolGameData)
 		return false
 	end
 
-	-- 바로 적용해야하는 스탯은 바로 적용한다. (이동속도 등)
-	playerStatistic:GetStat(StatType.Move)
+	if not self:PostUpdateRemovedToolGameData(playerId, playerStatistic) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
 
 	return true
 end
@@ -268,6 +278,11 @@ function CommonGlobalStorage:UpdateAddedToolGameData(playerId, toolGameData)
 
 	local playerStatistic = self.PlayerTable[playerId][StatusType.Statistic]
 	if not playerStatistic:UpdateAddedToolGameData(toolGameData) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
+	end
+
+	if not self:PostUpdateAddedToolGameData(playerId, playerStatistic) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end

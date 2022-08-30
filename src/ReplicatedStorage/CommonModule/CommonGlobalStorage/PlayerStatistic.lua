@@ -28,11 +28,12 @@ local EmptyStatistic = {
 	[StatType.STR] = 0,
 	[StatType.DEF] = 0,
 	[StatType.Move] = 0,
+	[StatType.Jump] = 0,
 	[StatType.AttackSpeed] = 0,
 	
-	[StatType.HP] = 0,
-	[StatType.MP] = 0,
-	[StatType.HIT] = 0,
+	[StatType.Hp] = 0,
+	[StatType.Mp] = 0,
+	[StatType.Hit] = 0,
 	[StatType.Dodge] = 0,
 	[StatType.Block] = 0,
 	[StatType.Critical] = 0,
@@ -54,19 +55,13 @@ function PlayerStatistic:GetPlayerStatisticRaw()
 end
 
 function PlayerStatistic:GetStat(statType)
-	local targetStatName = StatTypeConverter[statType]
-	if nil == targetStatName then
-        Debug.Assert(false, "비정상입니다.")
-		return nil
-	end
-
-	local targetStatType = self.Value[targetStatName]
-	if nil == targetStatType then
+	local targetStat = self.Value[statType]
+	if nil == targetStat then
 		Debug.Assert(false, "비정상입니다.")
 		return nil
 	end
 
-	return targetStatType
+	return targetStat
 end
 
 function PlayerStatistic:UpdateStatFromToolGameData(toolGameData, isAdded)

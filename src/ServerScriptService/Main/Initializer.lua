@@ -12,7 +12,12 @@ local Debug = ServerModuleFacade.Debug
 local ObjectCollisionGroupUtility = ServerModuleFacade.ObjectCollisionGroupUtility
 
 local ServerConstant = ServerModuleFacade.ServerConstant
-local DefaultCharacterWalkSpeed = ServerConstant.DefaultCharacterWalkSpeed
+
+local DefaultPlayerWalkSpeed = ServerConstant.DefaultPlayerWalkSpeed
+local DefaultPlayerMaxHealth = ServerConstant.DefaultPlayerMaxHealth
+local DefaultPlayerJumpHeight = ServerConstant.DefaultPlayerJumpHeight
+local DefaultPlayerJumpPower = ServerConstant.DefaultPlayerJumpPower
+
 
 local CommonEnum = ServerModuleFacade.CommonEnum
 local GameStateType = CommonEnum.GameStateType
@@ -99,7 +104,14 @@ function OnCharacterAdded(player, character)
 		Debug.Assert(false, "비정상입니다.")
 	end
 	
-	character.Humanoid.WalkSpeed = DefaultCharacterWalkSpeed
+	character.Humanoid.WalkSpeed = DefaultPlayerWalkSpeed
+	
+	character.Humanoid.MaxHealth = DefaultPlayerMaxHealth
+	character.Humanoid.Health = DefaultPlayerMaxHealth
+
+	character.Humanoid.JumpHeight = DefaultPlayerJumpHeight
+	character.Humanoid.JumpPower = DefaultPlayerJumpPower
+
 	character.Humanoid.Died:Connect(function()
 		local playerId = player.UserId
 		local attacker = ServerGlobalStorage:GetRecentAttacker(playerId)
