@@ -247,7 +247,7 @@ function ServerGlobalStorage:ApplyStatToHumanoid(playerId, playerStatistic)
 	local jump = playerStatistic:GetStat(StatType.Jump)
 	humanoid.JumpHeight = DefaultPlayerJumpHeight + jump
 	humanoid.JumpPower = DefaultPlayerJumpPower + jump
-	
+
 	return true
 end
 
@@ -908,7 +908,6 @@ function ServerGlobalStorage:CheckAndEquipIfWeapon(playerId, tool, fromWorkspace
 			return false
 		end
 	end
-
 
 	local prevTool, currentTool = self:EquipTool(playerId, equipType, tool)
 	if not currentTool then

@@ -143,8 +143,16 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
 
         local playerId = player.UserId
         if not ServerGlobalStorage:IsInBackpack(playerId, tool) then
-            Debug.Assert(false, "비정상입니다.")
-            return
+            if equipType == EquipType.Weapon then -- 무기
+                Debug.Assert(false, "비정상입니다.")
+                return
+            else -- 나머지 방어구
+                -- 방어구의 경우 손에 들고 있는 경우에 착용할 수 있도록 한다.
+                if not ServerGlobalStorage:IsInCharacterRaw(playerId, tool) then
+                    Debug.Assert(false, "비정상입니다.")
+                    return
+                end
+            end
         end
     
         local prevTool = nil
@@ -158,7 +166,7 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
             * 방어구의 경우(자체 구현)
                 무기에서 하는 것들을 행동을 수동으로 해줘야 한다.
         --]]
-        if equipType == EquipType.Weapon then
+        if equipType == EquipType.Weapon then -- 무기
             local humanoid = character:FindFirstChild("Humanoid")
             if not humanoid then
                 Debug.Print("캐릭터의 휴머노이드가 존재하지 않습니다. 있을 수 있는 상황입니다.")
@@ -172,7 +180,7 @@ function ServerRemoteEventImpl:InitializeRemoteEvents(ServerGlobalStorage)
             end
             
             humanoid:EquipTool(tool)
-        else
+        else -- 나머지 방어구
             prevTool, currentTool = ServerGlobalStorage:EquipTool(playerId, equipType, tool)
             if not currentTool then
                 Debug.Assert(false, "비정상입니다.")

@@ -9,6 +9,9 @@ local ToolUtility = ClientModuleFacade.ToolUtility
 
 local CommonEnum = ClientModuleFacade.CommonEnum
 local SlotType = CommonEnum.SlotType
+local ToolType = CommonEnum.ToolType
+local EquipType = CommonEnum.EquipType
+--local EquipTypeConverter = EquipType.Converter
 
 local KeyBinder = ClientModuleFacade.KeyBinder
 
@@ -30,14 +33,52 @@ function SelectToolActionForQuickSlot(tool)
 	if not tool then
 		return true
 	end
-	if not ClientGlobalStorage:IsInBackpack(PlayerId, tool) then
-		Debug.Assert(false, "플레이어가 소유한 도구가 아닙니다.")
-		return false
-	end
 
-	if not ClientGlobalStorage:SendSelectToolCTS(tool) then
-		Debug.Assert(false, "비정상입니다.")
-		return false
+	local toolGameData = ToolUtility:GetGameData(tool)
+	Debug.Assert(toolGameData, "비저상입니다.")
+
+	
+	local toolType = toolGameData.ToolType
+	if toolType == ToolType.Armor then
+		local equipType = toolGameData.EquipType
+		Debug.Assert(equipType, "비정상입니다.")
+
+		if ClientGlobalStorage:IsInBackpack(PlayerId, tool) then
+			-- 인벤토리에 있는 경우 손에 든다.
+			if not ClientGlobalStorage:SendSelectToolCTS(tool) then
+				Debug.Assert(false, "비정상입니다.")
+				return false
+			end
+		elseif ClientGlobalStorage:IsInCharacterRaw(PlayerId, tool) then
+			-- 캐릭터 손에 들려있는 방어구라면 장착한다.
+			if not ClientGlobalStorage:SendEquipToolCTS(equipType, tool) then
+				Debug.Assert(false, "비정상입니다.")
+				return false
+			end
+			
+		elseif ClientGlobalStorage:IsInCharacter(PlayerId, equipType, tool, false) then
+			-- 캐릭터가 장착하고 있다면 장착해제 한다.
+			if not ClientGlobalStorage:SendUnequipToolCTS(equipType) then
+				Debug.Assert(false, "비정상입니다.")
+				return false
+			end
+		else
+			Debug.Assert(false, "무슨 경우인지 확인해봐야 합니다.")
+			return false
+		end
+	else
+		if ClientGlobalStorage:IsInCharacterRaw(PlayerId, tool) then
+			-- 캐릭터가 장착하고(손에 들고) 있다면 장착해제한다. 
+		elseif ClientGlobalStorage:IsInBackpack(PlayerId, tool) then
+			-- 캐릭터가 장착하지 않고 있고(손에 들고 있지 않고), Backpack에 존재하면 장착한다.(손에 든다.)
+			if not ClientGlobalStorage:SendSelectToolCTS(tool) then
+				Debug.Assert(false, "비정상입니다.")
+				return false
+			end
+		else
+			Debug.Assert(false, "무슨 경우인지 확인해봐야 합니다.")
+			return false
+		end
 	end
 
 	return true
@@ -100,6 +141,7 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
 			return
 		end
 
+
 		local quickSlotActionName = tostring(targetSlotIndexEnum)
 		KeyBinder:BindAction(Enum.UserInputState.Begin, targetSlotIndexEnum, quickSlotActionName, function(inputObject)
 			if not SelectToolActionForQuickSlot(newGuiToolSlotController.Tool) then
@@ -109,6 +151,7 @@ function GuiToolSlotController:new(slotType, slotIndex, newGuiSlot)
 		end)
 
 		newGuiToolSlotController.GuiSlot.Activated:connect(function(inputObject)
+
 			if not SelectToolActionForQuickSlot(newGuiToolSlotController.Tool) then
 				Debug.Assert(false, "비정상입니다.")
 				return

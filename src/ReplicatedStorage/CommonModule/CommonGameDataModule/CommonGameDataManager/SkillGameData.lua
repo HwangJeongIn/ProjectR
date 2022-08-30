@@ -58,17 +58,19 @@ end
 setmetatable(SkillGameData, GameDataBase)
 SkillGameData:Initialize(GameDataType.Skill)
 
---[[ 기본 공격 		--]] SkillGameData:InsertData(1, {Name = "BaseAttack", SkillType = SkillTypeSelector.AttackSkill, Cooldown = .2, AttackRate = 1000, Description = "Inflicting <AttackRate>% Damage."})
+--[[ 기본 공격 		--]] SkillGameData:InsertData(1, {Name = "BaseAttack", SkillType = SkillTypeSelector.AttackSkill, Cooldown = .2, AttackRate = 50, Description = "Inflicting <AttackRate>% damage"})
 
 --[[ 휠윈드			--]] --SkillGameData:InsertData(2, {Name = "WhirlwindSlash", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, AttackRate = 300, Description = "Spin around, inflicting <AttackRate>% Damage."})
 --[[ 템페스트 슬래시--]] --SkillGameData:InsertData(3, {Name = "TempestSlash", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, AttackRate = 210, Description = "Charge and slash, inflicting <AttackRate>% Damage."})
 
---[[ 파워 스트라이크--]] --SkillGameData:InsertData(4, {Name = "PowerStrike", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, AttackRate = 450, Description = "Deliver a powerful attack, inflicting <AttackRate>% Damage."})
---[[ 스톰 블레이드	--]] --SkillGameData:InsertData(5, {Name = "StormBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, AttackRate = 130, Description = "Smash the ground to create a storm of blades, inflicting <AttackRate>% Damage"})
 
+--[[ 파워 스트라이크--]] SkillGameData:InsertData(4, {Name = "PowerStrike", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, AttackRate = 450, Description = "Deliver a powerful attack, inflicting <AttackRate>% damage."})
+--[[ 스톰 블레이드	--]] SkillGameData:InsertData(5, {Name = "StormBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, AttackRate = 130, Description = "Creates a storm of blades, inflicting <AttackRate>% damage"})
+--[[ 플레임 블레이드--]] SkillGameData:InsertData(6, {Name = "FlameBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 5, AttackRate = 700, Description = "Creates 3 flame balls from the sky and fire flame arrow, inflicting <AttackRate>% damage"})
 
+--[[ 라이트닝 볼텍스--]] --SkillGameData:InsertData(7, {Name = "LightningVortex", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 5, AttackRate = 10, Description = "Creates a rectangular lightning forward, inflicting <AttackRate>% damage for 5s"})
+--[[ 오러 블레이드	--]] --SkillGameData:InsertData(8, {Name = "AuraBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 10, AttackRate = 100, Description = "Quickly slash the space and spread a wave of energy that attacks ranged foes, inflicting <AttackRate>% damage"})
 
---[[ 메테오			--]] --SkillGameData:InsertData(6, {Name = "FlameBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 5, AttackRate = 700, Description = "Call a flame balls and arrow from the sky that deals a large amount of damage upon landing, inflicting <AttackRate>% Damage"})
 
 
 return setmetatable({}, SkillGameData)
