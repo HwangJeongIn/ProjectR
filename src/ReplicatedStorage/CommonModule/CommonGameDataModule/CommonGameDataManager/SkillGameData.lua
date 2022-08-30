@@ -68,8 +68,8 @@ SkillGameData:Initialize(GameDataType.Skill)
 --[[ 스톰 블레이드	--]] SkillGameData:InsertData(5, {Name = "StormBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 1, AttackRate = 130, Description = "Creates a storm of blades, inflicting <AttackRate>% damage"})
 --[[ 플레임 블레이드--]] SkillGameData:InsertData(6, {Name = "FlameBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 5, AttackRate = 700, Description = "Creates 3 flame balls from the sky and fire flame arrow, inflicting <AttackRate>% damage"})
 
---[[ 라이트닝 볼텍스--]] --SkillGameData:InsertData(7, {Name = "LightningVortex", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 5, AttackRate = 10, Description = "Creates a rectangular lightning forward, inflicting <AttackRate>% damage for 5s"})
---[[ 오러 블레이드	--]] --SkillGameData:InsertData(8, {Name = "AuraBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 10, AttackRate = 100, Description = "Quickly slash the space and spread a wave of energy that attacks ranged foes, inflicting <AttackRate>% damage"})
+--[[ 라이트닝 볼텍스--]] SkillGameData:InsertData(7, {Name = "LightningVortex", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 5, AttackRate = 10, Description = "Creates a rectangular lightning forward, inflicting <AttackRate>% damage for 5s"})
+--[[ 오러 블레이드	--]] SkillGameData:InsertData(8, {Name = "AuraBlade", SkillType = SkillTypeSelector.AttackSkill, Cooldown = 3, AttackRate = 100, Description = "Quickly slash the space and spread a wave of energy that attacks ranged foes, inflicting <AttackRate>% damage"})
 
 
 

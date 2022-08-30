@@ -465,7 +465,7 @@
 					<bool name="Looped">true</bool>
 					<string name="Name">Emit_ThunderSound</string>
 					<bool name="PlayOnRemove">false</bool>
-					<float name="PlaybackSpeed">1</float>
+					<float name="PlaybackSpeed">1.5</float>
 					<bool name="Playing">false</bool>
 					<token name="RollOffMode">0</token>
 					<Ref name="SoundGroup">null</Ref>
