@@ -35,6 +35,7 @@ function SkillSequencePlayer:StartSkillSequenceAnimationTrackPlayer(animationTra
 end
 
 function SkillSequencePlayer:Simulate(skillCollisionHandler)
+    Debug.Print("Simulate")
     local prevTime = os.clock()
     local currentTime = prevTime
     local deltaTime = 0
@@ -68,6 +69,10 @@ function SkillSequencePlayer:Simulate(skillCollisionHandler)
         deltaTime = currentTime - prevTime
         prevTime = currentTime
 
+        currentAnimationTrackStateType = nil
+        currentCollisionSequenceStateType = nil
+        returnedCollisionSequencePlayers = nil
+
         if currentAnimationTrackIndex <= self.SkillSequenceAnimationTrackPlayerCount then
             currentAnimationTrackStateType, returnedCollisionSequencePlayers = currentSkillSequenceAnimationTrackPlayer:Update(currentTime)
         
@@ -88,6 +93,7 @@ function SkillSequencePlayer:Simulate(skillCollisionHandler)
             currentCollisionSequenceStateType = collisionSequencePlayer:Update(currentTime)
             if SkillCollisionSequenceStateType.Ended == currentCollisionSequenceStateType then
                 collisionSequencePlayer:End()
+                self.SkillSequenceCollisionPlayerCount -= 1
                 table.remove(self.SkillSequenceCollisionPlayers, collisionSequencePlayerIndex)
             end 
         end

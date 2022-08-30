@@ -221,22 +221,6 @@ function SkillCollisionSequencePlayer:Start(originCFrame, skillCollisionHandler)
     self.PrevTime = os.clock()
 
     return true
-    
-    --[[
-    local skillCollisionHandler = function(skillCollision, touchedPart, outputFromHandling)
-        if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
-            
-            local touchedPartCollisionGroupName = ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(touchedPart)
-            Debug.Print(touchedPart.Name .. " : ".. tostring(touchedPartCollisionGroupName))
-
-            if self:ValidateTargetInRange(toolOwnerPlayer, touchedPart) then
-                self:ApplySkillToTarget(toolOwnerPlayer, touchedPart, outputFromHandling)
-            end
-
-            outputFromHandling.PendingKill = true
-        end
-    end
-    --]]
 end
 
 function SkillCollisionSequencePlayer:End()

@@ -106,6 +106,8 @@ function Temp()
 	end
 end
 
+
+--[[
 while #game.Players:GetPlayers() < 1 do
 	wait(1)
 end
@@ -118,34 +120,28 @@ end
 Temp()
 
 ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
-
+--]]
 --wait(30)
 --ServerGlobalStorage:ClearCurrentMap()
 
 
-while false  do
+while true  do
 	-- 다른 플레이어를 기다리는 중
-	if IsTestMode then
-		while #game.Players:GetPlayers() < 1 do
-			wait(1)
-		end
-		--[[
-		if IsTestMode and #game.Players:GetPlayers() < 2 then
-			Instance.new("Player", game.Players)
-		end
-		--]]
-	else
-		while #game.Players:GetPlayers() < 2 do
-			wait(1)
-		end
+	while #game.Players:GetPlayers() < 2 do
+		wait(1)
 	end
-
 	wait(3)
 
 	-- 플레이어 저장
 	
 	local playersInGame = {}
 	local players = game.Players:GetPlayers()
+	for i, player in pairs(players) do
+		while not player.Character do
+			wait(1)
+		end
+	end
+
 	for i, player in pairs(players) do
 		
 		if not player then
@@ -157,19 +153,12 @@ while false  do
 	end
 	
 
-	-- 10초 딜레이
-	if IsTestMode then
-		wait(1)
-	else
-		wait(5)
-	end
-
+	wait(5)
 	
 	-- 맵 선택
 
 	--ServerGlobalStorage:SelectRandomMapAndEnterMap(playersInGame)
 	ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(playersInGame)
-	
 	Initializer:StartGame(playersInGame)
 	
 	-- 맵 선택 메시지, 게임 시작 메시지
@@ -259,13 +248,10 @@ while false  do
 		NotifyWinnerSTC:FireAllClients(winnerType)
 	end
 	
-	if IsTestMode then
-		wait(3)
-	end
 	
+	wait(5)
+
 	-- 맵 정리
-	
-	
 	Initializer:ClearPlayers(playersInGame)
 	ClearGui()
 	ServerGlobalStorage:ClearCurrentMap()

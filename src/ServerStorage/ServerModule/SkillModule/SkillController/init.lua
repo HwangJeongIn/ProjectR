@@ -40,18 +40,19 @@ function SkillController:ApplySkillToTarget(toolOwnerPlayer, target, outputFromH
 end
 
 function SkillController:ActivateInternally(toolOwnerPlayer)
+    Debug.Print("ActivateInternally")
     local skillSequencePlayer = Utility:DeepCopy(SkillSequencePlayer)
 
-    --[[
-    if not skillSequencePlayer:Initialize(toolOwnerPlayer, self.SkillSequence, self.MultipleProcessingSkillCollisionHandler) then
-        Debug.Assert(false, "비정상입니다.")
-        return false
-    end
-    --]]
-
-    if not skillSequencePlayer:Initialize(toolOwnerPlayer, self.SkillSequence, self.SkillCollisionHandler) then
-        Debug.Assert(false, "비정상입니다.")
-        return false
+    if self.MultipleProcessing then
+        if not skillSequencePlayer:Initialize(toolOwnerPlayer, self.SkillSequence, self.MultipleProcessingSkillCollisionHandler) then
+            Debug.Assert(false, "비정상입니다.")
+            return false
+        end
+    else
+        if not skillSequencePlayer:Initialize(toolOwnerPlayer, self.SkillSequence, self.SkillCollisionHandler) then
+            Debug.Assert(false, "비정상입니다.")
+            return false
+        end
     end
     
     skillSequencePlayer:Start()
@@ -137,6 +138,7 @@ function SkillController:SetSkill(tool, skillGameData)
 
     self.Tool = tool
     self.SkillGameDataKey = skillGameDataKey
+    self.MultipleProcessing = skillGameData.MultipleProcessing
     self.Name = skillGameData.Name
     self.Cooldown = skillGameData.Cooldown
 
@@ -144,17 +146,23 @@ function SkillController:SetSkill(tool, skillGameData)
 
 
     self.MultipleProcessingSkillCollisionHandler = function(skillCollision, touchedPart, outputFromHandling)
+        if outputFromHandling.Hit or outputFromHandling.PendingKill then
+            return true
+        end
+
         if ObjectCollisionGroupUtility:IsCollidableByPart(skillCollision, touchedPart) then
             if touchedPart.Parent == self.ToolOwnerPlayer.Character then
-                return
+                return false
             end
 
             --local touchedPartCollisionGroupName = ObjectCollisionGroupUtility:GetCollisionGroupNameByPart(touchedPart)
             --Debug.Print(touchedPart.Name .. " : ".. tostring(touchedPartCollisionGroupName))
 
+            -- 일단 한프레임에 한 대상에 대해서만 처리하도록 한다.
             if self:ValidateTargetInRange(self.ToolOwnerPlayer, touchedPart) then
                 if self:ApplySkillToTarget(self.ToolOwnerPlayer, touchedPart, outputFromHandling) then
                     outputFromHandling.Hit = true
+                    return true
                 end
             end
         end
