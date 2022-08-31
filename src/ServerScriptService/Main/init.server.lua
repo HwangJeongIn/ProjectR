@@ -58,7 +58,7 @@ end
 
 
 function Temp()
-    wait(20)
+    wait(3)
     while #game.Players:GetPlayers() < 1 do
         wait(1)
     end
@@ -70,10 +70,10 @@ function Temp()
 
 	local players = game.Players:GetPlayers()
 	for i, player in pairs(players) do
-		Initializer:PushDefaulTools(player)
+		Initializer:PushDefaulToolsTemp(player)
 	end
     
-    ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
+    --ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
 end
 
 

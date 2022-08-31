@@ -100,18 +100,20 @@ Sight : 시야
 --]]
 
 -- 무기 종류
-ToolGameData:InsertData(1, {Name = "WoodStick", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 10, AttackSpeed = 10})
+ToolGameData:InsertData(1, {Name = "RustySword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 7 })
 
+ToolGameData:InsertData(2, {Name = "Sword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10})
+ToolGameData:InsertData(3, {Name = "Axe", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 15, SkillSet = {4}})
 
-ToolGameData:InsertData(2, {Name = "Sword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {4,7, 8, 6}})
-ToolGameData:InsertData(3, {Name = "Axe", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, DEF = 5, Move = 1, AttackSpeed = 10})
-ToolGameData:InsertData(4, {Name = "RustySword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
-ToolGameData:InsertData(5, {Name = "SmallKnife", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
-ToolGameData:InsertData(6, {Name = "Knife", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
-ToolGameData:InsertData(7, {Name = "BlueSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
-ToolGameData:InsertData(8, {Name = "FlameSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
-ToolGameData:InsertData(9, {Name = "FrostSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
-ToolGameData:InsertData(10, {Name = "BloodSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
+ToolGameData:InsertData(4, {Name = "WoodStick", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 5, SkillSet = {7}})
+
+ToolGameData:InsertData(5, {Name = "BlueSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, SkillSet = {4,5,8}})
+ToolGameData:InsertData(6, {Name = "BloodSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 35, SkillSet = {5,8,6} })
+
+ToolGameData:InsertData(7, {Name = "SmallKnife", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
+ToolGameData:InsertData(8, {Name = "Knife", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
+ToolGameData:InsertData(9, {Name = "FlameSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
+ToolGameData:InsertData(10, {Name = "FrostSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })
 
 
 --[[
@@ -131,7 +133,8 @@ ToolGameData:InsertData(10, {Name = "BloodSword", ToolType = ToolTypeSelector.We
 ToolGameData:InsertData(101, {Name = "Helmet", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Helmet, DEF = 15})
 ToolGameData:InsertData(102, {Name = "Chestplate", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 40, Move = -8})
 ToolGameData:InsertData(103, {Name = "Leggings", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 20})
-ToolGameData:InsertData(104, {Name = "Boots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 10, Jump = 5})
+ToolGameData:InsertData(104, {Name = "Boots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 15})
+ToolGameData:InsertData(105, {Name = "FeatherBoots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 5, Jump = 30})
 
 
 

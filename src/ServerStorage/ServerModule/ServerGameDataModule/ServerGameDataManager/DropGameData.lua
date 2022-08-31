@@ -64,7 +64,17 @@ setmetatable(DropGameData, GameDataBase)
 DropGameData:Initialize(GameDataType.Drop)
 
 
-DropGameData:InsertData(1, {ToolGameDataKeySet = {10}})
-DropGameData:InsertData(2, {ToolGameDataKeySet = {101, 102, 103, 104}})
+DropGameData:InsertData(1, {ToolGameDataKeySet = {1}}) -- RustySword
+DropGameData:InsertData(2, {ToolGameDataKeySet = {3,4}}) -- Axe, WoodStick
+
+DropGameData:InsertData(3, {ToolGameDataKeySet = {5}}) -- BlueSword
+DropGameData:InsertData(4, {ToolGameDataKeySet = {6}}) -- BloodSword
+
+
+DropGameData:InsertData(101, {ToolGameDataKeySet = {101,102,103,104}}) -- Armors
+DropGameData:InsertData(102, {ToolGameDataKeySet = {105}}) -- FeatherBoots
+
+
+
 
 return setmetatable({}, DropGameData)

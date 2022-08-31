@@ -52,6 +52,11 @@ end
 setmetatable(WorldInteractorGameData, GameDataBase)
 WorldInteractorGameData:Initialize(GameDataType.WorldInteractor)
 
---[[ 	--]] WorldInteractorGameData:InsertData(1, {WorldInteractorType = WorldInteractorTypeSelector.ItemBox, MaxHp = 4, DropGameDataKey = 1})
---[[    --]] WorldInteractorGameData:InsertData(2, {WorldInteractorType = WorldInteractorTypeSelector.ItemBox, MaxHp = 4, DropGameDataKey = 2})
+--[[ 	--]] WorldInteractorGameData:InsertData(1, {WorldInteractorType = WorldInteractorTypeSelector.ItemBox, MaxHp = 1, DropGameDataKey = 1})
+--[[    --]] WorldInteractorGameData:InsertData(2, {WorldInteractorType = WorldInteractorTypeSelector.ItemBox, MaxHp = 2, DropGameDataKey = 2})
+--[[ 	--]] WorldInteractorGameData:InsertData(3, {WorldInteractorType = WorldInteractorTypeSelector.ItemBox, MaxHp = 4, DropGameDataKey = 3})
+--[[    --]] WorldInteractorGameData:InsertData(4, {WorldInteractorType = WorldInteractorTypeSelector.ItemBox, MaxHp = 4, DropGameDataKey = 4})
+--[[ 	--]] WorldInteractorGameData:InsertData(101, {WorldInteractorType = WorldInteractorTypeSelector.ItemBox, MaxHp = 2, DropGameDataKey = 101})
+--[[    --]] WorldInteractorGameData:InsertData(102, {WorldInteractorType = WorldInteractorTypeSelector.ItemBox, MaxHp = 3, DropGameDataKey = 102})
+
 return setmetatable({}, WorldInteractorGameData)
