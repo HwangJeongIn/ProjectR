@@ -44,7 +44,7 @@ local ServerConstant = {
 	SkillCollisionInVisible = 1,
 
 	-- skill
-	DefaultSkillCollisionSpeed = 100,
+	DefaultSkillCollisionSpeed = 130,
 
 	DefaultSTR = 0,
 	DefaultDEF = 0
