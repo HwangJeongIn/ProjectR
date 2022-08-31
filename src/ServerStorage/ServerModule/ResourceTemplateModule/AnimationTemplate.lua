@@ -103,13 +103,15 @@ function AnimationTemplate:InitializeAllKeyframeSequences(keyframeSequencesFolde
 end
 
 function AnimationTemplate:InitializeAllAnimationTemplates(animationsFolder, keyframeSequencesFolder)
-    if not self:InitializeAllAnimations(animationsFolder) then
-        Debug.Assert(false, "InitializeAllAnimations에 실패했습니다.")
-        return false
+    if game:GetService("RunService"):IsStudio() then
+        if not self:InitializeAllKeyframeSequences(keyframeSequencesFolder) then
+            Debug.Assert(false, "InitializeAllKeyframeSequences에 실패했습니다.")
+            return false
+        end
     end
 
-    if not self:InitializeAllKeyframeSequences(keyframeSequencesFolder) then
-        Debug.Assert(false, "InitializeAllKeyframeSequences에 실패했습니다.")
+    if not self:InitializeAllAnimations(animationsFolder) then
+        Debug.Assert(false, "InitializeAllAnimations에 실패했습니다.")
         return false
     end
 

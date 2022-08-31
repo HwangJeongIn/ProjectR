@@ -45,12 +45,15 @@ function SelectToolActionForQuickSlot(tool)
 
 		if ClientGlobalStorage:IsInBackpack(PlayerId, tool) then
 			-- 인벤토리에 있는 경우 손에 든다.
+            
+            Debug.Print("인벤토리에 있는 경우 손에 든다.")
 			if not ClientGlobalStorage:SendSelectToolCTS(tool) then
 				Debug.Assert(false, "비정상입니다.")
 				return false
 			end
 		elseif ClientGlobalStorage:IsInCharacterRaw(PlayerId, tool) then
 			-- 캐릭터 손에 들려있는 방어구라면 장착한다.
+            Debug.Print("캐릭터 손에 들려있는 방어구라면 장착한다.")
 			if not ClientGlobalStorage:SendEquipToolCTS(equipType, tool) then
 				Debug.Assert(false, "비정상입니다.")
 				return false
@@ -58,6 +61,7 @@ function SelectToolActionForQuickSlot(tool)
 			
 		elseif ClientGlobalStorage:IsInCharacter(PlayerId, equipType, tool, false) then
 			-- 캐릭터가 장착하고 있다면 장착해제 한다.
+            Debug.Print("캐릭터가 장착하고 있다면 장착해제 한다.")
 			if not ClientGlobalStorage:SendUnequipToolCTS(equipType) then
 				Debug.Assert(false, "비정상입니다.")
 				return false

@@ -1,15 +1,11 @@
--- 로컬 변수 정의, 바인드 --------------------------------------------------------------------------------------------
+local Initializer = require(script:WaitForChild("Initializer"))
+Initializer:InitializeGame()
 
--- 플레이어에게 복제되는 값들을 저장하는 컨테이너
--- 서버와 모든 플레이어에게 보인다.
--- GUI를 업데이트 하기 위한 MainMessage, MainMessage value 등이 들어간다.
 
 local Debris = game:GetService("Debris")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 
--- 서버에서만 보이는 스토리지 -- 소드와 맵 등을 저장했다.
--- 다른 플레이어는 보지 못하기 때문에 악용할 수 없다
 local ServerStorage = game:GetService("ServerStorage")
 
 local ServerModuleFacade = require(ServerStorage:WaitForChild("ServerModuleFacade"))
@@ -52,7 +48,6 @@ end)
 
 
 
-local Initializer = require(script:WaitForChild("Initializer"))
 
 
 function ClearGui()
@@ -61,13 +56,11 @@ function ClearGui()
 	MainMessage.Value = ""
 end
 
-Initializer:InitializeGame()
 
 function Temp()
 	local players = game.Players:GetPlayers()
 	for i, player in pairs(players) do
-		Initializer:PushDefaulWeaponTools(player)
-		Initializer:PushDefaulArmorTools(player)
+		Initializer:PushDefaulTools(player)
 
 		
 		--[[
@@ -152,6 +145,8 @@ while true  do
 		ChangeGameStateSTC:FireClient(player, GameStateType.Starting)
 	end
 	
+    -- 임시 코드
+	Initializer:ClearPlayers(playersInGame)
 
 	wait(5)
 	

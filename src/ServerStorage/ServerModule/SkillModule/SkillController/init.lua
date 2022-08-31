@@ -40,7 +40,7 @@ function SkillController:ApplySkillToTarget(toolOwnerPlayer, target, outputFromH
 end
 
 function SkillController:ActivateInternally(toolOwnerPlayer)
-    Debug.Print("ActivateInternally")
+    --Debug.Print("ActivateInternally")
     local skillSequencePlayer = Utility:DeepCopy(SkillSequencePlayer)
 
     if self.MultipleProcessing then
@@ -65,7 +65,7 @@ function SkillController:Activate(player)
         return false
     end
 
-    local currentTime = os.clock()
+    local currentTime = os.time()
     if self.LastActivationTime then
         local elapsedTime = currentTime - self.LastActivationTime
         if elapsedTime < self.Cooldown then
@@ -75,6 +75,7 @@ function SkillController:Activate(player)
     end
 
     self.LastActivationTime = currentTime
+    Debug.Print("SkillLastActivationTime => " .. tostring(self.SkillGameDataKey) .. " : " .. tostring(self.LastActivationTime))
     ServerGlobalStorage:SetSkillLastActivationTimeAndNotify(self.ToolOwnerPlayer.UserId, self.SkillGameDataKey, self.LastActivationTime)
 
     if not self:ActivateInternally(player) then

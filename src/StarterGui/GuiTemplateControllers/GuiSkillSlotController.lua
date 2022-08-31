@@ -206,7 +206,8 @@ function GuiSkillSlotController:RefreshByLastActivationTime(lastActivationTime)
 	if not self.SkillLastActivationTime then
 		self.RemainingSkillCooldown = 0
 	else
-		local elapsedTime = os.clock() - self.SkillLastActivationTime
+        Debug.Print("캐릭터가 장착하고 있다면 장착해제 한다.")
+		local elapsedTime = os.time() - self.SkillLastActivationTime
 		self.RemainingSkillCooldown = self.SkillGameData.Cooldown - elapsedTime
 		self.RemainingSkillCooldown = math.max(0, self.RemainingSkillCooldown)
 	end

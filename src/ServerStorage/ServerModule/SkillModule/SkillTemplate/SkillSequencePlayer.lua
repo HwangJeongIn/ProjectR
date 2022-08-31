@@ -35,7 +35,7 @@ function SkillSequencePlayer:StartSkillSequenceAnimationTrackPlayer(animationTra
 end
 
 function SkillSequencePlayer:Simulate(skillCollisionHandler)
-    Debug.Print("Simulate")
+    --Debug.Print("Simulate")
     local prevTime = os.clock()
     local currentTime = prevTime
     local deltaTime = 0

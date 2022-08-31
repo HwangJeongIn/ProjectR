@@ -39,6 +39,7 @@ function Initializer:InitializeGame()
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
+
 	self:RegisterPlayerEvent()
 
 	return true
@@ -112,6 +113,9 @@ function OnCharacterAdded(player, character)
 	character.Humanoid.JumpHeight = DefaultPlayerJumpHeight
 	character.Humanoid.JumpPower = DefaultPlayerJumpPower
 
+    -- 임시 코드
+    Initializer:PushDefaulTools(player)
+
 	character.Humanoid.Died:Connect(function()
 		local playerId = player.UserId
 		local attacker = ServerGlobalStorage:GetRecentAttacker(playerId)
@@ -129,7 +133,6 @@ function OnCharacterAdded(player, character)
 			ChangeGameStateSTC:FireClient(player, GameStateType.Dead)
 		end
 		
-
 		-- 죽었을 때
 		if character:FindFirstChild("AliveTag")  then
 			Debris:AddItem(character.AliveTag, 0)
@@ -186,6 +189,11 @@ function Initializer:ClearPlayers(players)
 	end
 end
 
+function Initializer:PushDefaulTools(player)
+    self:PushDefaulArmorTools(player)
+    self:PushDefaulWeaponTools(player)
+end
+
 function Initializer:PushDefaulArmorTools(player)
 	ServerGlobalStorage:CreateToolToPlayer(101, player) -- DefaultHelmet
 	ServerGlobalStorage:CreateToolToPlayer(102, player) -- DefaultChestplate
@@ -214,8 +222,7 @@ function Initializer:StartGame(playersInGame)
 			continue
 		end
 		
-		self:PushDefaulWeaponTools(player)
-		self:PushDefaulArmorTools(player)
+		self:PushDefaulTools(player)
 
 		--[[
 		local boolValue = Instance.new("BoolValue")

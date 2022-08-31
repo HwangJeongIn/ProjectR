@@ -15,7 +15,9 @@ local CommonEnum = ClientModuleFacade.CommonEnum
 local GuiHpBarController = {}
 
 function GuiHpBarController:OnCharacterAdded(character)
-    local humanoid = character.Humanoid
+    local humanoid = Character:WaitForChild("Humanoid")
+    self.MaxHp = humanoid.MaxHealth
+    self.CurrentHp = humanoid.Health
 
     humanoid:GetPropertyChangedSignal("MaxHealth"):Connect(function()
         local maxHealth = humanoid.MaxHealth
@@ -28,19 +30,12 @@ function GuiHpBarController:OnCharacterAdded(character)
 end
 
 function GuiHpBarController:Initialize()
-
     local LocalPlayer = game.Players.LocalPlayer
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
     local GuiFacade = require(PlayerGui:WaitForChild("GuiFacade"))
 
-    local character = LocalPlayer.Character
-    local humanoid = character.Humanoid 
-    self.MaxHp = humanoid.MaxHealth
-    self.CurrentHp = humanoid.Health
-
-    self:OnCharacterAdded(character)
     LocalPlayer.CharacterAdded:Connect(function(character)
-        self:OnCharacterAdded(character)
+        self:OnCharacterAdded(self, character)
     end)
     
     self.GuiHpBar = GuiFacade.GuiHpBar
