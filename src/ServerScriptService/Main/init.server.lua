@@ -58,67 +58,31 @@ end
 
 
 function Temp()
+    wait(20)
+    while #game.Players:GetPlayers() < 1 do
+        wait(1)
+    end
+    
+    local testPlayer = game.Players:GetPlayers()[1]
+    while not testPlayer.Character do
+        wait(1)
+    end
+
 	local players = game.Players:GetPlayers()
 	for i, player in pairs(players) do
 		Initializer:PushDefaulTools(player)
-
-		
-		--[[
-		local tempPart = Instance.new("Part")
-		ObjectCollisionGroupUtility:SetSkillCollisionGroup(tempPart)
-
-		tempPart.Anchored = true
-		--tempPart.CanTouch = false
-		tempPart.CanCollide = false
-		tempPart.CanQuery = true
-
-		tempPart.Parent = game.workspace
-		tempPart.Size =  Vector3.new(2, 2, 2)
-		--tempPart.Position = Vector3.new(0, 0, 0)
-
-		tempPart.CFrame = player.Character.HumanoidRootPart.CFrame
-
-		print(tempPart.CollisionGroupId)
-
-		local connection = tempPart.Touched:Connect(function() end)
-		local touchingParts = tempPart:GetTouchingParts()
-
-		local finalTouchingParts = {}
-		for _, touchingPart in pairs(touchingParts) do
-			print("_" .. tostring(touchingPart.CollisionGroupId))
-
-			if ObjectCollisionGroupUtility:IsCollidableByPart(tempPart, touchingPart) then
-				table.insert(finalTouchingParts, touchingPart)
-			end
-		end
-
-		connection:Disconnect()
-
-		local a = 3
-		--]]
 	end
+    
+    ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
 end
 
-
---[[
-while #game.Players:GetPlayers() < 1 do
-	wait(1)
-end
-
-local testPlayer = game.Players:GetPlayers()[1]
-while not testPlayer.Character do
-	wait(1)
-end
 
 Temp()
-
-ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
---]]
 --wait(30)
 --ServerGlobalStorage:ClearCurrentMap()
 
 
-while true  do
+while false  do
 	-- 다른 플레이어를 기다리는 중
 	while #game.Players:GetPlayers() < 2 do
 		wait(1)

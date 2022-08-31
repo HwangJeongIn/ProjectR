@@ -176,6 +176,19 @@ function OnPlayerRemoving(player)
 end
 
 function Initializer:RegisterPlayerEvent()
+
+    
+    -- 서버가 초기화되기 전에 들어온 플레이어들
+    -- 일단 등록
+	local players = game.Players:GetPlayers()
+    for _, player in pairs(players) do
+        local character = player.Character
+        OnPlayerAdded(player)
+        if character then
+            OnCharacterAdded(player, character)
+        end
+    end
+
 	game.Players.PlayerAdded:Connect(OnPlayerAdded)
 	game.Players.PlayerRemoving:Connect(OnPlayerRemoving)
 end

@@ -6,15 +6,8 @@ local Utility = ServerModuleFacade.Utility
 local ResourceTemplateModule = ServerModuleFacade.ResourceTemplateModule
 
 local ServerEnum = ServerModuleFacade.ServerEnum
-local SkillSoundType = ServerEnum.SkillSoundType
+--local SkillSoundType = ServerEnum.SkillSoundType
 
-SkillSoundType = {
-    OnCreate = 1,
-    OnHit = 2,
-    OnDestroy = 3,
-    OnUpdate = 4,
-    Count = 5
-}
 
 -- OnDestroy는 OnHit를 정의하지 않고 OnDestroy만 정의한다.
 -- 충돌에 의해 소멸되지 않는 Skill Collision을 구현하기 위해 OnHit와 OnDestroy를 따로 구분하였다.

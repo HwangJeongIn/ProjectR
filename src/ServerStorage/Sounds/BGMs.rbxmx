@@ -1,0 +1,51 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<Meta name="ExplicitAutoJoints">true</Meta>
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Folder" referent="RBXDA5008C095B34C909879DAF5B131B118">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<string name="Name">BGMs</string>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+		</Properties>
+		<Item class="Sound" referent="RBXDC985BD2AC094D8EBC23D441AE1F7490">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">true</bool>
+				<string name="Name">ColdComfort</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://9039831846</url></Content>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">0.5</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+		<Item class="Sound" referent="RBXD7F6C7CDB41846EA84FE813E3E1B3CCF">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<float name="EmitterSize">10</float>
+				<bool name="Looped">true</bool>
+				<string name="Name">DesertCaravan</string>
+				<bool name="PlayOnRemove">false</bool>
+				<float name="PlaybackSpeed">1</float>
+				<bool name="Playing">false</bool>
+				<token name="RollOffMode">0</token>
+				<Ref name="SoundGroup">null</Ref>
+				<Content name="SoundId"><url>rbxassetid://1842350616</url></Content>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+				<double name="TimePosition">0</double>
+				<float name="Volume">0.5</float>
+				<float name="xmlRead_MaxDistance_3">10000</float>
+			</Properties>
+		</Item>
+	</Item>
+</roblox>

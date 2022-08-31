@@ -33,6 +33,7 @@ local StatusType = ServerEnum.StatusType
 local ToolType = ServerEnum.ToolType
 local EquipType = ServerEnum.EquipType
 local StatType = ServerEnum.StatType
+local MapType = ServerEnum.MapType
 
 
 local RemoteEvents = ReplicatedStorage:WaitForChild("RemoteEvents")
@@ -63,12 +64,12 @@ function ServerGlobalStorage:Initialize(toolSystem, worldInteractorSystem, npcSy
 	self.GetWorldInteractorSystem = function() return worldInteractorSystem end
 	self.GetNpcSystem = function() return npcSystem end
 
-	local mapController = require(script:WaitForChild("MapController"))
-	self.MapController = mapController
+	self.MapController = require(script:WaitForChild("MapController"))
+	self.BGMController = require(script:WaitForChild("BGMController"))
+    self.BGMController:StopAndPlayByMapType(MapType.MainMap, true)
 
 	local ServerRemoteEventImpl = require(script:WaitForChild("ServerRemoteEventImpl"))
 	ServerRemoteEventImpl:InitializeRemoteEvents(self)
-
 	return true
 end
 
@@ -162,6 +163,7 @@ function ServerGlobalStorage:SelectRandomMapAndEnterMap(playersInGame)
 	end
 
 	self.MapController:EnterMap(playersInGame)
+    self.BGMController:StopAndPlayByMapType(mapTemplate:GetMapType(), true)
 	return true
 end
 
@@ -177,10 +179,13 @@ function ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(playersInGame)
 		return false
 	end
 
+    local currentMapType = mapTemplate:GetMapType()
+    Debug.Assert(currentMapType, "비정상입니다.")
+
 	self.MapController:EnterMap(playersInGame)
+    self.BGMController:StopAndPlayByMapType(mapTemplate:GetMapType(), true)
 	return true
 end
-
 
 function ServerGlobalStorage:ClearCurrentMap()
 	-- Tool 정리
@@ -207,11 +212,11 @@ function ServerGlobalStorage:ClearCurrentMap()
 		end
 	end
 
-
 	-- Npc 정리
 	-- TODO : Npc 시스템 추가되면 정리 코드도 추가
 
 	self.MapController:ClearCurrentMap()
+    self.BGMController:StopAndPlayByMapType(MapType.MainMap, true)
 end
 
 function ServerGlobalStorage:OnCreateEmptyPlayerData(playerData)

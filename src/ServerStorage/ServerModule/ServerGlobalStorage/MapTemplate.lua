@@ -4,6 +4,8 @@ local Debug = CommonModuleFacade.Debug
 
 local CommonEnum = CommonModuleFacade.CommonEnum
 local GameDataType = CommonEnum.GameDataType
+local MapType = CommonEnum.MapType
+local MapTypeConverter = MapType.Converter
 
 local ServerStorage = game:GetService("ServerStorage")
 local MapsFolder = ServerStorage:WaitForChild("Maps")
@@ -23,7 +25,8 @@ local NpcsFolder = ServerStorage:WaitForChild("Npcs")
 --]]
 
 local MapTemplate = {
-	MapTable = {}
+	MapTable = {},
+    MapTypeToMapTable = {}
 }
 
 function MapTemplate:ValidateMapObjects(gameDataType, objectsFolder)
@@ -80,6 +83,11 @@ function MapTemplate:InitializeAllMaps()
 		self.MapTable[mapIndex] = {}
 
 		local mapName = map.Name
+        local currentMapType = MapType[mapName]
+        if not currentMapType then
+            Debug.Assert(false, "맵타입에 등록되지 않은 이름입니다. => " .. mapName)
+            return false
+        end
 
 		local mapObjects = Instance.new("Model")
 		mapObjects.Name = mapName .. "_Objects"
@@ -90,6 +98,8 @@ function MapTemplate:InitializeAllMaps()
 		local mapNpcs = map:FindFirstChild("Npcs")
 
 		self.MapTable[mapIndex].GetMap = function() return map end
+		self.MapTable[mapIndex].GetMapType = function() return currentMapType end
+
 		if mapTools then
 			if not self:ValidateMapObjects(GameDataType.Tool, mapTools) then
 				Debug.Assert(false, "ValidateMapObjects에 실패했습니다. => " .. mapName)
@@ -116,15 +126,34 @@ function MapTemplate:InitializeAllMaps()
 			mapNpcs.Parent = mapObjects
 		end
 		self.MapTable[mapIndex].GetNpcs = function() return mapNpcs end
+        self.MapTypeToMapTable[currentMapType] = self.MapTable[mapIndex]
 
 		self:SetWallCollisionRecursively(map)
 	end
 
-
 	return true
 end
 
-function MapTemplate:GetMapTemplate(mapIndex)
+function MapTemplate:GetMapTemplateByMapType(mapType)
+    if not mapType then
+        Debug.Assert(false, "비정상입니다.")
+		return nil
+    end
+
+    if not self.MapTypeToMapTable[mapType] then
+		Debug.Assert(false, "비정상입니다.")
+		return nil
+	end
+    
+    return self.MapTypeToMapTable[mapType]
+end
+
+function MapTemplate:GetMapTemplateByIndex(mapIndex)
+    if not mapIndex then
+        Debug.Assert(false, "비정상입니다.")
+		return nil
+    end
+
 	if not self.MapTable[mapIndex] then
 		Debug.Assert(false, "비정상입니다.")
 		return nil

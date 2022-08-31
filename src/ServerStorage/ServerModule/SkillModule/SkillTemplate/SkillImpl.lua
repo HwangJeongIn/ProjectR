@@ -574,7 +574,7 @@ function SkillImpl:RegisterAuraBlade(SkillTemplate) -- Aura Blade
         [SkillCollisionParameterType.SkillCollisionEffect] = "AuraSwordSlashEffect",
         [SkillCollisionParameterType.SkillCollisionOnDestroyEffect] = "HitEffect",
 
-        [SkillCollisionParameterType.SkillCollisionOnCreateSound] = "Fire_Explosion3Sound",
+        [SkillCollisionParameterType.SkillCollisionOnCreateSound] = "Fire_SwordSlash2Sound",
         --[SkillCollisionParameterType.SkillCollisionOnUpdateSound] = "Emit_AirSound",
         [SkillCollisionParameterType.SkillCollisionOnHitSound] = "Hit_DirtExplosion2Sound",
         --[SkillCollisionParameterType.SkillCollisionOnDestroySound] = "Disappear_ThunderSound",

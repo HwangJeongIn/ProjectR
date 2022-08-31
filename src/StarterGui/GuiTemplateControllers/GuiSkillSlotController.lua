@@ -50,6 +50,7 @@ function GuiSkillSlotController:new(slotIndex, newGuiSlot)
 	skillCooldownTimeText.TextScaled = true
 	skillCooldownTimeText.TextColor3 = Color3.new(1, 0.1, 0.1) 
 	skillCooldownTimeText.BackgroundTransparency = 1
+	skillCooldownTimeText.TextTransparency = .3
 	skillCooldownTimeText.Visible = false
 	skillCooldownTimeText.Parent = newGuiSkillSlotController.GuiSlot.GuiImage
 	newGuiSkillSlotController.GuiSkillCooldown = skillCooldownTimeText
@@ -206,7 +207,6 @@ function GuiSkillSlotController:RefreshByLastActivationTime(lastActivationTime)
 	if not self.SkillLastActivationTime then
 		self.RemainingSkillCooldown = 0
 	else
-        Debug.Print("캐릭터가 장착하고 있다면 장착해제 한다.")
 		local elapsedTime = os.time() - self.SkillLastActivationTime
 		self.RemainingSkillCooldown = self.SkillGameData.Cooldown - elapsedTime
 		self.RemainingSkillCooldown = math.max(0, self.RemainingSkillCooldown)

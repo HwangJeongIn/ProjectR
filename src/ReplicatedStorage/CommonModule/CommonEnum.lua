@@ -14,6 +14,15 @@ local CommonEnum = {
 		WaitingForFinishing = 5,
 		Count = 6
 	},
+
+    MapType = {
+        MainMap = 1,
+        DesertMap = 2,
+        DesertMap2 = 3,
+        ForestMap = 4,
+        NeonArenaMap = 5,
+        Count = 6
+    },
 	
 	WinnerType =  {
 		Player = 1,
@@ -113,6 +122,15 @@ CommonEnum.GameDataType.Converter = {
 	[CommonEnum.GameDataType.Drop] = "Drop",
 }
 Debug.Assert(CommonEnum.GameDataType.Count == #CommonEnum.GameDataType.Converter + 1, "비정상입니다.")
+
+CommonEnum.MapType.Converter = {
+	[CommonEnum.MapType.MainMap] = "MainMap",
+	[CommonEnum.MapType.DesertMap] = "DesertMap",
+	[CommonEnum.MapType.DesertMap2] = "DesertMap2",
+	[CommonEnum.MapType.ForestMap] = "ForestMap",
+	[CommonEnum.MapType.NeonArenaMap] = "NeonArenaMap",
+}
+Debug.Assert(CommonEnum.MapType.Count == #CommonEnum.MapType.Converter + 1, "비정상입니다.")
 
 CommonEnum.ToolType.Converter = {
 	[CommonEnum.ToolType.Weapon] = "Weapon",

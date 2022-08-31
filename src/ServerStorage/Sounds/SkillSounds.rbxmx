@@ -107,7 +107,7 @@
 					<bool name="Looped">false</bool>
 					<string name="Name">Fire_SwordSlash2Sound</string>
 					<bool name="PlayOnRemove">false</bool>
-					<float name="PlaybackSpeed">3</float>
+					<float name="PlaybackSpeed">8</float>
 					<bool name="Playing">false</bool>
 					<token name="RollOffMode">0</token>
 					<Ref name="SoundGroup">null</Ref>

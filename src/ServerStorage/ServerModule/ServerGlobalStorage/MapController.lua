@@ -5,6 +5,7 @@ local Debug = CommonModuleFacade.Debug
 
 local CommonEnum = CommonModuleFacade.CommonEnum
 local GameDataType = CommonEnum.GameDataType
+local MapType = CommonEnum.MapType
 
 local ServerStorage = game:GetService("ServerStorage")
 local MapsFolder = ServerStorage:WaitForChild("Maps")
@@ -38,7 +39,6 @@ end
 function MapController:GetCurrentMap()
 	return self.CurrentMap.Map
 end
-
 
 function MapController:AddObjectToCurrentMap(gameDataType, object)
 	if not self.CurrentMap.Map then
@@ -122,16 +122,7 @@ function MapController:SetCurrentMap(map)
 end
 
 function MapController:SelectDesertMapTemp()
-	local maps = MapsFolder:GetChildren()
-	local desertMapIndex = nil
-	for mapIndex, map in maps do
-		if "DesertMap" == map.Name then
-			desertMapIndex = mapIndex
-			break
-		end
-	end
-
-	local targetMapTemplate = MapTemplate:GetMapTemplate(desertMapIndex)
+	local targetMapTemplate = MapTemplate:GetMapTemplateByMapType(MapType.DesertMap)
 	Debug.Assert(targetMapTemplate, "비정상입니다.")
 	if not self:SetCurrentMap(targetMapTemplate:GetMap()) then
 		Debug.Assert(false, "비정상입니다.")
@@ -150,7 +141,7 @@ function MapController:SelectRandomMap()
 	end
 	
 	local selectedMapIndex = mapCandidates[math.random(1, #mapCandidates)]
-	local targetMapTemplate = MapTemplate:GetMapTemplate(selectedMapIndex)
+	local targetMapTemplate = MapTemplate:GetMapTemplateByIndex(selectedMapIndex)
 	Debug.Assert(targetMapTemplate, "비정상입니다.")
 	if not self:SetCurrentMap(targetMapTemplate:GetMap()) then
 		Debug.Assert(false, "비정상입니다.")
