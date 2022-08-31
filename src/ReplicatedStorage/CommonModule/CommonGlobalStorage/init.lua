@@ -353,7 +353,7 @@ function CommonGlobalStorage:EquipTool(playerId, equipType, tool)
 
 	local prevToolGameData = nil
 	if prevTool then
-		prevToolGameData = ToolUtility:GetGameData(currentTool)
+		prevToolGameData = ToolUtility:GetGameData(prevTool)
 		if not prevToolGameData then
 			Debug.Assert(false, "비정상입니다.")
 			return nil, nil

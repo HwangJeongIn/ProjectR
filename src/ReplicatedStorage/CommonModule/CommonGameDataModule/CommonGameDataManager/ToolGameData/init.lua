@@ -107,7 +107,7 @@ ToolGameData:InsertData(3, {Name = "Axe", ToolType = ToolTypeSelector.Weapon, Eq
 
 ToolGameData:InsertData(4, {Name = "WoodStick", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 5, SkillSet = {7}})
 
-ToolGameData:InsertData(5, {Name = "BlueSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, SkillSet = {4,5,8}})
+ToolGameData:InsertData(5, {Name = "BlueSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 25, SkillSet = {5,8,4}})
 ToolGameData:InsertData(6, {Name = "BloodSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 35, SkillSet = {5,8,6} })
 
 ToolGameData:InsertData(7, {Name = "SmallKnife", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, })

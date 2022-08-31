@@ -202,8 +202,9 @@ end
 
 function GuiSkillSlotsController:RefreshSkillByLastActivationTime(skillGameDataKey, lastActivationTime)
     if not self.SkillOwnerToolGameData then
-        Debug.Assert(false, "비정상입니다.")
-        return false
+        --Debug.Assert(false, "비정상입니다.")
+        --return false
+        return true -- 착용하고 있지 않을 수 있다. -- 들고 있는 무기를 버리는 경우
     end
 
     local skillCount = self.SkillOwnerToolGameData.SkillCount
