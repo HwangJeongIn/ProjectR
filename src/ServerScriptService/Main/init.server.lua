@@ -77,14 +77,14 @@ function Temp()
 end
 
 
-Temp()
+--Temp()
 --wait(30)
 --ServerGlobalStorage:ClearCurrentMap()
 
 
-while false  do
+while true  do
 	-- 다른 플레이어를 기다리는 중
-	while #game.Players:GetPlayers() < 2 do
+	while #game.Players:GetPlayers() < 3 do
 		wait(1)
 	end
 	wait(3)
@@ -128,7 +128,7 @@ while false  do
 			continue
 		end
 
-		ChangeGameStateSTC:FireClient(player, GameStateType.Playing, "TempMapName")
+		ChangeGameStateSTC:FireClient(player, GameStateType.Playing, "DesertMap")
 	end
 	
 	local currentGameLength = DefaultGameLength

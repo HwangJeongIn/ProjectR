@@ -129,12 +129,12 @@ ToolGameData:InsertData(9, {Name = "FrostSword", ToolType = ToolTypeSelector.Wea
 ToolGameData:InsertData(10, {Name = "BloodSword", ToolType = ToolTypeSelector.Weapon, EquipType = EquipTypeSelector.Weapon, STR = 10, DEF = 10, Move = 15, AttackSpeed = 30, SkillSet = {3, 5}})
 --]]
 
--- 방어구 종류
-ToolGameData:InsertData(101, {Name = "Helmet", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Helmet, DEF = 15})
-ToolGameData:InsertData(102, {Name = "Chestplate", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 40, Move = -8})
-ToolGameData:InsertData(103, {Name = "Leggings", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 20})
-ToolGameData:InsertData(104, {Name = "Boots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 15})
-ToolGameData:InsertData(105, {Name = "FeatherBoots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 10, Move = 5, Jump = 30})
+-- 방어구 종류 --
+ToolGameData:InsertData(101, {Name = "Helmet", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Helmet, DEF = 3})
+ToolGameData:InsertData(102, {Name = "Chestplate", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Chestplate, DEF = 10, Move = -8})
+ToolGameData:InsertData(103, {Name = "Leggings", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Leggings, DEF = 7})
+ToolGameData:InsertData(104, {Name = "Boots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 1, Move = 15})
+ToolGameData:InsertData(105, {Name = "FeatherBoots", ToolType = ToolTypeSelector.Armor, EquipType = EquipTypeSelector.Boots, DEF = 1, Move = 5, Jump = 30})
 
 
 

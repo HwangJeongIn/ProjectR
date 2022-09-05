@@ -16,7 +16,7 @@ local ServerConstant = {
 	DefaultSTRFactor = 1.2,
 	IsTestMode = false,
 	DefaultReward = 100,
-	DefaultGameLength = 50,
+	DefaultGameLength = 500,
 
 	DefaultPlayerWalkSpeed = 20, -- 16 : 기본 로블록스 값
 	DefaultPlayerMaxHealth = 100, -- 100 : 기본 로블록스 값
