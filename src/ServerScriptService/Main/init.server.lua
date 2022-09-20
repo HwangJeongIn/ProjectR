@@ -74,13 +74,12 @@ function Temp()
 	end
     
     ServerGlobalStorage:SelectDesertMapAndEnterMapTemp(game.Players:GetPlayers())
+
+	wait(30)
+	ServerGlobalStorage:ClearCurrentMap()
 end
 
-
 --Temp()
---wait(30)
---ServerGlobalStorage:ClearCurrentMap()
-
 
 while true  do
 	-- 다른 플레이어를 기다리는 중
