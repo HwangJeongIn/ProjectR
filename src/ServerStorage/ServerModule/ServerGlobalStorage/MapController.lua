@@ -17,9 +17,9 @@ local NpcUtility = CommonModuleFacade.NpcUtility
 local WorldInteractorUtility = CommonModuleFacade.WorldInteractorUtility
 --]]
 
-
-
-local MapTemplate = require(script.Parent:WaitForChild("MapTemplate"))
+local ServerModule = ServerStorage:WaitForChild("ServerModule")
+local ResourceTemplateModule = ServerModule:WaitForChild("ResourceTemplateModule")
+local MapTemplate = require(ResourceTemplateModule:WaitForChild("MapTemplate"))
 
 
 local MapController = {
