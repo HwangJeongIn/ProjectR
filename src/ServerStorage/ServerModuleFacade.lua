@@ -28,6 +28,17 @@ local WorldInteractorModule = ObjectModule:WaitForChild("WorldInteractorModule")
 local SkillModule = ServerModule:WaitForChild("SkillModule")
 local ResourceTemplateModule = ServerModule:WaitForChild("ResourceTemplateModule")
 
+-- 리소스
+local Maps = ServerStorage:WaitForChild("Maps")
+local Animations = ServerStorage:WaitForChild("Animations")
+local Effects = ServerStorage:WaitForChild("Effects")
+local Sounds = ServerStorage:WaitForChild("Sounds")
+
+-- 프리팹
+local Tools = ServerStorage:WaitForChild("Tools")
+local WorldInteractors = ServerStorage:WaitForChild("WorldInteractors")
+local Npcs = ServerStorage:WaitForChild("Npcs")
+
 
 local ServerModuleFacade = {
 	ServerModule = ServerModule,
@@ -44,7 +55,18 @@ local ServerModuleFacade = {
 	VehicleModule = VehicleModule,
 	WorldInteractorModule = WorldInteractorModule,
 	SkillModule = SkillModule,
-	ResourceTemplateModule = ResourceTemplateModule
+	ResourceTemplateModule = ResourceTemplateModule,
+
+	-- 리소스
+	Maps = Maps,
+	Animations = Animations,
+	Effects = Effects,
+	Sounds = Sounds,
+	
+	-- 프리팹
+	Tools = Tools,
+	WorldInteractors = WorldInteractors,
+	Npcs = Npcs,
 }
 
 setmetatable(ServerModuleFacade, CommonModuleFacade)
