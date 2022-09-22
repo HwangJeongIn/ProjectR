@@ -97,11 +97,8 @@ function GuiController:TestCode()
 end
 
 function GuiController:Initialize()
-	self.GuiInventoryController = require(script:WaitForChild("GuiInventoryController"))
-	self.GuiEquipSlotsController = require(script:WaitForChild("GuiEquipSlotsController"))
-	local GuiHUDController = require(script:WaitForChild("GuiHUDController"))
-	self.GuiQuickSlotsController = GuiHUDController.GuiQuickSlotsController
-	self.GuiSkillSlotsController = GuiHUDController.GuiSkillSlotsController
+	self.GuiPlayerStatusController = require(script:WaitForChild("GuiPlayerStatusController"))
+	self.GuiHUDController = require(script:WaitForChild("GuiHUDController"))
 
 	self.GuiMainMessageText = PlayerGui:WaitForChild("GuiMainMessage").GuiMainMessageText
 	self.GuiEventMessageText = PlayerGui:WaitForChild("GuiEventMessage").GuiEventMessageText
@@ -260,7 +257,7 @@ function GuiController:SetInventoryToolSlot(slotIndex, tool)
 		return false
 	end
 
-	if not self.GuiInventoryController:SetToolSlot(slotIndex, tool) then
+	if not self.GuiPlayerStatusController:SetInventoryToolSlot(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -274,16 +271,14 @@ function GuiController:SetEquipToolSlot(equipType, tool)
 		return false
 	end
 
-	if not self.GuiEquipSlotsController:SetToolSlot(equipType, tool) then
+	if not self.GuiPlayerStatusController:SetEquipToolSlot(equipType, tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
 
-	if EquipType.Weapon == equipType then
-		if not self.GuiSkillSlotsController:SetSkillOwnerToolSlot(tool) then
-			Debug.Assert(false, "비정상입니다.")
-			return false
-		end
+	if not self.GuiHUDController:SetSkillOwnerToolSlot(equipType, tool) then
+		Debug.Assert(false, "비정상입니다.")
+		return false
 	end
 
 	return true
@@ -295,7 +290,7 @@ function GuiController:SetQuickToolSlot(slotIndex, tool)
 		return false
 	end
 
-	if not self.GuiQuickSlotsController:SetToolSlot(slotIndex, tool) then
+	if not self.GuiHUDController:SetQuickToolSlot(slotIndex, tool) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
@@ -309,7 +304,7 @@ function GuiController:RefreshSkillByLastActivationTime(skillGameDataKey, lastAc
 		return false
 	end
 
-	if not self.GuiSkillSlotsController:RefreshSkillByLastActivationTime(skillGameDataKey, lastActivationTime) then
+	if not self.GuiHUDController:RefreshSkillByLastActivationTime(skillGameDataKey, lastActivationTime) then
 		Debug.Assert(false, "비정상입니다.")
 		return false
 	end
